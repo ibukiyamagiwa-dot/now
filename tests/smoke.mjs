@@ -7,7 +7,7 @@ import { execSync } from 'node:child_process';
 const require = createRequire(import.meta.url);
 let pw; try { pw = require('playwright'); } catch { pw = require(path.join(execSync('npm root -g').toString().trim(), 'playwright')); }
 const dir = path.resolve(process.argv[2] || '.'), shot = process.argv[3];
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.woff2': 'font/woff2', '.png': 'image/png' };
 const srv = http.createServer((q, r) => { const f = path.join(dir, decodeURIComponent(q.url.split('?')[0]).replace(/\/$/, '/index.html'));
   if (!f.startsWith(dir) || !fs.existsSync(f)) { r.writeHead(404); return r.end(); }
   r.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r); });
@@ -25,6 +25,8 @@ await page.goto(`http://127.0.0.1:${srv.address().port}/`); await page.waitForTi
 const src = fs.readFileSync(path.join(dir, 'index.html'), 'utf8') + (fs.existsSync(path.join(dir, 'js')) ? fs.readdirSync(path.join(dir, 'js')).map(f => fs.readFileSync(path.join(dir, 'js', f), 'utf8')).join('\n') : '');
 const names = [...new Set([...src.matchAll(/^(?:const|let|var|function)\s+([A-Za-z_$][\w$]*)/gm)].map(m => m[1]))].sort();
 const globals = await page.evaluate(ns => Object.fromEntries(ns.map(n => { try { return [n, eval('typeof ' + n)]; } catch (e) { return [n, 'ERR:' + e.name]; } })), names);
+const fontOk = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('16px PxFont'); });
+if (!fontOk) errors.push('フォント PxFont（css/px.woff2）が読めていない');
 const trail = [];
 for (let i = 0; i < 40; i++) { await page.keyboard.press('Space'); await page.waitForTimeout(250);
   trail.push(await page.evaluate(() => typeof G === 'object' && G ? `${G.mode}/${G.state}` : 'noG')); }

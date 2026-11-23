@@ -1,18 +1,5 @@
-# モーション・演出ビューア（本編のコピー。敵と技を選んで繰り返し見る）
-import os,sys
-ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-s=open(os.path.join(ROOT,'index.html'),encoding='utf-8').read()
-def rep(a,b):
-    global s
-    assert s.count(a)==1,(s.count(a),a[:80]);s=s.replace(a,b)
-
-rep("<title>パリィRPG 試作</title>","<title>いまだ！ モーション・演出ビューア</title>")
-# 再生速度（一時停止・スロー）
-rep("if(dbg.slow)dt/=4;","if(dbg.slow)dt/=4;dt*=VSPD;")
-rep("let UKV='B';","let UKV='B';let VSPD=1;")
-
-rep("layout();buildPanel();applyDev();toTitle();",
-r"""layout();buildPanel();applyDev();toTitle();
+// モーション・演出ビューア：本編と同じ js/ を読んだあとに動く。敵と技を選んで繰り返し見る。
+var VSPD=1; // 再生速度（0で一時停止）。本編のループが window.VSPD を見る
 (function(){REC.seen=REC.seen||{};Object.keys(EN).forEach(k=>REC.seen[k]=1);try{localStorage.setItem('parryRPG.tutDone','1')}catch(_){}
  const V={key:'red',pv:0,cat:'enemy',item:'turn',resp:'parry',loop:true,wait:20,ww:0,chase:null,done:false};
  const isLordish=k=>EN[k].kind==='lord'||k==='gateK';
@@ -95,5 +82,4 @@ body.mob:not(.port) canvas{width:calc(100vw - 244px);height:auto}`;
  ['pointerdown','touchstart'].forEach(ev=>bar.addEventListener(ev,e=>e.stopPropagation()));
  (function live(){try{const s=G.strikes&&G.strikes.find(x=>!x.done&&!x.fake);const r=s&&G.state==='enemy'?s.impact-G.et:null;const last=G.strikes&&[...G.strikes].reverse().find(x=>x.done&&x.res);
   q('vLive').textContent=`状態 ${G.state}${r!=null&&isFinite(r)?`　着弾まで ${r}F`:''}${last?`　直前：${({parry:'パリィ',just:'ジャスト',guard:'ガード'})[last.res]||last.res}`:''}${G.stop>0?`　止め ${G.stop}F`:''}`}catch(_){}requestAnimationFrame(live)})();
- window.V_=V;window.G_=()=>G;CFG.guide=false;vStart();paint()})();""")
-open(os.path.join(ROOT,'viewer.html'),'w',encoding='utf-8').write(s);print('built viewer.html')
+ window.V_=V;window.G_=()=>G;CFG.guide=false;vStart();paint()})();

@@ -32,6 +32,14 @@ const FORMS=[
  lore:'赤い鎧は殻になり、中身はくらやみになった。背中の触手は門のアーチをつくり、彼自身が新しい門になった。足元の水面には、のまれる前の赤い騎士が映っている。でも、それも救いではない。',
  parts:[['中身のない鎧と胸の核','胸＝いちばん重い、はぬしと同じ'],['門のアーチになった触手','輪の内側は門の向こう側。三つ首が出てくる裂け目と同じ形'],['アーチの赤い目','目が光った順に来る。「目の順」の総まとめ'],['両方の角','世界線は一つになった'],['銀の剣','それでも剣は銀のまま'],['水面の映り姿','のまれる前の赤い騎士。とどめの一瞬に本体と入れかわり、そのまま塵になる。白い羽根だけが残る']],
  pal:[['#5a1424','殻になった赤','中身はもういない'],['#120a1c','門の向こう','アーチの内側'],['#d8dce8','銀の刃','最後まで変わらない']]},
+{key:'dragon',ttl:'くらやみの竜',en:'THE FIRST SHAPE OF DARKNESS',old:'dragon',stage:[],
+ lore:'門のすき間から最初に漏れ出たもの。くらやみが、初めて「形」を持った姿。ゲームを始めて最初に出会う、くらやみそのもののような竜。昔、門のぬしが鎖でつないでいた。',
+ parts:[['首のちぎれた金のかせと鎖','門のぬしの縁どりと同じ金。昔ぬしがつないでいた証。今は鞭のように振るう'],['三つの目','「3」は門の数字。目は上位の存在の視線'],['背の石の棘','門の石のかけら。門から漏れたものだから、体に門が混ざっている'],['アーチの曲がり方の角','門のぬしの角と同じ曲がり方'],['ぼろぼろの翼と、裏の目','ぬしのマントと同じく、閉じこめられていたものがのぞく'],['紫黒の体と赤いひび','怒るとひびが赤く光り、のどに火がともる。光の赤（重い）が混ざる合図'],['影もぐり','くらやみそのものだから、影の中を通れる']],
+ pal:[['#2a1a34','紫黒の体','くらやみの最初の形'],['#b8902a','金のかせ','門のぬしの鎖'],['#ff3050','三つの目','見られている'],['#ff6030','のどの火','怒り（重い）']]},
+{key:'hydra',ttl:'三つ首の竜',en:'THE FINGERS',old:'hydra',stage:[],
+ lore:'竜ではない。人知の理解を超えた、別の何か。倒れたくらやみの竜の亡骸の胸が内側から裂け、その裂け目から、門の向こうの上位の存在が「指先」を三本差しこんでいる。見た目は三つ首の竜。気づいた人だけが、ぞっとする。',
+ parts:[['動かない竜の亡骸','竜が生き返ったのではない。体が、門の代わりの「通り道」にされた'],['胸の裂け目と、ふちの触手','赤い門のぬし第二形態の「触手の門」と同じ形'],['首の節が三つ','指の関節と同じ数。「3」は門の数字'],['首の横じわ','鱗ではなく、関節のしわ'],['角に見える白い爪','平たく、白っぽい。角ではない'],['真ん中の首がいちばん長い','指の長さの差'],['三本とも同じ向きにしか曲がらない','反対には決して曲がらない'],['付け根が一列に並ぶ','裂け目のふちに、手の甲のように並ぶ'],['倒すと、握って引っこむ','ここで初めて「手だった」と気づける']],
+ pal:[['#5e5272','灰紫の首','どの生き物の色でもない'],['#e8e0d0','白い爪','角に見える'],['#120a1c','裂け目の奥','門の向こう']]},
 ];
 const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_chain','dg_beat','dg_down2'],
  lord:['l_enter','l_idle','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_unlock','l_rally','l_pull','l_kneel'],
@@ -39,7 +47,9 @@ const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg
  red:['r_idle','r_seal','r_kamae','r_stance','r_two','r_swap','r_three','r_delay','r_thrust','r_feint','r_combo4','r_parry','r_counter','r_seefeint','r_push','r_rallyx','r_zanshin','r_zanpunish','r_rage'],
  red2:['r2_idle','r2_iai','r2_iai2','r2_three','r2_hold','r2_holdfeint','r2_thrust','r2_silent','r2_moon','r2_tsubame','r2_juji','r2_double','r2_seefeint','r2_kamae','r2_counter','r2_zanpunish','r2_rally','r2_rallyx','r2_last'],
  fallen:['f_rise','f_idle','f_kneel','f_cutten','f_back','f_arm','f_sa','f_reach','f_maw','f_dark','f_double','f_seefeint','f_counter','f_zanpunish','f_shift','f_twin','f_iai','f_silent','f_cage','f_rally','f_swallow'],
- fallen2:['f2_idle','f2_look','f2_ring','f2_four','f2_core','f2_reflect','f2_mirror','f2_dfeint','f2_seefeint','f2_counter','f2_zanpunish','f2_silentiai','f2_fingers','f2_tsubame','f2_close','f2_pulse','f2_silent','f2_juji','f2_rally','f2_rallyx','f2_end']};
-const EXMV={g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い',r_two:'二連撃',r_swap:'逆の二連撃',r_three:'三段突き',r_delay:'遅らせ突き',r_thrust:'突き',r_feint:'フェイント',r_combo4:'四連撃',r_push:'打ち合い',r2_double:'二重のフェイント',r2_rally:'打ち合い',f_cutten:'剣と触手',f_back:'背中の触手',f_arm:'腕の触手',f_sa:'剣と触手の三連',f_reach:'伸びる刃',f_maw:'胸の口',f_dark:'ささやき',f_double:'二重のフェイント',f_rally:'打ち合い',f2_ring:'背中の触手',f2_four:'四連撃',f2_core:'胸の口',f2_rally:'打ち合い',f2_rallyx:'打ち合い',r2_rallyx:'打ち合い',r_rallyx:'打ち合い'};
-const KSTAND=['r2_kamae','r_kamae','l_plant','l_seal','l2_threat','dg_state','r_seal','f_kneel','f2_look'],KSHOW=['g_enter','g_kneel','dg_turn','dg_down2','l_enter','l_kneel','l2_open','l2_down','r_rage','r2_last','f_rise','f_swallow','f2_end'];
+ fallen2:['f2_idle','f2_look','f2_ring','f2_four','f2_core','f2_reflect','f2_mirror','f2_dfeint','f2_seefeint','f2_counter','f2_zanpunish','f2_silentiai','f2_fingers','f2_tsubame','f2_close','f2_pulse','f2_silent','f2_juji','f2_rally','f2_rallyx','f2_end'],
+ dragon:['d_enter','d_idle','d_slam','d_stab','d_tail','d_chainwhip','d_dive','d_rage','d_breath','d_down'],
+ hydra:['h_enter','h_idle','h_order','h_fake','h_one','h_grab','h_rift','h_spit','h_pool','h_down']};
+const EXMV={g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い',r_two:'二連撃',r_swap:'逆の二連撃',r_three:'三段突き',r_delay:'遅らせ突き',r_thrust:'突き',r_feint:'フェイント',r_combo4:'四連撃',r_push:'打ち合い',r2_double:'二重のフェイント',r2_rally:'打ち合い',f_cutten:'剣と触手',f_back:'背中の触手',f_arm:'腕の触手',f_sa:'剣と触手の三連',f_reach:'伸びる刃',f_maw:'胸の口',f_dark:'ささやき',f_double:'二重のフェイント',f_rally:'打ち合い',f2_ring:'背中の触手',f2_four:'四連撃',f2_core:'胸の口',f2_rally:'打ち合い',d_slam:'のしかかり',d_stab:'噛みつき',d_tail:'尾',d_breath:'赤い炎',h_order:'光った首の順',h_one:'三本同時',h_spit:'吐き出し',h_pool:'くらやみの溜まり',f2_rallyx:'打ち合い',r2_rallyx:'打ち合い',r_rallyx:'打ち合い'};
+const KSTAND=['r2_kamae','r_kamae','l_plant','l_seal','l2_threat','dg_state','r_seal','f_kneel','f2_look'],KSHOW=['d_enter','d_rage','d_down','h_enter','h_down','g_enter','g_kneel','dg_turn','dg_down2','l_enter','l_kneel','l2_open','l2_down','r_rage','r2_last','f_rise','f_swallow','f2_end'];
 const KINDOF=id=>/_idle$/.test(id)?'main':KSTAND.includes(id)?'stand':KSHOW.includes(id)?'show':'atk';

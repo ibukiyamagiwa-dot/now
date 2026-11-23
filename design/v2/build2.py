@@ -1,8 +1,8 @@
 import base64,json,os
 HERE=os.path.dirname(os.path.abspath(__file__));os.chdir(HERE)
-js=''.join(open(f).read()+'\n' for f in ['engine.js','rig.js','motion.js','specs.js','hero.js','cards.js','moves.js','stages.js','content2.js'])
+js=''.join(open(f).read()+'\n' for f in ['engine.js','rig.js','motion.js','specs.js','hero.js','cards.js','dragon.js','moves.js','stages.js','content2.js'])
 old={}
-for k in ['samuraiB','gateK','lord','red','fallen']:
+for k in ['samuraiB','gateK','lord','red','fallen','dragon','hydra']:
     p=os.path.join(HERE,'..','old',k+'.png')
     if not os.path.exists(p):p=f'/tmp/oldc_{k}.png'
     old[k]='data:image/png;base64,'+base64.b64encode(open(p,'rb').read()).decode()

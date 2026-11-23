@@ -485,3 +485,77 @@ CL('fallen2','f2_tsubame','r2_tsubame',{n:'つばめ返し（タン・タン）'
 /* 連撃の合図：ゲームと同じく、一撃ごとに28F前の合図を置く（足りないものを補う） */
 (()=>{const fix={g_two:'w',dg_two:'w',l_two:'w',l_rev:'w',l2_tri:'w',r_two:'w',r_swap:'w',r_combo4:'w',f_cutten:'w',f_sa:'w',f2_four:'w'};
  for(const id in fix){const m=MV.find(x=>x.id===id);if(!m)continue;m.cues=(m.cues||[]).slice();for(const h of m.hits||[])if(!m.cues.some(c=>c.col!=='p'&&c.t===h-28))m.cues.push({t:h-28,col:fix[id]});m.cues.sort((a,b)=>a.t-b.t)}})();
+/* ---------- くらやみの竜 ---------- */
+const DI={cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0};
+const lamps=(B,J,t,beats)=>{/* 拍を数える灯り：竜の上に三つ。ゴン・ゴン・ゴンで一つずつ灯る */for(let i=0;i<3;i++){const x=J.sc[0]-8+i*8,y=J.sc[1]-40,on=t>=beats[i];B.disc(x,y,2,on?'#ffd080':'#3a2a40',on?'#fff0c0':'#4a3a50','#140a10',4)}};
+const thud=(B,t,beats)=>{for(const b of beats)if(t>=b&&t<b+5)for(let x=EXX-30;x<EXX+30;x+=3)B.set(x,FL-((x+t)%2),'#8a8090',4)};
+mv({f:'dragon',id:'d_enter',n:'登場：くらやみから形になる',bg:'lord',len:160,noHero:true,cap:'床のくらやみが盛り上がり、竜の形になる。最後に三つの目が開き、首のちぎれた金のかせが鳴る。',why:'くらやみが、初めて形を持った姿。だから最初は形がない。首のかせは、昔これを門のぬしがつないでいた証。',
+ keys:[K(0,Object.assign({},DI,{lift:-20,cr:6,eyes:0})),K(90,Object.assign({},DI,{lift:0,cr:2,eyes:0}),'out'),K(110,Object.assign({},DI,{eyes:1,hy:-2})),K(160,DI)],pp:(P,t)=>{P.eyes=t>=110?1:0},
+ post:(B,J,t)=>{const u=Math.min(1,t/90);for(let i=0;i<B.c.length;i++){const x=i%CW,y=i/CW|0;if(B.t[i]===1&&((x*7+y*13)%11)/11>u){B.c[i]=(x+y)%2?INK.col:INK.hi}}}});
+mv({f:'dragon',id:'d_idle',n:'立ち絵',bg:'lord',len:120,keys:sway({cr:0,wing:0,hy:0},{cr:1,wing:.15,hy:1},120,2),
+ cap:'三つの目、ぼろぼろの翼の裏の目、背の石の棘、首にちぎれた金のかせ。',why:'くらやみの体に、門の部品（石の棘、アーチの角）が混ざっている。門から漏れたものだから。'});
+mv({f:'dragon',id:'d_slam',n:'のしかかり（拍）',bg:'lord',len:150,cap:'前足を上げて白く光る。ゴン・ゴン・ゴンと地面が三回鳴り、上の灯りが一つずつ灯る。三つ灯った次の拍で、のしかかる。',why:'拍で読む攻撃を、最初に教えるボス。灯りを見ても、音を数えても読める。',
+ keys:[K(0,DI),K(14,{lift:10,cr:-2,ny:6,hy:-4,wing:.6}),K(50,{lift:12,cr:-2,ny:8,hy:-6,wing:.7}),K(52,{lift:0,cr:4,x:-26,ny:-4,hy:6,wing:.2},'in'),K(90,{lift:0,cr:4,x:-26,ny:-4,hy:6}),K(140,DI)],
+ cues:[{t:14,col:'w',at:J=>J.head}],hits:[52],fx:(B,J,t)=>{if(t>=14&&t<60)lamps(B,J,t,[22,32,42]);thud(B,t,[22,32,42])}});
+mv({f:'dragon',id:'d_stab',n:'三度の噛みつき',bg:'lord',len:150,cap:'首を引いて白く光り、噛みつく。続けて二度。口元の光が、一回ごとに出る。',why:'光ってから当たるまでは、いつも同じ。数ではなく、一回ずつの光を見る。',
+ keys:[K(0,DI),K(14,{nx:-8,ny:2,jaw:.3}),K(40,{nx:-8,ny:2,jaw:.6}),K(42,{nx:14,ny:-4,hy:6,jaw:0,x:-10},'in'),K(50,{nx:-6,ny:2,jaw:.6,x:-6}),K(72,{nx:14,ny:-6,hy:8,jaw:0,x:-10},'in'),K(86,{nx:-6,ny:2,jaw:.6,x:-6}),K(108,{nx:14,ny:-2,hy:4,jaw:0,x:-10},'in'),K(120,DI)],
+ cues:[{t:14,col:'w',at:J=>J.mouth},{t:44,col:'w',at:J=>J.mouth},{t:80,col:'w',at:J=>J.mouth}],hits:[42,72,108]});
+mv({f:'dragon',id:'d_tail',n:'尾の薙ぎ払い（拍）',bg:'lord',len:150,cap:'尾を高く巻き上げて白く光る。尾で地面を三回叩く。三つ灯った次の拍で、低く薙ぎ払う。',why:'のしかかりと同じ拍のルールを、別の体の部分で見せる。',
+ keys:[K(0,DI),K(14,{tail:-1.2,cr:1}),K(46,{tail:-1.2,cr:1}),K(50,{tail:1.5,cr:3,x:-14},'in'),K(80,{tail:1.5,cr:3,x:-14}),K(140,DI)],
+ cues:[{t:14,col:'w',at:J=>J.tail}],hits:[50],fx:(B,J,t)=>{if(t>=14&&t<58)lamps(B,J,t,[23,32,41]);thud(B,t,[23,32,41]);if(t>=48&&t<56)for(let x=HXX-4;x<EXX;x+=2)B.set(x,FL-3,'#bfe8ff',4)}});
+mv({f:'dragon',id:'d_rage',n:'怒り：赤い炎',bg:'lord',len:150,noHero:true,cap:'体のひびが赤く光り、のどの奥に火がともる。三つの目が金色に変わる。',why:'怒ると、攻撃の光にも赤（重い）が混ざりはじめる合図。',
+ keys:[K(0,DI),K(30,Object.assign({},DI,{hy:-8,ny:6,jaw:.8,wing:.8})),K(70,Object.assign({},DI,{hy:-8,ny:6,jaw:.8,wing:.8,rage:1})),K(150,Object.assign({},DI,{rage:1}))],pp:(P,t)=>{P.rage=t>=50?1:0}});
+mv({f:'dragon',id:'d_breath',n:'赤い炎（拍・重い）',bg:'lord',len:160,cap:'怒ったあと。首を高く上げ、赤く光る。のどの火が三回ふくらむ（拍）。次の拍で炎を吐く。重い。',why:'怒りの赤い炎は重いが、弾けば大きく反撃できる。拍のルールのまま、色だけが赤になる。',
+ keys:[K(0,Object.assign({},DI,{rage:1})),K(14,{rage:1,ny:10,hy:-10,jaw:.4}),K(46,{rage:1,ny:10,hy:-10,jaw:.6}),K(50,{rage:1,ny:-2,hy:6,jaw:1,x:-8},'in'),K(90,{rage:1,ny:-2,hy:6,jaw:1,x:-8}),K(150,Object.assign({},DI,{rage:1}))],
+ cues:[{t:14,col:'r',at:J=>J.mouth}],hits:[50],hitCol:'r',fx:(B,J,t)=>{if(t>=14&&t<58)lamps(B,J,t,[23,32,41]);for(const b of[23,32,41])if(t>=b&&t<b+6)glow(B,Math.round(J.mouth[0]+6),Math.round(J.mouth[1]),3,'#ff6030');
+  if(t>=48&&t<70){const u=Math.min(1,(t-48)/4);for(let i=0;i<40*u;i++){const x=J.mouth[0]-i*1.6,y=J.mouth[1]+i*.6+Math.sin(i+t)*2;B.disc(x,y,1.5+i*.06,i%3?'#ff6030':'#ffd040','#fff0a0','#a02010',4)}}}});
+mv({f:'dragon',id:'d_chainwhip',n:'かせの鎖',bg:'lord',len:130,cap:'首をひねって白く光る。首に残ったちぎれた金の鎖が、鞭のように飛んでくる。',why:'昔つながれていた鎖が、今は武器。門のぬしの鎖と同じ金が、竜の正体の手がかり。',
+ keys:[K(0,DI),K(14,{nx:8,ny:4,hy:-4}),K(40,{nx:8,ny:4,hy:-4}),K(42,{nx:-10,ny:-2,hy:4,x:-6},'in'),K(70,{nx:-10,ny:-2,hy:4,x:-6}),K(120,DI)],cues:[{t:14,col:'w',at:J=>J.head}],hits:[42],
+ fx:(B,J,t)=>{if(t>=38&&t<60){const u=Math.min(1,(t-38)/4)*(t<46?1:1-(t-46)/14),a=add(J.head,[6,10]);for(let i=0;i<18;i++){const s=i/18;B.set(lerp(a[0],HXX+8,s*u),lerp(a[1],FL-12,s*u)-Math.sin(s*3.14)*6,i%2?'#b8902a':'#f0c850',4)}}}});
+mv({f:'dragon',id:'d_dive',n:'影もぐり',bg:'lord',len:150,cap:'竜が自分の影に沈む。こちらの足元の床に、白い光がにじむ。そこから首が突き上がる。見る場所は、自分の足元。',why:'くらやみそのものだから、影の中を通れる。見る場所が竜から足元へ変わる。',
+ keys:[K(0,DI),K(10,Object.assign({},DI,{lift:-6,cr:4})),K(30,Object.assign({},DI,{lift:-40,cr:8})),K(100,Object.assign({},DI,{lift:-40,cr:8})),K(130,DI)],cues:[{t:20,col:'w',at:J=>[HXX+4,FL-2]}],hits:[48],
+ pre:(B,t)=>{if(t>=10&&t<120){for(let x=HXX-14;x<HXX+20;x++)B.set(x,FL,INK.hi,6);for(let x=EXX-26;x<EXX+26;x++)B.set(x,FL,INK.hi,6)}},
+ fx:(B,J,t)=>{if(t>=44&&t<70){const u=t<48?(t-44)/4:1-(t-48)/22,b=[HXX+4,FL];B.tube(b,[b[0]+4,b[1]-14*u],[b[0]-2,b[1]-28*u],4,2.5,DPAL.body,DPAL.hi,DPAL.lo,1);const h=[b[0]-2,b[1]-28*u];for(let i=0;i<3;i++)B.set(h[0]-2+i*2,h[1]-1,DPAL.eye,2)}},
+ post:(B,J,t)=>{for(let y=FL+1;y<CH;y++)for(let x=0;x<CW;x++){const i=y*CW+x;if(B.t[i]===1||B.t[i]===3){B.c[i]=((x+y)%5?'#1a1220':'#2a1e30');B.t[i]=6}}}});
+mv({f:'dragon',id:'d_down',n:'たおれる：亡骸が残る',bg:'lord',len:150,noHero:true,cap:'竜は崩れ落ち、首を床に垂れて動かなくなる。三つの目が消える。亡骸は消えずに残る。',why:'倒れたものは、くらやみに拾われる。この亡骸が、次に「通り道」にされる。',
+ keys:[K(0,DI),K(30,Object.assign({},DI,{cr:6,hy:8,ny:-6})),K(60,{dead:1}),K(150,{dead:1})],pp:(P,t)=>{P.dead=t>=60?1:0;P.eyes=t<50?1:0}});
+
+/* ---------- 三つ首の竜 ---------- */
+const HI={rift:1,f0:0,f1:0,f2:0};
+mv({f:'hydra',id:'h_enter',n:'登場：亡骸の胸が裂ける',bg:'hole',len:180,noHero:true,cap:'倒れた竜の亡骸の胸が、内側から裂ける。触手に縁どられた裂け目から、三本の首がゆっくり伸びてくる。亡骸は動かない。',why:'竜が生き返ったのではない。竜の体が、門の代わりの「通り道」にされた。',
+ keys:[K(0,{rift:0,curl:1}),K(50,{rift:1,curl:1},'out'),K(140,{rift:1,curl:0},'out'),K(180,{rift:1,curl:0})]});
+mv({f:'hydra',id:'h_idle',n:'立ち絵',bg:'hole',len:120,keys:sway({rift:1},{rift:1.05},120,2),
+ cap:'動かない竜の亡骸、胸の裂け目、そこから伸びる三本の首。首の節は三つ、角に見えるのは白い爪、真ん中の首がいちばん長い。',why:'見た目は三つ首の竜。でも、よく見ると指の手がかりが並んでいる。気づいた人だけがぞっとする。'});
+mv({f:'hydra',id:'h_order',n:'鳴いた数＝攻撃の数（光った首の順）',bg:'hole',len:170,cap:'首が鳴くたびに、その首が白く光る。鳴いた数が、この番の攻撃の数。光った順に噛みつく。',why:'数えて、順番を覚える。最初の首が当たる前に、全部の順番が決まっている。',
+ keys:[K(0,HI),K(80,HI),K(84,Object.assign({},HI,{f2:1,j2:.8}),'in'),K(96,HI),K(104,Object.assign({},HI,{f0:1,j0:.8}),'in'),K(116,HI),K(124,Object.assign({},HI,{f1:1,j1:.8}),'in'),K(140,HI),K(170,HI)],
+ pp:(P,t)=>{P.lit=[t>=40&&t<108?1:0,t>=56&&t<128?1:0,t>=24&&t<88?1:0]},
+ cues:[{t:56,col:'w',at:J=>J.fingers[2]},{t:76,col:'w',at:J=>J.fingers[0]},{t:96,col:'w',at:J=>J.fingers[1]}],hits:[84,104,124],
+ fx:(B,J,t)=>{for(const[b,i]of[[24,2],[40,0],[56,1]])if(t>=b&&t<b+10&&J.fingers[i]){const p=J.fingers[i];for(let q=0;q<2;q++){const r=3+(t-b)*1.2+q*3;for(let a=-1;a<=1;a+=.2)B.set(p[0]+Math.cos(a+3.14)*r,p[1]+Math.sin(a+3.14)*r,'#a8a0b0',4)}}}});
+mv({f:'hydra',id:'h_one',n:'三本同時',bg:'hole',len:130,cap:'三本の首が一度だけ同時に鳴き、三本とも白く光る。三本そろって、一度に噛みつく。重い一撃が一回。',why:'鳴いた数は一回＝攻撃は一回。三本そろっていても、数えるのは鳴き声。',
+ keys:[K(0,HI),K(14,Object.assign({},HI,{j0:.5,j1:.5,j2:.5})),K(42,{rift:1,f0:1,f1:1,f2:1,j0:.9,j1:.9,j2:.9},'in'),K(70,{rift:1,f0:1,f1:1,f2:1}),K(110,HI)],pp:(P,t)=>{P.lit=t>=14&&t<50?[1,1,1]:[0,0,0]},
+ cues:[{t:14,col:'w',at:J=>J.fingers[1]}],hits:[42]});
+mv({f:'hydra',id:'h_grab',n:'握りしめ（重い）',bg:'hole',len:140,cap:'三本の首が大きく広がり、赤く光る。三方向から、こちらを包むように閉じてくる。重い一撃が一回。',why:'三本が一点に閉じる動きは、手が握る動きそのもの。戦いの最中に一度だけ見せる、いちばん大きな手がかり。',
+ keys:[K(0,HI),K(14,Object.assign({},HI,{rift:1.3})),K(38,Object.assign({},HI,{rift:1.3})),K(42,{rift:1.2,f0:1,f1:1,f2:1,j0:.2,j1:.2,j2:.2},'in'),K(72,{rift:1.2,f0:1,f1:1,f2:1}),K(120,HI)],
+ cues:[{t:14,col:'r',at:J=>J.rift}],hits:[42],hitCol:'r'});
+mv({f:'hydra',id:'h_spit',n:'切り口の吐き出し（拍）',bg:'hole',len:150,cap:'首を一本落とすと、残った切り口から、くらやみのかたまりを放り上げる。ヒュ・ヒュ・ヒュの次の拍で落ちてくる。',why:'切っても、そこが新しい口になる。投げ物と拍は、小鬼のおかしらで先に教わっている。',
+ keys:[K(0,Object.assign({},HI,{f0:-1})),K(150,Object.assign({},HI,{f0:-1}))],pp:(P,t)=>{P.f0=0},
+ cues:[{t:14,col:'w',at:J=>J.rift}],hits:[66],
+ fx:(B,J,t)=>{const s=J.rift;for(const b of[24,37,50])if(t>=b&&t<b+6)for(let q=0;q<2;q++){const r=2+(t-b)+q*3;for(let a=-.8;a<=.8;a+=.2)B.set(s[0]-10+Math.cos(a+3.6)*r,s[1]-8+Math.sin(a+3.6)*r,'#a8a0b0',4)}
+  if(t>=20&&t<70){const u=(t-20)/46,x=lerp(s[0],HXX+6,u),y=lerp(s[1],FL-10,u)-Math.sin(u*3.14)*40;B.disc(x,y,2.4,INK.col,INK.hi,INK.lo,4)}}});
+mv({f:'hydra',id:'h_down',n:'たおす：握って、引っこむ',bg:'hole',len:200,noHero:true,cap:'最後の首を落とすと、三本が握りこぶしのように丸まり、裂け目の奥へ引っこむ。裂け目が閉じ、竜の亡骸は塵になって消える。',why:'倒したのではない。引っこめさせただけ。ここで初めて「手だった」と気づける。',
+ keys:[K(0,HI),K(40,Object.assign({},HI,{curl:.4})),K(90,Object.assign({},HI,{curl:.95,rift:.8}),'in'),K(130,{curl:1,rift:0},'in'),K(200,{curl:1,rift:0})],
+ post:(B,J,t)=>{if(t>=130){const u=Math.min(1,(t-130)/60);for(let i=0;i<B.c.length;i++){const x=i%CW,y=i/CW|0;if(B.t[i]!==1&&B.t[i]!==3&&B.t[i]!==2)continue;if(((x*7+y*13)%11)/11<u){B.c[i]=((x+y)%6===0&&u<.9)?'#6a6070':0;B.t[i]=B.c[i]?4:0}}}}});
+mv({f:'hydra',id:'h_pool',n:'足元の溜まり（光らない・拍）',bg:'hole',len:160,cap:'裂け目からくらやみが床を這い、こちらの足元に溜まる。光らない。ボコ・ボコと泡が二回はじけた次の拍で、真下から突き上げる。重い。',why:'光らない攻撃と拍は、どちらも先に教わっている（今のゲームの「くらやみの溜まり」）。',
+ keys:[K(0,HI),K(160,HI)],hits:[64],hitCol:'r',
+ pre:(B,t)=>{const u=Math.min(1,t/20);for(let x=Math.round(lerp(EXX-10,HXX-6,u));x<EXX;x++)B.set(x,FL,INK.hi,6)},
+ fx:(B,J,t)=>{for(const b of[28,46])if(t>=b&&t<b+8){for(let q=0;q<2;q++){const r=2+(t-b)*.8+q*2;for(let a=0;a<6.28;a+=.5)B.set(HXX+4+Math.cos(a)*r,FL-2+Math.sin(a)*r*.4,'#a8a0b0',4)}}
+  if(t>=60&&t<84){const u=t<64?(t-60)/4:1-(t-64)/20;for(let i=0;i<3;i++){const x=HXX+i*4;B.tube([x,FL],[x+(i-1)*2,FL-10*u],[x+(i-1)*3,FL-24*u],2,.5,INK.col,INK.hi,INK.lo,1)}}}});
+mv({f:'hydra',id:'h_fake',n:'鳴いたのに来ない首',bg:'hole',len:170,cap:'三本が順に鳴く。そのうち一本だけ、光が紫の輪になる。その首は噛みつかない（ふり）。来るのは白く光った首だけ。',why:'「鳴いた数＝攻撃の数」に、フェイントの色のルールを重ねた。数えるのは白い光だけ。フェイントは、うそつきの影で先に教わっている。',
+ keys:[K(0,HI),K(80,HI),K(84,Object.assign({},HI,{f2:1,j2:.8}),'in'),K(96,HI),K(110,Object.assign({},HI,{f0:.25})),K(116,HI),K(124,Object.assign({},HI,{f1:1,j1:.8}),'in'),K(140,HI),K(170,HI)],
+ pp:(P,t)=>{P.lit=[0,t>=56&&t<128?1:0,t>=24&&t<88?1:0]},
+ cues:[{t:56,col:'w',at:J=>J.fingers[2]},{t:76,col:'p',at:J=>J.fingers[0]},{t:96,col:'w',at:J=>J.fingers[1]}],hits:[84,124]});
+mv({f:'hydra',id:'h_rift',n:'裂け目のふちの触手',bg:'hole',len:130,cap:'裂け目が大きく開き、ふちの触手が一本、白く光ってのびてくる。',why:'首だけでなく、裂け目そのものも向こう側の一部。',
+ keys:[K(0,HI),K(14,Object.assign({},HI,{rift:1.4})),K(60,Object.assign({},HI,{rift:1.4})),K(90,HI)],cues:[{t:14,col:'w',at:J=>J.rift}],hits:[42],
+ fx:(B,J,t)=>{if(t>=38&&t<60){const u=t<42?(t-38)/4:1-(t-42)/18,c=J.rift;tentacle(B,c,[lerp(c[0],60,u),c[1]+6],[lerp(c[0],HXX+8,u),lerp(c[1],FL-10,u)],2.2,.6,true)}}});
+/* 拍の攻撃は、合図から当たりまでが拍のぶん長い（ゲームと同じ）。のしかかり38F、尾と炎36F */
+for(const id of ['d_slam','d_tail','d_breath','h_spit'])MV.find(m=>m.id===id).beat=true;

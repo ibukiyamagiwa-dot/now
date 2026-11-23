@@ -16,7 +16,7 @@ function stageCard(s){const c=el('figure','card stage');const cv=el('canvas');cv
 /* 立ち絵：大きく、地面だけ */
 function standCanvas(key,w,h,ox,sc){const cv=el('canvas','stand');cv.width=w;cv.height=h;const S=SPEC[key];const idle=MV.find(m=>m.f===key&&/idle/.test(m.id));
  const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);const P=idle?poseAt0(idle,tt%idle.len,Object.assign({},PDEF,S.pose)):{};if(idle&&idle.pp)idle.pp(P,tt%idle.len);P.chainL=P.chainL||22;
-   knight(B,ox,h-6,S,P,tt);if(key==='lord'||key==='lord2')pool(B,joints(ox,h-6,S,Object.assign({},PDEF,S.pose)),tt,key==='lord'?16:24);B.outline();if(S.aura)aura(B,S.aura,tt);const ctx=this.ctx;ctx.clearRect(0,0,w,h);B.toCanvas(ctx)}};ANIM.push(a);a.draw();return cv}
+   (S.draw||knight)(B,ox,h-6,S,P,tt);if(key==='lord'||key==='lord2')pool(B,joints(ox,h-6,S,Object.assign({},PDEF,S.pose)),tt,key==='lord'?16:24);B.outline();if(S.aura)aura(B,S.aura,tt);const ctx=this.ctx;ctx.clearRect(0,0,w,h);B.toCanvas(ctx)}};ANIM.push(a);a.draw();return cv}
 function ladder(keys,notes){const wrap=el('div','ladder');keys.forEach((k,i)=>{const col=el('div','step');const S=SPEC[k];col.appendChild(standCanvas(k,80,104,44));col.appendChild(el('div','lname',S.name));col.appendChild(el('div','ladd',notes[i]));wrap.appendChild(col);if(i<keys.length-1)wrap.appendChild(el('div','arrow','→'))});return wrap}
 function build(){const root=document.getElementById('book');
  root.appendChild(heroSec());root.appendChild(ladderSec());
@@ -27,7 +27,7 @@ function build(){const root=document.getElementById('book');
   const pl=el('div','pal');F.pal.forEach(p=>pl.appendChild(el('div','chip',`<i style="background:${p[0]}"></i><b>${p[1]}</b><span>${p[2]}</span>`)));txt.appendChild(pl);top.appendChild(txt);sec.appendChild(top);
   const tb=el('table','parts');tb.innerHTML='<tr><th>部品</th><th>意味</th></tr>'+F.parts.map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td></tr>`).join('');sec.appendChild(tb);
   sec.appendChild(el('h3','',`モーション <small>${MOVES_OF[F.key].length}</small>`));const g=el('div','grid');MOVES_OF[F.key].forEach(id=>g.appendChild(moveCard(MV.find(m=>m.id===id))));sec.appendChild(g);
-  sec.appendChild(el('h3','','専用ステージ'));const sg=el('div','sgrid');F.stage.forEach(id=>sg.appendChild(stageCard(STAGES.find(s=>s.id===id))));sec.appendChild(sg);
+  if(F.stage.length){sec.appendChild(el('h3','','専用ステージ'));const sg=el('div','sgrid');F.stage.forEach(id=>sg.appendChild(stageCard(STAGES.find(s=>s.id===id))));sec.appendChild(sg)}
   root.appendChild(sec)});
  root.appendChild(orderSec());
  const io=new IntersectionObserver(es=>es.forEach(e=>{const a=ANIM.find(a=>a.cv===e.target);if(a)a.vis=e.isIntersecting}),{rootMargin:'100px'});ANIM.forEach(a=>io.observe(a.cv));
@@ -48,7 +48,7 @@ function ladderSec(){const s=el('section','lad');s.id='ladder';
  return s}
 function orderSec(){const s=el('section','ord');s.id='order';s.appendChild(el('h2','','強さの順'));
  s.appendChild(el('p','lead','後に出る者ほど手ごわく。前の者を弱くするのではなく、後の者に技と読み方を足して並べた。数は攻撃の技だけ（立ち絵・演出は除く）。'));
- const rows=[['門番','gate','覚悟0のボス'],['黒い門番','dgate','中ボス'],['門のぬし','lord','覚悟4'],['暗い門のぬし','lord2','第二形態'],['赤い騎士','red','ぬしの次'],['本気の赤い騎士','red2','第二形態'],['赤い門のぬし','fallen','いちばん奥'],['第二形態','fallen2','最後']];
+ const rows=[['門番','gate','覚悟0のボス'],['くらやみの竜','dragon','覚悟1〜3'],['三つ首の竜','hydra','竜のあと'],['黒い門番','dgate','中ボス（覚悟3〜）'],['門のぬし','lord','覚悟4'],['暗い門のぬし','lord2','第二形態'],['赤い騎士','red','ぬしの次'],['本気の赤い騎士','red2','第二形態'],['赤い門のぬし','fallen','いちばん奥'],['第二形態','fallen2','最後']];
  let h='<tr><th>だれ</th><th>技</th><th>連撃</th><th>最大</th><th>赤</th><th>紫の輪</th><th>光らない</th><th>押せば罰</th><th>打ち合い</th></tr>';
  for(const[n,k,w]of rows){const ids=MOVES_OF[k].filter(id=>KINDOF(id)==='atk');let mh=0,mu=0,r=0,f=0,d=0,pu=0,ra=0;for(const id of ids){const m=MV.find(x=>x.id===id),hc=(m.hits||[]).length,cs=m.cues||[];mh=Math.max(mh,hc);if(hc>1)mu++;if(cs.some(c=>c.col==='r')||m.hitCol==='r')r++;if(cs.some(c=>c.col==='p'))f++;if(hc&&!cs.length)d++;if(m.heroP||/zanshin|zanpunish|seefeint|counter/.test(id))pu++;if(cs.some(c=>c.col==='g'))ra++}
   h+=`<tr><td><b>${n}</b><br><small>${w}</small></td><td>${ids.length}</td><td>${mu}</td><td>${mh}</td><td>${r}</td><td>${f}</td><td>${d}</td><td>${pu}</td><td>${ra}</td></tr>`}

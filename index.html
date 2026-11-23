@@ -444,7 +444,7 @@ for(const k of['cue','cueRed','cueFake','rallyCue','headCue']){const f=SFX[k];if
 /* ===== 敵データ（pre＝予兆までの溜め、m＝攻撃倍率） ===== */
 const pick=a=>dbg.fix?a[0]:a[Math.random()*a.length|0];
 const EN={
- golem:{name:'岩の巨人',hp:60,atk:16,kind:'golem',col:'#8f929e',hint:'ゴン・ゴン・ゴンの次の拍で拳を振り下ろす',hard:true,lungeF:5,lungeD:56,turn:()=>[{pre:32,m:1.4,cl:P.golemBeatF*3+P.golemLastF,beat:true,bn:3,mv:'smash',ft:36}]},
+ golem:{name:'岩の巨人',hp:60,atk:16,kind:'golem',col:'#8f929e',hint:'ゴンのたびに胸の印が灯る　3つ灯った次の拍で拳を振り下ろす',hard:true,lungeF:5,lungeD:56,turn:()=>[{pre:32,m:1.4,cl:48,beat:true,bf:12,bn:3,mv:'smash',ft:36}]},
  beast:{name:'牙の盗賊',hp:56,atk:7,kind:'beast',col:'#c77a45',thief:true,daggers:3,hint:'弾いた短剣は投げ返せる　爪を弾き損ねると見切りを盗まれる',turn:()=>{const n=G.en.daggers||0;return n&&Math.random()<.55?Array.from({length:n},(_,i)=>({pre:i?4:14,m:.8,proj:true})):[{pre:pick([10,22]),m:1.2,melee:true}]}},
  shroom:{name:'毒キノコ',hp:48,atk:8,kind:'shroom',col:'#c0392b',hint:'毒は毎ターン強くなる　かいふくで消せる',poison:5,turn:()=>[{pre:18}]},
  armor:{name:'鉄の守り手',hp:66,atk:11,kind:'armor',col:'#6f8aa8',hint:'盾で剣を防ぐ　パリィで崩せる　まほうは盾を無視',shield:true,turn:()=>[{pre:20,m:1.2}]},
@@ -471,7 +471,7 @@ const EN={
  doll:{name:'からくり人形',hp:58,atk:10,kind:'doll',col:'#b08a5a',hint:'キリッのあと、ランプが4つ灯った次の拍で斬る',turn:()=>{const e=G.en,w=Math.min(3,e.wind||0);e.wind=w+1;const I=[20,18,16,14][w];return[{pre:24,m:1.1,mv:'tick',beats:[I,I*2,I*3,I*4],cl:I*5}]}},
  hydra:{name:'三つ首の竜',hp:230,atk:11,kind:'hydra',col:'#4f7a5a',boss:true,hard:false,lungeD:46,hint:'最初の音の数が攻撃の数　光った首の順に噛みつく',turn:()=>hydraTurn()},
  dragon:{name:'くらやみの竜',hp:180,atk:12,kind:'dragon',col:'#b8323f',boss:true,lungeD:46,hint:'怒ると赤い炎　重いが、弾けば大きく反撃',
-  turn:()=>{const SL=[{pre:24,m:1.8,mv:'slam',beat:true,bf:10,bn:3,cl:38}],ST=[{pre:22,m:.8,mv:'stab'},{pre:2,m:.8,mv:'stab'},{pre:8,m:.8,mv:'stab'}],TL=[{pre:20,m:1.4,mv:'tail',beat:true,bf:9,bn:3,cl:36}];
+  turn:()=>{const SL=[{pre:24,m:1.8,mv:'slam',beat:true,bf:10,bn:3,cl:38,bo:-2}],ST=[{pre:22,m:.8,mv:'stab'},{pre:2,m:.8,mv:'stab'},{pre:8,m:.8,mv:'stab'}],TL=[{pre:20,m:1.4,mv:'tail',beat:true,bf:9,bn:3,cl:36}];
    const base=pick([SL,ST,TL]);
    if(!G.en.rage)return base;return pick([base.map(x=>Object.assign({},x,{pre:Math.round(x.pre*.6)})),[{pre:26,m:2,red:true,mv:'breath',beat:true,bf:9,bn:3,cl:36},{pre:6,m:.8,mv:'stab'}],[{pre:20,m:1.4,mv:'tail',beat:true,bf:9,bn:3,cl:36},{pre:4,m:.8,mv:'stab'}]])}}
 };
@@ -1439,7 +1439,7 @@ function buildStrikes(L,t,lastI){const e=G.en,cl0=e.cue||P.cueF;const list=L.map
   if(s.ping){t+=s.pre||0;G.pings.push({t,heads:s.heads||(s.head!=null?[s.head]:null),note:s.note??G.pings.length,done:false,i:G.pings.length});return null}
   if(s.fake){t+=s.pre||12;const o={fake:true,mv:s.mv,cue:t,end:t+14,start:t-12,impact:Infinity,cl:14,m:0,red:false,res:null,done:false,cued:false};t+=30;return o}
   const cl=s.cl||cl0;if(s.gap!=null)t=lastI+s.gap;else t+=(s.pre||0)+cl;lastI=t;const red=!!s.red||(!!e.redP&&!dbg.fix&&Math.random()<e.redP);if(red)tipOnce('red','赤い光は重い攻撃　痛いですが、弾けば大きく返せます');
-  const o={impact:t,cue:t-cl,cl,beat:!!s.beat,mv:s.mv,bf:s.bf,bn:s.bn,proj:!!s.proj,melee:!!s.melee,start:s.st!=null?s.st:t-cl-(s.pre||0),ft:s.ft||0,m:s.m||1,feint:!!s.feint,red,boom:!!s.boom,counter:!!s.counter,dark:!!s.dark,back:s.back||0,beats:s.beats,lob:!!s.lob,head:s.head,heads:s.heads,spit:!!s.spit,note:s.note,rhythm:!!s.rhythm,rally:!!s.rally,rallyOpen:!!s.rallyOpen,rallyEnd:!!s.rallyEnd,lock:!!s.lock,nc:!!s.nc,sdrain:!!s.drain,ten:s.ten,nolight:!!s.nolight,res:null,done:false,cued:false};t+=8;return o}).filter(Boolean);return{list,t}}
+  const o={impact:t,cue:t-cl,cl,beat:!!s.beat,mv:s.mv,bf:s.bf,bn:s.bn,proj:!!s.proj,melee:!!s.melee,start:s.st!=null?s.st:t-cl-(s.pre||0),ft:s.ft||0,m:s.m||1,feint:!!s.feint,red,boom:!!s.boom,counter:!!s.counter,dark:!!s.dark,back:s.back||0,beats:s.beats,lob:!!s.lob,head:s.head,heads:s.heads,spit:!!s.spit,note:s.note,rhythm:!!s.rhythm,rally:!!s.rally,rallyOpen:!!s.rallyOpen,rallyEnd:!!s.rallyEnd,lock:!!s.lock,nc:!!s.nc,bo:s.bo||0,sdrain:!!s.drain,ten:s.ten,nolight:!!s.nolight,res:null,done:false,cued:false};t+=8;return o}).filter(Boolean);return{list,t}}
 function startEnemy(list){
  const e=G.en;
  if(!list){
@@ -1463,7 +1463,7 @@ function enemyStep(){
  G.et++;G.fxAt=null;
  for(const s of G.strikes){
   if(!s.cued&&G.et>=s.cue){s.cued=true;if(s.lob)SFX.toss();else if(s.dark){}else if(s.mv==='tick'){SFX.kiri()}else if(s.heads&&G.en.kind==='hydra'){s.heads.forEach(h=>SFX.headCue(h));if(s.red)SFX.cueRed()}else if(s.note!=null){SFX.cue();if(!eyeFoe())SFX.ping(s.note)}else s.fake?SFX.cueFake():s.red?SFX.cueRed():SFX.cue();if(s.red&&G.en.kind==='dragon'){SFX.rage();shake(P.shake*.6)}if(s.rallyOpen)SFX.rallyCue();if((G.en.kind==='lord'||G.en.key==='gateK')&&!s.fake&&(s.mv==='arm'||s.mv==='bk'||s.mv==='maw'||s.mv==='reach'||s.mv==='vlash'||s.mv==='cape'))SFX.wet()}
-  if(s.beat&&!s.done){const k=G.et-s.cue,B=s.bf||P.golemBeatF,N=s.bn||4;if(k>=B&&k%B===0&&k<=B*N){if(s.mv==='slam'||s.mv==='hslam'){SFX.thud(k/B-1);shake(P.shake*.25)}else if(s.mv==='tail'||s.mv==='htent')SFX.rattle(k/B-1);else if(s.mv==='breath'){SFX.charge(k/B-1);shake(P.shake*.15)}else if(s.mv==='smash'){SFX.gong(k/B-1);shake(P.shake*.3)}else if(s.mv==='step'&&k===B*(N+1)){}else if(s.mv==='pool'){SFX.step(k/B-1,N);const fx=poolX(s,G.et);for(let q=0;q<6;q++)G.pts.push({x:fx+(Math.random()-.5)*12,y:FLOOR-1,vx:(Math.random()-.5)*.9,vy:-.4-Math.random()*.7,t:0,life:18,col:'#6a3a8a',sz:1,drag:.95,g:.04})}else if(s.mv==='step'){SFX.step(k/B-1,N);const fx=ghostStart(N)-(k/B)*GSTEP;for(let q=0;q<5;q++)G.pts.push({x:fx+(Math.random()-.5)*6,y:FLOOR,vx:(Math.random()-.5)*.8,vy:-.3-Math.random()*.5,t:0,life:18,col:'#4a4058',sz:1,drag:.95,g:0});mark(fx,FLOOR+1,'star',1,'#6a6080')}else SFX.holdTick(k/B-1)}}
+  if(s.beat&&!s.done){const k=G.et-s.cue-(s.bo||0),B=s.bf||P.golemBeatF,N=s.bn||4;if(k>=B&&k%B===0&&k<=B*N){if(s.mv==='slam'||s.mv==='hslam'){SFX.thud(k/B-1);shake(P.shake*.25)}else if(s.mv==='tail'||s.mv==='htent')SFX.rattle(k/B-1);else if(s.mv==='breath'){SFX.charge(k/B-1);shake(P.shake*.15)}else if(s.mv==='smash'){SFX.gong(k/B-1);shake(P.shake*.3)}else if(s.mv==='step'&&k===B*(N+1)){}else if(s.mv==='pool'){SFX.step(k/B-1,N);const fx=poolX(s,G.et);for(let q=0;q<6;q++)G.pts.push({x:fx+(Math.random()-.5)*12,y:FLOOR-1,vx:(Math.random()-.5)*.9,vy:-.4-Math.random()*.7,t:0,life:18,col:'#6a3a8a',sz:1,drag:.95,g:.04})}else if(s.mv==='step'){SFX.step(k/B-1,N);const fx=ghostStart(N)-(k/B)*GSTEP;for(let q=0;q<5;q++)G.pts.push({x:fx+(Math.random()-.5)*6,y:FLOOR,vx:(Math.random()-.5)*.8,vy:-.3-Math.random()*.5,t:0,life:18,col:'#4a4058',sz:1,drag:.95,g:0});mark(fx,FLOOR+1,'star',1,'#6a6080')}else SFX.holdTick(k/B-1)}}
   if(s.mv==='pool'&&!s.done&&G.et-s.cue===(s.bf||12)*((s.bn||2)+1)){SFX.whisper();const fx=poolX(s,G.et);for(let q=0;q<10;q++)G.pts.push({x:fx+(Math.random()-.5)*10,y:FLOOR-2,vx:(Math.random()-.5)*.8,vy:-.6-Math.random()*.8,t:0,life:20,col:'#9a62b4',sz:1,drag:.96,g:.05})}
   if(s.mv==='step'&&!s.done&&G.et-s.cue===(s.bf||12)*((s.bn||2)+1)){SFX.whisper();for(let q=0;q<10;q++)G.pts.push({x:GHX+(Math.random()-.5)*14,y:FLOOR-6-Math.random()*20,vx:(Math.random()-.5)*.6,vy:-.4-Math.random()*.6,t:0,life:20,col:'#8a9ac8',sz:1,drag:.96,g:0})}
   if(s.beats&&!s.done){const k=G.et-s.cue,bi=s.beats.indexOf(k);if(bi>=0){if(s.lob){if(G._tk!==G.et){G._tk=G.et;SFX.whistle(bi)}}else SFX.tick(bi,s.beats.length)}}
@@ -1875,7 +1875,7 @@ function enemyPose(){
    lean=Math.min(1,(G.et-s.start)/10);
    if(G.et<s.cue){if(s.feint&&(s.cue-G.et)%38<5&&s.cue-G.et>12)twitch=1}
    else{cue=s.dark||s.lob||s.nolight?-1:G.et-s.cue;red=s.red;gold=!!s.rallyOpen;proj=s.proj;if(s.beats&&!s.lob){const k=G.et-s.cue;pulse=s.beats.some(b=>k>=b&&k<b+4);hold=Math.min(1,k/20)}if(s.fake){lean=0;lunge=cue<4?cue/4*.3:Math.max(0,.3*(1-(cue-4)/10));fake=true}else if(s.beat&&!s.dark){const B=s.bf||P.golemBeatF,N=s.bn||4;hold=s.mv==='smash'?Math.min(1,(Math.min(N,Math.floor(cue/B))+Math.min(1,(cue%B)/4)*(cue<B*N?1:0))/N):Math.min(1,cue/(B*2));pulse=cue>=B&&cue%B<B/2&&cue<=B*N+B/2}
-   if(s.mv==='slam'||s.mv==='hslam')rise=Math.min(1,cue/(s.cl-4));mv=s.mv}
+   if(s.mv==='hslam')rise=Math.min(1,cue/(s.cl-4));if(s.mv==='slam'){const B=s.bf||10,kk=cue-(s.bo||0),h=Math.min(3,Math.max(0,Math.floor(kk/B))),lv=[.12,.45,.75,1],pv=h?lv[h-1]:0;rise=pv+(lv[h]-pv)*Math.min(1,Math.max(0,kk-h*B)/4)}mv=s.mv}
   }
  }
  if(G.state==='enemy'){for(const s of G.strikes){if((s.mv==='slam'||s.mv==='hslam')&&!s.done&&G.et>=s.impact-3)rise=Math.max(0,(s.impact-G.et)/3)}}
@@ -1916,7 +1916,7 @@ function drawEnemy(){
  let tip;
  if(e.kind==='golem'){
   const sw=G.state==='enemy'?p.lunge:0,tr=p.hold&&!sw?((G.anim>>1)%2?1:-1):0,SH=an('golemS',x,y),ry=y-20-p.lean*6-p.hold*16,fx=Math.round(x-20-p.lean*3-sw*6+tr),fy=Math.round(ry+(y-8-ry)*sw),sx=SH.x,sy=SH.y;
-  {const gs=G.state==='enemy'&&G.strikes.find(s=>s.mv==='smash'&&!s.done&&G.et>=s.cue),B=P.golemBeatF,lit=gs?Math.min(3,1+Math.floor((G.et-gs.cue)/B)):1;for(let j=0;j<lit;j++){const R=an('golemR',x,y,j);l.fillStyle=j===lit-1&&gs?'#fff3b0':'#ffd75e';l.fillRect(R.x-1,R.y-1,3,3)}}
+  {const gs=G.state==='enemy'&&G.strikes.find(s=>s.mv==='smash'&&!s.done&&G.et>=s.cue),B=gs?(gs.bf||P.golemBeatF):12,lit=gs?Math.min(3,Math.floor((G.et-gs.cue)/B)):0,fl=lit===3&&(G.anim>>1)%2;for(let j=0;j<3;j++){const R=an('golemR',x,y,j),on=j<lit;l.fillStyle=OUT;l.fillRect(R.x-2,R.y-2,5,5);l.fillStyle=on?(lit===3?(fl?'#ffffff':'#ff5a5a'):'#ffd75e'):'#3a2a20';l.fillRect(R.x-1,R.y-1,3,3)}}
   for(let t=0;t<=1;t+=.1){const ax=sx+(fx-sx)*t,ay=sy+(fy-sy)*t;l.fillStyle=OUT;l.fillRect(Math.round(ax)-3,Math.round(ay)-3,7,7)}
   for(let t=0;t<=1;t+=.1){const ax=sx+(fx-sx)*t,ay=sy+(fy-sy)*t;l.fillStyle=nCol('#64626e',v,e.tint);l.fillRect(Math.round(ax)-2,Math.round(ay)-2,5,5)}
   {const F=nspr('fist',v,e.tint);l.drawImage(F,fx-(F.width>>1),fy-(F.height>>1));tip={x:fx-5,y:fy-6}}
@@ -1928,7 +1928,7 @@ function drawEnemy(){
  else if(e.kind==='slime'){tip=bigF?{x:xs-14,y:y-14-idle}:{x:xs-7,y:y-8-idle}}
  else if(e.kind==='bomb'){tip={x:x-6,y:y-10};if(e.fuse!=null&&e.fuse>0){const BF=an('bombF',x,y),bx=BF.x,by=BF.y,n=e.fuse*5;let ex=bx,ey=by;for(let i=0;i<n;i++){ex=bx+Math.round(i*.6);ey=by-1-i+(i%4===3?1:0);px(ex,ey,'#c8a060');px(ex+1,ey,'#5a4030')}if((G.anim>>2)%2)pxStar(ex,ey-1,e.fuse<=1?3:2,e.fuse<=1?'#ff4a5a':'#ffd27a')}}
  else if(e.kind==='samurai'){const H=an(e.key==='samuraiB'?'samuraiBH':'samuraiH',x,y);if(G.state==='enemy'){const ex=Math.round(H.x-14-p.lean*3),ey=Math.round(H.y-10-p.lean*6);outLine(H.x,H.y,ex,ey,v==='w'?'#fff4ee':'#d9e2f2');tip={x:ex,y:ey}}else tip={x:H.x-4,y:H.y-2}}
- else if(e.kind==='dragon'){const ts=tailStrike();if(ts){const tp=tailPose(ts,x,y);drawTail(tp,pal)}tip=p.mv==='tail'&&ts?(()=>{const tp=tailPose(ts,x,y);return{x:Math.round(tp.E[0]),y:Math.round(tp.E[1])}})():p.mv==='tail'?{x:x+37,y:y-38}:p.mv==='slam'?{x:x-14,y:y-40-Math.round((p.rise||0)*9)}:p.mv==='breath'?{x:x-34,y:y-57}:{x:x-36,y:y-17}}
+ else if(e.kind==='dragon'){const ts=tailStrike();if(ts){const tp=tailPose(ts,x,y);drawTail(tp,pal)}dragonBeatLamps(x,y);tip=p.mv==='tail'&&ts?(()=>{const tp=tailPose(ts,x,y);return{x:Math.round(tp.E[0]),y:Math.round(tp.E[1])}})():p.mv==='tail'?{x:x+37,y:y-38}:p.mv==='slam'?{x:x-14,y:y-40-Math.round((p.rise||0)*9)}:p.mv==='breath'?{x:x-34,y:y-57}:{x:x-36,y:y-17}}
  else if(e.kind==='imp'){const Hd=an('imp',x,y);tip={x:Hd.x,y:Hd.y};const thr=G.state==='enemy'&&G.strikes.some(s=>s.lob&&!s.done&&G.et>=s.cue&&G.et<s.cue+4);const ls=G.state==='enemy'&&G.strikes.find(s=>s.lob&&!s.done&&G.et>=s.start&&G.et<s.cue);if(!thr){const k=ls?Math.min(1,(G.et-ls.start)/Math.max(1,ls.cue-ls.start)):0,rx=Hd.x,ry=Math.round(Hd.y-10*k);disc(rx,ry,3,OUT);disc(rx,ry,2.2,'#8a7d74');px(rx-1,ry-1,'#c8bcb0')}}
  else if(e.kind==='knight'&&e.key==='gateK'){tip=drawGateK(e,x,y-idle,v)}
  else if(e.kind==='knight'){const ns=G.state==='enemy'&&G.strikes.find(s=>!s.done),k=ns&&G.et>=ns.start?Math.max(0,1-Math.abs(G.et-ns.cue)/10):0,LN=[6, 9, 7, 3],ct=nCol('#4a2260',v,e.tint),cT=nCol('#9a62b4',v,e.tint);
@@ -1967,11 +1967,15 @@ function drawSpell(a){
 function disc(cx,cy,r,col){cx=Math.round(cx);cy=Math.round(cy);l.fillStyle=col;const R=Math.max(0,r);for(let dy=-Math.floor(R);dy<=Math.floor(R);dy++){const dx=Math.floor(Math.sqrt(R*R-dy*dy));l.fillRect(cx-dx,cy+dy,dx*2+1,1)}}
 function lerp2(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}
 /* 尾：構え（3拍のカラカラ）→ 背中越しに振り下ろす（一定速度）→ 戻す */
+function dragonBeatStrike(){return G.state==='enemy'&&G.en&&G.en.kind==='dragon'?G.strikes.find(s=>s.beat&&!s.done&&!s.cx&&G.et>=s.cue):null}
+function dragonBeatLamps(x,y){const s=dragonBeatStrike();if(!s)return;const B=s.bf||9,lit=Math.min(3,Math.max(0,Math.floor((G.et-s.cue-(s.bo||0))/B))),fl=lit===3&&(G.anim>>1)%2;
+ for(let j=0;j<3;j++){const lx=x-4+j*9,ly=y-74,on=j<lit;l.fillStyle=OUT;l.fillRect(lx-2,ly-2,6,6);l.fillStyle=on?(lit===3?(fl?'#ffffff':(s.red?'#ff3a3a':'#ff5a5a')):(s.red?'#ff8a5a':'#ffd75e')):'#3a2a20';l.fillRect(lx-1,ly-1,4,4)}}
+function drawSlamShadow(){const s=G.state==='enemy'&&G.en&&G.en.kind==='dragon'&&G.strikes.find(x=>x.mv==='slam'&&!x.done&&G.et>=x.cue);if(!s)return;const B=s.bf||10,kk=G.et-s.cue-(s.bo||0),h=Math.min(3,Math.max(0,Math.floor(kk/B))),w=10+h*8,cx=HX+6,cy=FLOOR+1;l.globalAlpha=.35+h*.17;l.fillStyle='#000000';for(let dx=-w;dx<=w;dx++){const hh=Math.round(2.2*Math.sqrt(Math.max(0,1-(dx*dx)/(w*w))));l.fillRect(cx+dx,cy-hh,1,hh*2+1)}l.globalAlpha=1}
 function tailPose(s,x,y){const B=[x+20,y-29],rest={C:[x+32,y-36],E:[x+38,y-46]},up={C:[x+44,y-80],E:[x+8,y-74]},hit={C:[x-26,y-96],E:[HX+16,y-3]};
  const k=G.et-s.cue,d=G.et-s.impact,SW=9;let C,E;
  if(d>0){const r=Math.min(1,d/14),q=r*r;C=lerp2(hit.C,rest.C,q);E=lerp2(hit.E,rest.E,q)}
  else if(d>=-SW){const t=(d+SW)/SW;C=lerp2(up.C,hit.C,t);E=lerp2(up.E,hit.E,t)}
- else{const u=Math.min(1,Math.max(0,k)/9),q=1-(1-u)*(1-u);C=lerp2(rest.C,up.C,q);E=lerp2(rest.E,up.E,q);const Bt=s.bf||9;if(k>=Bt&&k%Bt<3){E=[E[0]+((k%2)?2:-2),E[1]-2]}}
+ else{const Bt0=s.bf||9,h=Math.min(2,Math.max(0,Math.floor(k/Bt0))),u=Math.min(1,(h+Math.min(1,Math.max(0,k-h*Bt0)/4))/3),q=1-(1-u)*(1-u);C=lerp2(rest.C,up.C,q);E=lerp2(rest.E,up.E,q);const Bt=s.bf||9;if(k>=Bt&&k%Bt<3){E=[E[0]+((k%2)?2:-2),E[1]-2]}}
  return{B,C,E,sw:d>=-SW&&d<=0?(d+SW)/SW:-1}}
 function bez(p,t){const u=1-t;return[u*u*p.B[0]+2*u*t*p.C[0]+t*t*p.E[0],u*u*p.B[1]+2*u*t*p.C[1]+t*t*p.E[1]]}
 function drawTail(p,pal){const N=90,pts=[];for(let i=0;i<=N;i++)pts.push(bez(p,i/N));const rad=i=>1.3+2.7*Math.pow(1-i/N,.7);
@@ -2207,7 +2211,7 @@ function draw(){
  if(G.state==='ko'&&G.stop>0){l.fillStyle='rgba(8,2,6,.6)';l.fillRect(0,0,LW,LH)}
  const IA=(G.iai||G.xs)&&G.stop>0&&G.state!=='ko'&&!G.uk;if(IA){l.fillStyle='rgba(4,2,12,.7)';l.fillRect(0,0,LW,LH)}
  if(G.uk){const t=G.uk.t;l.fillStyle=`rgba(3,1,8,${t<UK.CUT?.86:t<UK.HIT?.72:t<UK.END-6?.5:.25})`;l.fillRect(0,0,LW,LH)}
- drawHole();drawEnemy();drawLordKo();drawHero();drawFX();drawIai();drawUK();drawXSlash();drawWhis();drawRally();drawUKV();
+ drawHole();drawEnemy();drawLordKo();drawSlamShadow();drawHero();drawFX();drawIai();drawUK();drawXSlash();drawWhis();drawRally();drawUKV();
  if(G.state==='enter'&&G.enter&&G.enter.t<70){l.fillStyle=`rgba(0,0,0,${Math.max(0,.92-G.enter.t/70*.92).toFixed(3)})`;l.fillRect(0,0,LW,LH)}
  const KC=G.state==='ko'&&G.t<=koZoomEnd()?G.ko.cam:IA?{z:S*1.4,fx:(HX+EX)/2,fy:FLOOR-30}:null,z=KC?KC.z:S,w=960/z,h=540/z;
  const x0=KC?Math.max(0,Math.min(LW-w,Math.round(KC.fx-w/2))):0,y0=KC?Math.max(0,Math.min(LH-h,Math.round(KC.fy-h/2))):0;

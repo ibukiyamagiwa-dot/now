@@ -1,0 +1,80 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>いまだ！ 門の番人たち 設定資料集</title>
+<style>
+:root{--bg:#0f0d12;--pa:#17141c;--ln:#2a2532;--tx:#e8e2ea;--mu:#9a90a4;--ac:#ffd040;--red:#ff4a5a;--pu:#b060ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.75 "Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+canvas{image-rendering:pixelated;display:block}
+header.cover{padding:48px 20px 28px;max-width:1100px;margin:0 auto}
+.kick{font-size:12px;letter-spacing:.25em;color:var(--mu)}h1{font-size:clamp(28px,6vw,48px);line-height:1.2;margin:.2em 0 .3em;font-weight:800}
+h1 span{color:var(--red)}.sub{color:var(--mu);max-width:44em}
+#nav{position:sticky;top:0;z-index:5;background:rgba(15,13,18,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--ln);display:flex;gap:2px;overflow-x:auto;padding:6px 10px;scrollbar-width:none}
+#nav a{flex:none;color:var(--tx);text-decoration:none;font-size:13px;padding:6px 10px;border-radius:6px;background:var(--pa)}#nav a:active{background:var(--ln)}
+main{max-width:1100px;margin:0 auto;padding:0 16px 120px}
+section{scroll-margin-top:48px;padding:40px 0 12px;border-bottom:1px solid var(--ln)}
+h2{font-size:clamp(24px,5vw,34px);margin:0;line-height:1.3}h3{font-size:17px;margin:28px 0 10px;color:var(--mu);font-weight:600;letter-spacing:.05em}h3 small{color:var(--tx);margin-left:6px}
+h4{margin:22px 0 6px;font-size:14px;color:var(--mu);letter-spacing:.1em}
+.lead{color:var(--tx);max-width:46em}.note{background:var(--pa);border-left:3px solid var(--ac);padding:12px 14px;border-radius:4px;font-size:14px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:14px 0}
+.rules div{background:var(--pa);border-radius:8px;padding:10px 12px;font-size:13px}.rules b{display:block;font-size:15px}
+.pillars{counter-reset:p;display:grid;gap:10px;margin:14px 0}.pillars div{counter-increment:p;background:var(--pa);border-radius:8px;padding:12px 14px 12px 46px;position:relative}
+.pillars div:before{content:counter(p);position:absolute;left:14px;top:10px;font-size:22px;font-weight:800;color:var(--ac)}.pillars b{display:block}
+.ladder{display:flex;align-items:flex-end;gap:4px;overflow-x:auto;padding:6px 0 10px}.step{flex:none;width:150px;text-align:center}.step canvas{width:144px;margin:0 auto}
+.lname{font-weight:700;font-size:14px}.ladd{font-size:12px;color:var(--mu);line-height:1.5;min-height:3em}.arrow{flex:none;color:var(--mu);align-self:center;font-size:20px}
+.fhead{display:flex;gap:14px;align-items:flex-end;margin-bottom:14px}.num{font-size:44px;font-weight:800;color:var(--ln);line-height:1}.en{font-size:11px;letter-spacing:.25em;color:var(--mu)}
+.ftop{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:20px;align-items:start}
+.art{background:radial-gradient(ellipse at 50% 80%,#2a2232,#141018 70%);border-radius:10px;padding:10px;position:relative}.art .stand{width:100%;max-width:330px;margin:0 auto}
+.old{position:absolute;right:8px;top:8px;width:92px;background:#000;border:1px solid var(--ln);border-radius:6px;overflow:hidden;font-size:10px;color:var(--mu);text-align:center}.old img{width:100%;display:block;image-rendering:pixelated}
+.lore{font-size:16px;margin-top:0}.pal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}
+.chip{display:grid;grid-template-columns:22px 1fr;column-gap:8px;font-size:12px;background:var(--pa);border-radius:6px;padding:6px 8px;align-items:center}.chip i{grid-row:span 2;width:22px;height:22px;border-radius:4px;border:1px solid #0006}.chip b{font-size:13px}.chip span{color:var(--mu)}
+table.parts{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}table.parts th{text-align:left;color:var(--mu);font-weight:500;font-size:12px;border-bottom:1px solid var(--ln);padding:4px 8px}
+table.parts td{border-bottom:1px solid var(--ln);padding:8px;vertical-align:top}table.parts td:first-child{font-weight:700;width:34%;white-space:normal}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px}
+.card{margin:0;background:var(--pa);border-radius:10px;overflow:hidden;border:1px solid var(--ln)}.card canvas{width:100%;cursor:pointer}.card.paused canvas{outline:2px solid var(--ac);outline-offset:-2px}
+figcaption{padding:10px 12px 12px;font-size:13px;line-height:1.65}.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.row b{font-size:15px;margin-right:auto}
+.tag{font-size:11px;padding:1px 7px;border-radius:99px;white-space:nowrap}.tag.ex{background:#2a3a2a;color:#a8e0a0}.tag.nw{background:#3a2a10;color:#ffd080}
+.read,.why{margin:6px 0 0}.k{display:inline-block;font-size:10px;color:var(--mu);border:1px solid var(--ln);border-radius:4px;padding:0 5px;margin-right:6px;vertical-align:1px}.why{color:var(--mu)}
+.foot{margin-top:8px;font-size:11px;color:var(--mu)}.fr{margin-left:auto;font-variant-numeric:tabular-nums}.gap{font-variant-numeric:tabular-nums}
+.lt{width:10px;height:10px;border-radius:50%;display:inline-block}.lt.w{background:#fff}.lt.r{background:#ff4040}.lt.g{background:#ffd040}.lt.p{background:transparent;border:2px solid var(--pu)}
+#impl ol li,#impl ul li{margin:6px 0}#impl .q{background:var(--pa);border-radius:8px;padding:10px 14px;margin:8px 0}#impl .q b{color:var(--ac)}
+#spd{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:9;background:#1e1a24f2;border:1px solid var(--ln);border-radius:99px;padding:4px;display:flex;gap:2px;box-shadow:0 6px 20px #0008}
+#spd span{font-size:11px;color:var(--mu);padding:6px 8px 6px 10px}#spd button{border:0;background:transparent;color:var(--tx);font:inherit;font-size:13px;padding:6px 12px;border-radius:99px}#spd button.on{background:var(--ac);color:#000;font-weight:700}
+@media (max-width:700px){.ftop{grid-template-columns:1fr}.sgrid{grid-template-columns:1fr}.grid{grid-template-columns:1fr}body{font-size:14px}.old{width:76px}}
+</style></head><body>
+<header class="cover"><div class="kick">いまだ！ ・ 設定資料集</div><h1>門の番人たち<br><span>八つの姿</span></h1>
+<p class="sub">門番から、赤い門のぬしの第二形態まで。立ち絵、全モーション、膝をつく・本気を出す・のまれる瞬間、専用ステージ。すべての部品に意味を持たせた。カードは動く。タップで一時停止。</p></header>
+<nav id="nav"></nav>
+<main id="book">
+<section id="rules"><h2>この資料集の約束</h2>
+<p class="lead">光の色の意味は、どの姿でも変えない。体の色（くらやみの紫など）は「材料の色」で、合図ではない。合図は必ず光る形（星・輪）で出る。</p>
+<div class="rules"><div><i class="lt w"></i><b>白い光</b>ふつうの攻撃</div><div><i class="lt r"></i><b>赤い光</b>重い攻撃</div><div><i class="lt p"></i><b>紫の輪</b>フェイント（押さない）</div><div><i class="lt g"></i><b>金の光</b>打ち合い</div></div>
+<div class="pillars">
+<div><b>同じ骨組みで、全員を描く</b>赤い騎士と赤い門のぬしは、本当に同じ体（同じ関節、同じ構え）にくらやみを足しただけ。だから「同じ人」が、理屈ではなく目でわかる。</div>
+<div><b>部品の数＝強さ</b>上の段は前の段の部品をかならず受けつぎ、一つ以上足す。並べると順番がわかる（次の「禍々しさの階段」）。</div>
+<div><b>読むものは一つずつ増やす</b>「目の数＝回数」は黒い門番で教え、暗い門のぬしで使い、第二形態で総まとめにする。新しいルールを同時に二つ出さない。</div>
+<div><b>背景も戦う</b>ぬしが本気になると門が開き、騎士が本気になると旗が落ちる。ステージは体の続き。</div>
+<div><b>合図から当たりまでの間は変えない</b>居合も、触手も、暗闇でも、合図からの間はいつもと同じ。見えない速さは「途中の絵を描かない」ことで出し、間では出さない。</div>
+</div></section>
+</main>
+<section id="impl" style="max-width:1100px;margin:0 auto;padding:40px 16px 140px">
+<h2>実装するなら</h2>
+<h3>やり方</h3>
+<p>この資料集の絵は、どれも一枚ずつ描いたものではなく、同じ骨組み（関節の角度）から毎回描いている。ゲームにもこの骨組みを入れれば、絵を一枚ずつ描かずに、ここにある全モーションをそのまま動かせる。ファイルも軽い。</p>
+<ul><li><b>よいところ：</b>モーションの修正が数字の変更で済む。8体ぶんの姿が、同じ仕組みで増やせる。</li>
+<li><b>弱いところ：</b>自動で描くので、いまの手描きのドットに比べて線が細く、顔（兜）の作りこみが弱い。体も細身。→ 立ち絵の兜まわりだけは、手で整えた部品に差しかえるのがおすすめ。</li>
+<li><b>重さ：</b>毎フレーム描くとスマホで重くなるおそれがある。→ 戦闘の前に、その敵の全コマを一度だけ描いて画像にしておく。</li></ul>
+<h3>順番（おすすめ）</h3>
+<ol><li><b>赤い騎士の系統（4つの姿）</b>：同じ骨組みの恩恵が一番大きく、物語の山場。剣を極めた8つの動きもここ。</li>
+<li><b>門のぬしの系統と大門の間</b>：鎖と門が背景とつながるので、ステージと一緒に入れる。</li>
+<li><b>門番と黒い門番、関所</b>。</li>
+<li><b>演出の仕上げ</b>：旗が落ちる、門が開く、水面の映り姿の入れかわり（とどめの白黒赤と合わせる）。</li></ol>
+<p>量の目安：姿 8、モーション 54、ステージ 7。</p>
+<h3>決めてほしいこと</h3>
+<div class="q"><b>1.</b> 赤い騎士を全身赤にするか（いまは灰色の鎧に赤い前垂れ）。</div>
+<div class="q"><b>2.</b> 門番を二刀にするか（交差の構え＝通行止め、のため）。</div>
+<div class="q"><b>3.</b> 門のぬしを1.3倍にするか。縦持ちのスマホで角が画面上に切れないか、入れる前に確かめる。</div>
+<div class="q"><b>4.</b> 「新しい案」のカード（構えの切り替え、片手でいなす、残心、居合、映り姿の入れかわり など）のうち、どれを技として入れるか。いまの技のカードは、見た目だけの差しかえで済む。</div>
+<div class="q"><b>5.</b> 足りない、違う、と思う部品。意味ごと直す。</div>
+</section>
+<div id="spd"><span>速さ</span><button data-s="1" class="on">1</button><button data-s=".5">½</button><button data-s=".25">¼</button><button data-s="0">止</button></div>
+<script>/*JS*/</script>
+</body></html>

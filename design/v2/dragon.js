@@ -8,7 +8,7 @@ const DR={
  k:{out:'#9a86c4',lbl:'覚悟3 黒い',name:'黒いくらやみの竜',sk:['#030205','#09070c','#141018','#221c29','#352c3e'],rim:'#5e4e78',bel:['#0e0b12','#1a1620','#28222e','#38303e'],mem:['#020103','#06040a','#0e0a14','#18121f'],vein:'#2a2038',bone:['#24202a','#4a4450','#7a727c','#9e96a0'],eye:'#ff4040',gold:['#2e2410','#5a4a24','#8a7640'],crack:'#24101c',weye:2,feel:10,frill:5,smoke:2,drip:3,more:0},
  v:{out:'#d0a8ff',lbl:'覚悟4 紫の',name:'紫のくらやみの竜',sk:['#0a0418','#1a0a30','#2c1450','#44247a','#6438a8'],rim:'#a676f4',bel:['#20103a','#3a2260','#56387e','#72549a'],mem:['#08021a','#120630','#200c46','#341662'],vein:'#6a34aa',bone:['#3a2a50','#74609a','#ac9ad0','#e0d2f4'],eye:'#ff6ad8',gold:['#3e2a14','#7a5a2a','#b08a44'],crack:'#3a1050',weye:2,feel:12,frill:7,smoke:1,drip:2,more:1}};
 const DPAL={body:DR.n.sk[2],hi:DR.n.sk[3],lo:DR.n.sk[1],eye:DR.n.eye};
-const DPDEF={wcount:-1,tcount:-1,ccount:-1,x:0,cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0,lift:0,rage:0,dead:0,eyes:3,fl:0,fr:0,tailUp:0,slap:0,sweep:0,sac:0,feel:0,melt:0,quiver:0,twitch:0,puppet:0,ceye:0};
+const DPDEF={wcount:-1,tcount:-1,ccount:-1,x:0,cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0,lift:0,rage:0,dead:0,eyes:3,fl:0,fr:0,tailUp:0,slap:0,sweep:0,sac:0,feel:0,melt:0,quiver:0,twitch:0,puppet:0,ceye:0,cjaw:0};
 const MK=(x,y)=>(y+1024)*4096+x+1024,UK=k=>[(k%4096)-1024,Math.floor(k/4096)-1024];
 function dDisc(m,cx,cy,r,lump,seed){const L=lump||0,s=seed||0;for(let y=Math.floor(cy-r*1.3-1);y<=Math.ceil(cy+r*1.3+1);y++)for(let x=Math.floor(cx-r*1.3-1);x<=Math.ceil(cx+r*1.3+1);x++){const dx=x+.5-cx,dy=y+.5-cy,a=Math.atan2(dy,dx),rr=r*(1+L*(Math.sin(a*5+s)*.6+Math.sin(a*3-s*1.7)*.4));if(dx*dx+dy*dy<=rr*rr)m.add(MK(x,y))}return m}
 function dCurve(m,f,r0,r1,N,lump,seed){for(let i=0;i<=N;i++){const t=i/N,p=f(t);dDisc(m,p[0],p[1],typeof r0==='function'?r0(t):lerp(r0,r1,t),lump,(seed||0)+i*.9)}return m}
@@ -93,7 +93,7 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
   const hot=['#3a0c14','#7a1e1c','#c2402a','#ff7a3a','#ffc070'],sc=P.sac;dShade(B,m,[mix(BE[0],hot[0],sc),mix(BE[1],hot[1],sc),mix(BE[2],hot[2],sc*.85),mix(BE[3],hot[3],sc*.8),mix(BE[3],hot[4],sc*.7)],null);
   for(let i=0;i<3;i++){const a=i*2.1+.4;B.line(c[0],c[1],c[0]+Math.cos(a)*R0*.9,c[1]+Math.sin(a)*R0*.9,mix(BE[0],'#200408',.5),1)}if(sc>.4){B.set(c[0],c[1],'#ffe0a0',1);B.set(c[0]+1,c[1],'#ffc070',1)}J.sac=c}
  /* ===== 頭：低く、前へ。ずれて並ぶ三つの目、裂ける口、あごの下の触手 ===== */
- const hs=1.15*k,jw=dd>0?0:P.jaw,ha=-P.hy*.02-dd*.3-P.puppet*1.1+jw*.45+Math.max(0,jw-.7)*.4,ja=dd>0?.25*dd:.06+jw*.55+Math.max(0,jw-.7)*.7,R=v=>add(Hb,rot([v[0]*hs,v[1]*hs],ha)),hg=[2,1],Jw=v=>add(R(hg),rot([(v[0]-hg[0])*hs,(v[1]-hg[1])*hs],ha-ja));
+ const hs=1.15*k,jw=dd>0?0:P.jaw,ha=-P.hy*.02-dd*.3-P.puppet*1.1+jw*.45+Math.max(0,jw-.7)*.4,ja=dd>0?.25*dd+P.cjaw*.9:.06+jw*.55+Math.max(0,jw-.7)*.7,R=v=>add(Hb,rot([v[0]*hs,v[1]*hs],ha)),hg=[2,1],Jw=v=>add(R(hg),rot([(v[0]-hg[0])*hs,(v[1]-hg[1])*hs],ha-ja));
  /* 奥の角 */dTent(B,[R([3,-6]),R([10,-12]),R([7,-19])],1.4,.4,FAR(BO));
  /* 下あご */{const m=new Set();dCurve(m,t=>LP(Jw([1,2.2]),Jw([-15,1.8]),t),t=>(3-1.2*t)*hs,0,14,.04,7);dShade(B,m,SK,rim)}
  if(ja>.04){const m=B.mask([R([3,1]),R([-17,.6]),Jw([-16,1.4]),Jw([3,2])]);for(const key of m){const[x,y]=UK(key);B.set(x,y,(x+y)%5?'#2a0612':'#3e0c1c',1)}
@@ -126,16 +126,16 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  /* ===== 溶ける／形になる：melt=1で床のくらやみだけ。上から消え、境目は液のしずく ===== */
  if(P.melt>0){const yT=oy-76*(1-P.melt);for(let y=0;y<B.h;y++)for(let x=0;x<B.w;x++){const i=y*B.w+x;if(B.t[i]!==1&&B.t[i]!==2)continue;const h=hsh(x,y);if(y<yT-h*3)dClr(B,x,y);else if(y<yT+3+h*2){B.c[i]=h<.5?INK.hi:INK.col;B.t[i]=1}}
   for(let x=Math.round(bx-30*k);x<bx+40*k;x++){const w=Math.sin((x-bx)*.15+T*.1);if(P.melt>.05&&B.get(x,oy-1)===0&&hsh(x,1)<.85)B.set(x,oy-1,w>0?INK.hi:INK.col,1)}}
- Object.assign(J,{hip:Q(13,-19),sc:Q(-4,-30),top:Math.min(...tops),head:R([-6,-4]),mouth:R([-16,1.5]),chest:Q(-5,-21),foot:NF,ffoot:FF,k});return J}
+ Object.assign(J,{chead:R([-8,-3]),hip:Q(13,-19),sc:Q(-4,-30),top:Math.min(...tops),head:R([-6,-4]),mouth:R([-16,1.5]),chest:Q(-5,-21),foot:NF,ffoot:FF,k});return J}
 function bz2(h,t){const u=1-t;return[u*u*h[0][0]+2*u*t*h[1][0]+t*t*h[2][0],u*u*h[0][1]+2*u*t*h[1][1]+t*t*h[2][1]]}
 
 /* ===== 三つ首の竜：竜の亡骸の胸の裂け目から出る、三本の「指」 =====
    竜の形は借り物、その借り物の体を、上位の存在が通り道に使う。首は指：節が三つ、関節のしわ、角に見える平たい白い爪、真ん中がいちばん長い、同じ向きにしか曲がらない、付け根が一列。
    肌は、どの生き物の色でもない灰紫。ぬれていない。乾いた、古い、死んだものの肌。 */
 const HSK=['#14111a','#332d3d','#544b60','#7a7086','#a69cb0'],HPAD=['#3a2e3a','#5e4a58','#86707e'],HNAIL=['#8a8278','#c8c0b4','#ece6da','#ffffff'];
-function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,lit:[0,0,0],curl:0,rift:1,emerge:1,grip:0,heads:1,press:0,cut:[0,0,0],stump:0},S.pose||{});for(const[a,v]of Object.entries(P0||{}))if(v!==undefined&&!(typeof v==='number'&&!isFinite(v)))P[a]=v;
+function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,lit:[0,0,0],curl:0,rift:1,emerge:1,grip:0,heads:1,press:0,cut:[0,0,0],stump:0,swap:0,spread:0,grab:0,tx0:0,ty0:0,tx1:0,ty1:0,tx2:0,ty2:0},S.pose||{});for(const[a,v]of Object.entries(P0||{}))if(v!==undefined&&!(typeof v==='number'&&!isFinite(v)))P[a]=v;
  const k=S.k||1,tint=P.tint||S.tint;
- const J=drawDragon(B,ox,oy,{k,pose:{},tint},{dead:1,x:P.x,tint,quiver:P.quiver,puppet:P.puppet,ceye:P.ceye},T),D=J.D,SKc=D.sk.map(c=>mix(c,'#07040b',.3));
+ const J=drawDragon(B,ox,oy,{k,pose:{},tint},{dead:1,x:P.x,tint,quiver:P.quiver,puppet:P.puppet,ceye:P.ceye,cjaw:P.cjaw},T),D=J.D,SKc=D.sk.map(c=>mix(c,'#07040b',.3));
  const c=add(J.chest,[1*k,-4*k]),ro=Math.max(0,P.rift),rw=5.4*k*ro,rh=10*k*ro,tl=-.35;J.rift=c;
  /* 胸の皮の下を、指の形が内側から押す */if(P.press>0){for(let i=0;i<3;i++){const ph=(T*.05+i*1.3)%1,p=add(c,rot([(-3+i*3)*k,(-4+ph*8)*k],tl)),m=new Set();dCurve(m,s=>add(p,rot([s*7*k,-s*2*k],tl-1)),2.8*k*P.press,1.8*k*P.press,8);dShade(B,m,[SKc[1],SKc[2],SKc[3],mix(SKc[4],'#c0a8c8',.4),mix(SKc[4],'#e0d0e0',.5)],null)}}
  const R=v=>add(c,rot(v,tl)),inR=(x,y)=>{const q=rot([x-c[0],y-c[1]],-tl);return(q[0]*q[0])/(rw*rw)+(q[1]*q[1])/(rh*rh)<=1};
@@ -147,9 +147,9 @@ function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:
   for(let i=0;i<3;i++){const a=1.4+i*.5,s0=R([Math.cos(a)*rw,Math.sin(a)*rh]),s1=R([Math.cos(a)*(rw+4*ro),Math.sin(a)*(rh+2*ro)]);dTent(B,[s0,s1],.9,.3,HNAIL)}}
  /* ===== 三本の指 ===== */
  const fin=[],cut=P.cut||[0,0,0],order=[2,0,1];const pts=[];
- for(let i=0;i<3;i++){const root=R([-rw*.5,(-6+i*6)*k]),L=[[13,12,10],[16,15,12],[12,11,9]][i].map(v=>v*k*P.emerge*(1-P.curl*.65)),a0=[-2.05,-1.5,-1.0][i]+Math.sin(T*.04+i*2)*.05*(1-P.grip),bend=-.5-P.curl*1.25-P.grip*.75;
+ for(let i=0;i<3;i++){const root=R([-rw*.5,(-6+i*6)*k]),L=[[13,12,10],[16,15,12],[12,11,9]][i].map(v=>v*k*P.emerge*(1-P.curl*.65)),A0=[-2.05,-1.5,-1.0],a0=lerp(A0[i],A0[2-i],P.swap)+[-.55,0,.5][i]*P.spread+Math.sin(T*.04+i*2)*.05*(1-P.grip),bend=-.5-P.curl*1.25-P.grip*.75;
   let ch=[root],a=a0;for(let j=0;j<3;j++){const p=ch[j];ch.push([p[0]+Math.cos(a)*L[j],p[1]+Math.sin(a)*L[j]]);a+=bend}
-  const f=P['f'+i]||0;if(f>0){const tg=[HXX_+12+i*1.5,FL_-14-i*3],Ls=L[0]+L[1]+L[2],dl=Math.hypot(tg[0]-root[0],tg[1]-root[1]);for(let j=1;j<=3;j++){const q=LP(root,tg,Math.min(1,(L.slice(0,j).reduce((x,y)=>x+y,0)/Ls)*(dl>0?1:0)));const mid=j<3?[q[0],q[1]-Math.sin(j/3*3.14)*4*k]:q;ch[j]=LP(ch[j],mid,f)}}
+  const f=P['f'+i]||0;if(f>0){const gT=[[HXX_+4,FL_-30],[HXX_+16,FL_-15],[HXX_+6,FL_-2]][i],tg0=P['tx'+i]?[P['tx'+i],P['ty'+i]]:[HXX_+12+i*1.5,FL_-14-i*3],tg=LP(tg0,gT,P.grab),bump=lerp(4,[18,3,-6][i],P.grab),Ls=L[0]+L[1]+L[2],dl=Math.hypot(tg[0]-root[0],tg[1]-root[1]);for(let j=1;j<=3;j++){const q=LP(root,tg,Math.min(1,(L.slice(0,j).reduce((x,y)=>x+y,0)/Ls)*(dl>0?1:0)));const mid=j<3?[q[0]+(P.grab&&i!==1?(i===0?-4:4)*P.grab*Math.sin(j/3*3.14):0),q[1]-Math.sin(j/3*3.14)*bump*k]:q;ch[j]=LP(ch[j],mid,f)}}
   pts.push(ch)}
  for(const i of order){const ch=pts[i],cu=cut[i];if(P.emerge<.03)continue;
   if(P.grip>.5&&P.emerge<.5){/* 裂け目のふちに、内側から指がかかる。見えるのは指先と白い爪だけ */const ga=[-2.5,-2.95,-3.4][i],e=P.emerge/.34,rp=R([Math.cos(ga)*(rw-1),Math.sin(ga)*(rh-1)]),o=dir(ga+tl,3.2*k*e),p1=add(rp,o),p2=add(p1,[-1*k*e,3.4*k*e]);dTent(B,[rp,p1,p2],2.2*k,1.6*k,HSK,mix(HSK[4],'#d8cce0',.3),true);if(e>.4){const a2=Math.atan2(p2[1]-p1[1],p2[0]-p1[0]),N=v=>add(p2,rot([v[0]*k,v[1]*k],a2));B.poly([N([-2,-1.8]),N([1.6,-1.6]),N([2.2,0]),N([1.6,1.6]),N([-2,1.4])].map((q,j)=>q),HNAIL[1],HNAIL[3],HNAIL[0]);B.set(...N([2.4,0]),HNAIL[2],1)}fin.push(p2);continue}
@@ -161,11 +161,11 @@ function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:
   /* 頭＝指先：上に平たい白い爪（角に見える）。腹が縦に裂けて口になり、目が開く */const tp=ch[3],bp=ch[2],a=Math.atan2(tp[1]-bp[1],tp[0]-bp[0]),Rh=v=>add(tp,rot([v[0]*k,v[1]*k],a)),jw=(P['j'+i]||0),hd=P.heads;
   const nail=[Rh([-5.5,-2.4]),Rh([-1,-3.6]),Rh([2.6,-3]),Rh([3.4,-1.6]),Rh([-5,-1.2])];B.poly(nail,HNAIL[1],HNAIL[3],HNAIL[0]);B.line(...Rh([-5,-1.4]),...Rh([2.8,-1.8]),HNAIL[0],1);B.set(...Rh([0,-3]),HNAIL[3],1);
   if(hd>.05){const op=hd*(.2+jw*.9);if(op>.1){const mo=[Rh([3,.2]),Rh([-5,0]),Rh([-5,.4+op*3]),Rh([3,.8+op*4.5])];B.poly(mo,'#2a0612','#3e0c1c','#14040a');for(let q=0;q<4;q++){B.set(...Rh([2-q*2,.6]),HNAIL[2],1);B.set(...Rh([1.6-q*2,.4+op*3.6]),HNAIL[2],1)}}
-   const ec=P.lit[i]?'#ffffff':'#ff3050';if(hd>.5){B.set(...Rh([-1.8,-.6]),ec,2);B.set(...Rh([-3.4,-.2]),ec,2);B.set(...Rh([-.6,-1]),HSK[0],1)}}
+   const ec=P.lit[i]?'#ffffff':'#ff3050';if(P.lit[i]&&hd>.5){const g=Rh([-1,-.5]);glow(B,Math.round(g[0]),Math.round(g[1]),4,'#ffffff')}if(hd>.5){B.set(...Rh([-1.8,-.6]),ec,2);B.set(...Rh([-3.4,-.2]),ec,2);B.set(...Rh([-.6,-1]),HSK[0],1)}}
   fin.push(Rh([3.6,.6]))}
  /* 裂け目のふちの触手：指の付け根の前を、ぬれて動く */if(ro>.2){for(let q=0;q<9;q++){const a=q/9*6.28+.3,p=R([Math.cos(a)*(rw+1),Math.sin(a)*(rh+1)]),o=a+Math.sin(T*.07+q*1.7)*.6,L=(3+(q%3))*k*ro;tentacle(B,p,add(p,dir(o,L*.5)),add(p,dir(o+.5*Math.sin(T*.05+q),L)),.9*k,.3,q%4===0)}}
  /* くらやみのしたたり */if(ro>.3)for(let i=0;i<3;i++){const p=R([(-2+i*2)*k,rh]),ph=(T*.3+i*17)%20;B.set(p[0],p[1]+ph*.6,INK.hi,4)}
  J.fingers=fin;J.heads=fin;return J}
-Object.assign(PDEF,DPDEF,{f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,curl:0,rift:1,emerge:1,grip:0,heads:1,press:0,stump:0});
+Object.assign(PDEF,DPDEF,{f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,curl:0,rift:1,emerge:1,grip:0,heads:1,press:0,stump:0,swap:0,spread:0,grab:0,tx0:0,ty0:0,tx1:0,ty1:0,tx2:0,ty2:0,cjaw:0});
 SPEC.dragon={name:'くらやみの竜',k:1,draw:drawDragon,pose:{},aura:{r:2,c1:'#22142e',c2:'#1a1024',rim:'#6a3a90'}};
 SPEC.hydra={name:'三つ首の竜',k:1,draw:drawHydra,pose:{},aura:{r:3,c1:'#2a1840',c2:'#1e1230',rim:'#c070ff'}};

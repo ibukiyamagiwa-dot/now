@@ -544,16 +544,18 @@ mv({f:'hydra',id:'h_order',n:'鳴いた数＝攻撃の数（光った首の順�
  pp:(P,t)=>{P.lit=[t>=40&&t<108?1:0,t>=56&&t<128?1:0,t>=24&&t<88?1:0]},
  cues:[{t:56,col:'w',at:J=>J.fingers[2]},{t:76,col:'w',at:J=>J.fingers[0]},{t:96,col:'w',at:J=>J.fingers[1]}],hits:[84,104,124],
  fx:(B,J,t)=>{for(const[b,i]of[[24,2],[40,0],[56,1]])if(t>=b&&t<b+10&&J.fingers[i]){const p=J.fingers[i];for(let q=0;q<2;q++){const r=3+(t-b)*1.2+q*3;for(let a=-1;a<=1;a+=.2)B.set(p[0]+Math.cos(a+3.14)*r,p[1]+Math.sin(a+3.14)*r,'#a8a0b0',4)}}}});
-mv({f:'hydra',id:'h_one',n:'三本同時',bg:'hole',len:130,cap:'三本の首が一度だけ同時に鳴き、三本とも白く光る。三本そろって、一度に噛みつく。重い一撃が一回。',why:'鳴いた数は一回＝攻撃は一回。三本そろっていても、数えるのは鳴き声。',
- keys:[K(0,HI),K(14,Object.assign({},HI,{j0:.5,j1:.5,j2:.5})),K(42,{rift:1,f0:1,f1:1,f2:1,j0:.9,j1:.9,j2:.9},'in'),K(70,{rift:1,f0:1,f1:1,f2:1}),K(110,HI)],pp:(P,t)=>{P.lit=t>=14&&t<50?[1,1,1]:[0,0,0]},
+mv({f:'hydra',id:'h_one',n:'三本同時',bg:'hole',len:130,cap:'三本の首が縦一列にそろい、一度だけ同時に鳴いて、三本とも白く光る。三本がまっすぐ平行に突っこむ。高い・まん中・低い、の三か所に同時に当たる一撃が一回。',why:'鳴いた数は一回＝攻撃は一回。三本そろっていても、数えるのは鳴き声。握りしめ（赤・包む）とちがい、三本はまっすぐ平行に来る。',
+ keys:[K(0,HI),K(14,Object.assign({},HI,{spread:-.3,j0:.5,j1:.5,j2:.5})),K(38,Object.assign({},HI,{spread:-.35,j0:.7,j1:.7,j2:.7,x:4})),K(42,{rift:1,spread:-.6,f0:1,f1:1,f2:1,j0:.9,j1:.9,j2:.9,tx0:HXX+14,ty0:FL-24,tx1:HXX+16,ty1:FL-14,tx2:HXX+14,ty2:FL-4},'in'),K(66,{rift:1,spread:-.6,f0:1,f1:1,f2:1,tx0:HXX+14,ty0:FL-24,tx1:HXX+16,ty1:FL-14,tx2:HXX+14,ty2:FL-4}),K(110,HI)],pp:(P,t)=>{P.lit=t>=14&&t<50?[1,1,1]:[0,0,0]},
  cues:[{t:14,col:'w',at:J=>J.fingers[1]}],hits:[42]});
-mv({f:'hydra',id:'h_grab',n:'握りしめ（重い）',bg:'hole',len:140,cap:'三本の首が大きく広がり、赤く光る。三方向から、こちらを包むように閉じてくる。重い一撃が一回。',why:'三本が一点に閉じる動きは、手が握る動きそのもの。戦いの最中に一度だけ見せる、いちばん大きな手がかり。',
- keys:[K(0,HI),K(14,Object.assign({},HI,{rift:1.3})),K(38,Object.assign({},HI,{rift:1.3})),K(42,{rift:1.2,f0:1,f1:1,f2:1,j0:.2,j1:.2,j2:.2},'in'),K(72,{rift:1.2,f0:1,f1:1,f2:1}),K(120,HI)],
+mv({f:'hydra',id:'h_grab',n:'握りしめ（重い）',bg:'hole',len:150,cap:'裂け目が大きく開き、三本が手のひらを広げるように大きく開いて、赤く光る。上・前・下の三方向から弧を描いて回りこみ、こちらを包んで、握りつぶす。重い一撃が一回。',why:'三本が一点に閉じる動きは、手が握る動きそのもの。三本同時（白・平行）とちがい、こちらは広がってから包む。戦いの最中に一度だけ見せる、いちばん大きな手がかり。',
+ keys:[K(0,HI),K(14,Object.assign({},HI,{rift:1.3,spread:1,j0:.3,j1:.3,j2:.3})),K(38,Object.assign({},HI,{rift:1.35,spread:1.15,j0:.5,j1:.5,j2:.5})),K(42,{rift:1.2,spread:.4,grab:1,f0:1,f1:1,f2:1,j0:.2,j1:.2,j2:.2},'in'),K(52,{rift:1.2,spread:.4,grab:1,f0:1,f1:1,f2:1,curl:.25}),K(76,{rift:1.2,spread:.4,grab:1,f0:1,f1:1,f2:1,curl:.25}),K(120,HI)],
  cues:[{t:14,col:'r',at:J=>J.rift}],hits:[42],hitCol:'r'});
-mv({f:'hydra',id:'h_spit',n:'切り口の吐き出し（拍）',bg:'hole',len:150,cap:'首を一本落とすと、残った切り口がふくらんで、くらやみのかたまりを放り上げる。ヒュ・ヒュ・ヒュと鳴るたびに、竜の亡骸の白目が一つずつ開く。三つ開いた次の拍で落ちてくる。',why:'切っても、そこが新しい口になる。何拍目かは、亡骸の目で数える（竜のときと同じ「目が全部開いた次の拍」）。投げ物と拍は、小鬼のおかしらで先に教わっている。',
- keys:[K(0,Object.assign({},HI,{cut:[1,0,0],stump:0})),K(14,Object.assign({},HI,{cut:[1,0,0],stump:.6})),K(20,Object.assign({},HI,{cut:[1,0,0],stump:1.2}),'in'),K(24,Object.assign({},HI,{cut:[1,0,0],stump:0})),K(150,Object.assign({},HI,{cut:[1,0,0],stump:0}))],pp:(P,t)=>{P.cut=[1,0,0];P.ceye=t<24||t>=80?0:t<37?1:t<50?2:3},
+mv({f:'hydra',id:'h_spit',n:'切り口の吐き出し（拍）',bg:'hole',len:150,cap:'首を一本落とすと、残った切り口がふくらんで、目の付いたくらやみのかたまりを高く放り上げる。ヒュ・ヒュ・ヒュと鳴るたびに、竜の亡骸の白目が一つずつ開く。足元に落ちる影がだんだん濃くなり、三つ開いた次の拍で落ちてくる。',why:'切っても、そこが新しい口になる。何拍目かは亡骸の目で、どこに落ちるかは足元の影で読む。投げ物と拍は、小鬼のおかしらで先に教わっている。',
+ keys:[K(0,Object.assign({},HI,{stump:0})),K(14,Object.assign({},HI,{stump:.7})),K(20,Object.assign({},HI,{stump:1.3}),'in'),K(23,Object.assign({},HI,{stump:-.2})),K(30,Object.assign({},HI,{stump:0})),K(150,Object.assign({},HI,{stump:0}))],pp:(P,t)=>{P.cut=[1,0,0];P.ceye=t<24||t>=80?0:t<37?1:t<50?2:3},
  cues:[{t:14,col:'w',at:J=>J.fingers[0]||J.rift}],hits:[66],
- fx:(B,J,t)=>{const s=J.fingers[0]||J.rift;if(t>=20&&t<70){const u=(t-20)/46,x=lerp(s[0],HXX+6,u),y=lerp(s[1],FL-10,u)-Math.sin(u*3.14)*40;B.disc(x,y,2.4,INK.col,INK.hi,INK.lo,4)}}});
+ fx:(B,J,t)=>{const s=J.fingers[0]||J.rift;if(t>=20&&t<67){const u=(t-20)/46,x=lerp(s[0],HXX+6,u),y=lerp(s[1],FL-10,u)-Math.sin(u*3.14)*44,sh=Math.round(2+u*6);
+   for(let xx=-sh;xx<=sh;xx++)if((xx+t)%2||u>.7)B.set(HXX+6+xx,FL,u>.7?'#000000':'#0a0610',6);
+   const m=new Set();dDisc(m,x,y,4.2,.15,t*.3);dShade(B,m,['#05020a','#120a1e','#24143a','#3e2666','#6a46a0'],'#c8a2f4');B.set(x-1,y,'#ff3050',2);B.set(x,y,'#ff3050',2);B.set(x-1,y-1,'#2a0612',1);for(let i=0;i<3;i++)B.set(x+2-i*2,y+5+((t+i)%3),INK.hi,4)}}});
 mv({f:'hydra',id:'h_down',n:'たおす：握って、引っこむ',bg:'hole',len:200,noHero:true,cap:'最後の首を落とすと、三本が握りこぶしのように丸まり、裂け目の奥へ引っこむ。裂け目が閉じ、竜の亡骸は塵になって消える。',why:'倒したのではない。引っこめさせただけ。ここで初めて「手だった」と気づける。',
  keys:[K(0,HI),K(40,Object.assign({},HI,{curl:.4,j0:1,j1:1,j2:1})),K(90,Object.assign({},HI,{curl:.95,rift:.8,emerge:.6}),'in'),K(130,{curl:1,rift:0,emerge:0},'in'),K(200,{curl:1,rift:0,emerge:0})],
  post:(B,J,t)=>{if(t>=130){const u=Math.min(1,(t-130)/60);for(let i=0;i<B.c.length;i++){const x=i%CW,y=i/CW|0;if(B.t[i]!==1&&B.t[i]!==3&&B.t[i]!==2)continue;if(((x*7+y*13)%11)/11<u){B.c[i]=((x+y)%6===0&&u<.9)?'#6a6070':0;B.t[i]=B.c[i]?4:0}}}}});
@@ -566,8 +568,25 @@ mv({f:'hydra',id:'h_fake',n:'鳴いたのに来ない首',bg:'hole',len:170,cap:
  keys:[K(0,HI),K(80,HI),K(84,Object.assign({},HI,{f2:1,j2:.8}),'in'),K(96,HI),K(110,Object.assign({},HI,{f0:.25})),K(116,HI),K(124,Object.assign({},HI,{f1:1,j1:.8}),'in'),K(140,HI),K(170,HI)],
  pp:(P,t)=>{P.lit=[0,t>=56&&t<128?1:0,t>=24&&t<88?1:0]},
  cues:[{t:56,col:'w',at:J=>J.fingers[2]},{t:76,col:'p',at:J=>J.fingers[0]},{t:96,col:'w',at:J=>J.fingers[1]}],hits:[84,124]});
-mv({f:'hydra',id:'h_rift',n:'裂け目のふちの触手',bg:'hole',len:130,cap:'裂け目が大きく開き、ふちの触手が一本、白く光ってのびてくる。',why:'首だけでなく、裂け目そのものも向こう側の一部。',
- keys:[K(0,HI),K(14,Object.assign({},HI,{rift:1.4})),K(60,Object.assign({},HI,{rift:1.4})),K(90,HI)],cues:[{t:14,col:'w',at:J=>J.rift}],hits:[42],
- fx:(B,J,t)=>{if(t>=38&&t<60){const u=t<42?(t-38)/4:1-(t-42)/18,c=J.rift;tentacle(B,c,[lerp(c[0],60,u),c[1]+6],[lerp(c[0],HXX+8,u),lerp(c[1],FL-10,u)],2.2,.6,true)}}});
+mv({f:'hydra',id:'h_rift',n:'裂け目のふちの触手',bg:'hole',len:130,cap:'裂け目が大きく開き、ふちの肉から太い触手が一本ずるりと出て、とぐろを巻きながら先を白く光らせる。弧を描いて、横からたたきつける。',why:'首だけでなく、裂け目そのものも向こう側の一部。首とちがい、横から弧で来る。',
+ keys:[K(0,HI),K(14,Object.assign({},HI,{rift:1.4})),K(60,Object.assign({},HI,{rift:1.4})),K(90,HI)],cues:[{t:14,col:'w',at:J=>J.ttip||J.rift}],hits:[42],
+ fx:(B,J,t)=>{if(t<10||t>=80)return;const c=add(J.rift,[-3,6]),F=['#1c0810','#4a1424','#7a2a3c','#a24a5a','#c87a86'];let pts;
+  if(t<40){const u=Math.min(1,(t-10)/12),w=Math.sin(t*.25);pts=[c,add(c,[-4*u,8*u]),add(c,[-10*u+w,4*u]),add(c,[-12*u,-6*u]),add(c,[-6*u+w,-12*u])]}
+  else{const u=t<42?(t-40)/2:Math.max(0,1-(t-46)/30),h=[HXX+10,FL-12];pts=[c,add(c,[-6,-14*u]),LP(add(c,[-14,-22]),[(c[0]+h[0])/2,FL-34],u),LP(add(c,[-10,-16]),add(h,[6,-10]),u),LP(add(c,[-6,-12]),h,u)]}
+  const sm=[];for(let i=0;i+1<pts.length;i++)for(let s=0;s<1;s+=.25)sm.push(LP(pts[i],pts[i+1],s));sm.push(pts[pts.length-1]);dTent(B,sm,3.2,1,F,'#e0a0b0');
+  for(let i=2;i<sm.length-1;i+=2){const p=sm[i];B.set(p[0]+1,p[1]+2,'#e8c8d0',1)}J.ttip=sm[sm.length-1]}});
+mv({f:'hydra',id:'h_swap',n:'首のすり替え',bg:'hole',len:140,cap:'一本の首だけが白く光る。すぐに三本が交差して、位置を二度三度入れかわる。光った首は、目が白く光ったまま。入れかわりが止まった場所から、光った首だけが噛みつく。',why:'見る場所の読み合い。数でも順番でもなく、「光った首を目で追う」。目を離さなければ、どの高さから来るかがわかる。',
+ keys:[K(0,HI),K(14,Object.assign({},HI,{j0:.4})),K(20,Object.assign({},HI,{swap:0})),K(26,Object.assign({},HI,{swap:1})),K(32,Object.assign({},HI,{swap:0})),K(38,Object.assign({},HI,{swap:1})),K(42,Object.assign({},HI,{swap:1,f0:1,j0:.9}),'in'),K(64,Object.assign({},HI,{swap:1,f0:1})),K(100,Object.assign({},HI,{swap:0})),K(140,HI)],pp:(P,t)=>{P.lit=t>=14&&t<50?[1,0,0]:[0,0,0]},
+ cues:[{t:14,col:'w',at:J=>J.fingers[0]}],hits:[42]});
+mv({f:'hydra',id:'h_crawl',n:'指歩き（拍）',bg:'hole',len:160,cap:'まん中の首が白く光る。外の二本が床に指先をつき、指で歩くように亡骸ごと這い寄ってくる（トン・トン・トン）。つくたびに亡骸の白目が一つずつ開き、三つ開いた次の拍で、まん中の首が上から突き刺す。',why:'三本の首が「手」として床を歩く。いちばん冒涜的な姿で、拍は吐き出しと同じく亡骸の目で数える。',
+ keys:[K(0,HI),K(14,Object.assign({},HI,{j1:.4})),K(19,Object.assign({},HI,{f0:.9,tx0:EXX-34,ty0:FL-1,x:0})),K(23,Object.assign({},HI,{f0:1,tx0:EXX-34,ty0:FL,x:-5}),'in'),K(28,Object.assign({},HI,{f2:.9,tx2:EXX-30,ty2:FL-1,x:-5})),K(32,Object.assign({},HI,{f2:1,tx2:EXX-36,ty2:FL,x:-10}),'in'),K(37,Object.assign({},HI,{f0:.9,tx0:EXX-44,ty0:FL-1,x:-10})),K(41,Object.assign({},HI,{f0:1,tx0:EXX-46,ty0:FL,x:-15}),'in'),
+  K(46,Object.assign({},HI,{x:-15,j1:.8,emerge:1})),K(50,Object.assign({},HI,{x:-15,f1:1,j1:.2,tx1:HXX+8,ty1:FL-12}),'in'),K(70,Object.assign({},HI,{x:-15,f1:1,tx1:HXX+8,ty1:FL-12})),K(130,HI)],pp:(P,t)=>{P.ceye=t<23||t>=70?0:t<32?1:t<41?2:3;P.lit=[0,t>=14&&t<56?1:0,0]},
+ cues:[{t:14,col:'w',at:J=>J.fingers[1]}],hits:[50],fx:(B,J,t)=>{for(const[b,i]of[[23,0],[32,2],[41,0]])if(t>=b&&t<b+6&&J.fingers[i])ddust(B,[J.fingers[i][0],FL],t-b,1)}});
+mv({f:'hydra',id:'h_toy',n:'ひまなとき：亡骸をもてあそぶ',bg:'hole',len:320,cap:'こちらが攻めてこないと、指は竜の亡骸で遊びはじめる。頭をつつき、角に指をかけて持ち上げ、別の指であごを開け閉めして「しゃべらせる」。白目の亡骸がこちらを向いて口をぱくぱくさせ、飽きると、指を離して落とす。最後に胴を指先でトントンとたたく。',why:'この体は、中のものにとって手袋で、おもちゃ。待ち時間にも正体の手がかりを見せ、ぞっとさせる。攻撃ではないので光らない。',
+ keys:[K(0,HI),K(40,HI),K(60,Object.assign({},HI,{f1:1,tx1:EXX-36,ty1:FL-14,j1:0})),K(64,Object.assign({},HI,{f1:1,tx1:EXX-35,ty1:FL-10})),K(68,Object.assign({},HI,{f1:1,tx1:EXX-36,ty1:FL-14})),K(72,Object.assign({},HI,{f1:1,tx1:EXX-35,ty1:FL-10})),
+  K(90,Object.assign({},HI,{f1:1,tx1:EXX-30,ty1:FL-14,puppet:0})),K(116,Object.assign({},HI,{f1:1,tx1:EXX-24,ty1:FL-32,puppet:1})),
+  K(130,Object.assign({},HI,{f1:1,tx1:EXX-24,ty1:FL-32,puppet:1,f0:1,tx0:EXX-40,ty0:FL-22})),K(200,Object.assign({},HI,{f1:1,tx1:EXX-24,ty1:FL-32,puppet:1,f0:1,tx0:EXX-40,ty0:FL-22})),
+  K(212,Object.assign({},HI,{f1:.6,tx1:EXX-24,ty1:FL-32,puppet:0,f0:0}),'in'),K(236,HI),K(250,Object.assign({},HI,{f2:.8,tx2:EXX-4,ty2:FL-14})),K(254,Object.assign({},HI,{f2:.9,tx2:EXX-4,ty2:FL-11})),K(258,Object.assign({},HI,{f2:.8,tx2:EXX-4,ty2:FL-14})),K(262,Object.assign({},HI,{f2:.9,tx2:EXX-4,ty2:FL-11})),K(280,HI),K(320,HI)],
+ pp:(P,t)=>{P.cjaw=t>=136&&t<200?(Math.sin((t-136)*.45)>0?.9:0):0;P.ceye=t>=120&&t<212?3:0},fx:(B,J,t)=>{if(t>=212&&t<222)ddust(B,[EXX-30,FL],t-212,2)}});
 /* 拍の攻撃は、合図から当たりまでが拍のぶん長い（ゲームと同じ）。のしかかり38F、尾と炎36F */
-for(const id of ['d_slam','d_tail','d_breath','h_spit'])MV.find(m=>m.id===id).beat=true;
+for(const id of ['d_slam','d_tail','d_breath','h_spit','h_crawl'])MV.find(m=>m.id===id).beat=true;

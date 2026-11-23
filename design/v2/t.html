@@ -1,0 +1,9 @@
+<!doctype html><html><body style="background:#111;margin:0">
+<div id=o></div>
+<script src="engine.js"></script><script src="rig.js"></script><script src="motion.js"></script><script src="specs.js"></script><script src="cards.js"></script><script src="moves.js"></script><script src="stages.js"></script>
+<script>
+const sh=(st,who)=>{const B=new Buf(SW,SH);STG[st.s](B,0,st.o);const H=new Buf(SW,SH);knight(H,SW-62,SFL,SPEC.hero,{},0);B.blit(H,true);
+ who.forEach(([k,x,P])=>{knight(B,x,SFL,SPEC[k],Object.assign({chainL:30},P||{}),0)});B.outline();const c=document.createElement('canvas');c.width=SW;c.height=SH;c.style.cssText='width:720px;image-rendering:pixelated;margin:4px';B.toCanvas(c.getContext('2d'));o.appendChild(c)};
+sh({s:'gate'},[['gate',120],['dgate',160],['lord',205]]);
+sh({s:'red'},[['red',150],['fallen',200]]);
+</script></body></html>

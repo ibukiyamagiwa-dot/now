@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body{margin:0;background:#0f0d12;color:#e8e2ea;font:14px/1.6 "Noto Sans CJK JP","Noto Sans JP",sans-serif;padding:18px;width:1000px}
+h1{font-size:22px;margin:0 0 4px}.sub{color:#9a90a4;font-size:13px;margin-bottom:14px}
+.row{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}.lab{width:250px;flex:none}.lab b{font-size:20px;display:block}.lab .t{font-size:15px;font-weight:700;margin:2px 0 6px}.lab p{margin:0;color:#b8b0c0;font-size:12.5px}
+canvas{image-rendering:pixelated;display:block}.rec{color:#ffd040}
+.zoom{display:flex;gap:10px}.zoom div{text-align:center;font-size:12px;color:#9a90a4}
+</style></head><body>
+<h1>作風の書き比べ</h1><div class="sub">左から 主人公・スライム・門番・門のぬし（ゲームと同じ 240×135 を3倍で表示）</div>
+<div id="rows"></div>
+<h1 style="margin-top:8px">拡大：門番と門のぬしの兜</h1><div class="sub">門番の兜を、ぬしが角と錠前つきで受けついでいる。情報量の差</div><div class="zoom" id="zoom"></div>
+<script src="sty.js"></script><script src="figs.js"></script><script src="subjects.js"></script><script src="bg.js"></script>
+<script>
+const T={A:['A','絵本の騎士物語','形は単純、色はベタ。読みやすいが、重い話と門の番人の格が出ない。'],B:['B','やさしいことばで語る、底の見えないおとぎ話','3頭身。色を抑え、意味のある部品だけ描きこむ。合図の光だけが一番あざやか。','rec'],C:['C','本格ダークファンタジー','5頭身以上で細かく描く。かっこいいが、スライムと並ぶと浮き、240×135では合図が埋もれやすい。']};
+for(const st of['A','B','C']){const r=document.createElement('div');r.className='row';const l=document.createElement('div');l.className='lab';l.innerHTML=`<b class="${T[st][3]||''}">${T[st][0]}${st==='B'?'（おすすめ）':''}</b><div class="t">${T[st][1]}</div><p>${T[st][2]}</p>`;
+ const c=document.createElement('canvas');c.width=W;c.height=Hh;c.style.width=(W*3)+'px';const B=scene(st);B.put(c.getContext('2d'));r.appendChild(l);r.appendChild(c);rows.appendChild(r);
+ const z=document.createElement('div');const zc=document.createElement('canvas');zc.width=110;zc.height=80;zc.style.width='320px';const x=zc.getContext('2d');x.drawImage(c,124,34,110,80,0,0,110,80);z.appendChild(zc);z.append(st);zoom.appendChild(z)}
+</script></body></html>

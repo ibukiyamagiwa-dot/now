@@ -8,7 +8,7 @@ const DR={
  k:{lbl:'覚悟3 黒い',name:'黒いくらやみの竜',sk:['#030205','#09070c','#141018','#221c29','#352c3e'],rim:'#5e4e78',bel:['#0e0b12','#1a1620','#28222e','#38303e'],mem:['#020103','#06040a','#0e0a14','#18121f'],vein:'#2a2038',bone:['#24202a','#4a4450','#7a727c','#9e96a0'],eye:'#ff4040',gold:['#2e2410','#5a4a24','#8a7640'],crack:'#24101c',weye:2,feel:10,frill:5,smoke:2,drip:3,more:0},
  v:{lbl:'覚悟4 紫の',name:'紫のくらやみの竜',sk:['#0a0418','#1a0a30','#2c1450','#44247a','#6438a8'],rim:'#a676f4',bel:['#20103a','#3a2260','#56387e','#72549a'],mem:['#08021a','#120630','#200c46','#341662'],vein:'#6a34aa',bone:['#3a2a50','#74609a','#ac9ad0','#e0d2f4'],eye:'#ff6ad8',gold:['#3e2a14','#7a5a2a','#b08a44'],crack:'#3a1050',weye:2,feel:12,frill:7,smoke:1,drip:2,more:1}};
 const DPAL={body:DR.n.sk[2],hi:DR.n.sk[3],lo:DR.n.sk[1],eye:DR.n.eye};
-const DPDEF={x:0,cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0,lift:0,rage:0,dead:0,eyes:3,fl:0,fr:0,tailUp:0,slap:0,sweep:0,sac:0,feel:0,melt:0,quiver:0,twitch:0};
+const DPDEF={wcount:-1,tcount:-1,ccount:-1,x:0,cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0,lift:0,rage:0,dead:0,eyes:3,fl:0,fr:0,tailUp:0,slap:0,sweep:0,sac:0,feel:0,melt:0,quiver:0,twitch:0};
 const MK=(x,y)=>(y+1024)*4096+x+1024,UK=k=>[(k%4096)-1024,Math.floor(k/4096)-1024];
 function dDisc(m,cx,cy,r,lump,seed){const L=lump||0,s=seed||0;for(let y=Math.floor(cy-r*1.3-1);y<=Math.ceil(cy+r*1.3+1);y++)for(let x=Math.floor(cx-r*1.3-1);x<=Math.ceil(cx+r*1.3+1);x++){const dx=x+.5-cx,dy=y+.5-cy,a=Math.atan2(dy,dx),rr=r*(1+L*(Math.sin(a*5+s)*.6+Math.sin(a*3-s*1.7)*.4));if(dx*dx+dy*dy<=rr*rr)m.add(MK(x,y))}return m}
 function dCurve(m,f,r0,r1,N,lump,seed){for(let i=0;i<=N;i++){const t=i/N,p=f(t);dDisc(m,p[0],p[1],typeof r0==='function'?r0(t):lerp(r0,r1,t),lump,(seed||0)+i*.9)}return m}
@@ -33,7 +33,7 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  const tops=[],J={k,D,dead:dd};
  /* ===== 背の扇の翼（奥）：膜の内側がこちらを向く。膜の目、ふちから垂れる細い触手 ===== */
  const wg=lerp(P.wing,-1.7,dd),W=Q(-1,-41-4*wg+br*.6),S0=Q(-5,-27),A=[Q(19,-22),Q(9,-27)];
- const TP=[[-15,-53,8],[-1,-63,10],[14,-61,9],[28,-51,7],[37,-36,4]].map(([x,y,a],i)=>Q(x+Math.sin(T*.03+i)*.4,y-a*wg));
+ const TP=[[-15,-53,8],[-1,-63,10],[14,-61,9],[27,-51,7],[33,-37,4]].map(([x,y,a],i)=>Q(x+Math.sin(T*.03+i)*.4,y-a*wg));
  const SC=[];for(let i=0;i<4;i++)SC.push(LP(LP(TP[i],TP[i+1],.5),W,.36));SC.push(LP(LP(TP[4],A[0],.5),W,.24));
  const wp=[W,TP[0],SC[0],TP[1],SC[1],TP[2],SC[2],TP[3],SC[3],TP[4],SC[4],A[0],A[1],S0],wm=B.mask(wp),md=Math.max(...TP.map(t=>Math.hypot(t[0]-W[0],t[1]-W[1])));
  const segd=(p,a,b)=>{const vx=b[0]-a[0],vy=b[1]-a[1],t=Math.max(0,Math.min(1,((p[0]-a[0])*vx+(p[1]-a[1])*vy)/(vx*vx+vy*vy)));return Math.hypot(p[0]-a[0]-vx*t,p[1]-a[1]-vy*t)};
@@ -43,8 +43,8 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  /* ふちのぎざぎざ */for(let i=0;i<5;i++)for(let s=.1;s<.92;s+=.13){const a=i<4?TP[i]:TP[4],b=SC[i],p=LP(a,b,s);if(hsh(i,s*9)>.45){dClr(B,p[0],p[1]+1);dClr(B,p[0]+1,p[1]+1)}}
  /* 腕と指（肉）、先は骨のとげ */dTent(B,[S0,LP(S0,W,.5),W],2.6,1.8,SK,rim);for(const t of TP){const m1=LP(W,t,.55);dTent(B,[W,[m1[0]-1,m1[1]-1],LP(W,t,.78)],1.6,.9,SK,rim);dTent(B,[LP(W,t,.74),t],1,.4,BO)}
  tops.push(...TP.map(t=>t[1]));
- /* 膜の目：のまれるほど開く。こちらを見る */if(dd<.5)for(let i=0;i<3;i++){const p=LP(LP(LP(W,TP[i+1],.55),LP(W,TP[i+2],.55),.5),W,.05),x=Math.round(p[0]),y=Math.round(p[1]),bl=((T>>1)+i*37)%97<4;
-  B.line(x-1,y-1,x+1,y-1,fd(D.vein),1);if(D.weye===0||bl){B.line(x-1,y,x+1,y,ME[0],1)}else if(D.weye===1){B.set(x-1,y,ME[0],1);B.set(x,y,D.eye,2);B.set(x+1,y,ME[0],1)}else{B.set(x-1,y,D.eye,2);B.set(x,y,D.eye,2);B.set(x+1,y,mix(D.eye,'#000000',.4),2);B.set(x-1,y,'#100008',2);B.set(x,y+1,ME[0],1)}}
+ /* 膜の目：のまれるほど開く。こちらを見る */if(dd<.5)for(let i=0;i<3;i++){const p=LP(LP(LP(W,TP[i+1],.55),LP(W,TP[i+2],.55),.5),W,.05),x=Math.round(p[0]),y=Math.round(p[1]),bl=((T>>1)+i*37)%97<4,cnt=P.wcount>=0,lv=cnt?(i<P.wcount?3:0):bl?0:D.weye;
+  B.line(x-1,y-1,x+1,y-1,fd(D.vein),1);if(lv===3){B.line(x-2,y-1,x+2,y-1,fd(D.vein),1);B.line(x-2,y,x+2,y,D.eye,2);B.set(x,y,'#120008',2);B.line(x-1,y+1,x+1,y+1,mix(D.eye,'#000000',.45),2)}else if(lv===0){B.line(x-1,y,x+1,y,ME[0],1)}else if(lv===1){B.set(x-1,y,ME[0],1);B.set(x,y,D.eye,2);B.set(x+1,y,ME[0],1)}else{B.set(x-1,y,D.eye,2);B.set(x,y,D.eye,2);B.set(x+1,y,mix(D.eye,'#000000',.4),2);B.set(x-1,y,'#100008',2);B.set(x,y+1,ME[0],1)}}
  /* ふちから垂れる細い触手（覚悟で長くなる） */if(dd<.8)for(let i=0;i<5;i++){const a=SC[i],L=D.frill+(i%2),sw=Math.sin(T*.05+i*1.9)*1.5;const pts=[a,[a[0]+sw*.5,a[1]+L*.5],[a[0]+sw,a[1]+L]];for(let j=0;j<L;j++){const q=LP(pts[0],pts[2],j/L);B.set(q[0]+Math.sin(j*.8+T*.06+i)*.8,q[1],j<L-1?ME[2]:ME[3],1)}}
  /* ===== 奥の脚 ===== */
  const lift=Math.max(0,P.lift-6)*.9,legHind=(hx,ft,R,thr)=>{const H=Q(hx,-17),F=[bx+ft*k-dd*4,oy],Kn=[lerp(H[0],F[0],.5)-6*k,lerp(H[1],F[1],.45)],An=[F[0]+4*k,F[1]-4*k];
@@ -55,13 +55,14 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
    /* 長すぎる四本の指 */for(let i=0;i<4;i++){const e=[F[0]-5*k+i*1.6*k,F[1]+(up>.2?-1+i*.8:0)],c=R===SK?BO:FAR(BO);dTent(B,[Wr,LP(Wr,e,.6),e],.8,.5,R);B.set(e[0]-1,e[1],c[3],1);B.set(e[0]-2,e[1]+(up>.2?1:0),c[2],1)}return F};
  legHind(16,14,FAR(SK),5);const FF=legFront(-8,-14,P.fr,FAR(SK),4);
  /* ===== 尾：床をなでて、先が三つに裂ける。途中に門の要石が肉に埋まっている ===== */
- const tb=Q(17,-19),rest=Q(43,-35+Math.sin(T*.04)*2),UP=Q(30,-60),SL=[bx+40*k,oy-1],SW=[HXX+16,oy-3],LM=[bx+52*k,oy-2];
+ const tb=Q(17,-19),rest=Q(37,-38+Math.sin(T*.04)*2),UP=Q(26,-58),SL=[bx+28*k,oy-1],SW=[HXX+16,oy-3],LM=[bx+52*k,oy-2];
  let tip=rest;tip=LP(tip,UP,P.tailUp);tip=LP(tip,SL,P.slap);tip=LP(tip,SW,P.sweep);tip=LP(tip,LM,dd);tip=[tip[0]-P.twitch*3,tip[1]-P.twitch*7];
  const c1=LP(LP(Q(32,-10),Q(30,-2),P.sweep),Q(32,-6),dd),c2=[lerp(c1[0],tip[0],.5)+6*(1-P.sweep)*(1-dd)*(1-P.slap),lerp(c1[1],tip[1],.6)+(P.slap>.5?-8*P.slap:0)];
  const tf0=cub(tb,c1,c2,tip),wv=(1-dd)*(1-P.sweep)*(1-P.slap),tf=t=>{const p=tf0(t),q=tf0(Math.min(1,t+.02)),a=Math.atan2(q[1]-p[1],q[0]-p[0])+1.57,o=Math.sin(T*.06-t*5)*1.6*t*wv;return[p[0]+Math.cos(a)*o,p[1]+Math.sin(a)*o]};
  {const m=new Set();dCurve(m,tf,t=>(5.6-4.4*t)*k,0,36,.04,3);dShade(B,m,SK,rim);
   for(let i=1;i<9;i++){const t=i/10,p=tf(t),q=tf(t+.02),a=Math.atan2(q[1]-p[1],q[0]-p[0])-1.57,L=(3.2-t*2.4)*k,r=(5.6-4.4*t)*k;const b=[p[0]+Math.cos(a)*(r-.5),p[1]+Math.sin(a)*(r-.5)];if(i!==5)dTent(B,[b,[b[0]+Math.cos(a+.5)*L,b[1]+Math.sin(a+.5)*L]],.9,.3,BO)}
-  /* 要石：門のアーチのいちばん上の石。肉に半分埋まっている */{const p=tf(.5),q=tf(.52),a=Math.atan2(q[1]-p[1],q[0]-p[0]),L=v=>add(p,rot(v,a)),G=['#2a2632','#5a5466','#8a8498','#b8b2c4'].map(fd);B.poly([L([-2.2,-2]),L([2.2,-2]),L([3.2,-6.4]),L([-3.2,-6.4])],G[1],G[3],G[0]);B.line(...L([0,-3]),...L([0,-5.6]),G[0],1);for(const s of[-2.6,2.6]){const e=L([s,-2.4]);B.set(e[0],e[1],SK[3],1)}const e=L([0,-1.6]);B.set(e[0],e[1],SK[3],1)}
+  /* 要石：門のアーチのいちばん上の石。肉に半分埋まっている */{const p=tf(.68),q=tf(.7),a=Math.atan2(q[1]-p[1],q[0]-p[0]),L=v=>add(p,rot(v,a)),G=['#2a2632','#5a5466','#8a8498','#b8b2c4'].map(fd);B.poly([L([-2.2,-2]),L([2.2,-2]),L([3.2,-6.4]),L([-3.2,-6.4])],G[1],G[3],G[0]);B.line(...L([0,-3]),...L([0,-5.6]),G[0],1);for(const s of[-2.6,2.6]){const e=L([s,-2.4]);B.set(e[0],e[1],SK[3],1)}const e=L([0,-1.6]);B.set(e[0],e[1],SK[3],1)}
+  /* 尾の三つの目：ふだんは閉じたすじ。尾の技では、床を打つたびに一つずつ開く */for(let i=0;i<3;i++){const t=[.16,.32,.5][i],p=tf(t),q=tf(t+.02),a=Math.atan2(q[1]-p[1],q[0]-p[0]),L=v=>add(p,rot(v,a)).map(Math.round),c=L([0,-1]),op=P.tcount>i||(P.tcount<0&&D.more);B.set(c[0]-1,c[1]-1,SK[1],1);B.set(c[0],c[1]-1,SK[1],1);B.set(c[0]+1,c[1]-1,SK[1],1);if(op){B.set(c[0]-1,c[1],D.eye,2);B.set(c[0],c[1],P.tcount>i?D.eye:'#120008',2);B.set(c[0]+1,c[1],D.eye,2);if(P.tcount>i)B.set(c[0],c[1],'#120008',2)}else B.line(c[0]-1,c[1],c[0]+1,c[1],SK[0],1)}
   /* 先は三つに裂けた触手 */const te=tf(1),tq=tf(.96),ta=Math.atan2(te[1]-tq[1],te[0]-tq[0]);J.tendrils=[];for(let i=-1;i<=1;i++){const a=ta+i*.7+Math.sin(T*.08+i)*.25*(1-dd),L=(4+(i===0?1.5:0)+D.more*2)*k,m1=[te[0]+Math.cos(a)*L*.5,te[1]+Math.sin(a)*L*.5],e=[m1[0]+Math.cos(a+.6*Math.sin(T*.06+i))*L*.5,m1[1]+Math.sin(a+.6*Math.sin(T*.06+i))*L*.5];dTent(B,[te,m1,e],1.1,.35,SK);J.tendrils.push(e)}
   J.tail=te}
  /* ===== 胴：肩が高く、あばらが浮く。ぬれた光 ===== */
@@ -72,7 +73,7 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  if(dd<.5)for(const[x,y]of[[-6,-31],[-5,-31],[3,-27]]){const p=Q(x,y);if(B.tag(Math.round(p[0]),Math.round(p[1]))===1)B.set(p[0],p[1],mix(SK[4],'#ffffff',.45),1)}
  /* ===== 手前の後ろ脚 ===== */legHind(12,10,SK,6.8);
  /* ===== 首：弓なりに上がって、頭は低く前へ。のどの板、埋まった金のかせ、のど袋 ===== */
- const Hb=dd>0?LP(Q(-30-P.nx,-18+P.ny),[bx-34*k,oy-5],dd):Q(-30-P.nx,-18+P.ny),N0=Q(-13,-25),N1=LP(Q(-16-P.nx*.2,-39+P.ny*.1),Q(-18,-14),dd),N2=LP(Q(-28-P.nx*.6,-33+P.ny*.6),Q(-28,-8),dd),nf=cub(N0,N1,N2,Hb),nr=t=>(6.6-2.6*t)*k;
+ const Hb=dd>0?LP(Q(-27-P.nx,-18+P.ny),[bx-32*k,oy-5],dd):Q(-27-P.nx,-18+P.ny),N0=Q(-13,-25),N1=LP(Q(-16-P.nx*.2,-39+P.ny*.1),Q(-18,-14),dd),N2=LP(Q(-25-P.nx*.6,-33+P.ny*.6),Q(-28,-8),dd),nf=cub(N0,N1,N2,Hb),nr=t=>(6.6-2.6*t)*k;
  const nm=new Set();dCurve(nm,nf,nr,0,40,.05,5);
  /* 皮膚の下を這うもの */const cp=(T%240)/70;if(cp<1&&dd<.3){const p=nf(cp),q=nf(Math.min(1,cp+.02)),a=Math.atan2(q[1]-p[1],q[0]-p[0])-1.57;dDisc(nm,p[0]+Math.cos(a)*(nr(cp)-1),p[1]+Math.sin(a)*(nr(cp)-1),2.2*k)}
  dShade(B,nm,SK,rim,null,true);
@@ -109,8 +110,8 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  /* くらやみのよだれ */if(dd<.5){const ph=(T*.25+3)%22,p=Jw([-14,3]);for(let j=0;j<Math.min(ph,7);j++)B.set(p[0],p[1]+j,j>4?D.sk[1]:D.sk[2],1)}
  /* ===== 手前の前脚 ===== */const NF=legFront(-10,-18,P.fl,SK,5.4);
  /* ===== ひび：ふだんは古い傷あと。怒ると皮が裂けて、中の赤が光る（光の赤＝重い） ===== */
- const cr=[[[-13,-27],[-15,-22],[-12,-17]],[[0,-30],[2,-25],[0,-21],[3,-16]],[[9,-24],[11,-19]],[[-6,-18],[-8,-14]]];for(const c of cr){const pts=c.map(p=>Q(...p));for(let i=0;i+1<pts.length;i++){B.line(...pts[i],...pts[i+1],rg?'#ff4a3a':fd(D.crack),1);if(rg){const m=LP(pts[i],pts[i+1],.5);B.set(m[0],m[1],'#ffc070',1);B.set(m[0]-1,m[1],SK[3],1)}}}
- if(rg){for(const t of[.3,.55,.8]){const[p]=nrm(t);B.line(p[0]-1,p[1]-2,p[0]+1,p[1]+1,'#ff4a3a',1);B.set(p[0],p[1],'#ffc070',1)}}
+ /* 三本の大きな傷：尾の側から順に、肩、首。炎の前に一度消え、拍ごとに一本ずつ赤がたまる */const cr=[[[11,-26],[13,-21],[10,-16]],[[0,-31],[2,-26],[0,-21],[3,-16]],[[-12,-28],[-15,-23],[-12,-18]],[[-6,-18],[-8,-14]]];cr.forEach((c,ci)=>{const pts=c.map(p=>Q(...p)),on=rg&&(P.ccount<0||(ci<3&&ci<P.ccount)),full=P.ccount>=0&&ci<P.ccount;for(let i=0;i+1<pts.length;i++){B.line(...pts[i],...pts[i+1],on?'#ff4a3a':fd(D.crack),1);if(on&&full){const w=LP(pts[i],pts[i+1],.5);B.set(w[0]+1,w[1],'#ff4a3a',1)}if(on){const m=LP(pts[i],pts[i+1],.5);B.set(m[0],m[1],'#ffc070',1);B.set(m[0]-1,m[1],SK[3],1)}}});
+ if(rg&&(P.ccount<0||P.ccount>=3)){for(const t of[.3,.55,.8]){const[p]=nrm(t);B.line(p[0]-1,p[1]-2,p[0]+1,p[1]+1,'#ff4a3a',1);B.set(p[0],p[1],'#ffc070',1)}}
  /* ===== 紫の段：目が体じゅうに増える（上位の存在の視線） ===== */
  if(D.more&&dd<.5){const sp=[nf(.22),nf(.5),nf(.72),Q(-8,-22),Q(2,-26),Q(9,-21),tf(.3),tf(.65)];sp.forEach((p,i)=>{const o=((T>>1)+i*41)%71>3,x=Math.round(p[0]),y=Math.round(p[1]);B.set(x-1,y-1,SK[1],1);B.set(x,y-1,SK[1],1);B.set(x+1,y-1,SK[1],1);if(o){B.set(x-1,y,D.eye,2);B.set(x,y,'#120008',2);B.set(x+1,y,D.eye,2)}else B.line(x-1,y,x+1,y,SK[0],1)})}
  /* ===== 黒い段から：背から、くらやみがのぼる ===== */

@@ -486,7 +486,7 @@ const DR={
  k:{lbl:'覚悟3 黒い',name:'黒いくらやみの竜',sk:['#030205','#09070c','#141018','#221c29','#352c3e'],rim:'#5e4e78',bel:['#0e0b12','#1a1620','#28222e','#38303e'],mem:['#020103','#06040a','#0e0a14','#18121f'],vein:'#2a2038',bone:['#24202a','#4a4450','#7a727c','#9e96a0'],eye:'#ff4040',gold:['#2e2410','#5a4a24','#8a7640'],crack:'#24101c',weye:2,feel:10,frill:5,smoke:2,drip:3,more:0},
  v:{lbl:'覚悟4 紫の',name:'紫のくらやみの竜',sk:['#0a0418','#1a0a30','#2c1450','#44247a','#6438a8'],rim:'#a676f4',bel:['#20103a','#3a2260','#56387e','#72549a'],mem:['#08021a','#120630','#200c46','#341662'],vein:'#6a34aa',bone:['#3a2a50','#74609a','#ac9ad0','#e0d2f4'],eye:'#ff6ad8',gold:['#3e2a14','#7a5a2a','#b08a44'],crack:'#3a1050',weye:2,feel:12,frill:7,smoke:1,drip:2,more:1}};
 const DPAL={body:DR.n.sk[2],hi:DR.n.sk[3],lo:DR.n.sk[1],eye:DR.n.eye};
-const DPDEF={x:0,cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0,lift:0,rage:0,dead:0,eyes:3,fl:0,fr:0,tailUp:0,slap:0,sweep:0,sac:0,feel:0,melt:0,quiver:0,twitch:0};
+const DPDEF={wcount:-1,tcount:-1,ccount:-1,x:0,cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0,lift:0,rage:0,dead:0,eyes:3,fl:0,fr:0,tailUp:0,slap:0,sweep:0,sac:0,feel:0,melt:0,quiver:0,twitch:0};
 const MK=(x,y)=>(y+1024)*4096+x+1024,UK=k=>[(k%4096)-1024,Math.floor(k/4096)-1024];
 function dDisc(m,cx,cy,r,lump,seed){const L=lump||0,s=seed||0;for(let y=Math.floor(cy-r*1.3-1);y<=Math.ceil(cy+r*1.3+1);y++)for(let x=Math.floor(cx-r*1.3-1);x<=Math.ceil(cx+r*1.3+1);x++){const dx=x+.5-cx,dy=y+.5-cy,a=Math.atan2(dy,dx),rr=r*(1+L*(Math.sin(a*5+s)*.6+Math.sin(a*3-s*1.7)*.4));if(dx*dx+dy*dy<=rr*rr)m.add(MK(x,y))}return m}
 function dCurve(m,f,r0,r1,N,lump,seed){for(let i=0;i<=N;i++){const t=i/N,p=f(t);dDisc(m,p[0],p[1],typeof r0==='function'?r0(t):lerp(r0,r1,t),lump,(seed||0)+i*.9)}return m}
@@ -511,7 +511,7 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  const tops=[],J={k,D,dead:dd};
  /* ===== 背の扇の翼（奥）：膜の内側がこちらを向く。膜の目、ふちから垂れる細い触手 ===== */
  const wg=lerp(P.wing,-1.7,dd),W=Q(-1,-41-4*wg+br*.6),S0=Q(-5,-27),A=[Q(19,-22),Q(9,-27)];
- const TP=[[-15,-53,8],[-1,-63,10],[14,-61,9],[28,-51,7],[37,-36,4]].map(([x,y,a],i)=>Q(x+Math.sin(T*.03+i)*.4,y-a*wg));
+ const TP=[[-15,-53,8],[-1,-63,10],[14,-61,9],[27,-51,7],[33,-37,4]].map(([x,y,a],i)=>Q(x+Math.sin(T*.03+i)*.4,y-a*wg));
  const SC=[];for(let i=0;i<4;i++)SC.push(LP(LP(TP[i],TP[i+1],.5),W,.36));SC.push(LP(LP(TP[4],A[0],.5),W,.24));
  const wp=[W,TP[0],SC[0],TP[1],SC[1],TP[2],SC[2],TP[3],SC[3],TP[4],SC[4],A[0],A[1],S0],wm=B.mask(wp),md=Math.max(...TP.map(t=>Math.hypot(t[0]-W[0],t[1]-W[1])));
  const segd=(p,a,b)=>{const vx=b[0]-a[0],vy=b[1]-a[1],t=Math.max(0,Math.min(1,((p[0]-a[0])*vx+(p[1]-a[1])*vy)/(vx*vx+vy*vy)));return Math.hypot(p[0]-a[0]-vx*t,p[1]-a[1]-vy*t)};
@@ -521,8 +521,8 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  /* ふちのぎざぎざ */for(let i=0;i<5;i++)for(let s=.1;s<.92;s+=.13){const a=i<4?TP[i]:TP[4],b=SC[i],p=LP(a,b,s);if(hsh(i,s*9)>.45){dClr(B,p[0],p[1]+1);dClr(B,p[0]+1,p[1]+1)}}
  /* 腕と指（肉）、先は骨のとげ */dTent(B,[S0,LP(S0,W,.5),W],2.6,1.8,SK,rim);for(const t of TP){const m1=LP(W,t,.55);dTent(B,[W,[m1[0]-1,m1[1]-1],LP(W,t,.78)],1.6,.9,SK,rim);dTent(B,[LP(W,t,.74),t],1,.4,BO)}
  tops.push(...TP.map(t=>t[1]));
- /* 膜の目：のまれるほど開く。こちらを見る */if(dd<.5)for(let i=0;i<3;i++){const p=LP(LP(LP(W,TP[i+1],.55),LP(W,TP[i+2],.55),.5),W,.05),x=Math.round(p[0]),y=Math.round(p[1]),bl=((T>>1)+i*37)%97<4;
-  B.line(x-1,y-1,x+1,y-1,fd(D.vein),1);if(D.weye===0||bl){B.line(x-1,y,x+1,y,ME[0],1)}else if(D.weye===1){B.set(x-1,y,ME[0],1);B.set(x,y,D.eye,2);B.set(x+1,y,ME[0],1)}else{B.set(x-1,y,D.eye,2);B.set(x,y,D.eye,2);B.set(x+1,y,mix(D.eye,'#000000',.4),2);B.set(x-1,y,'#100008',2);B.set(x,y+1,ME[0],1)}}
+ /* 膜の目：のまれるほど開く。こちらを見る */if(dd<.5)for(let i=0;i<3;i++){const p=LP(LP(LP(W,TP[i+1],.55),LP(W,TP[i+2],.55),.5),W,.05),x=Math.round(p[0]),y=Math.round(p[1]),bl=((T>>1)+i*37)%97<4,cnt=P.wcount>=0,lv=cnt?(i<P.wcount?3:0):bl?0:D.weye;
+  B.line(x-1,y-1,x+1,y-1,fd(D.vein),1);if(lv===3){B.line(x-2,y-1,x+2,y-1,fd(D.vein),1);B.line(x-2,y,x+2,y,D.eye,2);B.set(x,y,'#120008',2);B.line(x-1,y+1,x+1,y+1,mix(D.eye,'#000000',.45),2)}else if(lv===0){B.line(x-1,y,x+1,y,ME[0],1)}else if(lv===1){B.set(x-1,y,ME[0],1);B.set(x,y,D.eye,2);B.set(x+1,y,ME[0],1)}else{B.set(x-1,y,D.eye,2);B.set(x,y,D.eye,2);B.set(x+1,y,mix(D.eye,'#000000',.4),2);B.set(x-1,y,'#100008',2);B.set(x,y+1,ME[0],1)}}
  /* ふちから垂れる細い触手（覚悟で長くなる） */if(dd<.8)for(let i=0;i<5;i++){const a=SC[i],L=D.frill+(i%2),sw=Math.sin(T*.05+i*1.9)*1.5;const pts=[a,[a[0]+sw*.5,a[1]+L*.5],[a[0]+sw,a[1]+L]];for(let j=0;j<L;j++){const q=LP(pts[0],pts[2],j/L);B.set(q[0]+Math.sin(j*.8+T*.06+i)*.8,q[1],j<L-1?ME[2]:ME[3],1)}}
  /* ===== 奥の脚 ===== */
  const lift=Math.max(0,P.lift-6)*.9,legHind=(hx,ft,R,thr)=>{const H=Q(hx,-17),F=[bx+ft*k-dd*4,oy],Kn=[lerp(H[0],F[0],.5)-6*k,lerp(H[1],F[1],.45)],An=[F[0]+4*k,F[1]-4*k];
@@ -533,13 +533,14 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
    /* 長すぎる四本の指 */for(let i=0;i<4;i++){const e=[F[0]-5*k+i*1.6*k,F[1]+(up>.2?-1+i*.8:0)],c=R===SK?BO:FAR(BO);dTent(B,[Wr,LP(Wr,e,.6),e],.8,.5,R);B.set(e[0]-1,e[1],c[3],1);B.set(e[0]-2,e[1]+(up>.2?1:0),c[2],1)}return F};
  legHind(16,14,FAR(SK),5);const FF=legFront(-8,-14,P.fr,FAR(SK),4);
  /* ===== 尾：床をなでて、先が三つに裂ける。途中に門の要石が肉に埋まっている ===== */
- const tb=Q(17,-19),rest=Q(43,-35+Math.sin(T*.04)*2),UP=Q(30,-60),SL=[bx+40*k,oy-1],SW=[HXX+16,oy-3],LM=[bx+52*k,oy-2];
+ const tb=Q(17,-19),rest=Q(37,-38+Math.sin(T*.04)*2),UP=Q(26,-58),SL=[bx+28*k,oy-1],SW=[HXX+16,oy-3],LM=[bx+52*k,oy-2];
  let tip=rest;tip=LP(tip,UP,P.tailUp);tip=LP(tip,SL,P.slap);tip=LP(tip,SW,P.sweep);tip=LP(tip,LM,dd);tip=[tip[0]-P.twitch*3,tip[1]-P.twitch*7];
  const c1=LP(LP(Q(32,-10),Q(30,-2),P.sweep),Q(32,-6),dd),c2=[lerp(c1[0],tip[0],.5)+6*(1-P.sweep)*(1-dd)*(1-P.slap),lerp(c1[1],tip[1],.6)+(P.slap>.5?-8*P.slap:0)];
  const tf0=cub(tb,c1,c2,tip),wv=(1-dd)*(1-P.sweep)*(1-P.slap),tf=t=>{const p=tf0(t),q=tf0(Math.min(1,t+.02)),a=Math.atan2(q[1]-p[1],q[0]-p[0])+1.57,o=Math.sin(T*.06-t*5)*1.6*t*wv;return[p[0]+Math.cos(a)*o,p[1]+Math.sin(a)*o]};
  {const m=new Set();dCurve(m,tf,t=>(5.6-4.4*t)*k,0,36,.04,3);dShade(B,m,SK,rim);
   for(let i=1;i<9;i++){const t=i/10,p=tf(t),q=tf(t+.02),a=Math.atan2(q[1]-p[1],q[0]-p[0])-1.57,L=(3.2-t*2.4)*k,r=(5.6-4.4*t)*k;const b=[p[0]+Math.cos(a)*(r-.5),p[1]+Math.sin(a)*(r-.5)];if(i!==5)dTent(B,[b,[b[0]+Math.cos(a+.5)*L,b[1]+Math.sin(a+.5)*L]],.9,.3,BO)}
-  /* 要石：門のアーチのいちばん上の石。肉に半分埋まっている */{const p=tf(.5),q=tf(.52),a=Math.atan2(q[1]-p[1],q[0]-p[0]),L=v=>add(p,rot(v,a)),G=['#2a2632','#5a5466','#8a8498','#b8b2c4'].map(fd);B.poly([L([-2.2,-2]),L([2.2,-2]),L([3.2,-6.4]),L([-3.2,-6.4])],G[1],G[3],G[0]);B.line(...L([0,-3]),...L([0,-5.6]),G[0],1);for(const s of[-2.6,2.6]){const e=L([s,-2.4]);B.set(e[0],e[1],SK[3],1)}const e=L([0,-1.6]);B.set(e[0],e[1],SK[3],1)}
+  /* 要石：門のアーチのいちばん上の石。肉に半分埋まっている */{const p=tf(.68),q=tf(.7),a=Math.atan2(q[1]-p[1],q[0]-p[0]),L=v=>add(p,rot(v,a)),G=['#2a2632','#5a5466','#8a8498','#b8b2c4'].map(fd);B.poly([L([-2.2,-2]),L([2.2,-2]),L([3.2,-6.4]),L([-3.2,-6.4])],G[1],G[3],G[0]);B.line(...L([0,-3]),...L([0,-5.6]),G[0],1);for(const s of[-2.6,2.6]){const e=L([s,-2.4]);B.set(e[0],e[1],SK[3],1)}const e=L([0,-1.6]);B.set(e[0],e[1],SK[3],1)}
+  /* 尾の三つの目：ふだんは閉じたすじ。尾の技では、床を打つたびに一つずつ開く */for(let i=0;i<3;i++){const t=[.16,.32,.5][i],p=tf(t),q=tf(t+.02),a=Math.atan2(q[1]-p[1],q[0]-p[0]),L=v=>add(p,rot(v,a)).map(Math.round),c=L([0,-1]),op=P.tcount>i||(P.tcount<0&&D.more);B.set(c[0]-1,c[1]-1,SK[1],1);B.set(c[0],c[1]-1,SK[1],1);B.set(c[0]+1,c[1]-1,SK[1],1);if(op){B.set(c[0]-1,c[1],D.eye,2);B.set(c[0],c[1],P.tcount>i?D.eye:'#120008',2);B.set(c[0]+1,c[1],D.eye,2);if(P.tcount>i)B.set(c[0],c[1],'#120008',2)}else B.line(c[0]-1,c[1],c[0]+1,c[1],SK[0],1)}
   /* 先は三つに裂けた触手 */const te=tf(1),tq=tf(.96),ta=Math.atan2(te[1]-tq[1],te[0]-tq[0]);J.tendrils=[];for(let i=-1;i<=1;i++){const a=ta+i*.7+Math.sin(T*.08+i)*.25*(1-dd),L=(4+(i===0?1.5:0)+D.more*2)*k,m1=[te[0]+Math.cos(a)*L*.5,te[1]+Math.sin(a)*L*.5],e=[m1[0]+Math.cos(a+.6*Math.sin(T*.06+i))*L*.5,m1[1]+Math.sin(a+.6*Math.sin(T*.06+i))*L*.5];dTent(B,[te,m1,e],1.1,.35,SK);J.tendrils.push(e)}
   J.tail=te}
  /* ===== 胴：肩が高く、あばらが浮く。ぬれた光 ===== */
@@ -550,7 +551,7 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  if(dd<.5)for(const[x,y]of[[-6,-31],[-5,-31],[3,-27]]){const p=Q(x,y);if(B.tag(Math.round(p[0]),Math.round(p[1]))===1)B.set(p[0],p[1],mix(SK[4],'#ffffff',.45),1)}
  /* ===== 手前の後ろ脚 ===== */legHind(12,10,SK,6.8);
  /* ===== 首：弓なりに上がって、頭は低く前へ。のどの板、埋まった金のかせ、のど袋 ===== */
- const Hb=dd>0?LP(Q(-30-P.nx,-18+P.ny),[bx-34*k,oy-5],dd):Q(-30-P.nx,-18+P.ny),N0=Q(-13,-25),N1=LP(Q(-16-P.nx*.2,-39+P.ny*.1),Q(-18,-14),dd),N2=LP(Q(-28-P.nx*.6,-33+P.ny*.6),Q(-28,-8),dd),nf=cub(N0,N1,N2,Hb),nr=t=>(6.6-2.6*t)*k;
+ const Hb=dd>0?LP(Q(-27-P.nx,-18+P.ny),[bx-32*k,oy-5],dd):Q(-27-P.nx,-18+P.ny),N0=Q(-13,-25),N1=LP(Q(-16-P.nx*.2,-39+P.ny*.1),Q(-18,-14),dd),N2=LP(Q(-25-P.nx*.6,-33+P.ny*.6),Q(-28,-8),dd),nf=cub(N0,N1,N2,Hb),nr=t=>(6.6-2.6*t)*k;
  const nm=new Set();dCurve(nm,nf,nr,0,40,.05,5);
  /* 皮膚の下を這うもの */const cp=(T%240)/70;if(cp<1&&dd<.3){const p=nf(cp),q=nf(Math.min(1,cp+.02)),a=Math.atan2(q[1]-p[1],q[0]-p[0])-1.57;dDisc(nm,p[0]+Math.cos(a)*(nr(cp)-1),p[1]+Math.sin(a)*(nr(cp)-1),2.2*k)}
  dShade(B,nm,SK,rim,null,true);
@@ -587,8 +588,8 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  /* くらやみのよだれ */if(dd<.5){const ph=(T*.25+3)%22,p=Jw([-14,3]);for(let j=0;j<Math.min(ph,7);j++)B.set(p[0],p[1]+j,j>4?D.sk[1]:D.sk[2],1)}
  /* ===== 手前の前脚 ===== */const NF=legFront(-10,-18,P.fl,SK,5.4);
  /* ===== ひび：ふだんは古い傷あと。怒ると皮が裂けて、中の赤が光る（光の赤＝重い） ===== */
- const cr=[[[-13,-27],[-15,-22],[-12,-17]],[[0,-30],[2,-25],[0,-21],[3,-16]],[[9,-24],[11,-19]],[[-6,-18],[-8,-14]]];for(const c of cr){const pts=c.map(p=>Q(...p));for(let i=0;i+1<pts.length;i++){B.line(...pts[i],...pts[i+1],rg?'#ff4a3a':fd(D.crack),1);if(rg){const m=LP(pts[i],pts[i+1],.5);B.set(m[0],m[1],'#ffc070',1);B.set(m[0]-1,m[1],SK[3],1)}}}
- if(rg){for(const t of[.3,.55,.8]){const[p]=nrm(t);B.line(p[0]-1,p[1]-2,p[0]+1,p[1]+1,'#ff4a3a',1);B.set(p[0],p[1],'#ffc070',1)}}
+ /* 三本の大きな傷：尾の側から順に、肩、首。炎の前に一度消え、拍ごとに一本ずつ赤がたまる */const cr=[[[11,-26],[13,-21],[10,-16]],[[0,-31],[2,-26],[0,-21],[3,-16]],[[-12,-28],[-15,-23],[-12,-18]],[[-6,-18],[-8,-14]]];cr.forEach((c,ci)=>{const pts=c.map(p=>Q(...p)),on=rg&&(P.ccount<0||(ci<3&&ci<P.ccount)),full=P.ccount>=0&&ci<P.ccount;for(let i=0;i+1<pts.length;i++){B.line(...pts[i],...pts[i+1],on?'#ff4a3a':fd(D.crack),1);if(on&&full){const w=LP(pts[i],pts[i+1],.5);B.set(w[0]+1,w[1],'#ff4a3a',1)}if(on){const m=LP(pts[i],pts[i+1],.5);B.set(m[0],m[1],'#ffc070',1);B.set(m[0]-1,m[1],SK[3],1)}}});
+ if(rg&&(P.ccount<0||P.ccount>=3)){for(const t of[.3,.55,.8]){const[p]=nrm(t);B.line(p[0]-1,p[1]-2,p[0]+1,p[1]+1,'#ff4a3a',1);B.set(p[0],p[1],'#ffc070',1)}}
  /* ===== 紫の段：目が体じゅうに増える（上位の存在の視線） ===== */
  if(D.more&&dd<.5){const sp=[nf(.22),nf(.5),nf(.72),Q(-8,-22),Q(2,-26),Q(9,-21),tf(.3),tf(.65)];sp.forEach((p,i)=>{const o=((T>>1)+i*41)%71>3,x=Math.round(p[0]),y=Math.round(p[1]);B.set(x-1,y-1,SK[1],1);B.set(x,y-1,SK[1],1);B.set(x+1,y-1,SK[1],1);if(o){B.set(x-1,y,D.eye,2);B.set(x,y,'#120008',2);B.set(x+1,y,D.eye,2)}else B.line(x-1,y,x+1,y,SK[0],1)})}
  /* ===== 黒い段から：背から、くらやみがのぼる ===== */
@@ -1116,39 +1117,39 @@ const lamps=(B,J,t,beats)=>{for(let i=0;i<3;i++){const x=J.sc[0]-8+i*8,y=(J.top!
 const thud=(B,t,beats)=>{for(const b of beats)if(t>=b&&t<b+5)for(let x=EXX-30;x<EXX+30;x+=3)B.set(x,FL-((x+t)%2),'#8a8090',4)};
 /* 足が床をたたいたときの土ぼこり（体が動いた結果だけ） */const ddust=(B,p,d,w)=>{if(d<0||d>9)return;for(let i=0;i<6;i++){const s=i<3?-1:1,x=p[0]+s*(2+d*(.6+i%3*.3))*(w||1),y=FL-1-(i%3)*d*.25;B.set(x,y,d<5?'#8a8094':'#4e4858',4)}};
 const dpool=(B,cx,w,t,c)=>{for(let x=-w;x<=w;x++){const h=Math.max(0,(1-(x*x)/(w*w))*2.4+Math.sin(x*.7+t*.2)*.6);for(let y=0;y<h;y++)B.set(cx+x,FL-y,y<h-1?(c||INK.col):INK.hi,1)}};
-mv({f:'dragon',id:'d_enter',n:'登場：くらやみから形になる',bg:'lord',len:190,noHero:true,cap:'床のくらやみが泡立ち、下から竜の形に盛り上がる。三つの目が、ばらばらの順に一つずつ開く。最後に背の扇がひらく。',why:'くらやみが、初めて形を持った姿。だから最初は形がない。目がそろって開かないのは、まだ「生き物のまね」が上手くないから。',
+mv({f:'dragon',ox:8,id:'d_enter',n:'登場：くらやみから形になる',bg:'lord',len:190,noHero:true,cap:'床のくらやみが泡立ち、下から竜の形に盛り上がる。三つの目が、ばらばらの順に一つずつ開く。最後に背の扇がひらく。',why:'くらやみが、初めて形を持った姿。だから最初は形がない。目がそろって開かないのは、まだ「生き物のまね」が上手くないから。',
  keys:[K(0,Object.assign({},DI,{melt:1,wing:-1.4,cr:6})),K(20,Object.assign({},DI,{melt:1,wing:-1.4,cr:6})),K(108,Object.assign({},DI,{melt:0,wing:-1.4,cr:4}),'io'),K(140,Object.assign({},DI,{wing:-1.4,cr:2})),K(156,Object.assign({},DI,{wing:.4,hy:-4,jaw:.6}),'out'),K(190,DI)],
- pp:(P,t)=>{P.eyes=t<110?0:t<120?1:t<132?2:3},pre:(B,t)=>{if(t<116)dpool(B,EXX,Math.round(Math.min(36,6+t*.9)-Math.max(0,t-70)*.6),t)}});
-mv({f:'dragon',id:'d_idle',n:'立ち絵',bg:'lord',len:160,keys:sway({cr:0,wing:0,hy:0,ny:0},{cr:1,wing:.12,hy:-2,ny:1},160,2),
+ pp:(P,t)=>{P.eyes=t<110?0:t<120?1:t<132?2:3},pre:(B,t)=>{if(t<116)dpool(B,EXX+8,Math.round(Math.min(36,6+t*.9)-Math.max(0,t-70)*.6),t)}});
+mv({f:'dragon',ox:8,id:'d_idle',n:'立ち絵',bg:'lord',len:160,keys:sway({cr:0,wing:0,hy:0,ny:0},{cr:1,wing:.12,hy:-2,ny:1},160,2),
  cap:'低く這い、肩だけが高い。あごの下の触手が揺れ、背の扇の膜には閉じた目。首の皮膚の下を、ときどき何かが這う。',why:'竜の形をしているが、竜ではない。くらやみが生き物のまねをしている。'});
-mv({f:'dragon',id:'d_slam',n:'のしかかり（拍）',bg:'lord',len:160,cap:'頭を上げて白く光る。前足で床を三回踏み鳴らす（ドン・ドン・ドン）。四回目の拍で後ろ足で立ち上がり、全身で落ちてくる。',why:'拍を数えるのは「足踏み」。見ても聞いても同じ数になる。灯りのような外の印には頼らない。',
+mv({f:'dragon',ox:8,id:'d_slam',n:'のしかかり（拍）',bg:'lord',len:160,cap:'頭を上げて白く光ると、背の扇の三つの目がいったん閉じる。前足で床を踏み鳴らすたびに（ドン・ドン・ドン）、扇の目が一つずつ開く。三つ全部開いた次の拍で、立ち上がって全身で落ちてくる。',why:'からくり人形のランプと同じ「全部そろったら次の拍」。数える印は体の一部（扇の目）。足踏みの音でも同じ数になる。',
  keys:[K(0,DI),K(14,{ny:-4,hy:-4,wing:.3}),K(18,{fl:1,cr:-1,ny:-5,wing:.3}),K(22,{fl:0,cr:2,ny:-1,wing:.3},'in'),K(27,{fr:1,cr:-1,ny:-5,wing:.35}),K(32,{fr:0,cr:2,ny:-1,wing:.35},'in'),K(37,{fl:1,cr:-1,ny:-6,wing:.4}),K(42,{fl:0,cr:2,ny:-1,wing:.4},'in'),
   K(48,{lift:16,cr:-2,ny:-8,hy:-6,wing:1,jaw:.5},'out'),K(52,{lift:0,cr:6,x:-20,ny:4,hy:3,wing:.3},'in'),K(92,{cr:6,x:-20,ny:4,hy:3}),K(140,DI)],
- cues:[{t:14,col:'w',at:J=>J.head}],hits:[52],fx:(B,J,t)=>{ddust(B,J.foot,t-22);ddust(B,J.ffoot,t-32);ddust(B,J.foot,t-42);ddust(B,J.foot,t-52,2.4)}});
-mv({f:'dragon',id:'d_stab',n:'三度の噛みつき',bg:'lord',len:150,cap:'首を縮めて白く光り、低く突っこんで噛む。二度目は口を大きく開け、三度目は口の端がほおまで裂けて、奥の歯の列が見える。光は一回ずつ出る。',why:'光ってから当たるまでは、いつも同じ。開く口の大きさは怖さを増やすだけで、読み方は変わらない。',
+ cues:[{t:14,col:'w',at:J=>J.head}],hits:[52],pp:(P,t)=>{P.wcount=t<14||t>=70?-1:t<22?0:t<32?1:t<42?2:3},fx:(B,J,t)=>{ddust(B,J.foot,t-22);ddust(B,J.ffoot,t-32);ddust(B,J.foot,t-42);ddust(B,J.foot,t-52,2.4)}});
+mv({f:'dragon',ox:8,id:'d_stab',n:'三度の噛みつき',bg:'lord',len:150,cap:'首を縮めて白く光り、低く突っこんで噛む。二度目は口を大きく開け、三度目は口の端がほおまで裂けて、奥の歯の列が見える。光は一回ずつ出る。',why:'光ってから当たるまでは、いつも同じ。開く口の大きさは怖さを増やすだけで、読み方は変わらない。',
  keys:[K(0,DI),K(14,{nx:-6,ny:-6,hy:-4,jaw:.4}),K(38,{nx:-7,ny:-7,hy:-5,jaw:.6}),K(42,{nx:12,ny:5,hy:3,jaw:.1,x:-10},'in'),K(48,{nx:10,ny:4,jaw:.1,x:-10}),K(56,{nx:-4,ny:-3,jaw:.6,x:-6}),K(68,{nx:-5,ny:-5,jaw:.85,x:-6}),K(72,{nx:12,ny:6,hy:3,jaw:.1,x:-12},'in'),K(80,{nx:-4,ny:-4,jaw:.9,x:-6}),K(104,{nx:-6,ny:-6,jaw:1,x:-6,hy:-6}),K(108,{nx:13,ny:6,hy:3,jaw:.1,x:-12},'in'),K(130,DI)],
  cues:[{t:14,col:'w',at:J=>J.mouth},{t:44,col:'w',at:J=>J.mouth},{t:80,col:'w',at:J=>J.mouth}],hits:[42,72,108]});
-mv({f:'dragon',id:'d_tail',n:'尾の薙ぎ払い（拍）',bg:'lord',len:160,cap:'尾を高く上げ、先が白く光る。尾で床を三回打つ（バン・バン・バン）。打つたびに少しずつ高く振りかぶり、四回目の拍で低く薙ぎ払う。',why:'のしかかりと同じ拍のルールを、別の体の部分で見せる。数えるのは「尾が床を打った回数」。',
+mv({f:'dragon',ox:8,id:'d_tail',n:'尾の薙ぎ払い（拍）',bg:'lord',len:160,cap:'尾を高く上げ、先が白く光る。尾にある三つの閉じた目が、尾で床を打つたびに（バン・バン・バン）一つずつ開く。三つ全部開いた次の拍で、低く薙ぎ払う。',why:'のしかかりと同じ「目が全部開いたら次の拍」を、尾で見せる。',
  keys:[K(0,DI),K(14,{tailUp:1,cr:1}),K(19,{tailUp:1}),K(23,{tailUp:.3,slap:1,cr:2},'in'),K(27,{tailUp:1,slap:0}),K(32,{tailUp:.3,slap:1,cr:2},'in'),K(36,{tailUp:1.1,slap:0}),K(41,{tailUp:.3,slap:1,cr:2},'in'),K(46,{tailUp:1.2,slap:0,x:6,cr:1,ny:-3}),K(50,{tailUp:0,sweep:1,x:-8,cr:3,ny:2},'in'),K(72,{sweep:1,x:-8,cr:3}),K(104,{sweep:0,x:0,cr:0}),K(150,DI)],
- cues:[{t:14,col:'w',at:J=>J.tail}],hits:[50],fx:(B,J,t)=>{for(const b of[23,32,41])ddust(B,[J.tail[0],FL],t-b,1.4)}});
-mv({f:'dragon',id:'d_feel',n:'あごの触手',bg:'lord',len:130,cap:'あごの下の触手が逆立ち、先が白く光る。首は動かないまま、触手だけがのびて刺さる。',why:'見る場所が「頭」ではなく「あごの下」になる。竜のふりをした何かであることが、ここで一度だけはっきり見える。',
+ cues:[{t:14,col:'w',at:J=>J.tail}],hits:[50],pp:(P,t)=>{P.tcount=t<14||t>=68?-1:t<23?0:t<32?1:t<41?2:3},fx:(B,J,t)=>{for(const b of[23,32,41])ddust(B,[J.tail[0],FL],t-b,1.4)}});
+mv({f:'dragon',ox:8,id:'d_feel',n:'あごの触手',bg:'lord',len:130,cap:'あごの下の触手が逆立ち、先が白く光る。首は動かないまま、触手だけがのびて刺さる。',why:'見る場所が「頭」ではなく「あごの下」になる。竜のふりをした何かであることが、ここで一度だけはっきり見える。',
  keys:[K(0,DI),K(14,{ny:-3,hy:-3,feel:-.4}),K(40,{ny:-3,hy:-3,feel:-.5}),K(42,{ny:1,feel:1,x:-6},'in'),K(62,{ny:1,feel:1,x:-6}),K(84,{feel:0}),K(130,DI)],cues:[{t:14,col:'w',at:J=>J.feelers[1]}],hits:[42]});
-mv({f:'dragon',id:'d_rage',n:'怒り：皮が裂ける',bg:'lord',len:170,noHero:true,cap:'身を縮め、それから立ち上がって口を裂けるほど開き、全身をふるわせて吠える。古い傷あとの皮が裂け、中から赤い光がのぞく。扇がいっぱいに広がる。',why:'怒ると、攻撃の光にも赤（重い）が混ざりはじめる合図。赤は「中身」の色で、体の色ではない。',
+mv({f:'dragon',ox:8,id:'d_rage',n:'怒り：皮が裂ける',bg:'lord',len:170,noHero:true,cap:'身を縮め、それから立ち上がって口を裂けるほど開き、全身をふるわせて吠える。古い傷あとの皮が裂け、中から赤い光がのぞく。扇がいっぱいに広がる。',why:'怒ると、攻撃の光にも赤（重い）が混ざりはじめる合図。赤は「中身」の色で、体の色ではない。',
  keys:[K(0,DI),K(22,Object.assign({},DI,{cr:4,ny:4,hy:4,wing:-.4})),K(44,{lift:9,hy:-10,ny:-8,jaw:1,wing:1.1,quiver:.7},'out'),K(110,{lift:9,hy:-10,ny:-8,jaw:1,wing:1.1,quiver:.5}),K(140,{rage:1,wing:.3}),K(170,{rage:1})],pp:(P,t)=>{P.rage=t>=60?1:0}});
-mv({f:'dragon',id:'d_breath',n:'赤い炎（拍・重い）',bg:'lord',len:170,cap:'怒ったあと。口元が赤く光る。のどを鳴らして三回飲みこむように首をしゃくり、そのたびにのど袋がふくらんで、うすい皮の向こうに火が透ける。四回目の拍で吐く。重い。',why:'拍を数えるのは「のど袋」。三回ふくらんだ次の拍。怒りの赤い炎は重いが、弾けば大きく反撃できる。',
+mv({f:'dragon',ox:8,id:'d_breath',n:'赤い炎（拍・重い）',bg:'lord',len:170,cap:'怒ったあと。口元が赤く光ると、体の裂け目の赤い光がいったん全部消える。首をしゃくって飲みこむたびに、尾の側の傷から順に一本ずつ赤がたまり、のど袋もふくらむ。三本とも赤くなった次の拍で吐く。重い。',why:'赤がたまっていく先が、のど。三本そろったら次の拍。怒りの赤い炎は重いが、弾けば大きく反撃できる。',
  keys:[K(0,Object.assign({},DI,{rage:1})),K(14,{rage:1,ny:-4,hy:-6,sac:.1}),K(20,{rage:1,ny:-7,hy:-8,sac:.12}),K(23,{rage:1,ny:-2,hy:-3,sac:.4},'in'),K(29,{rage:1,ny:-7,hy:-8,sac:.42}),K(32,{rage:1,ny:-2,hy:-3,sac:.7},'in'),K(38,{rage:1,ny:-7,hy:-8,sac:.72}),K(41,{rage:1,ny:-2,hy:-3,sac:1},'in'),K(46,{rage:1,ny:-9,hy:-10,sac:1,lift:6,wing:.8}),K(50,{rage:1,ny:2,hy:2,jaw:1,sac:.1,lift:0,x:-4,wing:.6},'in'),K(80,{rage:1,ny:2,hy:2,jaw:1,x:-4}),K(150,Object.assign({},DI,{rage:1}))],
- cues:[{t:14,col:'r',at:J=>J.mouth}],hits:[50],hitCol:'r',fx:(B,J,t)=>{if(t>=48&&t<76){const u=Math.min(1,(t-48)/4),f=t<70?1:(76-t)/6,m=J.mouth;for(let i=0;i<34*u*f;i++){const x=m[0]-i*1.4,y=m[1]+i*.22+Math.sin(i*.9+t*.7)*(1+i*.05);if(x<HXX-8)break;B.disc(x,y,1.2+i*.08,i%4?'#ff5a28':'#ffc040','#fff0a0','#a01a10',4)}}}});
-mv({f:'dragon',id:'d_dive',n:'影もぐり',bg:'lord',len:150,cap:'竜の体が頭からくずれて、床のくらやみの水たまりになる。水たまりが床をすべって、こちらの足元へ来る。足元の床が白く光る。そこから首が突き上がる。',why:'くらやみそのものだから、形を捨てられる。見る場所が竜から自分の足元へ変わる。',
+ cues:[{t:14,col:'r',at:J=>J.mouth}],hits:[50],hitCol:'r',pp:(P,t)=>{P.ccount=t<14||t>=56?-1:t<23?0:t<32?1:t<41?2:3},fx:(B,J,t)=>{if(t>=48&&t<76){const u=Math.min(1,(t-48)/4),f=t<70?1:(76-t)/6,m=J.mouth;for(let i=0;i<34*u*f;i++){const x=m[0]-i*1.4,y=m[1]+i*.22+Math.sin(i*.9+t*.7)*(1+i*.05);if(x<HXX-8)break;B.disc(x,y,1.2+i*.08,i%4?'#ff5a28':'#ffc040','#fff0a0','#a01a10',4)}}}});
+mv({f:'dragon',ox:8,id:'d_dive',n:'影もぐり',bg:'lord',len:150,cap:'竜の体が頭からくずれて、床のくらやみの水たまりになる。水たまりが床をすべって、こちらの足元へ来る。足元の床が白く光る。そこから首が突き上がる。',why:'くらやみそのものだから、形を捨てられる。見る場所が竜から自分の足元へ変わる。',
  keys:[K(0,DI),K(8,Object.assign({},DI,{cr:4,ny:4})),K(30,Object.assign({},DI,{melt:1,cr:6}),'in'),K(104,Object.assign({},DI,{melt:1})),K(134,Object.assign({},DI,{melt:0}),'out'),K(150,DI)],cues:[{t:20,col:'w',at:J=>[HXX+4,FL-2]}],hits:[48],
- pre:(B,t)=>{if(t>=24&&t<110){const u=Math.min(1,(t-24)/16),back=t>78?Math.min(1,(t-78)/24):0,x=lerp(lerp(EXX,HXX+4,u),EXX,back);dpool(B,Math.round(x),12,t)}},
+ pre:(B,t)=>{if(t>=24&&t<110){const u=Math.min(1,(t-24)/16),back=t>78?Math.min(1,(t-78)/24):0,x=lerp(lerp(EXX+8,HXX+4,u),EXX+8,back);dpool(B,Math.round(x),12,t)}},
  fx:(B,J,t)=>{if(t>=44&&t<74){const u=t<48?(t-44)/4:1-(t-48)/26,b=[HXX+6,FL],D=J.D,h=[b[0]-2,b[1]-30*u];dTent(B,[[b[0]+3,b[1]],[b[0]+7,b[1]-15*u],h],5.4,3.4,D.sk,D.rim);
    const R=v=>[h[0]+v[0],h[1]+v[1]],m=new Set();dDisc(m,...R([0,-1]),4);dCurve(m,s=>LP(R([-1,-2]),R([-10,-7]),s),3,1.6,8);dShade(B,m,D.sk,D.rim);const j=new Set();dCurve(j,s=>LP(R([-1,1]),R([-9,3]),s),2.2,1.2,8);dShade(B,j,D.sk,D.rim);
    B.line(...R([-10,-5]),...R([-1,0]),'#2a0612',1);for(let i=0;i<4;i++){B.set(...R([-8+i*2,-4+i*.5]),D.bone[3],1);B.set(...R([-7+i*2,1+i*.4]),D.bone[2],1)}B.set(...R([-4,-4]),D.eye,2);B.set(...R([-3,-4]),D.eye,2);B.set(...R([-1,-5]),D.eye,2);B.set(...R([-1,-3]),D.eye,2);
    for(let i=0;i<3;i++){const s=R([-5+i*2,3]);B.line(s[0],s[1],s[0]+Math.sin(t*.3+i),s[1]+4,D.sk[3],1)}}},
  post:(B,J,t)=>{for(let y=FL+1;y<CH;y++)for(let x=0;x<CW;x++){const i=y*CW+x;if(B.t[i]===1||B.t[i]===3){B.c[i]=((x+y)%5?'#1a1220':'#2a1e30');B.t[i]=6}}}});
-mv({f:'dragon',id:'d_down',n:'たおれる：亡骸が残る',bg:'lord',len:210,noHero:true,cap:'のけぞって声にならない声で叫ぶ。前足が折れ、一度だけ起き上がろうとして、崩れ落ちる。扇は背にかぶさり、三つの目がばらばらに閉じる。最後に尾の先が一度だけ動く。亡骸の下から、くらやみがしみ出す。',why:'倒れたものは、くらやみに拾われる。この亡骸は消えない。次に「通り道」にされる。',
+mv({f:'dragon',ox:8,id:'d_down',n:'たおれる：亡骸が残る',bg:'lord',len:210,noHero:true,cap:'のけぞって声にならない声で叫ぶ。前足が折れ、一度だけ起き上がろうとして、崩れ落ちる。扇は背にかぶさり、三つの目がばらばらに閉じる。最後に尾の先が一度だけ動く。亡骸の下から、くらやみがしみ出す。',why:'倒れたものは、くらやみに拾われる。この亡骸は消えない。次に「通り道」にされる。',
  keys:[K(0,DI),K(6,{x:6,lift:7,hy:-9,ny:-7,jaw:1,wing:1,quiver:1},'out'),K(34,{x:4,lift:5,hy:-7,ny:-5,jaw:.8,wing:.8,quiver:.4}),K(58,{x:2,dead:.4,jaw:.5,wing:.2,fl:.3},'in'),K(70,{x:2,dead:.3,ny:-4,jaw:.4,quiver:.3}),K(92,{dead:1,wing:-1,jaw:.2},'in'),K(150,{dead:1}),K(156,{dead:1,twitch:1},'out'),K(166,{dead:1,twitch:0}),K(210,{dead:1})],
- pp:(P,t)=>{P.eyes=t<112?3:t<126?2:t<142?1:0},pre:(B,t)=>{if(t>=160)dpool(B,EXX,Math.round(Math.min(38,(t-160)*.8)),t)},fx:(B,J,t)=>{ddust(B,[EXX-14,FL],t-92,3);ddust(B,[EXX+12,FL],t-94,2)}});
+ pp:(P,t)=>{P.eyes=t<112?3:t<126?2:t<142?1:0},pre:(B,t)=>{if(t>=160)dpool(B,EXX+8,Math.round(Math.min(38,(t-160)*.8)),t)},fx:(B,J,t)=>{ddust(B,[EXX-6,FL],t-92,3);ddust(B,[EXX+20,FL],t-94,2)}});
 /* ---------- 三つ首の竜 ---------- */
 const HI={rift:1,f0:0,f1:0,f2:0};
 mv({f:'hydra',id:'h_enter',n:'登場：亡骸の胸が裂ける',bg:'hole',len:180,noHero:true,cap:'倒れた竜の亡骸の胸が、内側から裂ける。触手に縁どられた裂け目から、三本の首がゆっくり伸びてくる。亡骸は動かない。',why:'竜が生き返ったのではない。竜の体が、門の代わりの「通り道」にされた。',
@@ -1302,7 +1303,7 @@ const FORMS=[
  pal:[['#5a1424','殻になった赤','中身はもういない'],['#120a1c','門の向こう','アーチの内側'],['#d8dce8','銀の刃','最後まで変わらない']]},
 {key:'dragon',ttl:'くらやみの竜',en:'THE FIRST SHAPE OF DARKNESS',old:'dragon',stage:[],variants:[['n','膜の目は閉じている。あごの触手は短い。かせは金のまま'],['r','膜の目がうす目に。触手がのび、扇のふちから細い触手が垂れはじめる'],['k','膜の目が開き、三つの目は赤に。背からくらやみがのぼる。触手はさらに長い'],['v','目が首・胴・尾にまで増え、ばらばらにまばたく。扇の破れが広がる']],
  lore:'門のすき間から最初に漏れ出たもの。くらやみが「竜のまね」をして、初めて形を持った生き物。形は竜だが、竜ではない。目はずれて並び、口は開きすぎ、あごの下には触手がある。昔、門のぬしが金のかせでつないでいた。門にすき間ができたのは、尾に埋まっている要石が抜けたから。',
- parts:[['低く這う体と、高い肩','いまのゲームの竜の姿勢を引きつぐ。頭は低く前へ出て、いつでも噛みつける'],['ずれて並ぶ三つの目','大きいのが一つ、小さいのが二つ。そろわず、ばらばらにまばたく。「3」は門の数字、目は上位の存在の視線'],['あごの下の触手','竜にはないもの。ふだんは垂れて揺れ、ときどきのびて刺す'],['裂けるほど開く口','大きく開くと口の端がほおまで裂け、奥に歯の列が何重にも見える'],['浮いたあばら、ぬれた皮膚','やせた生き物の体。息にあわせてあばらが動き、首の皮膚の下をときどき何かが這う'],['背の扇（翼）','骨の指と、血管の浮いたうすい膜。膜には閉じた目が三つ。覚悟が上がるほど開く'],['肉に埋まった金のかせ','門のぬしの金。割れた輪のまわりに肉が盛り上がって、もう外れない'],['尾に埋まった要石','門のアーチのいちばん上の石。半分肉に埋まっている。尾の先は三つに裂けた触手'],['のど袋','炎の前にふくらみ、うすい皮の向こうに火が透ける。拍を数える場所'],['古い傷あと','ふだんは暗い。怒ると皮が裂けて、中の赤が光る。赤は「中身」の色で、体の色ではない']],
+ parts:[['低く這う体と、高い肩','いまのゲームの竜の姿勢を引きつぐ。頭は低く前へ出て、いつでも噛みつける'],['ずれて並ぶ三つの目','大きいのが一つ、小さいのが二つ。そろわず、ばらばらにまばたく。「3」は門の数字、目は上位の存在の視線'],['あごの下の触手','竜にはないもの。ふだんは垂れて揺れ、ときどきのびて刺す'],['裂けるほど開く口','大きく開くと口の端がほおまで裂け、奥に歯の列が何重にも見える'],['浮いたあばら、ぬれた皮膚','やせた生き物の体。息にあわせてあばらが動き、首の皮膚の下をときどき何かが這う'],['背の扇（翼）','骨の指と、血管の浮いたうすい膜。膜には閉じた目が三つ。覚悟が上がるほど開く'],['肉に埋まった金のかせ','門のぬしの金。割れた輪のまわりに肉が盛り上がって、もう外れない'],['尾に埋まった要石','門のアーチのいちばん上の石。半分肉に埋まっている。尾の先は三つに裂けた触手'],['のど袋と三本の大きな傷','炎の前に傷の赤が一度消え、拍ごとに尾の側から一本ずつたまる。三本そろった次の拍で吐く'],['扇の目と、尾の目','ふだんは閉じている。のしかかりでは扇の目が、尾では尾の目が、拍ごとに一つずつ開く。全部開いた次の拍で来る'],['古い傷あと','ふだんは暗い。怒ると皮が裂けて、中の赤が光る。赤は「中身」の色で、体の色ではない']],
  pal:[['#312040','紫黒の肉','くらやみの最初の形'],['#5c4866','うすい腹','ぬれた、生き物の色'],['#b0a2ac','骨のとげ','角・扇の指・歯'],['#a8822a','金のかせ','門のぬしの金'],['#ffd75e','三つの目','覚悟3から赤、4は桃色'],['#ff7a3a','のど袋の火','怒り（重い）']]},
 {key:'hydra',ttl:'三つ首の竜',en:'THE FINGERS',old:'hydra',stage:[],
  lore:'竜ではない。人知の理解を超えた、別の何か。倒れたくらやみの竜の亡骸の胸が内側から裂け、その裂け目から、門の向こうの上位の存在が「指先」を三本差しこんでいる。見た目は三つ首の竜。気づいた人だけが、ぞっとする。',

@@ -695,6 +695,7 @@ const LI={ua:1.8,fa:2.9,sw:-1.75,ua2:1.6,fa2:2.4};
 const LUP={ua:-2.1,fa:-1.3,sw:-.5,ua2:-1.9,fa2:-1.2,cr:2,x:3,lean:-.1};
 const LDN={ua:2.7,fa:2.6,sw:2.45,ua2:2.5,fa2:2.6,x:-12,lean:.3,cr:3};
 const LBK={ua:.4,fa:.1,sw:3.14,ua2:.6,fa2:.2,x:4,lean:-.15,cr:2};
+const LDP={ua:.2,fa:-.4,sw:3.14,ua2:.3,fa2:-.2,x:8,lean:-.3,cr:6},LKU={ua:2.4,fa:1.4,sw:-1.57,ua2:2.2,fa2:1.4,x:2,cr:1},LKT={ua:2.5,fa:1.3,sw:-.95,ua2:2.3,fa2:1.3,x:2,cr:1};
 const LTH={ua:3.1,fa:3.12,sw:3.14,ua2:3.0,fa2:3.1,x:-16,lean:.25,cr:3,ff:-12};
 mv({f:'lord',id:'l_idle',n:'立ち絵：鍵の番人',bg:'lord',len:120,keys:sway({cr:1.5},{cr:2.5},120,2),
  cap:'鍵の大剣を立て、背中の鎖で門とつながっている。足元にはくらやみが溜まる。',why:'鎖＝門とつながっている。角＝門のアーチ。剣＝鍵。マントの裏の目＝閉じ込めたもの。「この先には何かがいる」を一枚で言う。'});
@@ -706,10 +707,9 @@ mv({f:'lord',id:'l_two',n:'二連撃',bg:'lord',len:120,cap:'鍵を高く振り�
 mv({f:'lord',id:'l_rev',n:'逆二連撃',bg:'lord',len:120,cap:'剣先を下げて白く光る。すくい上げから入り、打ち下ろしで終わる。',why:'二連撃と順番が逆。剣先の高さ（上か下か）で最初の一撃が読める。',
  keys:[K(0,LI),K(16,{ua:2.2,fa:1.2,sw:.6,x:4,cr:3,lean:-.1}),K(30,{ua:2.2,fa:1.2,sw:.6,x:4,cr:3}),K(44,{ua:3.0,fa:-2.6,sw:-2.5,x:-12,lean:.1},'in'),K(50,LUP),K(58,LDN,'in'),K(76,LDN),K(110,LI)],
  cues:[{t:16,col:'w'}],hits:[44,58],trails:[[40,46,'w'],[54,60,'w']]});
-mv({f:'lord',id:'l_thrust',n:'赤い突き：解錠',bg:'lord',len:120,cap:'鍵を引いて赤く光る。まっすぐ突いて、ひねる。重い一撃。',why:'鍵を「差しこんで回す」動き。門を開ける動きで、あなたをこじ開けようとする。',
- keys:[K(0,LI),K(18,LBK),K(34,LBK),K(46,LTH,'in'),K(56,LTH),K(64,Object.assign({},LTH,{sw:3.14,fa:-3.0})),K(110,LI)],
- cues:[{t:18,col:'r'}],hits:[46],hitCol:'r',trails:[[42,48,'r']],
- fx:(B,J,t)=>{if(t>=52&&t<70&&J.tip){/* ひねり：歯がきらめく */const d=t-52;star(B,Math.round(J.tip[0]+6),Math.round(J.tip[1]),[3,2,3,2,1][d%5],'r')}}});
+mv({f:'lord',id:'l_thrust',n:'赤い突き（一撃）',bg:'lord',len:120,cap:'鍵を体の後ろまで深く引き、腰を落として、ぴたりと止まる（溜め）。赤く光る。体ごと一突き。ひねらない。重い一撃で終わる。',why:'見分け方は構え。「深く引いて止まる」なら一撃。解錠（鍵を顔の前に立てて、カチ・カチと回して見せる）とは、光る前から形がちがう。',
+ keys:[K(0,LI),K(16,LDP,'out'),K(40,LDP),K(46,Object.assign({},LTH,{x:-22}),'in'),K(72,Object.assign({},LTH,{x:-22})),K(110,LI)],
+ cues:[{t:18,col:'r'}],hits:[46],hitCol:'r',trails:[[42,48,'r']]});
 mv({f:'lord',id:'l_feint',n:'突きのフェイント',bg:'lord',len:110,cap:'紫の輪が出たら、ふり。鍵を引くが、突かずに戻す。押したら負け。',why:'赤い突きと「引き」までは同じ。輪の色だけで見分ける＝色のルールが試される。',
  keys:[K(0,LI),K(18,LBK),K(34,LBK),K(40,Object.assign({},LBK,{x:-2,lean:0})),K(56,Object.assign({},LBK,{x:4})),K(100,LI)],cues:[{t:18,col:'p'}]});
 mv({f:'lord',id:'l_rally',n:'打ち合い',bg:'lord',len:130,cap:'剣が金色に光ったら打ち合い。押されたら、押し返す。',why:'金＝打ち合い、は全ボス共通。ぬしは重いので、押し合いの間が長い。',
@@ -1074,8 +1074,8 @@ mv({f:'red2',id:'r2_counter',n:'返し斬り（本気）',bg:'red',len:140,heroP
 
 /* ===== 強さの順を整える：後の者に技と読み方を足す ===== */
 /* 門のぬし：黒い門番より上に。リズムの軸を足す */
-mv({f:'lord',id:'l_unlock',n:'解錠（タン・タタ）',bg:'lord',len:130,cap:'鍵を引いて白く光る。突き刺して、すぐに二度ひねる。突きのあとの二撃は間が短い（タン・タタ）。最後のひねりだけ赤い光。',why:'鍵を差しこんで回す動きを、そのままリズムにした。三撃目が重いので、最後まで気を抜けない。',
- keys:[K(0,LI),K(18,LBK),K(34,LBK),K(46,LTH,'in'),K(52,Object.assign({},LTH,{fa:-3.0,sw:3.0})),K(56,Object.assign({},LTH,{fa:3.0,sw:3.3})),K(60,Object.assign({},LTH,{fa:-3.0,sw:3.0})),K(64,Object.assign({},LTH,{fa:3.0,sw:3.3,x:-18})),K(100,LTH),K(124,LI)],
+mv({f:'lord',id:'l_unlock',n:'解錠（タン・タタ）',bg:'lord',len:130,cap:'鍵を顔の前に立てて白く光る。鍵を空中でカチ（白）・カチ（赤）と二回まわして見せる。まわすたびに光る。そのあと突き刺して、見せたとおりに二度ひねる（タン・タタ）。最後のひねりだけ赤。',why:'見分け方は構え。「鍵を立てて、回して見せる」なら連撃。見せた回数が、突きのあとのひねりの数。最初から深く引いて止まる赤い突き（一撃）とは形がちがう。',
+ keys:[K(0,LI),K(14,LKU,'out'),K(26,LKU),K(28,LKT,'in'),K(31,LKU),K(34,LKU),K(36,LKT,'in'),K(39,LKU),K(42,LBK),K(46,LTH,'in'),K(52,Object.assign({},LTH,{fa:-3.0,sw:3.0})),K(56,Object.assign({},LTH,{fa:3.0,sw:3.3})),K(60,Object.assign({},LTH,{fa:-3.0,sw:3.0})),K(64,Object.assign({},LTH,{fa:3.0,sw:3.3,x:-18})),K(100,LTH),K(124,LI)],
  cues:[{t:18,col:'w'},{t:28,col:'w'},{t:36,col:'r'}],hits:[46,56,64],trails:[[42,48,'w']],
  fx:(B,J,t)=>{for(const h of[56,64])if(t>=h&&t<h+6&&J.tip)star(B,Math.round(J.tip[0]+5),Math.round(J.tip[1]),[3,2,3,2,1,1][t-h],h===64?'r':'w')}});
 

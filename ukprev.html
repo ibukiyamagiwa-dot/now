@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#160b11">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>いまだ！ 打ち返しの演出くらべ</title>
+<meta name="description" content="引きつけて、弾け。ボタンひとつで遊ぶ、パリィとジャスト回避のドット絵コマンドRPG。">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>いまだ！　試作</h1>
+  <p>ボタンは A（Space）ひとつ　Esc／P でメニュー</p>
+</header>
+<div class="wrap">
+  <section class="stage" aria-label="戦闘画面">
+    <div class="cvbox"><canvas id="cv" width="960" height="540"></canvas><button id="mMenu" aria-label="メニュー">≡</button></div>
+    <div id="mhud">
+      <div class="mtop"><span id="mStage"></span><span id="mTurn"></span></div>
+      <div class="mrow">
+        <div><div class="mnm"><b>騎士</b><span id="hHp"></span></div><div class="mg" id="hG"><i id="hBar"></i></div><div class="msub"><span id="hMk"></span><span id="hPot"></span></div></div>
+        <div><div class="mnm"><b id="eNm"></b><span id="eHp"></span></div><div class="mg e"><i id="eBar"></i></div><div class="msub"><span id="eSub"></span></div></div>
+      </div>
+    </div>
+    <div id="mmsg"><div id="mPrompt"></div><div id="mTip"></div><div id="mLine"></div></div>
+    <div id="pad" role="group" aria-label="操作"></div>
+    <div class="bar">
+      <div id="msg" role="status">…</div>
+      <div class="menu" role="group" aria-label="コマンド">
+        <button id="c1" class="cm big">たたかう</button>
+        <button id="c2" class="cm">まほう</button>
+        <button id="c3" class="cm">かいふく</button>
+      </div>
+      <button id="menuBtn">メニュー</button>
+      <button id="skipTut">チュートリアルを飛ばす</button>
+      <button id="def">A</button>
+    </div>
+    <div id="card" hidden><div class="spot"></div><div class="cbox"><p class="ct"></p><p class="cn"></p></div></div>
+    <div id="ov" class="ov" hidden></div>
+  </section>
+  <aside class="panel" aria-label="調整盤">
+    <h2>調整盤</h2>
+    <p class="note">単位はフレーム（60F＝1秒）　動かすと次の攻撃から反映　数値はこのブラウザに自動保存されます</p>
+    <div id="main"></div>
+    <div class="derived" id="der"></div>
+    <details open><summary>見切りゲージと追撃</summary><div id="gauge"></div><div class="derived" id="der2"></div></details>
+    <details open><summary>とどめの演出</summary><div id="ko"></div></details>
+    <details><summary>細かい項目</summary><div id="adv"></div></details>
+    <details open><summary>デバッグ</summary>
+      <label class="tg"><input type="checkbox" id="dBar">受付バーと着弾リングを表示</label>
+      <label class="tg"><input type="checkbox" id="dSlow">スロー（1/4倍）</label>
+      <label class="tg"><input type="checkbox" id="dGod">自分が倒れない</label>
+      <label class="tg"><input type="checkbox" id="dFix">敵の行動を固定（いつも同じ溜め）</label>
+      <label class="tg"><input type="checkbox" id="dAll">すべての技を使う（解放を無視）</label>
+      <div class="btns"><button id="bPrev">前の敵</button><button id="bNext">次の敵</button><button id="bRe">この戦闘をやり直す</button><button id="bMk">見切り＋1段</button><button id="bTut">チュートリアル</button><button id="bSoul">魂＋5</button><button id="bForget">技を忘れる</button></div>
+    </details>
+    <details><summary>数値の書き出し・読み込み</summary>
+      <textarea id="json" spellcheck="false" aria-label="パラメーターのJSON"></textarea>
+      <div class="btns"><button id="bCopy">コピー</button><button id="bLoad">貼った内容を読み込む</button><button id="bReset">初期値に戻す</button></div>
+    </details>
+    <p class="stats" id="stats"></p>
+  </aside>
+</div>
+<script>var PAGE='ukprev';</script>
+<script src="js/00-base.js"></script>
+<script src="js/01-params.js"></script>
+<script src="js/02-sfx.js"></script>
+<script src="js/03-enemies.js"></script>
+<script src="js/04-boss-lord.js"></script>
+<script src="js/05-abyss-eye.js"></script>
+<script src="js/06-boss-red.js"></script>
+<script src="js/07-boss-gatek.js"></script>
+<script src="js/08-dojo.js"></script>
+<script src="js/09-rally.js"></script>
+<script src="js/10-fate.js"></script>
+<script src="js/11-bgm.js"></script>
+<script src="js/12-unlocks.js"></script>
+<script src="js/13-upgrades.js"></script>
+<script src="js/14-state.js"></script>
+<script src="js/15-tutorial.js"></script>
+<script src="js/16-tips-records.js"></script>
+<script src="js/17-practice.js"></script>
+<script src="js/18-cards.js"></script>
+<script src="js/19-fx.js"></script>
+<script src="js/20-hero.js"></script>
+<script src="js/21-enemy-turn.js"></script>
+<script src="js/22-ko.js"></script>
+<script src="js/23-loop.js"></script>
+<script src="js/24-draw-data.js"></script>
+<script src="js/25-draw.js"></script>
+<script src="js/26-menu.js"></script>
+<script src="js/27-input.js"></script>
+<script src="js/28-dev.js"></script>
+<script src="js/29-boot.js"></script>
+<script src="pages/ukprev.js"></script>
+</body>
+</html>

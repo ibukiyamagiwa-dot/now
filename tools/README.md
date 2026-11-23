@@ -2,17 +2,12 @@
 
 | ファイル | 何をするか |
 | --- | --- |
-| `build_rally.py` | 本編 `index.html` から打ち合い道場 `rally.html` を作る（`RP_PAGE` を true にし、見出しとタイトルを変えるだけ） |
-| `build_viewer.py` | 本編からモーションのビューア `viewer.html` を作る（敵と技を選んで再生、速さ、コマ送り） |
-| `build_ukprev.py` | 本編から打ち返し演出の比べ見ページ `ukprev.html` を作る |
-| `font/rebuild.py` | ゲームで使う文字だけを含むフォント（DotGothic16、OFL）を作り直し、`index.html` に埋めこむ。文字を増やしたら実行 |
+| `build_pages.py` | 本編から、打ち合い道場 `rally.html`・モーションのビューア `viewer.html`・打ち返しの演出くらべ `ukprev.html` を作る。ゲームを直したら毎回実行する |
+| `split.py` | 1ファイル版の `index.html` を css/ と js/ に分けたスクリプト（2026-11-23に実行済み。記録として残している） |
+| `font/rebuild.py` | ゲームで使う文字だけのフォント `css/px.woff2`（DotGothic16、OFL）を作り直す。文字を増やしたら実行 |
 | `shot.py` | ページを開いてスクリーンショットを撮る（見た目の確認用、Playwright） |
 
-## 決まり
-- ゲームを直したら、`build_rally.py` `build_viewer.py` `build_ukprev.py` をすべて実行し、3ページもそろえる。
-- 3つのビルドは、**1ファイルの `index.html` への文字列置換**で作っている。置換する元の文字列（`const RP_PAGE=false;`、`<title>パリィRPG 試作</title>` など）は `assert` で1か所だけあることを確かめているので、見つからなければ止まる。
-
-## ファイル分割（setup ブランチの `tools/split.py`）と合わせるときの注意
-- 分割すると、置換の元になる文字列は `js/` 以下の別ファイルへ移る。ビルドは「分割後のファイルを読み、フラグだけを差しかえたページを出す」形に書きかえる必要がある。いちばん簡単なのは、`RP_PAGE` などのフラグを URL のパラメーターかページごとの小さな `<script>` で決めるようにして、道場とビューアも同じ `js/` を読むようにすること。
-- `<title>` を「いまだ！」に直すと、`build_rally.py` の置換元（`<title>パリィRPG 試作</title>`）も変わる。合わせて直す。
-- 道場・ビューア・比べ見ページをリポジトリの直下に置くと、GitHub Pages で `…/now/rally.html` などとしてサインインなしで開けるようになる。claude.ai のアーティファクトがサインインなしで開けない問題の解決にもなる。公開してよいかは惟吹が決める。
+## 3ページのしくみ
+- 3ページとも、本編と同じ `css/` と `js/` を読む。本編のコードを文字列置換で書きかえることはしない。
+- 違いは、タイトル・見出しと、本編より前に置く `window.PAGE`（`js/08-dojo.js` の `RP_PAGE` がこれを見る）、本編のあとに読む `pages/viewer.js` `pages/ukprev.js` だけ。
+- `pages/` のコードは本編の関数（`tick` `startEnemy` `press` など）を差しかえて動く。本編でこれらの名前を変えたら、`pages/` も直す。`bash tests/check.sh` で3ページが動くかを確かめられる。

@@ -1,20 +1,7 @@
-# 打ち返しの演出くらべ（本編のコピー。演出だけ差し替えて、赤い騎士で繰り返し見せる）
-import os,sys
-ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-s=open(os.path.join(ROOT,'index.html'),encoding='utf-8').read()
-def rep(a,b):
-    global s
-    assert s.count(a)==1,(s.count(a),a[:80]);s=s.replace(a,b)
-
-rep("<title>パリィRPG 試作</title>","<title>いまだ！ 打ち返しの演出くらべ</title>")
-
-# 演出パターンは本編に入っている。くらべ用の印だけ足す
-rep("let UKV='B';","let UKV='A';const UKPREV=true;")
-# くらべ中は押しても何も起きない
-rep("function press(){","function press(){if(UKPREV)return;")
-# 起動：赤い騎士で、打ち返しを繰り返す
-rep("layout();buildPanel();applyDev();toTitle();",
-r"""layout();buildPanel();applyDev();toTitle();
+// 打ち返しの演出くらべ：本編と同じ js/ を読んだあとに動く。赤い騎士で打ち返しを繰り返し見せる。
+UKV='A';
+const UKPREV=true;
+{const P0=press;press=function(){if(UKPREV)return;return P0.apply(this,arguments)}} // くらべ中は押しても何も起きない
 (function(){REC.seen=REC.seen||{};REC.seen.red=1;try{localStorage.setItem('parryRPG.tutDone','1')}catch(_){}
  PV=0;PMV=null;startPractice('red');G.card=null;G.cards=[];if(G.enter)G.enter.t=999;let wait=40;
  function go(){const g=G;g.card=null;g.cards=[];g.state='enemy';g.strikes=[];g.et=0;g.endT=1e9;g.en.hp=g.en.hpMax;g.hero.hp=g.hero.max;g.txt=[];
@@ -40,5 +27,4 @@ body.mob:not(.port) #ukbar button span,body.mob:not(.port) #ukcap{display:none}`
  const set=k=>{UKV=k;wait=8;G.uk=null;G.stop=0;G.xs=null;bar.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===k));$('ukcap').textContent=P.find(p=>p[0]===k)[2]};
  bar.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();try{ac()}catch(_){}if(b.dataset.v)set(b.dataset.v);if(b.dataset.slow){dbg.slow=!dbg.slow;b.classList.toggle('on',dbg.slow)}});
  ['pointerdown','touchstart'].forEach(ev=>bar.addEventListener(ev,e=>e.stopPropagation()));
- set('A');window.UKT=()=>G.uk?G.uk.t:-1})();""")
-open(os.path.join(ROOT,'ukprev.html'),'w',encoding='utf-8').write(s);print('built ukprev.html')
+ set('A');window.UKT=()=>G.uk?G.uk.t:-1})();

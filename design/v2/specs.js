@@ -22,6 +22,13 @@ function cuff(B,h,k,col,hi){B.disc(h[0]+.5*k,h[1]-1.2*k,1.6*k,col,hi,'#1a1820',1
 function dangle(B,h,k,n,col,hi,T,ph){for(let i=1;i<=n;i++){const x=h[0]+1*k+Math.sin(T*.08+i*.7+(ph||0))*.6*i*.4,y=h[1]-.5*k+i*1.7*k;B.set(x,y,i%2?col:hi,1);if(i%2)B.set(x+1,y,col,1)}}
 function drag(B,a,k,len,T,col,hi){/* 床を引きずる鎖 */let p=a;const fl=a[1]+999;for(let i=1;i<=len;i++){const t=i/len,x=a[0]+t*len*1.8*k*.6+Math.sin(T*.05+i)*.4,y=Math.min(a[1]+t*30*k,a[1]+(i*2.2)*k);const yy=Math.min(y,B.__floor||y);B.set(x,yy,i%2?col:hi,1)}}
 function stains(col){return (B,R,k)=>{for(let i=0;i<9;i++){const p=R([(-3+((i*5)%7))*k,(2+((i*3)%10))*k]);B.set(p[0],p[1],col,2)}}}
+
+/* 鎖かたびらの目：下着の色の上に、細かい輪の点 */
+function mail(B,J,under,dot){const k=J.k,x0=Math.round(J.hip[0]-10*k),x1=Math.round(J.hip[0]+10*k),y0=Math.round(J.sc[1]-4*k),y1=Math.round(J.footF[1]);for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(B.get(x,y)===under&&(x+y*2)%3===0)B.set(x,y,dot,B.tag(x,y))}
+/* 封印のひびから走る、くらやみの筋 */
+function veins(B,c,k,T,n,col,hi){for(let i=0;i<n;i++){let x=c[0],y=c[1];const a0=-2.4+i*(4.8/Math.max(1,n-1));for(let j=0;j<7+i%3*2;j++){const a=a0+Math.sin(j*1.7+i)*.5;x+=Math.cos(a)*1.2*k;y+=Math.sin(a)*1.2*k+.3*k;B.set(x,y,(j+(T>>3))%4?col:hi,2)}}}
+function drips(B,c,k,T,n,col){for(let i=0;i<n;i++){const x=c[0]+(-2+i*2)*k,ph=(T*.3+i*9)%16;for(let j=0;j<3+i%2*3;j++)B.set(x,c[1]+j+1,col,2);if(ph<8)B.set(x,c[1]+7+ph,col,2)}}
+function rivets(B,c,k,r,n,col){for(let i=0;i<n;i++){const a=-2.8+i*(2.6/(n-1));B.set(c[0]+Math.cos(a)*r*k,c[1]+Math.sin(a)*r*k,col,2)}}
 const SPEC={};
 PAL.hero={arm:'#b8bcc8',armHi:'#e8eaf0',armLo:'#686c7e',trim:'#8a8ea0',trimHi:'#c8ccd8',trimLo:'#4a4e5e',chest:'#c4c8d4',glove:'#5a4a40',eye:'#ffffff',under:'#4a4850',underHi:'#6a6870',underLo:'#2a2830',foot:'#686c7e',footHi:'#a0a4b4'};
 /* 主人公の盾：紋章のない、まっさらな盾。差分では、ここに歩んだ道のりが刻まれていく */
@@ -45,7 +52,7 @@ function smoke(B,x,y,T,n,col){for(let i=0;i<n;i++){const ph=(T*.6+i*17)%24,xx=x+
 function crack(B,pts,col){for(let i=0;i+1<pts.length;i++)B.line(...pts[i],...pts[i+1],col,1)}
 
 SPEC.gate={hk:1.3,lk:.8,name:'門番',k:1,pal:PAL.guard,helm:{type:'bucket',band:['#8a6a3a','#c8a050'],dents:[[-3,-2],[2,1]]},
- tabard:{len:10,col:'#2a3a6a',hi:'#3e5090',lo:'#18224a',mark:gateMark('#c8a050')},
+ tabard:{len:12,w:4.3,col:'#2e4288',hi:'#4a62b8',lo:'#1a2658',edge:'#c8a050',mark:gateMark('#e0b860')},tabardFront:true,
  w:W_SHORT,w2:W_SHORT,
  front:(B,J,T)=>{for(const[h,ph]of[[J.hdF,0],[J.hdB,1]]){cuff(B,h,J.k,'#5a5e6c','#9aa0b4');dangle(B,h,J.k,3,'#5a5e6c','#9aa0b4',T,ph)}},
  w2front:true,
@@ -53,7 +60,8 @@ SPEC.gate={hk:1.3,lk:.8,name:'門番',k:1,pal:PAL.guard,helm:{type:'bucket',band
 
 SPEC.dgate={hk:1.3,lk:.8,name:'黒い門番',k:1,pal:PAL.dguard,
  helm:{type:'bucket',band:['#4a3058','#7a50a0'],dents:[[-3,-2],[2,1]],cracks:[[2,-4],[2.5,-3],[3,-2]],extra:(B,R,k,T,P)=>{const op=P.eyes!=null?P.eyes:3;for(let i=0;i<3;i++){const p=R([(-2.4+i*2)*k,-2*k]);B.set(...p,i<op?INK.eye:'#140a10',2)}}},
- tabard:{len:11,col:'#1a1022',hi:'#2e1c3a',lo:'#0a0510',mark:gateMark('#4a3058')},
+ tabard:{len:12,w:4.3,col:'#202a56',hi:'#33407a',lo:'#10142e',edge:'#6a5030',mark:(B,R,k)=>{gateMark('#8a7040')(B,R,k);stains('#3e2458')(B,R,k)}},tabardFront:true,
+ aura:{r:3,c1:'#2a1840',c2:'#1e1230',rim:'#6a3a90'},
  cape:{len:13,col:'#22142e',hi:'#3a2450',lo:'#0c0614',tatter:4,extra:(B,J,T,c)=>{const k=J.k;for(let i=0;i<3;i++){const x=lerp(c.d[0],c.e[0],i/2),y=lerp(c.d[1],c.e[1],i/2),w=Math.sin(T*.1+i*2)*3;tentacle(B,[x,y-1],[x+2+w,y+4],[x-2+w*1.5,y+8],1.3*k,.4*k,false)}}},
  w:W_ROT,w2:W_ROT,
  mid:(B,J,T)=>{const k=J.k;/* くらやみが背中から這い上がる筋 */crack(B,[add(J.sc,[5*k,2*k]),add(J.sc,[2*k,-2*k]),add(J.sc,[3*k,-5*k])],INK.hi);crack(B,[add(J.hip,[4*k,-2*k]),add(J.hip,[1*k,-6*k])],INK.hi)},
@@ -63,7 +71,7 @@ SPEC.dgate={hk:1.3,lk:.8,name:'黒い門番',k:1,pal:PAL.dguard,
  w2front:true,
  pose:{ua:1.75,fa:-.5,sw:-2.25,ua2:1.4,fa2:-2.5,sw2:-.85,ff:-6,fb:6,lean:.08}};
 
-const lordHelm={type:'bhorn',band:['#6a5020','#b8902a'],glow:'#ff3050',dents:[[-3.5,-1.5],[1,1.5],[-1,-3]],cracks:[[3,-4],[3.4,-3],[3,-2],[3.6,-1]],crackCol:'#ff3050',hs:1.3,horn:'#2a2434',hornHi:'#6e6680',hornLo:'#120e18',hornTip:'#b8902a',
+const lordHelm={type:'bhorn',rings:'#b8902a',band:['#6a5020','#b8902a'],glow:'#ff3050',dents:[[-3.5,-1.5],[1,1.5],[-1,-3]],cracks:[[3,-4],[3.4,-3],[3,-2],[3.6,-1]],crackCol:'#ff3050',hs:1.3,horn:'#2a2434',hornHi:'#6e6680',hornLo:'#120e18',hornTip:'#b8902a',
  };
 /* 足元のくらやみの溜まり：門の下から漏れ続けたものが、ぬしの足元に溜まっている */
 function pool(B,J,T,w){const k=J.k,y=Math.round(J.footF[1]),x0=J.footF[0]-4*k,x1=J.footB[0]+(w||14)*k;for(let x=Math.round(x0);x<=x1;x++){const h=1+((x*7+Math.floor(T/8))%5===0?1:0);for(let i=0;i<h;i++)B.set(x,y-i,i?INK.hi:INK.col,5)}
@@ -71,18 +79,20 @@ function pool(B,J,T,w){const k=J.k,y=Math.round(J.footF[1]),x0=J.footF[0]-4*k,x1
 /* マントの裏の目：閉じ込めたものが、ぬしの影から外をのぞいている */
 function capeEyes(B,J,T,n,col){const k=J.k;for(let i=0;i<n;i++){const op=((T/6|0)+i*3)%11>1;const x=J.hip[0]+(6+(i%3)*2.5)*k,y=J.hip[1]+(3+i*3.2)*k;if(B.get(x,y))B.set(x,y,op?col:'#140a10',2)}}
 SPEC.lord={hk:1.1,lk:.9,tk:.95,name:'門のぬし',k:1.3,pal:PAL.lord,helm:lordHelm,
- tabard:{len:13,col:'#222842',hi:'#333c5e',lo:'#10142a',mark:(B,R,k)=>{gateMark('#8a6a2a')(B,R,k);stains('#2e1a44')(B,R,k)}},
+ tabard:{len:14,w:5,col:'#263264',hi:'#3a4c8c',lo:'#121a3a',edge:'#9a7a30',mark:(B,R,k)=>{gateMark('#b8902a')(B,R,k);stains('#3a2058')(B,R,k)}},tabardFront:true,
+ aura:{r:3,c1:'#341a4c',c2:'#22122e',rim:'#8a4ab8'},
  cape:{len:28,col:'#1c1622',hi:'#342a3c',lo:'#0c0a10',tatter:7,extra:(B,J,T)=>capeEyes(B,J,T,6,'#ff3050')},
  w:W_KEY,
  behind:(B,J,T,P)=>{const k=J.k,br=P.chainBr;for(let i=0;i<3;i++){const a=add(J.sc,[3*k,(-2+i*4)*k]);chain(B,a,[a[0]+(P.chainL||60),a[1]-10+i*12],'#5e566e','#b8902a',br)}},
- chest:(B,R,k,P)=>{/* 封印：胸の金の封。ひびの奥に赤い目がのぞく */const c=R([0,-9*k]);B.disc(c[0],c[1],3.2*k,'#b8902a','#f0c850','#6a4a14');B.disc(c[0],c[1],1.6*k,'#140a10',null,null);B.set(c[0],c[1],'#ff3050',2);crack(B,[[c[0]-3*k,c[1]-2*k],[c[0]-1*k,c[1]],[c[0]-2*k,c[1]+3*k]],'#140a10')},
- mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,7,'#4e2c70')},
- front:(B,J,T)=>{pool(B,J,T,16);for(const h of[J.hdF])cuff(B,h,J.k,'#3a3446','#6a6080')},
+ chest:(B,R,k,P)=>{/* 封印：胸の金の封。ひびの奥に赤い目がのぞく。ひびからくらやみの筋が走り、前垂れへしたたる */const c=R([0,-9*k]);veins(B,c,k,P.T||0,5,'#4e2c70','#9a5ad0');drips(B,[c[0],c[1]+3*k],k,P.T||0,3,'#2e1a44');B.disc(c[0],c[1],3.2*k,'#b8902a','#f0c850','#6a4a14');B.disc(c[0],c[1],1.6*k,'#140a10',null,null);B.set(c[0],c[1],'#ff3050',2);crack(B,[[c[0]-3*k,c[1]-2*k],[c[0]-1*k,c[1]],[c[0]-2*k,c[1]+3*k]],'#140a10')},
+ mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,10,'#5e3a88');mail(B,J,PAL.lord.under,PAL.lord.underHi)},
+ front:(B,J,T)=>{pool(B,J,T,18);for(const h of[J.hdF])cuff(B,h,J.k,'#3a3446','#6a6080');rivets(B,J.shF,J.k,3.2,5,'#b8902a');/* マントの裾から這い出るくらやみ */for(let i=0;i<3;i++){const x=J.hip[0]+(8+i*3)*J.k,y=J.footF[1]-1;tentacle(B,[x,y-2],[x+2+Math.sin(T*.07+i)*2,y-6],[x+(i%2?4:-1),y-10-i*2],1.2*J.k,.3*J.k,i===1)}},
  pose:{ua:1.8,fa:2.9,sw:-1.75,ua2:1.6,fa2:2.4,ff:-7,fb:7,cr:1.5,lean:.1}};
 
 SPEC.lord2={hk:1.1,lk:.9,tk:.95,name:'暗い門のぬし',k:1.3,pal:Object.assign({},PAL.lord,{eye:'#ff3050'}),
  helm:Object.assign({},lordHelm,{extra:(B,R,k,T)=>{/* 兜が割れて、ひとつ目がのぞく */crack(B,[R([0,-7*k]),R([.5*k,-3*k]),R([-.5*k,1*k])],'#140a10');B.disc(...R([-1.5*k,-2*k]),1.6*k,'#ff3050','#ffb0a0','#a01030');B.set(...R([-2*k,-2*k]),'#140a10',2)}}),
- tabard:{len:9,col:'#1a1e34',hi:'#2a3050',lo:'#0c0e1a',mark:(B,R,k)=>{gateMark('#5a4418')(B,R,k);stains('#4e2c70')(B,R,k)}},
+ tabard:{len:8,w:5,col:'#1a2046',hi:'#2a3466',lo:'#0c1028',edge:'#5a4418',mark:(B,R,k)=>{stains('#5e3a88')(B,R,k)}},tabardFront:true,
+ aura:{r:4,c1:'#46205e',c2:'#2a1238',rim:'#b060ff'},
  cape:{len:28,col:'#140e1a',hi:'#2a1e34',lo:'#06040a',tatter:9,extra:(B,J,T)=>capeEyes(B,J,T,9,'#ff3050')},
  w:Object.assign({},W_KEY,{col:'#5e4a78',hi:'#9a80c0',lo:'#22142e'}),tentB:true,
  behind:(B,J,T,P)=>{const k=J.k;
@@ -91,8 +101,8 @@ SPEC.lord2={hk:1.1,lk:.9,tk:.95,name:'暗い門のぬし',k:1.3,pal:Object.assig
  chest:(B,R,k,P)=>{/* 胸の扉が開く：体そのものが門になった */const o=P.door!=null?P.door:1;const c=R([0,-9*k]);
   B.disc(c[0],c[1],4*k,'#0a0306',null,null);for(let i=-3;i<=3;i+=2){B.set(c[0]+i*k,c[1]-3*k,'#e8e0d0',2);B.set(c[0]+i*k,c[1]+3*k,'#e8e0d0',2)}B.disc(c[0],c[1],1.8*k,'#ff3050','#ffb0a0','#a01030');B.set(c[0]-.5*k,c[1],'#140a10',2);
   for(const s of[-1,1]){const h=R([s*4*k,-9*k]),e=[h[0]+s*o*4*k,h[1]];B.poly([[h[0],h[1]-4*k],[e[0],h[1]-5*k],[e[0],h[1]+5*k],[h[0],h[1]+4*k]],'#42384e','#5e566e','#1c1824')}},
- mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,10,'#6a3a90')},
- front:(B,J,T)=>{pool(B,J,T,24);cuff(B,J.hdF,J.k,'#3a3446','#6a6080');dangle(B,J.hdF,J.k,5,'#5e566e','#b8902a',T,0)},
+ mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,14,'#7a4ab0');mail(B,J,PAL.lord.under,'#4e2c70');veins(B,add(J.sc,[0,5*J.k]),J.k,T,7,'#6a3a90','#c080ff')},
+ front:(B,J,T)=>{pool(B,J,T,26);rivets(B,J.shF,J.k,3.2,5,'#6a4a14');cuff(B,J.hdF,J.k,'#3a3446','#6a6080');dangle(B,J.hdF,J.k,5,'#5e566e','#b8902a',T,0)},
  pose:{ua:1.8,fa:2.9,sw:-1.75,ua2:1.0,fa2:1.4,ff:-7,fb:7,cr:2,lean:.14}};
 
 SPEC.red={hk:1.1,lk:.9,tk:.95,name:'赤い騎士',k:1,pal:PAL.red,

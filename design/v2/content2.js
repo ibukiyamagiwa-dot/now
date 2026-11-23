@@ -17,8 +17,8 @@ const FORMS=[
  parts:[['左右に開く胸の扉','体＝門。扉の奥の口と目が「門の向こう」。ここからの攻撃はいちばん重い'],['割れた兜の一つ目','人の顔（兜）が割れ、中の目が一つ'],['ちぎれた鎖','門とのつながりが切れた。手首から垂れた鎖は、触手が拾って鞭にする'],['背中の三本の触手と、先の目','黒い門番の「目の数＝回数」と同じルール'],['左腕の触手','人の腕の長さを超えて届く'],['破れた前垂れ','紺も紋章も、ほとんど残っていない'],['背後の門のすき間','ぬしが崩れたせいで、門が内側から押し開かれはじめた。のぞく指は、三つ首の竜と同じもの']],
  pal:[['#140e1a','もっと深い黒','封印がほどけた'],['#ff3050','胸の口の赤','いちばん重い場所'],['#22142e','くらやみの触手','門の向こうのもの']]},
 ];
-const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_chain','dg_down2'],
- lord:['l_enter','l_idle','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_rally','l_kneel'],
- lord2:['l2_open','l2_idle','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_rally','l2_whip','l2_gate','l2_down']};
+const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_chain','dg_beat','dg_down2'],
+ lord:['l_enter','l_idle','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_rally','l_pull','l_kneel'],
+ lord2:['l2_open','l2_idle','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_rally','l2_whip','l2_pool','l2_doors','l2_gate','l2_down']};
 const EXMV={g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い'};
 const KINDOF=id=>/_idle$/.test(id)?'main':/plant|seal|threat|state/.test(id)?'stand':/enter|turn|kneel|open|down/.test(id)?'show':'atk';

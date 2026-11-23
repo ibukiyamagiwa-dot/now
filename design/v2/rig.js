@@ -28,7 +28,9 @@ function drawTorso(B,S,J,P){const k=S.k,p=S.pal,L=-J.lean,h=J.hip,R=v=>add(h,rot
  B.poly([R([-3*k,-5*k]),R([3*k,-5*k]),R([7*k,-11*k]),R([6*k,-15*k]),R([-6*k,-15*k]),R([-7*k,-11*k])],p.arm,p.armHi,p.armLo);
  B.poly([R([-2.5*k,-6*k]),R([2.5*k,-6*k]),R([5.5*k,-12*k]),R([-5.5*k,-12*k])],p.chest||p.arm,p.armHi,p.armLo);
  B.poly([R([-4.5*k,-1*k]),R([4.5*k,-1*k]),R([4.5*k,-2.6*k]),R([-4.5*k,-2.6*k])],p.trim,p.trimHi,p.trimLo);
- if(S.tabard&&S.tabardFront){const t=S.tabard;B.poly([R([-4.5*k,-12*k]),R([4.5*k,-12*k]),R([4*k,t.len*k]),R([0,(t.len+1.5)*k]),R([-4*k,t.len*k])],t.col,t.hi,t.lo);if(t.mark)t.mark(B,v=>R([v[0],v[1]-7*k]),k*1.2)}
+ if(S.tabard&&S.tabardFront){const t=S.tabard,tw=t.w||4.5;B.poly([R([-tw*k,-12*k]),R([tw*k,-12*k]),R([(tw-.5)*k,t.len*k]),R([0,(t.len+1.5)*k]),R([-(tw-.5)*k,t.len*k])],t.col,t.hi,t.lo);
+  if(t.edge){for(let y=-12;y<=t.len;y+=.5){B.set(...R([-(tw-.2-(y+12)/(t.len+12)*.5)*k,y*k]),t.edge,2);B.set(...R([(tw-.2-(y+12)/(t.len+12)*.5)*k,y*k]),t.edge,2)}for(let x=-(tw-.5);x<=tw-.5;x+=.5)B.set(...R([x*k,(t.len+1.5-Math.abs(x)/(tw-.5)*1.5)*k]),t.edge,2)}
+  if(t.mark)t.mark(B,v=>R([v[0],v[1]-7*k]),k*1.2);if(t.over)t.over(B,R,k)}
  if(S.chest)S.chest(B,R,k,P)}
 function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R=v=>add(J.head,rot(v,a));
  const hm=S.helm;
@@ -47,7 +49,7 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   B.poly([R([-5*k,-.5*k]),R([1*k,-.5*k]),R([1*k,.8*k]),R([-5*k,.8*k])],OUT,null,null);B.poly([R([-3*k,.8*k]),R([-2*k,.8*k]),R([-2*k,3.5*k]),R([-3*k,3.5*k])],OUT,null,null);
   for(let i=0;i<2;i++)B.set(...R([(-4+i)*k,0]),p.eye,2)}
  if(hm.type==='bucket'||hm.type==='bhorn'){
-  if(hm.type==='bhorn')for(const sd of[-1,1]){const pts=[];for(let i=0;i<=10;i++){const t=i/10,a=t*Math.PI*.95;pts.push(R([sd*(3+Math.sin(a)*4.5)*k,(-5-(1-Math.cos(a))*4.2)*k]))}for(let i=0;i<10;i++)B.thick(pts[i],pts[i+1],(1.5-i*.08)*k,hm.horn,hm.hornHi,hm.hornLo);
+  if(hm.type==='bhorn')for(const sd of[-1,1]){const pts=[];for(let i=0;i<=10;i++){const t=i/10,a=t*Math.PI*.95;pts.push(R([sd*(3+Math.sin(a)*4.5)*k,(-5-(1-Math.cos(a))*4.2)*k]))}for(let i=0;i<10;i++)B.thick(pts[i],pts[i+1],(1.5-i*.08)*k,hm.horn,hm.hornHi,hm.hornLo);if(hm.rings)for(const i of[2,5]){B.set(...pts[i],hm.rings,2);B.set(pts[i][0]+1,pts[i][1],hm.rings,2)}
    const lp=R([sd*7.3*k,-8.5*k]);B.line(lp[0],lp[1],lp[0],lp[1]+2*k,'#5e566e');B.disc(lp[0],lp[1]+3*k,1.1*k,'#8a6a2a','#b8902a','#4a3414')}
   /* 筒形の兜：門番の兜は、ぬしの兜をまねた形（主従の印） */
   B.poly([R([-4.3*k,4.2*k]),R([4.3*k,4.2*k]),R([4.3*k,-4.2*k]),R([3.6*k,-4.8*k]),R([-3.6*k,-4.8*k]),R([-4.3*k,-4.2*k])],p.arm,p.armHi,p.armLo);
@@ -80,7 +82,7 @@ function drawCape(B,S,J,P,T){const c=S.cape;if(!c||P.capeOff>=1)return;const k=S
  const cw=c.wide||1,a=add(J.shB,[3.5*k*cw,1*k]),b=[h[0]+(11*cw+w)*k,h[1]+L*.5],d=[h[0]+(9*cw+w*1.3)*k,h[1]+L],e=[h[0]+2*k,h[1]+L*.92];
  const pts=[J.neck,J.shB,a,b];const n=c.tatter||0;if(n){for(let i=0;i<=n;i++){const t=i/n,x=lerp(b[0]+2*k,e[0],t),y=lerp(d[1],e[1],t)+((i%2)?-3*k:0);pts.push([x,y])}}else pts.push(d,e);pts.push(add(h,[2*k,-2*k]));
  B.poly(pts,c.col,c.hi,c.lo);if(c.extra)c.extra(B,J,T,{b,d,e,w})}
-function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{}),J=joints(ox,oy,S,P);J.P=P;
+function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{}),J=joints(ox,oy,S,P);J.P=P;P.T=T;
  if(S.behind)S.behind(B,J,T,P);
  drawCape(B,S,J,P,T);
  if(S.tentB)tentacle(B,J.shB,add(J.elB,[2*S.k,-2*S.k]),J.hdB,2*S.k,.7*S.k,true);else drawArm(B,S,J.shB,J.elB,J.hdB,false);if(S.w2&&P.sw2!=null&&!S.w2front)J.tip2=drawBlade(B,S,J.hdB,P.sw2,S.w2,false);
@@ -97,3 +99,10 @@ function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{})
 
 /* 角：門のアーチの形。根元から外へ張り出し、先が内へ戻る */
 function horn(B,R,k,s,hs,hm){const b=R([s*3.5*k,-5*k]),m=R([s*(7+hs*2.5)*k,-(9+hs*3)*k]),e=R([s*(3.5+hs)*k,-(15+hs*5)*k]);B.tube(b,m,e,2.2*k,.6*k,hm.horn||'#2a2434',hm.hornHi||'#6e6680',hm.hornLo||'#120e18');if(hm.hornTip)B.set(...e.map(Math.round),hm.hornTip,2)}
+
+/* くらやみのオーラ：暗い背景に溶けないよう、体のまわりに紫のにじみと、背中側のふちに光を置く */
+function aura(B,A,T){const W=B.w,H=B.h,d=new Int8Array(W*H).fill(-1),q=[];for(let i=0;i<W*H;i++){const t=B.t[i];if(t===1||t===2||t===3){d[i]=0;q.push(i)}}
+ for(let h=0;h<q.length;h++){const i=q[h];if(d[i]>=A.r)continue;const x=i%W,y=i/W|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(d[j]<0){d[j]=d[i]+1;q.push(j)}}}
+ for(let i=0;i<W*H;i++){if(d[i]<=0)continue;const x=i%W,y=i/W|0,t=B.t[i];if(t===1||t===2||t===4)continue;const n=d[i],fl=((x*7+y*13+(T>>2))%11);
+  if(n===1&&(x+y)%2===0)B.set(x,y,A.c1,9);else if(n===2&&(x+y)%3===0&&fl>2)B.set(x,y,A.c2,9);else if(n>=3&&fl===0&&y<B.h-8)B.set(x,y-((T>>3)%2),A.c2,9)}
+ /* 背中側（右と上）のふちに、紫の光 */for(let i=0;i<W*H;i++){if(B.t[i]!==3)continue;const x=i%W,y=i/W|0;const r=B.tag(x+1,y),u=B.tag(x,y-1);if((r!==1&&r!==2&&r!==3)&&(u!==1&&u!==2&&u!==3)&&B.tag(x-1,y)===1)B.set(x,y,A.rim,3);else if(r!==1&&r!==3&&B.tag(x-1,y)===1&&(x+y)%2)B.set(x,y,A.rim,3)}}

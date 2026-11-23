@@ -20,4 +20,4 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
  for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])trail(B,S,M,tt,ox,oy,4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);
- B.outline();return B}
+ B.outline();if(S.aura)aura(B,S.aura,tt);return B}

@@ -133,7 +133,9 @@ function drawTorso(B,S,J,P){const k=S.k,p=S.pal,L=-J.lean,h=J.hip,R=v=>add(h,rot
  B.poly([R([-3*k,-5*k]),R([3*k,-5*k]),R([7*k,-11*k]),R([6*k,-15*k]),R([-6*k,-15*k]),R([-7*k,-11*k])],p.arm,p.armHi,p.armLo);
  B.poly([R([-2.5*k,-6*k]),R([2.5*k,-6*k]),R([5.5*k,-12*k]),R([-5.5*k,-12*k])],p.chest||p.arm,p.armHi,p.armLo);
  B.poly([R([-4.5*k,-1*k]),R([4.5*k,-1*k]),R([4.5*k,-2.6*k]),R([-4.5*k,-2.6*k])],p.trim,p.trimHi,p.trimLo);
- if(S.tabard&&S.tabardFront){const t=S.tabard;B.poly([R([-4.5*k,-12*k]),R([4.5*k,-12*k]),R([4*k,t.len*k]),R([0,(t.len+1.5)*k]),R([-4*k,t.len*k])],t.col,t.hi,t.lo);if(t.mark)t.mark(B,v=>R([v[0],v[1]-7*k]),k*1.2)}
+ if(S.tabard&&S.tabardFront){const t=S.tabard,tw=t.w||4.5;B.poly([R([-tw*k,-12*k]),R([tw*k,-12*k]),R([(tw-.5)*k,t.len*k]),R([0,(t.len+1.5)*k]),R([-(tw-.5)*k,t.len*k])],t.col,t.hi,t.lo);
+  if(t.edge){for(let y=-12;y<=t.len;y+=.5){B.set(...R([-(tw-.2-(y+12)/(t.len+12)*.5)*k,y*k]),t.edge,2);B.set(...R([(tw-.2-(y+12)/(t.len+12)*.5)*k,y*k]),t.edge,2)}for(let x=-(tw-.5);x<=tw-.5;x+=.5)B.set(...R([x*k,(t.len+1.5-Math.abs(x)/(tw-.5)*1.5)*k]),t.edge,2)}
+  if(t.mark)t.mark(B,v=>R([v[0],v[1]-7*k]),k*1.2);if(t.over)t.over(B,R,k)}
  if(S.chest)S.chest(B,R,k,P)}
 function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R=v=>add(J.head,rot(v,a));
  const hm=S.helm;
@@ -152,7 +154,7 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   B.poly([R([-5*k,-.5*k]),R([1*k,-.5*k]),R([1*k,.8*k]),R([-5*k,.8*k])],OUT,null,null);B.poly([R([-3*k,.8*k]),R([-2*k,.8*k]),R([-2*k,3.5*k]),R([-3*k,3.5*k])],OUT,null,null);
   for(let i=0;i<2;i++)B.set(...R([(-4+i)*k,0]),p.eye,2)}
  if(hm.type==='bucket'||hm.type==='bhorn'){
-  if(hm.type==='bhorn')for(const sd of[-1,1]){const pts=[];for(let i=0;i<=10;i++){const t=i/10,a=t*Math.PI*.95;pts.push(R([sd*(3+Math.sin(a)*4.5)*k,(-5-(1-Math.cos(a))*4.2)*k]))}for(let i=0;i<10;i++)B.thick(pts[i],pts[i+1],(1.5-i*.08)*k,hm.horn,hm.hornHi,hm.hornLo);
+  if(hm.type==='bhorn')for(const sd of[-1,1]){const pts=[];for(let i=0;i<=10;i++){const t=i/10,a=t*Math.PI*.95;pts.push(R([sd*(3+Math.sin(a)*4.5)*k,(-5-(1-Math.cos(a))*4.2)*k]))}for(let i=0;i<10;i++)B.thick(pts[i],pts[i+1],(1.5-i*.08)*k,hm.horn,hm.hornHi,hm.hornLo);if(hm.rings)for(const i of[2,5]){B.set(...pts[i],hm.rings,2);B.set(pts[i][0]+1,pts[i][1],hm.rings,2)}
    const lp=R([sd*7.3*k,-8.5*k]);B.line(lp[0],lp[1],lp[0],lp[1]+2*k,'#5e566e');B.disc(lp[0],lp[1]+3*k,1.1*k,'#8a6a2a','#b8902a','#4a3414')}
   /* 筒形の兜：門番の兜は、ぬしの兜をまねた形（主従の印） */
   B.poly([R([-4.3*k,4.2*k]),R([4.3*k,4.2*k]),R([4.3*k,-4.2*k]),R([3.6*k,-4.8*k]),R([-3.6*k,-4.8*k]),R([-4.3*k,-4.2*k])],p.arm,p.armHi,p.armLo);
@@ -185,7 +187,7 @@ function drawCape(B,S,J,P,T){const c=S.cape;if(!c||P.capeOff>=1)return;const k=S
  const cw=c.wide||1,a=add(J.shB,[3.5*k*cw,1*k]),b=[h[0]+(11*cw+w)*k,h[1]+L*.5],d=[h[0]+(9*cw+w*1.3)*k,h[1]+L],e=[h[0]+2*k,h[1]+L*.92];
  const pts=[J.neck,J.shB,a,b];const n=c.tatter||0;if(n){for(let i=0;i<=n;i++){const t=i/n,x=lerp(b[0]+2*k,e[0],t),y=lerp(d[1],e[1],t)+((i%2)?-3*k:0);pts.push([x,y])}}else pts.push(d,e);pts.push(add(h,[2*k,-2*k]));
  B.poly(pts,c.col,c.hi,c.lo);if(c.extra)c.extra(B,J,T,{b,d,e,w})}
-function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{}),J=joints(ox,oy,S,P);J.P=P;
+function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{}),J=joints(ox,oy,S,P);J.P=P;P.T=T;
  if(S.behind)S.behind(B,J,T,P);
  drawCape(B,S,J,P,T);
  if(S.tentB)tentacle(B,J.shB,add(J.elB,[2*S.k,-2*S.k]),J.hdB,2*S.k,.7*S.k,true);else drawArm(B,S,J.shB,J.elB,J.hdB,false);if(S.w2&&P.sw2!=null&&!S.w2front)J.tip2=drawBlade(B,S,J.hdB,P.sw2,S.w2,false);
@@ -202,6 +204,13 @@ function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{})
 
 /* 角：門のアーチの形。根元から外へ張り出し、先が内へ戻る */
 function horn(B,R,k,s,hs,hm){const b=R([s*3.5*k,-5*k]),m=R([s*(7+hs*2.5)*k,-(9+hs*3)*k]),e=R([s*(3.5+hs)*k,-(15+hs*5)*k]);B.tube(b,m,e,2.2*k,.6*k,hm.horn||'#2a2434',hm.hornHi||'#6e6680',hm.hornLo||'#120e18');if(hm.hornTip)B.set(...e.map(Math.round),hm.hornTip,2)}
+
+/* くらやみのオーラ：暗い背景に溶けないよう、体のまわりに紫のにじみと、背中側のふちに光を置く */
+function aura(B,A,T){const W=B.w,H=B.h,d=new Int8Array(W*H).fill(-1),q=[];for(let i=0;i<W*H;i++){const t=B.t[i];if(t===1||t===2||t===3){d[i]=0;q.push(i)}}
+ for(let h=0;h<q.length;h++){const i=q[h];if(d[i]>=A.r)continue;const x=i%W,y=i/W|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(d[j]<0){d[j]=d[i]+1;q.push(j)}}}
+ for(let i=0;i<W*H;i++){if(d[i]<=0)continue;const x=i%W,y=i/W|0,t=B.t[i];if(t===1||t===2||t===4)continue;const n=d[i],fl=((x*7+y*13+(T>>2))%11);
+  if(n===1&&(x+y)%2===0)B.set(x,y,A.c1,9);else if(n===2&&(x+y)%3===0&&fl>2)B.set(x,y,A.c2,9);else if(n>=3&&fl===0&&y<B.h-8)B.set(x,y-((T>>3)%2),A.c2,9)}
+ /* 背中側（右と上）のふちに、紫の光 */for(let i=0;i<W*H;i++){if(B.t[i]!==3)continue;const x=i%W,y=i/W|0;const r=B.tag(x+1,y),u=B.tag(x,y-1);if((r!==1&&r!==2&&r!==3)&&(u!==1&&u!==2&&u!==3)&&B.tag(x-1,y)===1)B.set(x,y,A.rim,3);else if(r!==1&&r!==3&&B.tag(x-1,y)===1&&(x+y)%2)B.set(x,y,A.rim,3)}}
 
 /* ===== モーション：キーの並び。数値は補間、fxは効果 ===== */
 const ez={lin:t=>t,io:t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,out:t=>1-Math.pow(1-t,3),in:t=>t*t*t,snap:t=>t<1?0:1};
@@ -240,6 +249,13 @@ function cuff(B,h,k,col,hi){B.disc(h[0]+.5*k,h[1]-1.2*k,1.6*k,col,hi,'#1a1820',1
 function dangle(B,h,k,n,col,hi,T,ph){for(let i=1;i<=n;i++){const x=h[0]+1*k+Math.sin(T*.08+i*.7+(ph||0))*.6*i*.4,y=h[1]-.5*k+i*1.7*k;B.set(x,y,i%2?col:hi,1);if(i%2)B.set(x+1,y,col,1)}}
 function drag(B,a,k,len,T,col,hi){/* 床を引きずる鎖 */let p=a;const fl=a[1]+999;for(let i=1;i<=len;i++){const t=i/len,x=a[0]+t*len*1.8*k*.6+Math.sin(T*.05+i)*.4,y=Math.min(a[1]+t*30*k,a[1]+(i*2.2)*k);const yy=Math.min(y,B.__floor||y);B.set(x,yy,i%2?col:hi,1)}}
 function stains(col){return (B,R,k)=>{for(let i=0;i<9;i++){const p=R([(-3+((i*5)%7))*k,(2+((i*3)%10))*k]);B.set(p[0],p[1],col,2)}}}
+
+/* 鎖かたびらの目：下着の色の上に、細かい輪の点 */
+function mail(B,J,under,dot){const k=J.k,x0=Math.round(J.hip[0]-10*k),x1=Math.round(J.hip[0]+10*k),y0=Math.round(J.sc[1]-4*k),y1=Math.round(J.footF[1]);for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(B.get(x,y)===under&&(x+y*2)%3===0)B.set(x,y,dot,B.tag(x,y))}
+/* 封印のひびから走る、くらやみの筋 */
+function veins(B,c,k,T,n,col,hi){for(let i=0;i<n;i++){let x=c[0],y=c[1];const a0=-2.4+i*(4.8/Math.max(1,n-1));for(let j=0;j<7+i%3*2;j++){const a=a0+Math.sin(j*1.7+i)*.5;x+=Math.cos(a)*1.2*k;y+=Math.sin(a)*1.2*k+.3*k;B.set(x,y,(j+(T>>3))%4?col:hi,2)}}}
+function drips(B,c,k,T,n,col){for(let i=0;i<n;i++){const x=c[0]+(-2+i*2)*k,ph=(T*.3+i*9)%16;for(let j=0;j<3+i%2*3;j++)B.set(x,c[1]+j+1,col,2);if(ph<8)B.set(x,c[1]+7+ph,col,2)}}
+function rivets(B,c,k,r,n,col){for(let i=0;i<n;i++){const a=-2.8+i*(2.6/(n-1));B.set(c[0]+Math.cos(a)*r*k,c[1]+Math.sin(a)*r*k,col,2)}}
 const SPEC={};
 PAL.hero={arm:'#b8bcc8',armHi:'#e8eaf0',armLo:'#686c7e',trim:'#8a8ea0',trimHi:'#c8ccd8',trimLo:'#4a4e5e',chest:'#c4c8d4',glove:'#5a4a40',eye:'#ffffff',under:'#4a4850',underHi:'#6a6870',underLo:'#2a2830',foot:'#686c7e',footHi:'#a0a4b4'};
 /* 主人公の盾：紋章のない、まっさらな盾。差分では、ここに歩んだ道のりが刻まれていく */
@@ -263,7 +279,7 @@ function smoke(B,x,y,T,n,col){for(let i=0;i<n;i++){const ph=(T*.6+i*17)%24,xx=x+
 function crack(B,pts,col){for(let i=0;i+1<pts.length;i++)B.line(...pts[i],...pts[i+1],col,1)}
 
 SPEC.gate={hk:1.3,lk:.8,name:'門番',k:1,pal:PAL.guard,helm:{type:'bucket',band:['#8a6a3a','#c8a050'],dents:[[-3,-2],[2,1]]},
- tabard:{len:10,col:'#2a3a6a',hi:'#3e5090',lo:'#18224a',mark:gateMark('#c8a050')},
+ tabard:{len:12,w:4.3,col:'#2e4288',hi:'#4a62b8',lo:'#1a2658',edge:'#c8a050',mark:gateMark('#e0b860')},tabardFront:true,
  w:W_SHORT,w2:W_SHORT,
  front:(B,J,T)=>{for(const[h,ph]of[[J.hdF,0],[J.hdB,1]]){cuff(B,h,J.k,'#5a5e6c','#9aa0b4');dangle(B,h,J.k,3,'#5a5e6c','#9aa0b4',T,ph)}},
  w2front:true,
@@ -271,7 +287,8 @@ SPEC.gate={hk:1.3,lk:.8,name:'門番',k:1,pal:PAL.guard,helm:{type:'bucket',band
 
 SPEC.dgate={hk:1.3,lk:.8,name:'黒い門番',k:1,pal:PAL.dguard,
  helm:{type:'bucket',band:['#4a3058','#7a50a0'],dents:[[-3,-2],[2,1]],cracks:[[2,-4],[2.5,-3],[3,-2]],extra:(B,R,k,T,P)=>{const op=P.eyes!=null?P.eyes:3;for(let i=0;i<3;i++){const p=R([(-2.4+i*2)*k,-2*k]);B.set(...p,i<op?INK.eye:'#140a10',2)}}},
- tabard:{len:11,col:'#1a1022',hi:'#2e1c3a',lo:'#0a0510',mark:gateMark('#4a3058')},
+ tabard:{len:12,w:4.3,col:'#202a56',hi:'#33407a',lo:'#10142e',edge:'#6a5030',mark:(B,R,k)=>{gateMark('#8a7040')(B,R,k);stains('#3e2458')(B,R,k)}},tabardFront:true,
+ aura:{r:3,c1:'#2a1840',c2:'#1e1230',rim:'#6a3a90'},
  cape:{len:13,col:'#22142e',hi:'#3a2450',lo:'#0c0614',tatter:4,extra:(B,J,T,c)=>{const k=J.k;for(let i=0;i<3;i++){const x=lerp(c.d[0],c.e[0],i/2),y=lerp(c.d[1],c.e[1],i/2),w=Math.sin(T*.1+i*2)*3;tentacle(B,[x,y-1],[x+2+w,y+4],[x-2+w*1.5,y+8],1.3*k,.4*k,false)}}},
  w:W_ROT,w2:W_ROT,
  mid:(B,J,T)=>{const k=J.k;/* くらやみが背中から這い上がる筋 */crack(B,[add(J.sc,[5*k,2*k]),add(J.sc,[2*k,-2*k]),add(J.sc,[3*k,-5*k])],INK.hi);crack(B,[add(J.hip,[4*k,-2*k]),add(J.hip,[1*k,-6*k])],INK.hi)},
@@ -281,7 +298,7 @@ SPEC.dgate={hk:1.3,lk:.8,name:'黒い門番',k:1,pal:PAL.dguard,
  w2front:true,
  pose:{ua:1.75,fa:-.5,sw:-2.25,ua2:1.4,fa2:-2.5,sw2:-.85,ff:-6,fb:6,lean:.08}};
 
-const lordHelm={type:'bhorn',band:['#6a5020','#b8902a'],glow:'#ff3050',dents:[[-3.5,-1.5],[1,1.5],[-1,-3]],cracks:[[3,-4],[3.4,-3],[3,-2],[3.6,-1]],crackCol:'#ff3050',hs:1.3,horn:'#2a2434',hornHi:'#6e6680',hornLo:'#120e18',hornTip:'#b8902a',
+const lordHelm={type:'bhorn',rings:'#b8902a',band:['#6a5020','#b8902a'],glow:'#ff3050',dents:[[-3.5,-1.5],[1,1.5],[-1,-3]],cracks:[[3,-4],[3.4,-3],[3,-2],[3.6,-1]],crackCol:'#ff3050',hs:1.3,horn:'#2a2434',hornHi:'#6e6680',hornLo:'#120e18',hornTip:'#b8902a',
  };
 /* 足元のくらやみの溜まり：門の下から漏れ続けたものが、ぬしの足元に溜まっている */
 function pool(B,J,T,w){const k=J.k,y=Math.round(J.footF[1]),x0=J.footF[0]-4*k,x1=J.footB[0]+(w||14)*k;for(let x=Math.round(x0);x<=x1;x++){const h=1+((x*7+Math.floor(T/8))%5===0?1:0);for(let i=0;i<h;i++)B.set(x,y-i,i?INK.hi:INK.col,5)}
@@ -289,18 +306,20 @@ function pool(B,J,T,w){const k=J.k,y=Math.round(J.footF[1]),x0=J.footF[0]-4*k,x1
 /* マントの裏の目：閉じ込めたものが、ぬしの影から外をのぞいている */
 function capeEyes(B,J,T,n,col){const k=J.k;for(let i=0;i<n;i++){const op=((T/6|0)+i*3)%11>1;const x=J.hip[0]+(6+(i%3)*2.5)*k,y=J.hip[1]+(3+i*3.2)*k;if(B.get(x,y))B.set(x,y,op?col:'#140a10',2)}}
 SPEC.lord={hk:1.1,lk:.9,tk:.95,name:'門のぬし',k:1.3,pal:PAL.lord,helm:lordHelm,
- tabard:{len:13,col:'#222842',hi:'#333c5e',lo:'#10142a',mark:(B,R,k)=>{gateMark('#8a6a2a')(B,R,k);stains('#2e1a44')(B,R,k)}},
+ tabard:{len:14,w:5,col:'#263264',hi:'#3a4c8c',lo:'#121a3a',edge:'#9a7a30',mark:(B,R,k)=>{gateMark('#b8902a')(B,R,k);stains('#3a2058')(B,R,k)}},tabardFront:true,
+ aura:{r:3,c1:'#341a4c',c2:'#22122e',rim:'#8a4ab8'},
  cape:{len:28,col:'#1c1622',hi:'#342a3c',lo:'#0c0a10',tatter:7,extra:(B,J,T)=>capeEyes(B,J,T,6,'#ff3050')},
  w:W_KEY,
  behind:(B,J,T,P)=>{const k=J.k,br=P.chainBr;for(let i=0;i<3;i++){const a=add(J.sc,[3*k,(-2+i*4)*k]);chain(B,a,[a[0]+(P.chainL||60),a[1]-10+i*12],'#5e566e','#b8902a',br)}},
- chest:(B,R,k,P)=>{/* 封印：胸の金の封。ひびの奥に赤い目がのぞく */const c=R([0,-9*k]);B.disc(c[0],c[1],3.2*k,'#b8902a','#f0c850','#6a4a14');B.disc(c[0],c[1],1.6*k,'#140a10',null,null);B.set(c[0],c[1],'#ff3050',2);crack(B,[[c[0]-3*k,c[1]-2*k],[c[0]-1*k,c[1]],[c[0]-2*k,c[1]+3*k]],'#140a10')},
- mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,7,'#4e2c70')},
- front:(B,J,T)=>{pool(B,J,T,16);for(const h of[J.hdF])cuff(B,h,J.k,'#3a3446','#6a6080')},
+ chest:(B,R,k,P)=>{/* 封印：胸の金の封。ひびの奥に赤い目がのぞく。ひびからくらやみの筋が走り、前垂れへしたたる */const c=R([0,-9*k]);veins(B,c,k,P.T||0,5,'#4e2c70','#9a5ad0');drips(B,[c[0],c[1]+3*k],k,P.T||0,3,'#2e1a44');B.disc(c[0],c[1],3.2*k,'#b8902a','#f0c850','#6a4a14');B.disc(c[0],c[1],1.6*k,'#140a10',null,null);B.set(c[0],c[1],'#ff3050',2);crack(B,[[c[0]-3*k,c[1]-2*k],[c[0]-1*k,c[1]],[c[0]-2*k,c[1]+3*k]],'#140a10')},
+ mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,10,'#5e3a88');mail(B,J,PAL.lord.under,PAL.lord.underHi)},
+ front:(B,J,T)=>{pool(B,J,T,18);for(const h of[J.hdF])cuff(B,h,J.k,'#3a3446','#6a6080');rivets(B,J.shF,J.k,3.2,5,'#b8902a');/* マントの裾から這い出るくらやみ */for(let i=0;i<3;i++){const x=J.hip[0]+(8+i*3)*J.k,y=J.footF[1]-1;tentacle(B,[x,y-2],[x+2+Math.sin(T*.07+i)*2,y-6],[x+(i%2?4:-1),y-10-i*2],1.2*J.k,.3*J.k,i===1)}},
  pose:{ua:1.8,fa:2.9,sw:-1.75,ua2:1.6,fa2:2.4,ff:-7,fb:7,cr:1.5,lean:.1}};
 
 SPEC.lord2={hk:1.1,lk:.9,tk:.95,name:'暗い門のぬし',k:1.3,pal:Object.assign({},PAL.lord,{eye:'#ff3050'}),
  helm:Object.assign({},lordHelm,{extra:(B,R,k,T)=>{/* 兜が割れて、ひとつ目がのぞく */crack(B,[R([0,-7*k]),R([.5*k,-3*k]),R([-.5*k,1*k])],'#140a10');B.disc(...R([-1.5*k,-2*k]),1.6*k,'#ff3050','#ffb0a0','#a01030');B.set(...R([-2*k,-2*k]),'#140a10',2)}}),
- tabard:{len:9,col:'#1a1e34',hi:'#2a3050',lo:'#0c0e1a',mark:(B,R,k)=>{gateMark('#5a4418')(B,R,k);stains('#4e2c70')(B,R,k)}},
+ tabard:{len:8,w:5,col:'#1a2046',hi:'#2a3466',lo:'#0c1028',edge:'#5a4418',mark:(B,R,k)=>{stains('#5e3a88')(B,R,k)}},tabardFront:true,
+ aura:{r:4,c1:'#46205e',c2:'#2a1238',rim:'#b060ff'},
  cape:{len:28,col:'#140e1a',hi:'#2a1e34',lo:'#06040a',tatter:9,extra:(B,J,T)=>capeEyes(B,J,T,9,'#ff3050')},
  w:Object.assign({},W_KEY,{col:'#5e4a78',hi:'#9a80c0',lo:'#22142e'}),tentB:true,
  behind:(B,J,T,P)=>{const k=J.k;
@@ -309,8 +328,8 @@ SPEC.lord2={hk:1.1,lk:.9,tk:.95,name:'暗い門のぬし',k:1.3,pal:Object.assig
  chest:(B,R,k,P)=>{/* 胸の扉が開く：体そのものが門になった */const o=P.door!=null?P.door:1;const c=R([0,-9*k]);
   B.disc(c[0],c[1],4*k,'#0a0306',null,null);for(let i=-3;i<=3;i+=2){B.set(c[0]+i*k,c[1]-3*k,'#e8e0d0',2);B.set(c[0]+i*k,c[1]+3*k,'#e8e0d0',2)}B.disc(c[0],c[1],1.8*k,'#ff3050','#ffb0a0','#a01030');B.set(c[0]-.5*k,c[1],'#140a10',2);
   for(const s of[-1,1]){const h=R([s*4*k,-9*k]),e=[h[0]+s*o*4*k,h[1]];B.poly([[h[0],h[1]-4*k],[e[0],h[1]-5*k],[e[0],h[1]+5*k],[h[0],h[1]+4*k]],'#42384e','#5e566e','#1c1824')}},
- mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,10,'#6a3a90')},
- front:(B,J,T)=>{pool(B,J,T,24);cuff(B,J.hdF,J.k,'#3a3446','#6a6080');dangle(B,J.hdF,J.k,5,'#5e566e','#b8902a',T,0)},
+ mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,14,'#7a4ab0');mail(B,J,PAL.lord.under,'#4e2c70');veins(B,add(J.sc,[0,5*J.k]),J.k,T,7,'#6a3a90','#c080ff')},
+ front:(B,J,T)=>{pool(B,J,T,26);rivets(B,J.shF,J.k,3.2,5,'#6a4a14');cuff(B,J.hdF,J.k,'#3a3446','#6a6080');dangle(B,J.hdF,J.k,5,'#5e566e','#b8902a',T,0)},
  pose:{ua:1.8,fa:2.9,sw:-1.75,ua2:1.0,fa2:1.4,ff:-7,fb:7,cr:2,lean:.14}};
 
 SPEC.red={hk:1.1,lk:.9,tk:.95,name:'赤い騎士',k:1,pal:PAL.red,
@@ -420,7 +439,7 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
  for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])trail(B,S,M,tt,ox,oy,4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);
- B.outline();return B}
+ B.outline();if(S.aura)aura(B,S.aura,tt);return B}
 
 /* ===== 全モーション =====
    f:だれ  n:名前  cap:読み方（プレイヤーは何を見ればいいか）  why:この動きにした理由
@@ -682,6 +701,24 @@ mv({f:'lord2',id:'l2_gate',n:'門の向こうの指',bg:'lord',len:160,cap:'背�
  fx:(B,J,t)=>{for(let i=0;i<3;i++){const imp=58+i*10,d=t-imp,base=[CW-12,20+i*14];if(t<28)continue;let u=d<-10?.15:d<0?.15+(d+10)/10*.85:d<10?1:Math.max(.15,1-(d-10)/20);const tip=[lerp(base[0],HXX+8,u),lerp(base[1],FL-12-i*2,u)];
    /* 指：3つの節としわ。先は白い爪 */for(let s=0;s<=1;s+=.02){const x=lerp(base[0],tip[0],s),y=lerp(base[1],tip[1],s)-Math.sin(s*3.14)*8*u,r=2.4-s*1.2;for(let yy=-r;yy<=r;yy++)B.set(x,y+yy,(Math.abs(s-.33)<.02||Math.abs(s-.66)<.02)?'#2a2030':yy<-r+1?'#b0a8b8':yy>r-1?'#4a4050':'#7a7088',1)}B.set(tip[0],tip[1],'#e8e0d0',2);B.set(tip[0]+1,tip[1],'#e8e0d0',2)}}});
 
+/* ===== 追加の新しい技 ===== */
+mv({f:'dgate',id:'dg_beat',n:'鎖の拍',bg:'gate',len:150,cap:'黒い鎖で床を3回打つ（ガン・ガン・ガン）。その次の拍で、鎖が横から来る。',why:'拍で読む攻撃は、小鬼のおかしらで先に教わっている。「3」は門の数字。門番の誓いの鎖が、拍を刻む道具になった。',
+ keys:[K(0,X),K(14,Object.assign({},X,{ua2:.6,fa2:1.4})),K(130,Object.assign({},X,{ua2:.6,fa2:1.4})),K(146,X)],cues:[{t:20,col:'w',at:J=>[J.hdB[0]+10,FL-2]}],hits:[48],
+ fx:(B,J,t)=>{const h=J.hdB;const beats=[20,30,40];let up=1;for(const b of beats)if(t>=b&&t<b+4)up=0;if(t<48){for(let i=0;i<18;i++){const s=i/18,x=h[0]+s*14,y=lerp(h[1],FL-1,up?Math.min(1,s*1.4)*.7:Math.min(1,s*1.5));B.set(x,y,i%2?'#22142e':'#4e2c70',1)}for(const b of beats)if(t>=b&&t<b+5)spark(B,h[0]+13,FL-2,t-b,'w')}
+  else if(t<64){const u=Math.min(1,(t-44)/4);for(let i=0;i<24;i++){const s=i/24,x=lerp(h[0],HXX+8,s*u),y=lerp(h[1],FL-14,s*u)-Math.sin(s*3.14)*4;B.set(x,y,i%2?'#22142e':'#4e2c70',1)}}}});
+const LPULL={ua:.5,fa:.2,sw:-1.2,ua2:.4,fa2:.2,lean:-.25,cr:2,x:4};
+mv({f:'lord',id:'l_pull',n:'門の重み',bg:'lord',len:140,cap:'背中の鎖を両手で引き、背後の門がきしむ。胸の封印が赤く光ったら、鍵の大剣を叩きつける。重い。',why:'ぬしの力は門とつながっていることから来る。鎖を引く＝門の重さを自分の一撃に乗せる。',
+ keys:[K(0,LI),K(18,LPULL),K(36,Object.assign({},LPULL,{lean:-.3,x:6})),K(40,LUP),K(56,LUP),K(68,Object.assign({},LDN,{x:-16,cr:4}),'in'),K(100,Object.assign({},LDN,{x:-16,cr:4})),K(132,LI)],
+ cues:[{t:40,col:'r',at:J=>add(J.sc,[0,5*J.k])}],hits:[68],hitCol:'r',trails:[[64,70,'r']],pp:(P,t)=>{P.chainL=t>=18&&t<40?44:60},
+ fx:(B,J,t)=>{if(t>=18&&t<40&&(t>>1)%2)for(let i=0;i<3;i++)B.set(CW-2,J.sc[1]-6+i*8,'#c8a050',4);if(t>=68&&t<80){for(let x=HXX;x<EXX;x+=2)B.set(x,FL-1-((x+t)%3===0?1:0),'#ffb0a0',4)}}});
+mv({f:'lord2',id:'l2_pool',n:'足元の溜まりから',bg:'lord',len:130,cap:'ぬしの足元のくらやみが、床を這ってこちらの足元まで広がる。泡が白く光ったら、真下から触手が突き上がる。',why:'黒い門番を染めた「溜まり」が、ついにこちらへ届く。くらやみは悪意ではなく、ただ広がるもの。',
+ keys:[K(0,L2I),K(16,Object.assign({},L2I,{lean:.15,cr:3})),K(120,Object.assign({},L2I,{lean:.15,cr:3})),K(128,L2I)],cues:[{t:22,col:'w',at:J=>[HXX+6,FL-2]}],hits:[50],
+ pre:(B,t)=>{const u=Math.min(1,t/22);for(let x=Math.round(lerp(EXX-10,HXX-4,u));x<EXX;x++){B.set(x,FL,INK.hi,6);if((x+t)%4===0)B.set(x,FL-1,INK.col,6)}},
+ fx:(B,J,t)=>{if(t>=18&&t<46&&(t>>2)%2){B.set(HXX+5,FL-2,'#9a5ad0',4);B.set(HXX+8,FL-3,'#9a5ad0',4)}if(t>=46&&t<70){const u=t<50?(t-46)/4:1-(t-50)/20;for(let i=0;i<3;i++){const x=HXX+3+i*3;B.tube([x,FL],[x+(i-1)*2,FL-10*u],[x+(i-1)*4,FL-22*u],2,.5,'#4e2c70','#9a5ad0','#22142e',1)}}}});
+mv({f:'lord2',id:'l2_doors',n:'扉のかみ合わせ',bg:'lord',len:120,cap:'胸の扉を大きく開いたまま前に出る。赤く光ったら、扉があごのように閉じて挟みにくる。重い。',why:'扉＝門。閉じる門に挟まれる。胸の口（回復）とは別の、扉そのものの技。',
+ keys:[K(0,L2I),K(16,Object.assign({},L2I,{door:2,lean:-.1})),K(34,Object.assign({},L2I,{door:2.2,lean:.2,x:-14})),K(44,Object.assign({},L2I,{door:.2,lean:.35,x:-18}),'in'),K(70,Object.assign({},L2I,{door:.2,lean:.35,x:-18})),K(112,L2I)],
+ cues:[{t:16,col:'r',at:J=>add(J.sc,[0,9*J.k])}],hits:[44],hitCol:'r'});
+
 /* ===== 専用ステージ（ゲームと同じ 240×135） ===== */
 const SW=240,SH=135,SFL=106;
 function rect(B,x,y,w,h,c,tag=6){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)B.set(xx,yy,typeof c==='function'?c(xx,yy):c,tag)}
@@ -741,7 +778,7 @@ const STAGES=[
 function stageFrame(s,t){const B=new Buf(SW,SH);STG[s.st](B,t,s.open||s.rage||s.deep);
  const H=new Buf(SW,SH);knight(H,SW-62,SFL,SPEC.hero,{},t);B.blit(H,true);
  for(const[w,P]of s.who){const S=SPEC[w];knight(B,176,SFL,S,P,t);if(w==='lord')pool(B,joints(176,SFL,S,Object.assign({},PDEF,S.pose)),t,16)}
- B.outline();
+ B.outline();for(const[w]of s.who)if(SPEC[w].aura)aura(B,SPEC[w].aura,t);
  if(s.refl){const R=new Buf(SW,SH);knight(R,176,SFL,SPEC.red,{},t);for(let y=0;y<SH;y++)for(let x=0;x<SW;x++){const c=R.c[y*SW+x];if(!c)continue;const yy=SFL+2+Math.round((SFL-y)*.5),xx=x+Math.round(Math.sin(yy*.5+t*.12));if(yy>SFL+1&&yy<SH&&(xx+yy)%2===0)B.set(xx,yy,mix(c,'#0c0a14',.4),8)}}
  if(s.st==='hole')for(let x=0;x<SW;x++)if(B.tag(x,SFL)!==1)B.set(x,SFL,Math.sin(x*.3+t*.1)>.5?'#3a2a50':'#1a1428',6);
  return B}
@@ -765,9 +802,9 @@ const FORMS=[
  parts:[['左右に開く胸の扉','体＝門。扉の奥の口と目が「門の向こう」。ここからの攻撃はいちばん重い'],['割れた兜の一つ目','人の顔（兜）が割れ、中の目が一つ'],['ちぎれた鎖','門とのつながりが切れた。手首から垂れた鎖は、触手が拾って鞭にする'],['背中の三本の触手と、先の目','黒い門番の「目の数＝回数」と同じルール'],['左腕の触手','人の腕の長さを超えて届く'],['破れた前垂れ','紺も紋章も、ほとんど残っていない'],['背後の門のすき間','ぬしが崩れたせいで、門が内側から押し開かれはじめた。のぞく指は、三つ首の竜と同じもの']],
  pal:[['#140e1a','もっと深い黒','封印がほどけた'],['#ff3050','胸の口の赤','いちばん重い場所'],['#22142e','くらやみの触手','門の向こうのもの']]},
 ];
-const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_chain','dg_down2'],
- lord:['l_enter','l_idle','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_rally','l_kneel'],
- lord2:['l2_open','l2_idle','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_rally','l2_whip','l2_gate','l2_down']};
+const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_chain','dg_beat','dg_down2'],
+ lord:['l_enter','l_idle','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_rally','l_pull','l_kneel'],
+ lord2:['l2_open','l2_idle','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_rally','l2_whip','l2_pool','l2_doors','l2_gate','l2_down']};
 const EXMV={g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い'};
 const KINDOF=id=>/_idle$/.test(id)?'main':/plant|seal|threat|state/.test(id)?'stand':/enter|turn|kneel|open|down/.test(id)?'show':'atk';
 
@@ -790,7 +827,7 @@ function stageCard(s){const c=el('figure','card stage');const cv=el('canvas');cv
 /* 立ち絵：大きく、地面だけ */
 function standCanvas(key,w,h,ox,sc){const cv=el('canvas','stand');cv.width=w;cv.height=h;const S=SPEC[key];const idle=MV.find(m=>m.f===key&&/idle/.test(m.id));
  const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);const P=idle?poseAt0(idle,tt%idle.len,Object.assign({},PDEF,S.pose)):{};if(idle&&idle.pp)idle.pp(P,tt%idle.len);P.chainL=P.chainL||22;
-   knight(B,ox,h-6,S,P,tt);if(key==='lord'||key==='lord2')pool(B,joints(ox,h-6,S,Object.assign({},PDEF,S.pose)),tt,key==='lord'?16:24);B.outline();const ctx=this.ctx;ctx.clearRect(0,0,w,h);B.toCanvas(ctx)}};ANIM.push(a);a.draw();return cv}
+   knight(B,ox,h-6,S,P,tt);if(key==='lord'||key==='lord2')pool(B,joints(ox,h-6,S,Object.assign({},PDEF,S.pose)),tt,key==='lord'?16:24);B.outline();if(S.aura)aura(B,S.aura,tt);const ctx=this.ctx;ctx.clearRect(0,0,w,h);B.toCanvas(ctx)}};ANIM.push(a);a.draw();return cv}
 function ladder(keys,notes){const wrap=el('div','ladder');keys.forEach((k,i)=>{const col=el('div','step');const S=SPEC[k];col.appendChild(standCanvas(k,80,104,44));col.appendChild(el('div','lname',S.name));col.appendChild(el('div','ladd',notes[i]));wrap.appendChild(col);if(i<keys.length-1)wrap.appendChild(el('div','arrow','→'))});return wrap}
 function build(){const root=document.getElementById('book');
  root.appendChild(heroSec());root.appendChild(ladderSec());

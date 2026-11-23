@@ -16,8 +16,15 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  const J=knight(B,ox,oy,S,P,tt);J.P=P;
  if(M.fx)M.fx(B,J,tt,S,M);
  /* 共通：合図の光と、当たった瞬間の火花 */
- for(const c of (M.cues||[])){const d=tt-c.t;if(d>=0&&d<12){const tp=c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF;if(c.col==='p')ring(B,tp[0],tp[1],3+d*.8,'p');else star(B,Math.round(tp[0]),Math.round(tp[1]),[2,4,5,5,4,4,3,3,2,2,1,1][d],c.col)}}
+ for(const c of (M.cues||[])){const d=tt-c.t;if(d>=0&&d<18){const tp=c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF;if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
  for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])trail(B,S,M,tt,ox,oy,4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);
  B.outline();if(S.aura)aura(B,S.aura,tt);return B}
+
+/* 合図の光：大きな十字の星＋斜めの光＋まわりのにじみ。画面でいちばん目立つもの */
+function cueStar(B,x,y,d,col){const R=[4,7,9,10,10,9,9,8,7,6,5,5,4,3,3,2,2,1][d]||1,[c1,c2]=FXC[col];
+ for(let yy=-R-2;yy<=R+2;yy++)for(let xx=-R-2;xx<=R+2;xx++){const r=Math.hypot(xx,yy);if(r<R*.7&&r>1.5&&(xx+yy)%2===0&&B.tag(x+xx,y+yy)!==4)B.set(x+xx,y+yy,mix(c1,'#000000',.35),4)}
+ for(let i=-R;i<=R;i++){const a=Math.abs(i)<R*.45?c2:c1;B.set(x+i,y,a,4);B.set(x,y+i,a,4);if(Math.abs(i)<R*.3){B.set(x+i,y-1,c2,4);B.set(x+i,y+1,c2,4);B.set(x-1,y+i,c2,4);B.set(x+1,y+i,c2,4)}}
+ const dd=Math.round(R*.5);for(let i=-dd;i<=dd;i++){B.set(x+i,y+i,c1,4);B.set(x+i,y-i,c1,4)}
+ B.set(x,y,'#ffffff',4);B.set(x+1,y,'#ffffff',4);B.set(x,y+1,'#ffffff',4);B.set(x-1,y,'#ffffff',4);B.set(x,y-1,'#ffffff',4)}

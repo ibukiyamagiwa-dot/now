@@ -5,7 +5,7 @@ function heroVar_old(o){const S=JSON.parse(JSON.stringify({pal:SPEC.hero.pal,hel
 /* 差分の上描き：体の要所の座標（J）に、意味のある変化を大きく描く */
 const SCR=(B,a,b,hi,lo)=>{B.line(a[0],a[1],b[0],b[1],hi,2);B.line(a[0]+1,a[1]+1,b[0]+1,b[1]+1,lo,2)};
 /* 盾への描きこみ：差分の中心は盾。盾を見れば「どこまで来た騎士か」が読める */
-const SH={
+const HSH={
  scar:(B,c,k)=>{/* 大きな斜めの切り傷と、ふちの刻み：番人たちと渡り合った跡 */SCR(B,[c[0]-3*k,c[1]-3.5*k],[c[0]+2.5*k,c[1]+3*k],'#e8dcc0','#1a120c');SCR(B,[c[0]+1.5*k,c[1]-4*k],[c[0]+3*k,c[1]-1*k],'#e8dcc0','#1a120c');for(let i=0;i<5;i++){const x=c[0]-3*k+i*1.5*k;B.set(x,c[1]-5.4*k,0,0);B.set(x,c[1]-4.9*k,'#1a120c',2)}},
  gate:(B,c,k)=>{/* 開いた門の紋章：アーチの枠と、外へ開いた二枚の扉。真ん中は空いている */const G='#e0c070',x=c[0],y=c[1];
   for(const s of[-1,1]){for(let yy=-1.5;yy<=3.2;yy+=.5)B.set(x+s*1.8*k,y+yy*k,G,2);for(let t=0;t<=1;t+=.1){B.set(x+s*(1.8+t*1.3)*k,y+(-1.2+t*.6)*k,G,2);B.set(x+s*(1.8+t*1.3)*k,y+(3.2-t*.6)*k,G,2)}for(let yy=-.6;yy<=2.6;yy+=.5)B.set(x+s*3.1*k,y+yy*k,G,2)}
@@ -28,13 +28,13 @@ const GPAL={trim:'#b8902a',trimHi:'#f0c850',trimLo:'#6a4a14',foot:'#8a6a2a',foot
 const GSH={rim:'#f0c850',face:'#3a3e68',faceHi:'#5a5e90',faceLo:'#1a1e3a'};
 const HVARS=[
  {id:'base',n:'はじまり',how:'最初から',why:'傷のない鎧、何も描かれていない盾、赤い羽根。まだ何者でもない。'},
- {id:'scar',n:'傷だらけの盾',how:'門番を倒す',why:'傷は盾にだけ残る。大きな切り傷と、ふちの刻み。番人たちの剣を、この盾で受けてきた。',o:{V:{marks:[SH.scar]}}},
- {id:'tabard',n:'開いた門',how:'門のぬしを倒す',why:'門番たちと同じ紺の長い布と、盾に金の「開いた門」。閉じた門を越えた者。',o:{tabard:TAB,V:{marks:[SH.gate]}}},
- {id:'plume',n:'白い大羽根',how:'赤い騎士を倒す',why:'塵になった赤い騎士の、ただ一つの飾り。兜に大きく、盾の角にもひと房。受けついだのか、拾っただけか。',o:{helm:PLU,V:{marks:[SH.plume]}}},
+ {id:'scar',n:'傷だらけの盾',how:'門番を倒す',why:'傷は盾にだけ残る。大きな切り傷と、ふちの刻み。番人たちの剣を、この盾で受けてきた。',o:{V:{marks:[HSH.scar]}}},
+ {id:'tabard',n:'開いた門',how:'門のぬしを倒す',why:'門番たちと同じ紺の長い布と、盾に金の「開いた門」。閉じた門を越えた者。',o:{tabard:TAB,V:{marks:[HSH.gate]}}},
+ {id:'plume',n:'白い大羽根',how:'赤い騎士を倒す',why:'塵になった赤い騎士の、ただ一つの飾り。兜に大きく、盾の角にもひと房。受けついだのか、拾っただけか。',o:{helm:PLU,V:{marks:[HSH.plume]}}},
  {id:'gold',n:'金の縁どり',how:'ランクS',why:'肩・ひざ・帯に金。盾は紺に金のふち。誇りの色。……門のぬしの金も、昔はこう光っていた。',o:{pal:GPAL,helm:{ridge:'#f0c850'},V:GSH,fronts:[GOLDEDGE]}},
- {id:'ink',n:'くらやみのマント',how:'ならくをこえる',why:'マントがくらやみに染まり、盾のふちにもにじむ。いちばん深くまで降りた者。洗っても落ちない。',o:{capeExtra:INKCAPE,V:{marks:[SH.ink]}}},
+ {id:'ink',n:'くらやみのマント',how:'ならくをこえる',why:'マントがくらやみに染まり、盾のふちにもにじむ。いちばん深くまで降りた者。洗っても落ちない。',o:{capeExtra:INKCAPE,V:{marks:[HSH.ink]}}},
 ];
-HVARS.push({id:'all',n:'ぜんぶ',how:'すべてそろえる',why:'盾は歩んだ道のりそのもの。それでも兜・剣・体つき・マントの位置は同じ。だれが見ても「あの騎士」。',o:{tabard:TAB,helm:Object.assign({},PLU,{ridge:'#f0c850'}),pal:GPAL,capeExtra:INKCAPE,fronts:[GOLDEDGE],V:Object.assign({},GSH,{marks:[SH.gate,SH.scar,SH.ink,SH.plume]})}});
+HVARS.push({id:'all',n:'ぜんぶ',how:'すべてそろえる',why:'盾は歩んだ道のりそのもの。それでも兜・剣・体つき・マントの位置は同じ。だれが見ても「あの騎士」。',o:{tabard:TAB,helm:Object.assign({},PLU,{ridge:'#f0c850'}),pal:GPAL,capeExtra:INKCAPE,fronts:[GOLDEDGE],V:Object.assign({},GSH,{marks:[HSH.gate,HSH.scar,HSH.ink,HSH.plume]})}});
 /* 主人公のモーション（敵の左向きの骨組みで描いて、左右を反転する） */
 const HMOT=[
  {n:'待機',p:{},why:'剣先を前に、盾を引いて待つ'},

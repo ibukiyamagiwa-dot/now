@@ -1,0 +1,70 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>いまだ！ 設定資料集 第2版</title>
+<style>
+:root{--bg:#0f0d12;--pa:#17141c;--ln:#2a2532;--tx:#e8e2ea;--mu:#9a90a4;--ac:#ffd040;--red:#ff4a5a;--pu:#b060ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.75 "Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+canvas{image-rendering:pixelated;display:block}
+header.cover{padding:48px 20px 28px;max-width:1100px;margin:0 auto}
+.kick{font-size:12px;letter-spacing:.25em;color:var(--mu)}h1{font-size:clamp(28px,6vw,48px);line-height:1.2;margin:.2em 0 .3em;font-weight:800}
+h1 span{color:var(--red)}.sub{color:var(--mu);max-width:44em}
+#nav{position:sticky;top:0;z-index:5;background:rgba(15,13,18,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--ln);display:flex;gap:2px;overflow-x:auto;padding:6px 10px;scrollbar-width:none}
+#nav a{flex:none;color:var(--tx);text-decoration:none;font-size:13px;padding:6px 10px;border-radius:6px;background:var(--pa)}#nav a:active{background:var(--ln)}
+main{max-width:1100px;margin:0 auto;padding:0 16px 120px}
+section{scroll-margin-top:48px;padding:40px 0 12px;border-bottom:1px solid var(--ln)}
+h2{font-size:clamp(24px,5vw,34px);margin:0;line-height:1.3}h3{font-size:17px;margin:28px 0 10px;color:var(--mu);font-weight:600;letter-spacing:.05em}h3 small{color:var(--tx);margin-left:6px}
+h4{margin:22px 0 6px;font-size:14px;color:var(--mu);letter-spacing:.1em}
+.lead{color:var(--tx);max-width:46em}.note{background:var(--pa);border-left:3px solid var(--ac);padding:12px 14px;border-radius:4px;font-size:14px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:14px 0}
+.rules div{background:var(--pa);border-radius:8px;padding:10px 12px;font-size:13px}.rules b{display:block;font-size:15px}
+.pillars{counter-reset:p;display:grid;gap:10px;margin:14px 0}.pillars div{counter-increment:p;background:var(--pa);border-radius:8px;padding:12px 14px 12px 46px;position:relative}
+.pillars div:before{content:counter(p);position:absolute;left:14px;top:10px;font-size:22px;font-weight:800;color:var(--ac)}.pillars b{display:block}
+.ladder{display:flex;align-items:flex-end;gap:4px;overflow-x:auto;padding:6px 0 10px}.step{flex:none;width:150px;text-align:center}.step canvas{width:144px;margin:0 auto}
+.lname{font-weight:700;font-size:14px}.ladd{font-size:12px;color:var(--mu);line-height:1.5;min-height:3em}.arrow{flex:none;color:var(--mu);align-self:center;font-size:20px}
+.fhead{display:flex;gap:14px;align-items:flex-end;margin-bottom:14px}.num{font-size:44px;font-weight:800;color:var(--ln);line-height:1}.en{font-size:11px;letter-spacing:.25em;color:var(--mu)}
+.ftop{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:20px;align-items:start}
+.art{background:radial-gradient(ellipse at 50% 80%,#2a2232,#141018 70%);border-radius:10px;padding:10px;position:relative}.art .stand{width:100%;max-width:330px;margin:0 auto}
+.old{position:absolute;right:8px;top:8px;width:92px;background:#000;border:1px solid var(--ln);border-radius:6px;overflow:hidden;font-size:10px;color:var(--mu);text-align:center}.old img{width:100%;display:block;image-rendering:pixelated}
+.lore{font-size:16px;margin-top:0}.pal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}
+.chip{display:grid;grid-template-columns:22px 1fr;column-gap:8px;font-size:12px;background:var(--pa);border-radius:6px;padding:6px 8px;align-items:center}.chip i{grid-row:span 2;width:22px;height:22px;border-radius:4px;border:1px solid #0006}.chip b{font-size:13px}.chip span{color:var(--mu)}
+table.parts{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}table.parts th{text-align:left;color:var(--mu);font-weight:500;font-size:12px;border-bottom:1px solid var(--ln);padding:4px 8px}
+table.parts td{border-bottom:1px solid var(--ln);padding:8px;vertical-align:top}table.parts td:first-child{font-weight:700;width:34%;white-space:normal}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px}
+.card{margin:0;background:var(--pa);border-radius:10px;overflow:hidden;border:1px solid var(--ln)}.card canvas{width:100%;cursor:pointer}.card.paused canvas{outline:2px solid var(--ac);outline-offset:-2px}
+figcaption{padding:10px 12px 12px;font-size:13px;line-height:1.65}.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.row b{font-size:15px;margin-right:auto}
+.tag{font-size:11px;padding:1px 7px;border-radius:99px;white-space:nowrap}.tag.ex{background:#2a3a2a;color:#a8e0a0}.tag.nw{background:#3a2a10;color:#ffd080}.tag.st{background:#22304a;color:#a0c8ff}.tag.sh{background:#3a2240;color:#e0b0ff}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px}.hv canvas{width:100%;background:radial-gradient(ellipse at 50% 80%,#2a2232,#141018 70%)}
+.law{background:var(--pa);border-radius:10px;padding:14px 16px;margin:14px 0}.law b{color:var(--ac)}
+.read,.why{margin:6px 0 0}.k{display:inline-block;font-size:10px;color:var(--mu);border:1px solid var(--ln);border-radius:4px;padding:0 5px;margin-right:6px;vertical-align:1px}.why{color:var(--mu)}
+.foot{margin-top:8px;font-size:11px;color:var(--mu)}.fr{margin-left:auto;font-variant-numeric:tabular-nums}.gap{font-variant-numeric:tabular-nums}
+.lt{width:10px;height:10px;border-radius:50%;display:inline-block}.lt.w{background:#fff}.lt.r{background:#ff4040}.lt.g{background:#ffd040}.lt.p{background:transparent;border:2px solid var(--pu)}
+#next .q{background:var(--pa);border-radius:8px;padding:10px 14px;margin:8px 0}#impl .q b{color:var(--ac)}
+#spd{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:9;background:#1e1a24f2;border:1px solid var(--ln);border-radius:99px;padding:4px;display:flex;gap:2px;box-shadow:0 6px 20px #0008}
+#spd span{font-size:11px;color:var(--mu);padding:6px 8px 6px 10px}#spd button{border:0;background:transparent;color:var(--tx);font:inherit;font-size:13px;padding:6px 12px;border-radius:99px}#spd button.on{background:var(--ac);color:#000;font-weight:700}
+@media (max-width:700px){.ftop{grid-template-columns:1fr}.sgrid{grid-template-columns:1fr}.grid{grid-template-columns:1fr}body{font-size:14px}.old{width:76px}}
+</style></head><body>
+<header class="cover"><div class="kick">いまだ！ ・ 設定資料集 第2版</div><h1>門の系統<br><span>鎖でつながる者たち</span></h1>
+<p class="sub">決まった作風で描き直した、第2版の最初の章。主人公と、門番・黒い門番・門のぬし・暗い門のぬし。くらやみに関わるボスには、新しい技と派生の立ち絵を足した。カードは動く。タップで一時停止。</p></header>
+<nav id="nav"></nav>
+<main id="book">
+<section id="rules"><h2>この資料集の約束</h2>
+<p class="lead">「やさしいことばで語る、底の見えないおとぎ話」。描きこみの足し引きには、すべて設定上の意味がある。攻略で大事なものを一番目立たせる。</p>
+<div class="rules"><div><i class="lt w"></i><b>白い光</b>ふつうの攻撃</div><div><i class="lt r"></i><b>赤い光</b>重い攻撃</div><div><i class="lt p"></i><b>紫の輪</b>フェイント（押さない）</div><div><i class="lt g"></i><b>金の光</b>打ち合い</div></div>
+<div class="law"><b>世界の法則</b>　倒れたものは、くらやみに拾われる。くらやみは倒れたものを拾い、つなぎ直して、もっと悪い形で返す。悪意はない。ただの浸食。その向こうにいる上位の存在は、こちらに気づいてもいない。</div>
+<div class="pillars">
+<div><b>頭身は格の物差し</b>主人公 約3頭身、門番 約3.3頭身、ボス 約4頭身。強い者ほど頭が小さく、大人びる。</div>
+<div><b>同じ土台に部品を足す</b>同じ系統は同じ骨組み。上の段は前の段の部品を受けつぎ、足していく。部品の数＝のまれ具合。</div>
+<div><b>モチーフは意味を変えない</b>「3」は門の数字。「目」は上位の存在の視線。「金」は門のぬしの誇り。「紺」は門に仕える者。「銀」はのまれないもの。</div>
+<div><b>合図から当たりまでの間は変えない</b>どの技も、合図の光から当たりまで28F（打ち合いは別）。新しい技も同じ。</div>
+</div></section>
+</main>
+<section id="next" style="max-width:1100px;margin:0 auto;padding:40px 16px 140px">
+<h2>この先</h2>
+<p>次の章は「赤の系統」（赤い騎士、本気、赤い門のぬし、第二形態）。門のぬしと同じ骨組みで、のまれなかった世界線の姿として描く。そのあと、くらやみの竜と三つ首の竜、中ボスとモブ、専用ステージの順に足していく。</p>
+<h3>見てほしいところ</h3>
+<div class="q"><b>1.</b> 鎖の一本線で、門番から暗い門のぬしまでが同じ系統に見えるか。</div>
+<div class="q"><b>2.</b> 門のぬしが、黒い門番より禍々しく見えるか。</div>
+<div class="q"><b>3.</b> 新しい技（鎖の打ち払い、鎖の鞭、門の向こうの指）と派生の立ち絵のうち、ゲームに入れたいもの。</div>
+</section>
+<div id="spd"><span>速さ</span><button data-s="1" class="on">1</button><button data-s=".5">½</button><button data-s=".25">¼</button><button data-s="0">止</button></div>
+<script>/*JS*/</script>
+</body></html>

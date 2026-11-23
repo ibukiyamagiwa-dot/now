@@ -481,10 +481,10 @@ function lineTrail(B,S,M,t,ox,oy,n,col,which){/* 直線：切っ先の通り道�
    低く這う姿勢、高い肩、背の扇の翼。あごの下の触手、ずれて並ぶ三つの目、裂けるほど開く口、皮膚の下を這うもの。
    拍は灯りではなく体で見せる：前足の足踏み、尾で床を打つ、のど袋がふくらむ。 */
 const DR={
- n:{lbl:'覚悟1 ふつう',name:'くらやみの竜',sk:['#0b0711','#1e1129','#312040','#4c3462','#74549a'],rim:'#a47cd6',bel:['#22182c','#3e2e48','#5c4866','#7a6684'],mem:['#0c0714','#1a0f27','#2a1a3c','#42285a'],vein:'#5e3676',bone:['#3a3040','#76687a','#b0a2ac','#e4d8de'],eye:'#ffd75e',gold:['#5a3e12','#a8822a','#e8c050'],crack:'#3a1a30',weye:0,feel:5,frill:1,smoke:0,drip:1,more:0},
- r:{lbl:'覚悟2 赤い',name:'赤いくらやみの竜',sk:['#100508','#280c16','#3e1622','#5c2434','#84384c'],rim:'#c4626e',bel:['#2a0e14','#4a2228','#683a40','#8a565c'],mem:['#120408','#200a10','#32121c','#4a1a2c'],vein:'#7a2434',bone:['#3e2c30','#7a6264','#b49c9c','#e6d4d2'],eye:'#ffd75e',gold:['#5a3e12','#a8822a','#e8c050'],crack:'#5a1424',weye:1,feel:7,frill:3,smoke:0,drip:2,more:0},
- k:{lbl:'覚悟3 黒い',name:'黒いくらやみの竜',sk:['#030205','#09070c','#141018','#221c29','#352c3e'],rim:'#5e4e78',bel:['#0e0b12','#1a1620','#28222e','#38303e'],mem:['#020103','#06040a','#0e0a14','#18121f'],vein:'#2a2038',bone:['#24202a','#4a4450','#7a727c','#9e96a0'],eye:'#ff4040',gold:['#2e2410','#5a4a24','#8a7640'],crack:'#24101c',weye:2,feel:10,frill:5,smoke:2,drip:3,more:0},
- v:{lbl:'覚悟4 紫の',name:'紫のくらやみの竜',sk:['#0a0418','#1a0a30','#2c1450','#44247a','#6438a8'],rim:'#a676f4',bel:['#20103a','#3a2260','#56387e','#72549a'],mem:['#08021a','#120630','#200c46','#341662'],vein:'#6a34aa',bone:['#3a2a50','#74609a','#ac9ad0','#e0d2f4'],eye:'#ff6ad8',gold:['#3e2a14','#7a5a2a','#b08a44'],crack:'#3a1050',weye:2,feel:12,frill:7,smoke:1,drip:2,more:1}};
+ n:{out:'#c8a2f4',lbl:'覚悟1 ふつう',name:'くらやみの竜',sk:['#0b0711','#1e1129','#312040','#4c3462','#74549a'],rim:'#a47cd6',bel:['#22182c','#3e2e48','#5c4866','#7a6684'],mem:['#0c0714','#1a0f27','#2a1a3c','#42285a'],vein:'#5e3676',bone:['#3a3040','#76687a','#b0a2ac','#e4d8de'],eye:'#ffd75e',gold:['#5a3e12','#a8822a','#e8c050'],crack:'#3a1a30',weye:0,feel:5,frill:1,smoke:0,drip:1,more:0},
+ r:{out:'#f0909e',lbl:'覚悟2 赤い',name:'赤いくらやみの竜',sk:['#100508','#280c16','#3e1622','#5c2434','#84384c'],rim:'#c4626e',bel:['#2a0e14','#4a2228','#683a40','#8a565c'],mem:['#120408','#200a10','#32121c','#4a1a2c'],vein:'#7a2434',bone:['#3e2c30','#7a6264','#b49c9c','#e6d4d2'],eye:'#ffd75e',gold:['#5a3e12','#a8822a','#e8c050'],crack:'#5a1424',weye:1,feel:7,frill:3,smoke:0,drip:2,more:0},
+ k:{out:'#9a86c4',lbl:'覚悟3 黒い',name:'黒いくらやみの竜',sk:['#030205','#09070c','#141018','#221c29','#352c3e'],rim:'#5e4e78',bel:['#0e0b12','#1a1620','#28222e','#38303e'],mem:['#020103','#06040a','#0e0a14','#18121f'],vein:'#2a2038',bone:['#24202a','#4a4450','#7a727c','#9e96a0'],eye:'#ff4040',gold:['#2e2410','#5a4a24','#8a7640'],crack:'#24101c',weye:2,feel:10,frill:5,smoke:2,drip:3,more:0},
+ v:{out:'#d0a8ff',lbl:'覚悟4 紫の',name:'紫のくらやみの竜',sk:['#0a0418','#1a0a30','#2c1450','#44247a','#6438a8'],rim:'#a676f4',bel:['#20103a','#3a2260','#56387e','#72549a'],mem:['#08021a','#120630','#200c46','#341662'],vein:'#6a34aa',bone:['#3a2a50','#74609a','#ac9ad0','#e0d2f4'],eye:'#ff6ad8',gold:['#3e2a14','#7a5a2a','#b08a44'],crack:'#3a1050',weye:2,feel:12,frill:7,smoke:1,drip:2,more:1}};
 const DPAL={body:DR.n.sk[2],hi:DR.n.sk[3],lo:DR.n.sk[1],eye:DR.n.eye};
 const DPDEF={wcount:-1,tcount:-1,ccount:-1,x:0,cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0,lift:0,rage:0,dead:0,eyes:3,fl:0,fr:0,tailUp:0,slap:0,sweep:0,sac:0,feel:0,melt:0,quiver:0,twitch:0};
 const MK=(x,y)=>(y+1024)*4096+x+1024,UK=k=>[(k%4096)-1024,Math.floor(k/4096)-1024];
@@ -546,13 +546,17 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  const tor=new Set();dDisc(tor,...Q(-11,-20),(8.2+br*.4)*k,.05,1);dDisc(tor,...Q(-4,-24),8.4*k,.05,2);dDisc(tor,...Q(4,-20),7.2*k,.05,3);dDisc(tor,...Q(13,-19),7*k,.05,4);dShade(B,tor,SK,rim);
  {const has=(x,y)=>tor.has(MK(x,y));for(const key of tor){const[x,y]=UK(key);if(B.tag(x,y)!==1)continue;let d=0;while(d<5&&has(x,y+d+1))d++;if(d<4&&x<bx+17*k&&B.get(x,y)!==SK[0]){const f=(x+Math.round(y*.3))%3===0;B.set(x,y,d===0?BE[0]:f?BE[1]:d===1?BE[1]:d===2?BE[2]:BE[3],1)}}}
  /* あばら：息にあわせて動く */for(let i=0;i<4;i++){const x0=-7+i*5+br*.3,f=t=>Q(x0-t*3,-27+t*12+Math.abs(i-1.5)*.5);for(let t=.08;t<.86;t+=.06){const p=f(t),x=Math.round(p[0]),y=Math.round(p[1]);if(B.get(x,y)===SK[2]||B.get(x,y)===SK[3]){B.set(x,y,SK[1],1);if(B.get(x-1,y)===SK[2])B.set(x-1,y,SK[3],1)}}}
- /* 胴の三つの筋：ふだんは閉じた目のすじ。尾の技では、床を打つたびに後ろから一つずつ開く */for(let i=0;i<3;i++){const p=Q([9,2,-5][i],[-25,-27,-25][i]).map(Math.round),x=p[0],y=p[1],op=P.tcount>i;
-  B.line(x-2,y-1,x+2,y-1,SK[0],1);B.line(x-1,y-2,x+1,y-2,SK[3],1);if(op){B.line(x-2,y,x+2,y,D.eye,2);B.set(x,y,'#120008',2);B.line(x-1,y+1,x+1,y+1,mix(D.eye,'#000000',.45),2);B.set(x,y+1,'#120008',2)}else{B.line(x-2,y,x+2,y,SK[0],1);B.line(x-1,y+1,x+1,y+1,SK[1],1)}}
+ /* 胴の三つの筋：ふだんは閉じた、ぬれた肉の裂け目（ふちが腫れ、血管がのびる）。尾の技では、床を打つたびに後ろから一つずつ開いて目になる */{const lip=mix(SK[3],'#b04a66',.5),lipH=mix(SK[4],'#e0809a',.45),lipD=mix(SK[1],'#4a1028',.5),vn=mix(SK[2],'#6a2040',.6);
+  for(let i=0;i<3;i++){const p=Q([9,2,-5][i],[-25,-27,-25][i]).map(Math.round),x=p[0],y=p[1],op=P.tcount>i,pul=Math.sin(T*.11+i*2)>.6?1:0;
+   for(const[vx,vy]of[[-4,-2],[4,-2],[-3,2],[3,2],[0,-3]]){B.set(x+vx,y+vy,vn,1);B.set(x+Math.round(vx*.6),y+Math.round(vy*.6),vn,1)}
+   B.line(x-2,y-1,x+2,y-1,lip,1);B.set(x-1,y-2,lipH,1);B.set(x,y-2,lipH,1);B.set(x+1,y-2,lip,1);B.line(x-3,y,x-3,y,lip,1);B.set(x+3,y,lip,1);B.line(x-2,y+1+(op?1:0),x+2,y+1+(op?1:0),lipD,1);B.set(x,y+2+(op?1:0),lip,1);
+   if(op){B.line(x-2,y,x+2,y,D.eye,2);B.line(x-2,y+1,x+2,y+1,mix(D.eye,'#000000',.4),2);B.set(x,y,'#120008',2);B.set(x,y+1,'#120008',2);B.set(x-1,y-1,lipH,1)}
+   else{B.line(x-2,y,x+2,y,'#1a0410',1);if(pul)B.set(x-1+i%3,y,mix('#1a0410',D.eye,.35),1);B.set(x,y+1,lipD,1)}}}
  /* いぼ、ぬれた光 */for(const[x,y]of[[-9,-26],[-3,-29],[6,-25],[12,-24],[-14,-24]]){const p=Q(x,y);if(B.get(Math.round(p[0]),Math.round(p[1]))){B.set(p[0],p[1],SK[3],1);B.set(p[0],p[1]+1,SK[1],1)}}
  if(dd<.5)for(const[x,y]of[[-6,-31],[-5,-31],[3,-27]]){const p=Q(x,y);if(B.tag(Math.round(p[0]),Math.round(p[1]))===1)B.set(p[0],p[1],mix(SK[4],'#ffffff',.45),1)}
  /* ===== 手前の後ろ脚 ===== */legHind(12,10,SK,6.8);
  /* ===== 首：弓なりに上がって、頭は低く前へ。のどの板、埋まった金のかせ、のど袋 ===== */
- const Hb=dd>0?LP(Q(-27-P.nx,-18+P.ny),[bx-32*k,oy-5],dd):Q(-27-P.nx,-18+P.ny),N0=Q(-13,-25),N1=LP(Q(-16-P.nx*.2,-39+P.ny*.1),Q(-18,-14),dd),N2=LP(Q(-25-P.nx*.6,-33+P.ny*.6),Q(-28,-8),dd),nf=cub(N0,N1,N2,Hb),nr=t=>(6.6-2.6*t)*k;
+ const jb=dd>0?0:P.jaw,Hb0=dd>0?LP(Q(-27-P.nx,-18+P.ny),[bx-32*k,oy-5],dd):Q(-27-P.nx,-18+P.ny),Hb=[Hb0[0]+jb*2*k,Hb0[1]+jb*1.5*k],N0=Q(-13,-25),N1=LP(Q(-16-P.nx*.2,-39+P.ny*.1),Q(-18,-14),dd),N2=LP(Q(-25-P.nx*.6,-33+P.ny*.6),Q(-28,-8),dd),nf=cub(N0,N1,N2,Hb),nr=t=>(6.6-2.6*t)*k;
  const nm=new Set();dCurve(nm,nf,nr,0,40,.05,5);
  /* 皮膚の下を這うもの */const cp=(T%240)/70;if(cp<1&&dd<.3){const p=nf(cp),q=nf(Math.min(1,cp+.02)),a=Math.atan2(q[1]-p[1],q[0]-p[0])-1.57;dDisc(nm,p[0]+Math.cos(a)*(nr(cp)-1),p[1]+Math.sin(a)*(nr(cp)-1),2.2*k)}
  dShade(B,nm,SK,rim,null,true);
@@ -567,7 +571,7 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
   const hot=['#3a0c14','#7a1e1c','#c2402a','#ff7a3a','#ffc070'],sc=P.sac;dShade(B,m,[mix(BE[0],hot[0],sc),mix(BE[1],hot[1],sc),mix(BE[2],hot[2],sc*.85),mix(BE[3],hot[3],sc*.8),mix(BE[3],hot[4],sc*.7)],null);
   for(let i=0;i<3;i++){const a=i*2.1+.4;B.line(c[0],c[1],c[0]+Math.cos(a)*R0*.9,c[1]+Math.sin(a)*R0*.9,mix(BE[0],'#200408',.5),1)}if(sc>.4){B.set(c[0],c[1],'#ffe0a0',1);B.set(c[0]+1,c[1],'#ffc070',1)}J.sac=c}
  /* ===== 頭：低く、前へ。ずれて並ぶ三つの目、裂ける口、あごの下の触手 ===== */
- const hs=1.15*k,ha=P.hy*.02+dd*.35,ja=dd>0?.25*dd:.06+P.jaw*.5+Math.max(0,P.jaw-.7)*1.5,R=v=>add(Hb,rot([v[0]*hs,v[1]*hs],ha)),hg=[2,1],Jw=v=>add(R(hg),rot([(v[0]-hg[0])*hs,(v[1]-hg[1])*hs],ha+ja));
+ const hs=1.15*k,jw=dd>0?0:P.jaw,ha=-P.hy*.02-dd*.3+jw*.45+Math.max(0,jw-.7)*.4,ja=dd>0?.25*dd:.06+jw*.55+Math.max(0,jw-.7)*.7,R=v=>add(Hb,rot([v[0]*hs,v[1]*hs],ha)),hg=[2,1],Jw=v=>add(R(hg),rot([(v[0]-hg[0])*hs,(v[1]-hg[1])*hs],ha-ja));
  /* 奥の角 */dTent(B,[R([3,-6]),R([10,-12]),R([7,-19])],1.4,.4,FAR(BO));
  /* 下あご */{const m=new Set();dCurve(m,t=>LP(Jw([1,2.2]),Jw([-15,1.8]),t),t=>(3-1.2*t)*hs,0,14,.04,7);dShade(B,m,SK,rim)}
  if(ja>.04){const m=B.mask([R([3,1]),R([-17,.6]),Jw([-16,1.4]),Jw([3,2])]);for(const key of m){const[x,y]=UK(key);B.set(x,y,(x+y)%5?'#2a0612':'#3e0c1c',1)}
@@ -596,6 +600,7 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  /* ===== 黒い段から：背から、くらやみがのぼる ===== */
  if(D.smoke&&dd<.5){for(let i=0;i<10*D.smoke;i++){const s=(i*37%100)/100,b=LP(LP(Q(-6,-30),Q(14,-24),s),Q(4,-31),.2),ph=(T*.35+i*13)%18,x=b[0]+Math.sin(ph*.4+i)*1.3,y=b[1]-ph-2;if(!B.get(Math.round(x),Math.round(y)))B.set(x,y,ph<9?INK.hi:INK.col,4)}}
  /* しずく：腹とあごから */if(dd<.5)for(let i=0;i<D.drip;i++){const p=[Q(-6,-12),Q(6,-13),Jw([-8,4])][i%3],ph=(T*.4+i*23)%26,y=p[1]+ph*.7;if(y<oy-1){B.set(p[0],y,D.sk[2],4);if(ph>3)B.set(p[0],y-1,D.sk[1],4)}}
+ /* ===== シルエット：背中側（上と右）の外に明るいふちを一画素。暗い背景に溶けない ===== */if(dd<.6&&P.melt<=0){const oc=fd(D.out||D.rim),L=[];for(let y=1;y<B.h-1;y++)for(let x=1;x<B.w-1;x++){const i=y*B.w+x;if(B.t[i]!==0)continue;const b=B.t[i+B.w]===1,l=B.t[i-1]===1,bl=B.t[i+B.w-1]===1;if((b||l||bl)&&y<oy-1)L.push(i)}for(const i of L){B.c[i]=oc;B.t[i]=3}}
  /* ===== 溶ける／形になる：melt=1で床のくらやみだけ。上から消え、境目は液のしずく ===== */
  if(P.melt>0){const yT=oy-76*(1-P.melt);for(let y=0;y<B.h;y++)for(let x=0;x<B.w;x++){const i=y*B.w+x;if(B.t[i]!==1&&B.t[i]!==2)continue;const h=hsh(x,y);if(y<yT-h*3)dClr(B,x,y);else if(y<yT+3+h*2){B.c[i]=h<.5?INK.hi:INK.col;B.t[i]=1}}
   for(let x=Math.round(bx-30*k);x<bx+40*k;x++){const w=Math.sin((x-bx)*.15+T*.1);if(P.melt>.05&&B.get(x,oy-1)===0&&hsh(x,1)<.85)B.set(x,oy-1,w>0?INK.hi:INK.col,1)}}

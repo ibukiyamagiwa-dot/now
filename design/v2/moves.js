@@ -481,3 +481,7 @@ mv({f:'fallen2',id:'f2_silentiai',n:'水の中の無音の居合',bg:'hole',len:
  fx:(B,J,t)=>{if(t>=14&&t<30){const c=[EXX-4,FL+12];for(let q=0;q<3;q++){const r=3+(t-14)*1.1+q*4;if(r>20)continue;for(let a=-.9;a<=.9;a+=.12){B.set(c[0]-Math.cos(a)*r,c[1]-Math.sin(a)*r*.5,q?'#6a6278':'#a8a0b0',4);B.set(c[0]+Math.cos(a)*r,c[1]-Math.sin(a)*r*.5,q?'#6a6278':'#a8a0b0',4)}}}},post:W2});
 CL('fallen','f_silent','r2_silent',{n:'無音の居合',bg:'hole',post:(B,J,t)=>{const f=MV.find(x=>x.id==='r2_silent').fx;water(B,t)},cap:'光らない。腰の鞘から「チャキ」と音。その音から、いつもの間で来る。刃は銀、尾はくらやみ。',why:'本気の赤い騎士の技を、のまれても体が覚えている。'},p=>Object.assign({},p,{sheath:p.sheath}));
 CL('fallen2','f2_tsubame','r2_tsubame',{n:'つばめ返し（タン・タン）',bg:'hole',post:W2,cap:'白く光ったら、上からの弧、続けて下からの弧。水面の映り姿も同じ弧を描く。'},p=>Object.assign({},p,{sheath:undefined}));
+
+/* 連撃の合図：ゲームと同じく、一撃ごとに28F前の合図を置く（足りないものを補う） */
+(()=>{const fix={g_two:'w',dg_two:'w',l_two:'w',l_rev:'w',l2_tri:'w',r_two:'w',r_swap:'w',r_combo4:'w',f_cutten:'w',f_sa:'w',f2_four:'w'};
+ for(const id in fix){const m=MV.find(x=>x.id===id);if(!m)continue;m.cues=(m.cues||[]).slice();for(const h of m.hits||[])if(!m.cues.some(c=>c.col!=='p'&&c.t===h-28))m.cues.push({t:h-28,col:fix[id]});m.cues.sort((a,b)=>a.t-b.t)}})();

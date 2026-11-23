@@ -1427,7 +1427,7 @@ function ladderSec(){const s=el('section','lad');s.id='ladder';
  return s}
 function orderSec(){const s=el('section','ord');s.id='order';s.appendChild(el('h2','','強さの順'));
  s.appendChild(el('p','lead','後に出る者ほど手ごわく。前の者を弱くするのではなく、後の者に技と読み方を足して並べた。数は攻撃の技だけ（立ち絵・演出は除く）。'));
- const rows=[['門番','gate','覚悟0のボス'],['くらやみの竜','dragon','覚悟1〜3'],['三つ首の竜','hydra','竜のあと'],['黒い門番','dgate','中ボス（覚悟3〜）'],['門のぬし','lord','覚悟4'],['暗い門のぬし','lord2','第二形態'],['赤い騎士','red','ぬしの次'],['本気の赤い騎士','red2','第二形態'],['赤い門のぬし','fallen','いちばん奥'],['第二形態','fallen2','最後']];
+ const rows=[['門番','gate','覚悟0のボス'],['くらやみの竜','dragon','覚悟1〜3'],['黒い門番','dgate','中ボス（覚悟3〜）'],['三つ首の竜','hydra','竜のあと（隠れボス）'],['門のぬし','lord','覚悟4'],['暗い門のぬし','lord2','第二形態'],['赤い騎士','red','ぬしの次'],['本気の赤い騎士','red2','第二形態'],['赤い門のぬし','fallen','いちばん奥'],['第二形態','fallen2','最後']];
  let h='<tr><th>だれ</th><th>技</th><th>連撃</th><th>最大</th><th>赤</th><th>紫の輪</th><th>光らない</th><th>押せば罰</th><th>打ち合い</th></tr>';
  for(const[n,k,w]of rows){const ids=MOVES_OF[k].filter(id=>KINDOF(id)==='atk');let mh=0,mu=0,r=0,f=0,d=0,pu=0,ra=0;for(const id of ids){const m=MV.find(x=>x.id===id),hc=(m.hits||[]).length,cs=m.cues||[];mh=Math.max(mh,hc);if(hc>1)mu++;if(cs.some(c=>c.col==='r')||m.hitCol==='r')r++;if(cs.some(c=>c.col==='p'))f++;if(hc&&!cs.length)d++;if(m.heroP||/zanshin|zanpunish|seefeint|counter/.test(id))pu++;if(cs.some(c=>c.col==='g'))ra++}
   h+=`<tr><td><b>${n}</b><br><small>${w}</small></td><td>${ids.length}</td><td>${mu}</td><td>${mh}</td><td>${r}</td><td>${f}</td><td>${d}</td><td>${pu}</td><td>${ra}</td></tr>`}

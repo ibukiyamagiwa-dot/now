@@ -1,0 +1,6 @@
+<!doctype html><html><body><script src="engine.js"></script><script src="rig.js"></script><script src="motion.js"></script><script src="specs.js"></script><script src="hero.js"></script><script src="cards.js"></script><script src="dragon.js"></script><script src="moves.js"></script><script src="stages.js"></script><script src="content2.js"></script>
+<script>
+window.audit=()=>{const out=[];for(const k of ['gate','dragon','dgate','hydra','lord','lord2','red','red2','fallen','fallen2']){const ids=MOVES_OF[k].filter(id=>KINDOF(id)==='atk');let maxHits=0,red=0,feint=0,dark=0,punish=0,multi=0,rally=0;
+ for(const id of ids){const m=MV.find(x=>x.id===id);const h=(m.hits||[]).length;maxHits=Math.max(maxHits,h);if(h>1)multi++;if((m.cues||[]).some(c=>c.col==='r')||m.hitCol==='r')red++;if((m.cues||[]).some(c=>c.col==='p'))feint++;if(h&&!(m.cues||[]).length)dark++;if(m.heroP||/kamae|zanshin|zanpunish|seefeint|counter/.test(id))punish++;if((m.cues||[]).some(c=>c.col==='g'))rally++}
+ out.push([k,ids.length,multi,maxHits,red,feint,dark,punish,rally].join('\t'))}return out.join('\n')}
+</script></body></html>

@@ -818,10 +818,11 @@ mv({f:'fallen2',id:'f2_pulse',n:'核の拍',bg:'hole',len:150,cap:'胸の核が3
 
 /* ===== 本気の赤い騎士：居合の技を足す ===== */
 const R2S={ua:1.7,fa:2.2,sw:null,sheath:1};
-mv({f:'red2',id:'r2_iai2',n:'二の居合',bg:'red',len:170,cap:'居合で斬り抜けたあと、納刀をはさんで、振り返りざまにもう一度。2撃の間が長い（タン……タン）。見るのは目の光。',why:'納める速さも抜く速さと同じ。剣を極めた者には、「斬ったあと」がない。',
- keys:[K(0,R2S),K(41,R2S),K(42,IAI,'snap'),K(60,IAI),K(61,Object.assign({},R2S,{x:-66}),'snap'),K(83,Object.assign({},R2S,{x:-66})),K(84,Object.assign({},IAI,{x:0,lean:-.1}),'snap'),K(110,Object.assign({},IAI,{x:0})),K(111,R2S,'snap'),K(170,R2S)],
+mv({f:'red2',id:'r2_iai2',n:'弐の居合（すれちがい・後ろから・タン……タン）',bg:'red',len:170,cap:'居合で斬り抜けて、こちらの後ろへ抜ける。背後で「カチン」と納刀の音。振り返りざまに、後ろからもう一度。2撃の間が長い（タン……タン）。見るのは目の光。',why:'騎士が画面の反対側へ抜けて、逆の向きから来る。参段の居合（その場から動かない）とは、騎士の位置でひと目で分かれる。',
+ keys:[K(0,R2S),K(41,R2S),K(42,IAI,'snap'),K(60,IAI),K(61,Object.assign({},R2S,{x:-62}),'snap'),K(83,Object.assign({},R2S,{x:-62})),K(84,Object.assign({},IAI,{x:0,lean:-.1}),'snap'),K(110,Object.assign({},IAI,{x:0})),K(111,R2S,'snap'),K(170,R2S)],
  cues:[{t:14,col:'w',at:J=>add(J.head,[-3,0])},{t:56,col:'w',at:J=>add(J.head,[-3,0])}],hits:[42,84],
- fx:(B,J,t)=>{for(const h of[42,84])if(t>=h&&t<h+8){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-h)*.6)B.set(x,FL-14,'#ffffff',4)}}});
+ fx:(B,J,t)=>{for(const h of[42,84])if(t>=h&&t<h+8){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-h)*.6)B.set(x,FL-14,'#ffffff',4)}
+  if(t>=62&&t<76){/* 背後の納刀の音 */const c=add(J.hip,[-1*J.k,1*J.k]);for(let q=0;q<2;q++){const r=3+(t-62)*1.2+q*4;for(let a=-.9;a<=.9;a+=.15){B.set(c[0]-Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#a8a0b0',4);B.set(c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#a8a0b0',4)}}}}});
 mv({f:'red2',id:'r2_hold',n:'溜め居合',bg:'red',len:180,cap:'柄に手をかけたまま、長く動かない。じれて押せば負け。目が白く光ってから、いつもの間で来る。',why:'遅らせ突きの居合版。待つのも技。光が出るまでは、何も始まっていない。',
  keys:[K(0,R2S),K(20,Object.assign({},R2S,{cr:5.5,lean:.22})),K(105,Object.assign({},R2S,{cr:5.5,lean:.22})),K(106,IAI,'snap'),K(140,IAI),K(141,R2S,'snap'),K(180,R2S)],
  cues:[{t:78,col:'w',at:J=>add(J.head,[-3,0])}],hits:[106],
@@ -943,10 +944,11 @@ mv({f:'fallen2',id:'f2_dfeint',n:'水面の二重フェイント',bg:'hole',len:
  cues:[{t:16,col:'p',at:J=>[EXX-6,FL+14]},{t:42,col:'p',at:J=>[EXX-6,FL+14]},{t:70,col:'r',at:J=>add(J.head,[-3,0])}],hits:[98],hitCol:'r',trails:[[95,100,'r']],post:W2});
 
 /* 強さの順を整える（3）：数でも後の者が上になるように */
-mv({f:'red2',id:'r2_three',n:'三段の居合（タン・タタン）',bg:'red',len:170,cap:'目が白く光るたびに居合。1撃目のあと少し間があり、2撃目と3撃目は続けて来る（タン・タタン）。見るのは目の光。',why:'居合を三つ、リズムを崩して並べた。2撃目で安心すると、3撃目に斬られる。',
- keys:[K(0,R2S),K(41,R2S),K(42,IAI,'snap'),K(54,IAI),K(55,Object.assign({},R2S,{x:-66}),'snap'),K(69,Object.assign({},R2S,{x:-66})),K(70,Object.assign({},IAI,{x:0,lean:-.1}),'snap'),K(76,Object.assign({},IAI,{x:0,lean:-.1})),K(78,Object.assign({},IAI,{x:-60}),'snap'),K(110,Object.assign({},IAI,{x:-60})),K(111,R2S,'snap'),K(170,R2S)],
+const IAIS=(y)=>({ua:3.1,fa:3.0+y*.15,sw:3.14+y*.2,ua2:.9,fa2:.6,sheath:0,x:-4,lean:.25,cr:5,ff:-12,fb:9});
+mv({f:'red2',id:'r2_three',n:'参段の居合（その場・上中下・タン・タタン）',bg:'red',len:170,cap:'動かずに、その場で三度抜き打つ。刃は飛ぶ斬撃になって、上・中・下の三つの高さで飛んでくる。1撃目のあと少し間があり、2撃目と3撃目は続けて来る（タン・タタン）。',why:'弐の居合は「すれちがって、後ろから」。参段は「その場から、飛ぶ斬撃が三つ」。騎士が動くか動かないかで、ひと目で見分けられる。',
+ keys:[K(0,R2S),K(26,Object.assign({},R2S,{cr:5.5})),K(30,IAIS(-1),'snap'),K(40,IAIS(-1)),K(44,Object.assign({},R2S,{cr:5.5}),'snap'),K(58,Object.assign({},R2S,{cr:5.5})),K(60,IAIS(0),'snap'),K(64,IAIS(0)),K(66,IAIS(1),'snap'),K(78,IAIS(1)),K(84,R2S,'snap'),K(170,R2S)],
  cues:[{t:14,col:'w',at:J=>add(J.head,[-3,0])},{t:42,col:'w',at:J=>add(J.head,[-3,0])},{t:50,col:'w',at:J=>add(J.head,[-3,0])}],hits:[42,70,78],
- fx:(B,J,t)=>{for(const h of[42,70,78])if(t>=h&&t<h+7){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-h)*.7)B.set(x,FL-14,'#ffffff',4)}}});
+ fx:(B,J,t)=>{/* 飛ぶ斬撃：抜いた瞬間に出て、当たる瞬間にこちらへ届く三日月 */[[30,42,FL-26],[60,70,FL-15],[66,78,FL-5]].forEach(([s,h,y])=>{if(t>=s&&t<h+4){const u=Math.min(1,(t-s)/(h-s)),x=lerp(EXX-14,HXX+6,u);for(let a=-1.1;a<=1.1;a+=.12){const px=x+Math.cos(a)*5-5,py=y+Math.sin(a)*7;B.set(px,py,'#ffffff',4);B.set(px+1,py,'#bfe8ff',4)}for(let k=1;k<4;k++)B.set(x+k*4,y,'#8a90a8',4)}})}});
 mv({f:'red2',id:'r2_holdfeint',n:'溜めの中のふり',bg:'red',len:190,cap:'柄に手をかけて長く溜める。途中で一度、紫の輪（ふり）。押さずに待つと、目が白く光って本物の居合。',why:'「待つ」と「押さない」を重ねた。じれた心に、ふりが刺さる。押せば見抜かれる。',
  keys:[K(0,R2S),K(20,Object.assign({},R2S,{cr:5.5,lean:.22})),K(48,Object.assign({},R2S,{cr:5.2,lean:.15})),K(54,Object.assign({},R2S,{cr:5.5,lean:.22})),K(121,Object.assign({},R2S,{cr:5.5,lean:.22})),K(122,IAI,'snap'),K(150,IAI),K(151,R2S,'snap'),K(190,R2S)],
  cues:[{t:48,col:'p',at:J=>add(J.head,[-3,0])},{t:94,col:'w',at:J=>add(J.head,[-3,0])}],hits:[122],

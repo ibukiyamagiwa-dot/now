@@ -105,11 +105,13 @@ SPEC.lord2={hk:1.1,lk:.9,tk:.95,name:'暗い門のぬし',k:1.3,pal:Object.assig
  front:(B,J,T)=>{pool(B,J,T,26);rivets(B,J.shF,J.k,3.2,5,'#6a4a14');cuff(B,J.hdF,J.k,'#3a3446','#6a6080');dangle(B,J.hdF,J.k,5,'#5e566e','#b8902a',T,0)},
  pose:{ua:1.8,fa:2.9,sw:-1.75,ua2:1.0,fa2:1.4,ff:-7,fb:7,cr:2,lean:.14}};
 
-const SPEC_F2_BEHIND=(B,J,T,P)=>{const k=J.k,c=add(J.sc,[4*k,-4*k]),R0=19*k;/* 背中の触手が門のアーチをつくる：彼自身が門になった。輪の内側は門の向こう側 */
-  for(let y=-R0;y<=R0*.9;y++)for(let x=-R0;x<=R0;x++){const d=Math.hypot(x,Math.min(0,y));if(d<R0-2&&((x+y)&1)===0)B.set(c[0]+x,c[1]+y,'#120a1c',6)}
-  const pts=[];for(let i=0;i<=24;i++){const a=Math.PI+i/24*Math.PI;pts.push(add(c,dir(a,R0)))}pts.unshift(add(c,[-R0,R0*.9]));pts.push(add(c,[R0,R0*.9]));
+const SPEC_F2_BEHIND=(B,J,T,P)=>{const k=J.k,c=add(J.sc,[4*k,-4*k]),R0=19*k;/* 背中の触手が門のアーチをつくる：彼自身が門になった。輪の内側は門の向こう側。archTiltで門が前へ倒れる */
+  const tilt=P.archTilt||0,pv=add(c,[-R0,R0*.9]),TR=p=>tilt?add(pv,rot([p[0]-pv[0],p[1]-pv[1]],-tilt)):p;
+  if(!tilt)for(let y=-R0;y<=R0*.9;y++)for(let x=-R0;x<=R0;x++){const d=Math.hypot(x,Math.min(0,y));if(d<R0-2&&((x+y)&1)===0)B.set(c[0]+x,c[1]+y,'#120a1c',6)}
+  const pts=[];for(let i=0;i<=24;i++){const a=Math.PI+i/24*Math.PI;pts.push(TR(add(c,dir(a,R0))))}pts.unshift(TR(add(c,[-R0,R0*.9])));pts.push(TR(add(c,[R0,R0*.9])));
+  if(tilt){/* 倒れてくる門の内側：門の向こうの暗がり */const m=pts.map(p=>p);B.poly(m,'#1a0f28','#3a1a5a','#0a0614',6)}
   for(let i=0;i+1<pts.length;i++)B.thick(pts[i],pts[i+1],2.2*k,INK.col,INK.hi,INK.lo);
-  for(let i=1;i<pts.length-1;i+=3){const p=pts[i],o=dir(Math.atan2(p[1]-c[1],p[0]-c[0])+Math.sin(T*.06+i)*.4,7*k);tentacle(B,p,add(p,[o[0]*.6-1,o[1]*.6]),add(p,o),1.3*k,.4*k,false)}
+  for(let i=1;i<pts.length-1;i+=3){const p=pts[i],o=dir(Math.atan2(p[1]-c[1],p[0]-c[0])-tilt+Math.sin(T*.06+i)*.4,7*k);tentacle(B,p,add(p,[o[0]*.6-1,o[1]*.6]),add(p,o),1.3*k,.4*k,false)}
   for(let i=2;i<pts.length-1;i+=4)B.set(...pts[i].map(Math.round),((T/7|0)+i)%5?INK.eye2:'#140a10',2)};
 /* ===== 赤の系統：のまれなかった世界線の門のぬし ===== */
 /* 赤い鎧の作りこみ：肩当ての鋲、肘とひざの金の縁、胸板の筋、籠手の金 */
@@ -150,7 +152,7 @@ SPEC.fallen2={hk:1.1,lk:.9,tk:.95,name:'赤い門のぬし 第二形態',k:1.35,
  helm:{type:'bhorn',band:['#4a3414','#6a5020'],glow:'#ff3050',cracks:[[-2,-4],[-1.5,-3],[-2,-2],[2,-4],[2.5,-3]],crackCol:'#c080ff',horn:'#2a2434',hornHi:'#6e6680',hornLo:'#120e18',rings:'#6a4a14'},
  w:W_RED,tentB:true,
  behind:SPEC_F2_BEHIND,
- chest:(B,R,k,P)=>{/* 中身のない鎧：胸の板の隙間から核の赤 */const c=R([0,-9*k]);B.disc(c[0],c[1],2.2*k,'#ff3050','#ffb0a0','#a01030');B.set(c[0],c[1],'#ffffff',2);for(const s of[-1,1])B.poly([R([s*1.8*k,-13*k]),R([s*6*k,-13*k]),R([s*5*k,-6*k]),R([s*1.8*k,-7*k])],'#5a1424','#8a2838','#2a0614')},
+ chest:(B,R,k,P)=>{/* 中身のない鎧：胸の板の隙間から核の赤。coreで脈打つ */const c=R([0,-9*k]),cs=1+(P.core||0);B.disc(c[0],c[1],2.2*k*cs,'#ff3050','#ffb0a0','#a01030');B.set(c[0],c[1],'#ffffff',2);for(const s of[-1,1])B.poly([R([s*1.8*k,-13*k]),R([s*6*k,-13*k]),R([s*5*k,-6*k]),R([s*1.8*k,-7*k])],'#5a1424','#8a2838','#2a0614')},
  mid:(B,J,T)=>{smoke(B,J.sc[0],J.sc[1]-6,T,10,'#7a4ab0');smoke(B,J.hip[0],J.hip[1],T+9,8,'#7a4ab0');veins(B,add(J.sc,[0,5*J.k]),J.k,T,6,'#6a3a90','#c080ff')},
  aura:{r:4,c1:'#46205e',c2:'#2a1238',rim:'#ff4a8a'},
  pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.2,fa2:1.8,ff:-9,fb:7,cr:2,lean:.05}};

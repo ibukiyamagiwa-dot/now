@@ -1351,7 +1351,7 @@ function usable(n){const h=G.hero;if(!tutAllow(n))return false;return n===1||(n=
 function gain(v){if(!has('gauge'))return;const h=G.hero,b=Math.floor(h.mk/100);h.mk=Math.min(lvMax()*100,h.mk+v);if(Math.floor(h.mk/100)>b){if(b===1)tipOnce('lv2','見切りは3段まで溜まる　溜めるほど強いまほうになる');SFX.full();G.mkFlash=24}}
 function lose(v){G.hero.mk=Math.max(0,G.hero.mk-v)}
 const chased=a=>a&&(a.chase==='ok'||a.chase==='crit');
-function lungeK(a){if(!a||a.n!==1)return 0;const H=a.I+(a.chase==='ok'?(RM2.triple?24:16):a.chase==='crit'||a.chase==='miss'?8:2),R=a.chase==='ok'?10:7,t=a.t;if(t<=8)return Math.sin(t/16*Math.PI);if(t<=H)return 1;return Math.max(0,Math.cos((t-H)/R*Math.PI/2))}
+function lungeK(a){if(!a||a.n!==1)return 0;const D=a.d||0,H=a.I-D+(a.chase==='ok'?(RM2.triple?24:16):a.chase==='crit'||a.chase==='miss'?8:2),R=a.chase==='ok'?10:7,t=a.t-D;if(t<=0)return 0;if(t<=8)return Math.sin(t/16*Math.PI);if(t<=H)return 1;return Math.max(0,Math.cos((t-H)/R*Math.PI/2))}
 function move(d){if(G.state==='pick'){G.psel=(G.psel+d+3)%3;tone(1200,.03,'square',.04);return}if(G.state!=='cmd')return;ac();let n=G.sel;for(let i=0;i<3;i++){n=(n-1+d+3)%3+1;if(usable(n))break}G.sel=n;tone(1200,.03,'square',.04)}
 function pick1(n){if(G.state==='pick'){ac();if(G.psel===n-1){if(G.t>12)choose(n-1)}else{G.psel=n-1;tone(1200,.03,'square',.04)}return}if(G.state!=='cmd'||!usable(n))return;ac();if(G.sel===n){if(G.t>=10)cmd(n)}else{G.sel=n;tone(1200,.03,'square',.04)}}
 function mark(x,y,kind,size,col){G.marks.push({x,y,kind,size,col,t:0,life:kind==='slash'?8:14})}
@@ -1379,7 +1379,7 @@ function dmgEnemy(v,col,kind){
 function heroStep(){
  const a=G.act,h=G.hero,e=G.en;a.t++;
  const mul=e.broken?P.breakMul:1;
- if(a.n===1&&a.t===1&&G.floorD>0){a.thr=[];for(let i=0;i<G.floorD;i++)a.thr.push(2+i*4+8);G.floorD=0;text(HX+8,FLOOR-40,'投げ返し！','#d9e2f2',true)}
+ if(a.n===1&&a.t===1&&G.floorD>0){a.thr=[];const n=G.floorD;for(let i=0;i<n;i++)a.thr.push(8+i*7);/* 投げ返しを先に終えてから、剣の動きを始める */a.d=8+(n-1)*7+20;a.C+=a.d;a.I+=a.d;G.floorD=0;text(HX+8,FLOOR-40,'投げ返し！','#d9e2f2',true)}
  if(a.n===1&&a.thr){for(const ht of a.thr){if(a.t===ht-8)SFX.slash();if(a.t===ht){e.kind==='imp'?SFX.rock():SFX.metal();dmgEnemy(heroAtk()*.7,'#d9e2f2','throw');burst(EX-8,FLOOR-18,'#d9e2f2',8,1.4,1);G.stop=3;if(e.hp<=0)return ko(false)}}}
  if(a.n===1&&a.t===a.C)SFX.glint();
  if(a.n===1&&a.t===a.I&&e.stance&&!e.broken){const cp=contactPt();SFX.block();text(EX-10,FLOOR-56,'受け流された！','#ff9a9a',true);burst(cp.x,cp.y,'#fff3b0',14,2.2,1);mark(cp.x,cp.y,'star',8,'#ffffff');G.stop=8;shake(P.shake*.6);
@@ -1497,7 +1497,7 @@ function press(){
  if(G.state==='bintro'){if(G.t>8&&G.t<66)G.t=65;else if(G.t>=70)G.t=119;else nudge();return}
  if(G.state==='enter'){if(G.enter&&G.enter.t>30&&G.enter.t<140){G.enter.t=140;G.enter.dx=0;G.enter.f='guard';if(!G.banner)G.banner={s:G.en.name,t:0}}else nudge();return}
  if(G.state==='cmd'){if(G.t>=10)cmd(G.sel);else{G.buf=G.sel;nudge()}return}
- if(G.state==='hero'){const a=G.act;if(a&&a.n===1&&!a.chase&&has('chase')){const r=a.I-a.t;
+ if(G.state==='hero'){const a=G.act;if(a&&a.n===1&&a.d&&a.t<a.d){nudge();return}if(a&&a.n===1&&!a.chase&&has('chase')){const r=a.I-a.t;
   if(r>P.chaseF||(r<-P.lateF&&r>=-14)){const early=r>0;tutOn('miss');a.chase='miss';a.early=early;G.stats.miss++;syncStats();lose(P.mkMiss);SFX.miss();text(heroX(),FLOOR-34,early?'はやい！':'おそい！','#ff9a9a');if(!early)pose('early',12)}
   else if(r>P.chaseF||r<-14)nudge();
   else if(r<=P.chaseF&&r>=-P.lateF){a.chase=r<=P.critF&&has('heavy')&&barMode()!=='chase'?'crit':'ok';if(a.chase==='ok'&&G.mode==='tut'&&TUT[G.tut.i].key==='heavy')tutOn('ok');SFX.accept(a.chase==='crit')}}else nudge();return}

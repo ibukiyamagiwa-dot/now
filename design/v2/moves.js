@@ -527,8 +527,16 @@ mv({f:'dragon',ox:8,id:'d_down',n:'たおれる：亡骸が残る',bg:'lord',len
  pp:(P,t)=>{P.eyes=t<112?3:t<126?2:t<142?1:0},pre:(B,t)=>{if(t>=160)dpool(B,EXX+8,Math.round(Math.min(38,(t-160)*.8)),t)},fx:(B,J,t)=>{ddust(B,[EXX-6,FL],t-92,3);ddust(B,[EXX+20,FL],t-94,2)}});
 /* ---------- 三つ首の竜 ---------- */
 const HI={rift:1,f0:0,f1:0,f2:0};
-mv({f:'hydra',id:'h_enter',n:'登場：亡骸の胸が裂ける',bg:'hole',len:180,noHero:true,cap:'倒れた竜の亡骸の胸が、内側から裂ける。触手に縁どられた裂け目から、三本の首がゆっくり伸びてくる。亡骸は動かない。',why:'竜が生き返ったのではない。竜の体が、門の代わりの「通り道」にされた。',
- keys:[K(0,{rift:0,curl:1}),K(50,{rift:1,curl:1},'out'),K(140,{rift:1,curl:0},'out'),K(180,{rift:1,curl:0})]});
+mv({f:'hydra',id:'h_enter',n:'登場：亡骸の胸が裂ける',bg:'hole',len:280,noHero:true,
+ cap:'倒した竜の亡骸が、しばらく動かない。やがて関節の向きを無視してひきつりはじめ、胸の皮を内側から「指の形」が押し上げる。亡骸の三つの目が、白目のまま一斉に開く。胸が縦に裂け、あばらが外へ折れて飛ぶ。裂け目のふちに、まず白い爪が三つ、内側からかかる。中のものは亡骸の頭を糸で吊るように持ち上げ、落とす。それから三本の指が、関節を一つずつ鳴らしてのびきり、指先が縦に裂けて口になり、目が開く。声は出ない。',
+ why:'竜は生き返らない。竜の体が「手袋」のように使われている。亡骸の頭を人形のように持ち上げるのは、中のものにとって、この体が道具でしかないから。指先が「頭になる」瞬間を見せることで、三つ首の正体の手がかりを最初に一度だけ置く。',
+ keys:[K(0,{rift:0,emerge:0,heads:0,grip:1,press:0}),K(48,{rift:0,emerge:0,heads:0,grip:1,press:0}),K(84,{rift:0,emerge:0,heads:0,grip:1,press:1}),K(96,{rift:1,emerge:0,heads:0,grip:1,press:0},'out'),K(104,{rift:1,emerge:0,heads:0,grip:1}),K(124,{rift:1,emerge:.34,heads:0,grip:1},'out'),
+  K(148,{rift:1,emerge:.34,heads:0,grip:1,puppet:0}),K(154,{rift:1,emerge:.34,heads:0,grip:1,puppet:1},'out'),K(170,{rift:1,emerge:.34,heads:0,grip:1,puppet:1}),K(174,{rift:1,emerge:.34,heads:0,grip:1,puppet:0},'in'),
+  K(186,{rift:1,emerge:.55,heads:0,grip:.65},'out'),K(196,{rift:1,emerge:.55,heads:0,grip:.65}),K(206,{rift:1,emerge:.78,heads:0,grip:.3},'out'),K(216,{rift:1,emerge:.78,heads:0,grip:.3}),K(226,{rift:1,emerge:1,heads:0,grip:0},'out'),
+  K(234,{rift:1,heads:0,j0:0,j1:0,j2:0}),K(246,{rift:1,heads:1,j0:1,j1:1,j2:1},'out'),K(262,{rift:1,heads:1,j0:1,j1:1,j2:1}),K(280,{rift:1,heads:1})],
+ pp:(P,t)=>{const tw=[[34,39],[44,47],[55,61],[66,68],[76,80]];P.quiver=tw.some(([a,b])=>t>=a&&t<b)?(t%2?1.8:-1.8):0;P.ceye=t>=72&&t<236?3:0;P.lit=[0,0,0];if(t>=124&&t<148)P.grip=1+Math.sin(t*.9)*.08},
+ fx:(B,J,t)=>{const c=J.rift;if(t>=88&&t<120){const u=t-88;for(let i=0;i<10;i++){const a=-2.8+i*.38,v=1.2+(i%3)*.5,x=c[0]+Math.cos(a)*v*u,y=c[1]+Math.sin(a)*v*u+.05*u*u;if(y<FL)B.set(x,y,i%2?'#ece6da':'#c8c0b4',4)}for(let i=0;i<8;i++){const a=-2.4+i*.5,x=c[0]+Math.cos(a)*u*.8,y=c[1]+Math.sin(a)*u*.6+.08*u*u;if(y<FL)B.set(x,y,i%2?INK.hi:'#7a2a3c',4)}}
+  for(const b of[186,206,226])if(t>=b&&t<b+3)for(const f of J.fingers||[])if(f)B.set(f[0],f[1]-3,'#ffffff',4)}});
 mv({f:'hydra',id:'h_idle',n:'立ち絵',bg:'hole',len:120,keys:sway({rift:1},{rift:1.05},120,2),
  cap:'動かない竜の亡骸、胸の裂け目、そこから伸びる三本の首。首の節は三つ、角に見えるのは白い爪、真ん中の首がいちばん長い。',why:'見た目は三つ首の竜。でも、よく見ると指の手がかりが並んでいる。気づいた人だけがぞっとする。'});
 mv({f:'hydra',id:'h_order',n:'鳴いた数＝攻撃の数（光った首の順）',bg:'hole',len:170,cap:'首が鳴くたびに、その首が白く光る。鳴いた数が、この番の攻撃の数。光った順に噛みつく。',why:'数えて、順番を覚える。最初の首が当たる前に、全部の順番が決まっている。',
@@ -542,13 +550,12 @@ mv({f:'hydra',id:'h_one',n:'三本同時',bg:'hole',len:130,cap:'三本の首が
 mv({f:'hydra',id:'h_grab',n:'握りしめ（重い）',bg:'hole',len:140,cap:'三本の首が大きく広がり、赤く光る。三方向から、こちらを包むように閉じてくる。重い一撃が一回。',why:'三本が一点に閉じる動きは、手が握る動きそのもの。戦いの最中に一度だけ見せる、いちばん大きな手がかり。',
  keys:[K(0,HI),K(14,Object.assign({},HI,{rift:1.3})),K(38,Object.assign({},HI,{rift:1.3})),K(42,{rift:1.2,f0:1,f1:1,f2:1,j0:.2,j1:.2,j2:.2},'in'),K(72,{rift:1.2,f0:1,f1:1,f2:1}),K(120,HI)],
  cues:[{t:14,col:'r',at:J=>J.rift}],hits:[42],hitCol:'r'});
-mv({f:'hydra',id:'h_spit',n:'切り口の吐き出し（拍）',bg:'hole',len:150,cap:'首を一本落とすと、残った切り口から、くらやみのかたまりを放り上げる。ヒュ・ヒュ・ヒュの次の拍で落ちてくる。',why:'切っても、そこが新しい口になる。投げ物と拍は、小鬼のおかしらで先に教わっている。',
- keys:[K(0,Object.assign({},HI,{f0:-1})),K(150,Object.assign({},HI,{f0:-1}))],pp:(P,t)=>{P.f0=0},
- cues:[{t:14,col:'w',at:J=>J.rift}],hits:[66],
- fx:(B,J,t)=>{const s=J.rift;for(const b of[24,37,50])if(t>=b&&t<b+6)for(let q=0;q<2;q++){const r=2+(t-b)+q*3;for(let a=-.8;a<=.8;a+=.2)B.set(s[0]-10+Math.cos(a+3.6)*r,s[1]-8+Math.sin(a+3.6)*r,'#a8a0b0',4)}
-  if(t>=20&&t<70){const u=(t-20)/46,x=lerp(s[0],HXX+6,u),y=lerp(s[1],FL-10,u)-Math.sin(u*3.14)*40;B.disc(x,y,2.4,INK.col,INK.hi,INK.lo,4)}}});
+mv({f:'hydra',id:'h_spit',n:'切り口の吐き出し（拍）',bg:'hole',len:150,cap:'首を一本落とすと、残った切り口がふくらんで、くらやみのかたまりを放り上げる。ヒュ・ヒュ・ヒュと鳴るたびに、竜の亡骸の白目が一つずつ開く。三つ開いた次の拍で落ちてくる。',why:'切っても、そこが新しい口になる。何拍目かは、亡骸の目で数える（竜のときと同じ「目が全部開いた次の拍」）。投げ物と拍は、小鬼のおかしらで先に教わっている。',
+ keys:[K(0,Object.assign({},HI,{cut:[1,0,0],stump:0})),K(14,Object.assign({},HI,{cut:[1,0,0],stump:.6})),K(20,Object.assign({},HI,{cut:[1,0,0],stump:1.2}),'in'),K(24,Object.assign({},HI,{cut:[1,0,0],stump:0})),K(150,Object.assign({},HI,{cut:[1,0,0],stump:0}))],pp:(P,t)=>{P.cut=[1,0,0];P.ceye=t<24||t>=80?0:t<37?1:t<50?2:3},
+ cues:[{t:14,col:'w',at:J=>J.fingers[0]||J.rift}],hits:[66],
+ fx:(B,J,t)=>{const s=J.fingers[0]||J.rift;if(t>=20&&t<70){const u=(t-20)/46,x=lerp(s[0],HXX+6,u),y=lerp(s[1],FL-10,u)-Math.sin(u*3.14)*40;B.disc(x,y,2.4,INK.col,INK.hi,INK.lo,4)}}});
 mv({f:'hydra',id:'h_down',n:'たおす：握って、引っこむ',bg:'hole',len:200,noHero:true,cap:'最後の首を落とすと、三本が握りこぶしのように丸まり、裂け目の奥へ引っこむ。裂け目が閉じ、竜の亡骸は塵になって消える。',why:'倒したのではない。引っこめさせただけ。ここで初めて「手だった」と気づける。',
- keys:[K(0,HI),K(40,Object.assign({},HI,{curl:.4})),K(90,Object.assign({},HI,{curl:.95,rift:.8}),'in'),K(130,{curl:1,rift:0},'in'),K(200,{curl:1,rift:0})],
+ keys:[K(0,HI),K(40,Object.assign({},HI,{curl:.4,j0:1,j1:1,j2:1})),K(90,Object.assign({},HI,{curl:.95,rift:.8,emerge:.6}),'in'),K(130,{curl:1,rift:0,emerge:0},'in'),K(200,{curl:1,rift:0,emerge:0})],
  post:(B,J,t)=>{if(t>=130){const u=Math.min(1,(t-130)/60);for(let i=0;i<B.c.length;i++){const x=i%CW,y=i/CW|0;if(B.t[i]!==1&&B.t[i]!==3&&B.t[i]!==2)continue;if(((x*7+y*13)%11)/11<u){B.c[i]=((x+y)%6===0&&u<.9)?'#6a6070':0;B.t[i]=B.c[i]?4:0}}}}});
 mv({f:'hydra',id:'h_pool',n:'足元の溜まり（光らない・拍）',bg:'hole',len:160,cap:'裂け目からくらやみが床を這い、こちらの足元に溜まる。光らない。ボコ・ボコと泡が二回はじけた次の拍で、真下から突き上げる。重い。',why:'光らない攻撃と拍は、どちらも先に教わっている（今のゲームの「くらやみの溜まり」）。',
  keys:[K(0,HI),K(160,HI)],hits:[64],hitCol:'r',

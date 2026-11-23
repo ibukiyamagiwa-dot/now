@@ -22,7 +22,7 @@ function build(){const root=document.getElementById('book');
  root.appendChild(heroSec());root.appendChild(ladderSec());
  FORMS.forEach((F,i)=>{const sec=el('section','form');sec.id=F.key;
   const head=el('div','fhead');head.appendChild(el('div','num',String(i+1).padStart(2,'0')));head.appendChild(el('div','',`<div class="en">${F.en}</div><h2>${F.ttl}</h2>`));sec.appendChild(head);
-  const top=el('div','ftop');const art=el('div','art');art.appendChild(standCanvas(F.key,110,120,62));if(F.old)art.appendChild(el('div','old',`<img src="${OLDIMG[F.old]}" alt=""><span>いまのゲーム</span>`));top.appendChild(art);
+  const top=el('div','ftop');const art=el('div','art');art.appendChild(standCanvas(F.key,110,120,F.sox||62));if(F.old)art.appendChild(el('div','old',`<img src="${OLDIMG[F.old]}" alt=""><span>いまのゲーム</span>`));top.appendChild(art);
   const txt=el('div','ftxt');txt.appendChild(el('p','lore',F.lore));
   const pl=el('div','pal');F.pal.forEach(p=>pl.appendChild(el('div','chip',`<i style="background:${p[0]}"></i><b>${p[1]}</b><span>${p[2]}</span>`)));txt.appendChild(pl);top.appendChild(txt);sec.appendChild(top);
   if(F.variants){sec.appendChild(el('h3','','覚悟による色の段 <small>のまれていく段階</small>'));sec.appendChild(el('p','note','ゲームでは覚悟2から体の色が変わる（赤い→黒い→紫の）。色の段は「くらやみにのまれていく段階」なので、色だけでなく、のまれた分だけ部品も増やす。怒りのひびと炎の赤は、どの段でも同じ明るさで光り、体の色より目立つ。'));

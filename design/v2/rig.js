@@ -21,13 +21,14 @@ function drawLeg(B,S,H,K,F,front){const k=S.k,p=S.pal,d=front?0:1;
  B.poly([[F[0]-5*k,F[1]],[F[0]+2.5*k,F[1]],[F[0]+2.5*k,F[1]-3.5*k],[F[0]-1.5*k,F[1]-4*k]],p.foot||p.trim,p.footHi||p.trimHi,p.trimLo)}
 function drawTorso(B,S,J,P){const k=S.k,p=S.pal,L=-J.lean,h=J.hip,R=v=>add(h,rot([v[0],v[1]*(v[1]<0?(S.tk||PRO.tk):1)],L));
  /* 前垂れ（布）：所属と身分を示す布。色と紋章で誰の家来かが分かる */
- if(S.tabard){const t=S.tabard;B.poly([R([-4*k,-1*k]),R([4*k,-1*k]),R([3.5*k,t.len*k]),R([0,(t.len+1.5)*k]),R([-3.5*k,t.len*k])],t.col,t.hi,t.lo);if(t.mark)t.mark(B,R,k)}
+ if(S.tabard&&!S.tabardFront){const t=S.tabard;B.poly([R([-4*k,-1*k]),R([4*k,-1*k]),R([3.5*k,t.len*k]),R([0,(t.len+1.5)*k]),R([-3.5*k,t.len*k])],t.col,t.hi,t.lo);if(t.mark)t.mark(B,R,k)}
  /* 草摺（腰の板）：太ももを覆う板。動くと揺れる */
  B.poly([R([-5*k,-2*k]),R([5*k,-2*k]),R([6*k,4*k]),R([1*k,5*k]),R([-1*k,5*k]),R([-6*k,4*k])],p.armLo,p.arm,p.armLo);
  B.poly([R([-4*k,0]),R([4*k,0]),R([4.5*k,-6*k]),R([-4.5*k,-6*k])],p.under||p.armLo,p.underHi||p.arm,p.underLo||OUT);
  B.poly([R([-3*k,-5*k]),R([3*k,-5*k]),R([7*k,-11*k]),R([6*k,-15*k]),R([-6*k,-15*k]),R([-7*k,-11*k])],p.arm,p.armHi,p.armLo);
  B.poly([R([-2.5*k,-6*k]),R([2.5*k,-6*k]),R([5.5*k,-12*k]),R([-5.5*k,-12*k])],p.chest||p.arm,p.armHi,p.armLo);
  B.poly([R([-4.5*k,-1*k]),R([4.5*k,-1*k]),R([4.5*k,-2.6*k]),R([-4.5*k,-2.6*k])],p.trim,p.trimHi,p.trimLo);
+ if(S.tabard&&S.tabardFront){const t=S.tabard;B.poly([R([-4.5*k,-12*k]),R([4.5*k,-12*k]),R([4*k,t.len*k]),R([0,(t.len+1.5)*k]),R([-4*k,t.len*k])],t.col,t.hi,t.lo);if(t.mark)t.mark(B,v=>R([v[0],v[1]-7*k]),k*1.2)}
  if(S.chest)S.chest(B,R,k,P)}
 function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R=v=>add(J.head,rot(v,a));
  const hm=S.helm;
@@ -57,7 +58,8 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   if(hm.cracks)for(const c of hm.cracks)B.set(...R([c[0]*k,c[1]*k]),hm.crackCol||'#4e2c70',2)}
  if(hm.type==='round'){
   /* 主人公：丸い兜。顔は見せない＝だれでもこの騎士になれる。羽根飾りは前へ進む者の印 */
-  const w=Math.sin(T*.08)*1;for(let i=0;i<5;i++){const t=i/4;B.disc(...R([(1+t*7)*k,(-5.5+t*t*4+w*t)*k]),(1.6-t*.6)*k,hm.plume,hm.plumeHi,hm.plumeLo)}
+  const w=Math.sin(T*.08)*1,pk=hm.pk||1,pn=hm.pn||5;for(let i=0;i<pn;i++){const t=i/(pn-1);B.disc(...R([(1+t*7*pk)*k,(-5.5-(pk-1)*2+t*t*4*pk+w*t)*k]),(1.6-t*.6)*pk*k,hm.plume,hm.plumeHi,hm.plumeLo)}
+  if(hm.ridge)for(let y=-5;y<=-1;y+=.5)B.set(...R([-1.4*k,y*k]),hm.ridge,2);
   B.poly([R([-3.2*k,3.8*k]),R([3.6*k,3.8*k]),R([4.2*k,-1*k]),R([3*k,-4*k]),R([0,-5.4*k]),R([-3*k,-4*k]),R([-4.2*k,-1*k])],p.arm,p.armHi,p.armLo);
   for(let x=-4;x<=.6;x+=.5)B.set(...R([x*k,-.3*k]),OUT,2);for(let x=-3.6;x<=.4;x+=.5)B.set(...R([x*k,.2*k]),p.armLo,2);
   for(let y=-5;y<=-1;y+=.5)B.set(...R([-1.4*k,y*k]),p.armHi,2);for(let i=0;i<3;i++)B.set(...R([(-2.6+i*1)*k,2*k]),OUT,2)}
@@ -75,7 +77,7 @@ function drawBlade(B,S,hd,ang,W,front){const k=S.k,len=W.len*k,wd=(W.w||1.4)*k,u
  B.thick(P(.5*k,-(W.gw||3)*k),P(.5*k,(W.gw||3)*k),.9*k,W.guard,W.guardHi||W.guard,OUT);
  return P(len,0)}
 function drawCape(B,S,J,P,T){const c=S.cape;if(!c||P.capeOff>=1)return;const k=S.k,w=Math.sin(T*.07+(c.ph||0))*1.6+P.cw,L=c.len*k*(S.lk||PRO.lk),h=J.hip;
- const a=add(J.shB,[3.5*k,1*k]),b=[h[0]+(11+w)*k,h[1]+L*.5],d=[h[0]+(9+w*1.3)*k,h[1]+L],e=[h[0]+2*k,h[1]+L*.92];
+ const cw=c.wide||1,a=add(J.shB,[3.5*k*cw,1*k]),b=[h[0]+(11*cw+w)*k,h[1]+L*.5],d=[h[0]+(9*cw+w*1.3)*k,h[1]+L],e=[h[0]+2*k,h[1]+L*.92];
  const pts=[J.neck,J.shB,a,b];const n=c.tatter||0;if(n){for(let i=0;i<=n;i++){const t=i/n,x=lerp(b[0]+2*k,e[0],t),y=lerp(d[1],e[1],t)+((i%2)?-3*k:0);pts.push([x,y])}}else pts.push(d,e);pts.push(add(h,[2*k,-2*k]));
  B.poly(pts,c.col,c.hi,c.lo);if(c.extra)c.extra(B,J,T,{b,d,e,w})}
 function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{}),J=joints(ox,oy,S,P);J.P=P;

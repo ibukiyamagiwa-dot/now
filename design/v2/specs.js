@@ -18,9 +18,18 @@ const W_HERO={type:'long',len:12,w:1.2,col:'#e0e4f0',hi:'#ffffff',lo:'#8088a0',g
 const gateMark=(col)=>(B,R,k)=>{B.poly([R([-2*k,1*k]),R([2*k,1*k]),R([2*k,6*k]),R([-2*k,6*k])],col,null,null);B.line(...R([0,1.5*k]),...R([0,6*k]),'#140a10')};
 const SPEC={};
 PAL.hero={arm:'#b8bcc8',armHi:'#e8eaf0',armLo:'#686c7e',trim:'#8a8ea0',trimHi:'#c8ccd8',trimLo:'#4a4e5e',chest:'#c4c8d4',glove:'#5a4a40',eye:'#ffffff',under:'#4a4850',underHi:'#6a6870',underLo:'#2a2830',foot:'#686c7e',footHi:'#a0a4b4'};
-SPEC.hero={k:.72,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:18,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:19}),
- behind:(B,J)=>{/* 盾：紋章のない、まっさらな盾 */const k=J.k,c=add(J.hdB,[1*k,0]);B.poly([[c[0]-4*k,c[1]-5*k],[c[0]+4*k,c[1]-5*k],[c[0]+3.6*k,c[1]+1*k],[c[0],c[1]+5.5*k],[c[0]-3.6*k,c[1]+1*k]],'#76563c','#9a7250','#36281e');for(let x=-4;x<=4;x+=.5)B.set(c[0]+x*k,c[1]-5*k,'#b8bcc8',2)},
- pose:{ua:2.4,fa:2.2,sw:-2.5,ua2:1.4,fa2:1.9,ff:-5,fb:5}};
+/* 主人公の盾：紋章のない、まっさらな盾。差分では、ここに歩んだ道のりが刻まれていく */
+function heroShield(B,J,V){const k=J.k*1.55,c=add(J.hdB,[V.front?-.5*k:2.6*k,V.front?1.5*k:-.5*k]);const rim=V.rim||'#b8bcc8',face=V.face||'#76563c',fh=V.faceHi||'#9a7250',fl=V.faceLo||'#36281e';
+ /* 盾：木の板を鉄のふちで締めた、紋章のない盾。この騎士の顔の代わり */
+ const P0=[[c[0]-4*k,c[1]-5*k],[c[0]-1.5*k,c[1]-5.6*k],[c[0]+1.5*k,c[1]-5.6*k],[c[0]+4*k,c[1]-5*k],[c[0]+3.8*k,c[1]+.5*k],[c[0]+2*k,c[1]+4*k],[c[0],c[1]+5.6*k],[c[0]-2*k,c[1]+4*k],[c[0]-3.8*k,c[1]+.5*k]];
+ B.poly(P0,rim,'#e8eaf0','#565a6c');B.poly(P0.map(p=>[c[0]+(p[0]-c[0])*.8,c[1]+(p[1]-c[1])*.82]),face,fh,fl);
+ B.disc(c[0],c[1]-.5*k,1.3*k,rim,'#ffffff','#565a6c');/* 中央の鉄の突起 */
+ if(V.notch)for(let i=0;i<V.notch;i++){const x=c[0]-3*k+i*1.5*k;B.set(x,c[1]-4.4*k,'#e8eaf0',2);B.set(x,c[1]-3.9*k,fl,2)}
+ for(const m of (V.marks||[]))m(B,c,k,V)}
+const HV={};/* 差分。体つき・兜の形・剣の長さ・マントの位置は変えない */
+SPEC.hero={k:.72,hk:1.45,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:20,wide:1.5,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:19}),
+ mid:(B,J,T,P)=>{heroShield(B,J,Object.assign({front:P.shieldFront},P.V||{}))},
+ pose:{ua:2.4,fa:2.2,sw:-2.5,ua2:1.75,fa2:1.95,ff:-5,fb:5}};
 /* 鞘：赤い騎士の腰。ふだんは空のまま。本気になると剣が納まる */
 function sheathDraw(B,J,T,P){const k=J.k,h=J.hip,a=add(h,[-1*k,1*k]),b=add(h,[13*k,-5*k]);B.thick(a,b,1.2*k,'#2a1a22','#4a3038','#120810');B.line(...add(a,[0,0]),...add(a,[1*k,0]),'#c8a050');
  if(P.sheath){const g=add(a,[-4*k,2*k]);B.thick(a,g,1*k,'#2a1a22','#4a3038','#120810');B.thick(add(g,[-.5*k,-2*k]),add(g,[.5*k,2*k]),.8*k,'#6a4a50','#8a6a70','#120810')}}

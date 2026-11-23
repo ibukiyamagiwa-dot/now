@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body{margin:0;background:#0f0d12;color:#e8e2ea;font:14px/1.6 "Noto Sans CJK JP","Noto Sans JP",sans-serif;padding:20px;width:1060px}
+h1{font-size:24px;margin:0}h2{font-size:17px;margin:22px 0 8px;color:#9a90a4}.sub{color:#9a90a4;font-size:13px}
+canvas{image-rendering:pixelated;display:block}
+.top{display:flex;gap:20px;align-items:flex-start;margin-top:12px}.parts{flex:1}.parts table{border-collapse:collapse;width:100%;font-size:13px}.parts td{border-bottom:1px solid #2a2532;padding:5px 6px;vertical-align:top}.parts td:first-child{font-weight:700;width:30%}
+.row{display:flex;gap:8px;flex-wrap:wrap}.cell{width:166px;background:#17141c;border-radius:8px;padding:6px;font-size:11.5px;line-height:1.5}.cell b{font-size:13px;display:block}.cell i{font-style:normal;color:#ffd080;font-size:11px}.cell p{margin:2px 0 0;color:#b8b0c0}
+.m{width:110px}
+</style></head><body>
+<h1>主人公　設定画（試し）</h1><div class="sub">名実ともに騎士。だれもが自分を重ねられる。体つき・兜の形・剣の長さ・マントの位置は、どの差分でも変えない。</div>
+<div class="top"><div id="big"></div><div class="parts"><table>
+<tr><td>丸い兜と一本ののぞき穴</td><td>顔を見せない。だれでもこの騎士になれる</td></tr>
+<tr><td>赤い羽根飾りと赤いマント</td><td>前へ進む者の印。赤は「主人公の色」で、光らない（合図の赤とはちがう）</td></tr>
+<tr><td>長い銀の剣</td><td>いちばん読みやすい場所に、いちばん長く。銀は「のまれないもの」の色で、赤い騎士の剣と同じ</td></tr>
+<tr><td>何も描かれていない盾</td><td>顔を見せない騎士の、顔の代わり。最初はまっさらで、差分の多くはここに刻まれていく。盾を見れば「どこまで来た騎士か」がわかる</td></tr>
+<tr><td>傷のない鎧</td><td>始まりの姿。深く降りるほど、差分で変わっていく</td></tr>
+<tr><td>3頭身</td><td>いちばん小さく、いちばん頭が大きい。強い者ほど頭身が上がる世界で、見上げる側にいる</td></tr>
+</table></div></div>
+<h2>差分（クリアチェッカーのごほうび）</h2><div class="row" id="vars"></div>
+<h2>モーション（要所の1コマ）</h2><div class="row" id="mots"></div>
+<script src="engine.js"></script><script src="rig.js"></script><script src="motion.js"></script><script src="specs.js"></script><script src="hero.js"></script>
+<script>
+function draw(S,P,w,h,scale,fx){const B=new Buf(w,h);const J=knight(B,w-Math.round(w*.42),h-4,S,Object.assign({V:S.V},P),0);
+ if(fx==='spark'&&J.tip){star(B,Math.round(J.tip[0]),Math.round(J.tip[1]),5,'w')}
+ if(fx==='magic'&&J.tip){for(let i=0;i<14;i++){const a=i/14*6.28;B.set(J.tip[0]+Math.cos(a)*5,J.tip[1]+Math.sin(a)*5,i%2?'#7ad8ff':'#c8f0ff',4)}}
+ B.outline();const F=new Buf(w,h);F.blit(B,true);const c=document.createElement('canvas');c.width=w;c.height=h;c.style.width=w*scale+'px';const x=c.getContext('2d');x.fillStyle='#1e1a24';x.fillRect(0,0,w,h);const im=x.getImageData(0,0,w,h);for(let i=0;i<F.c.length;i++){if(!F.c[i])continue;const[r,g,b]=rgb(F.c[i]);im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b}x.putImageData(im,0,0);return c}
+big.appendChild(draw(SPEC.hero,{},60,46,6));
+for(const v of HVARS){const d=document.createElement('div');d.className='cell';d.appendChild(draw(heroVar(v.o||{}),{},48,42,3.4));d.insertAdjacentHTML('beforeend',`<b>${v.n}</b><i>${v.how}</i><p>${v.why}</p>`);vars.appendChild(d)}
+for(const m of HMOT){const d=document.createElement('div');d.className='cell m';d.appendChild(draw(SPEC.hero,m.p,48,40,2.2,m.fx));d.insertAdjacentHTML('beforeend',`<b>${m.n}</b><p>${m.why}</p>`);mots.appendChild(d)}
+</script></body></html>

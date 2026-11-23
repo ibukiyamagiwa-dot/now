@@ -20,9 +20,9 @@ const FORMS=[
  lore:'門のぬしが、くらやみに飲まれなかった場合の、あり得た別の姿。同じ人の、もう一つの世界線。ぬしがきれいに倒れた瞬間、門が一度だけ揺らぎ、向こうの世界線から歩み出てくる。彼の世界では、門は決して開けてはならないもの。主人公は、たった今その門を開けた者だ。',
  parts:[['ぬしと同じ筒形の兜（角が生える前）','同じ人だから、同じ兜。角はない＝門と一つになっていない'],['一本の白い羽根','ただ一つの飾り。後ろへ流れる＝いつも前へ出る者。主人公が最後に受けつぐもの'],['全身の赤','門に誓った者の色。のまれた世界線では、ぬしの封印のひびの奥に「赤い目」としてだけ残っている'],['ひびのない金の封印','ぬしと同じ封印。割れていない＝くらやみを閉じこめていない'],['赤い前垂れと「閉じた門」','ぬしと同じ形、同じ紋章。色だけが誓いの赤'],['鍵の輪の柄頭を持つ細い剣','のまれなかったので、鍵は大剣にならず細い剣のまま。銀＝のまれないもの'],['手首にかせも鎖もない','鎖でつながれる必要がなかった'],['動かない切っ先','ほかのボスはみな揺れている。一体だけ止まっている＝剣を極めた「静」'],['長いマント','本気のときに自分で斬り落とす']],
  pal:[['#a8303a','漆の赤','門への誓い'],['#d8b050','明るい金','曇っていない誇り'],['#e8e0d0','白い羽根','唯一の飾り'],['#d8dce8','銀の刃','のまれないもの']]},
-{key:'red2',ttl:'本気の赤い騎士',en:'THE RED KNIGHT — RESOLVED',old:null,stage:['s_red2'],
+{key:'red2',ttl:'本気の赤い騎士',en:'THE RED KNIGHT — RESOLVED',old:null,stage:['s_red2','s_red_end'],
  lore:'マントを斬り捨て、剣を鞘に納めた赤い騎士。ぬしの「裏に目のあるマント」への拒絶——ああはならない。ここから先は居合。',
- parts:[['マントがない','飾りを捨てた＝本気。背景の赤い旗も同時に落ちる'],['剣は鞘の中','剣が見えない＝体の動きでは読めない。読めるのは光だけ'],['白い目と、その尾','金から白へ。目そのものが合図になる'],['低い構え','居合の形'],['最期は立ったまま','剣を床に突き立て、倒れない']],
+ parts:[['マントがない','飾りを捨てた＝本気。背景の赤い旗も同時に落ちる'],['剣は鞘の中','剣が見えない＝体の動きでは読めない。読めるのは光だけ'],['白い目と、その尾','金から白へ。目そのものが合図になる'],['低い構え','居合の形'],['最期は構えたまま','剣を顔の前に縦に立てた、美しい構えのまま、目の光が消える。倒れない']],
  pal:[['#ffffff','白い目','合図そのもの'],['#a8303a','漆の赤','変わらない']]},
 {key:'fallen',ttl:'赤い門のぬし',en:'WHERE THE LINES MEET',old:'fallen',stage:['s_hole'],
  lore:'赤い騎士が倒れると、床に穴が開き、二つの世界線がそこで重なる。くらやみは彼をのみこみ、彼は結局、ぬしと同じものになっていく。どの世界線を選んでも、くらやみに行き着く。',
@@ -37,7 +37,7 @@ const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg
  lord:['l_enter','l_idle','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_rally','l_pull','l_kneel'],
  lord2:['l2_open','l2_idle','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_rally','l2_whip','l2_pool','l2_doors','l2_gate','l2_down'],
  red:['r_idle','r_seal','r_stance','r_two','r_swap','r_three','r_delay','r_thrust','r_feint','r_combo4','r_parry','r_push','r_zanshin','r_rage'],
- red2:['r2_idle','r2_iai','r2_double','r2_rally','r2_last'],
+ red2:['r2_idle','r2_iai','r2_iai2','r2_hold','r2_thrust','r2_double','r2_rally','r2_last'],
  fallen:['f_rise','f_idle','f_kneel','f_cutten','f_back','f_arm','f_sa','f_reach','f_maw','f_dark','f_double','f_shift','f_twin','f_iai','f_cage','f_rally','f_swallow'],
  fallen2:['f2_idle','f2_look','f2_ring','f2_four','f2_core','f2_reflect','f2_close','f2_pulse','f2_rally','f2_end']};
 const EXMV={g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い',r_two:'二連撃',r_swap:'逆の二連撃',r_three:'三段突き',r_delay:'遅らせ突き',r_thrust:'突き',r_feint:'フェイント',r_combo4:'四連撃',r_push:'打ち合い',r2_double:'二重のフェイント',r2_rally:'打ち合い',f_cutten:'剣と触手',f_back:'背中の触手',f_arm:'腕の触手',f_sa:'剣と触手の三連',f_reach:'伸びる刃',f_maw:'胸の口',f_dark:'ささやき',f_double:'二重のフェイント',f_rally:'打ち合い',f2_ring:'背中の触手',f2_four:'四連撃',f2_core:'胸の口',f2_rally:'打ち合い'};

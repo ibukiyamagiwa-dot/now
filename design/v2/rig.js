@@ -52,7 +52,7 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   /* 筒形の兜：門番の兜は、ぬしの兜をまねた形（主従の印） */
   B.poly([R([-4.3*k,4.2*k]),R([4.3*k,4.2*k]),R([4.3*k,-4.2*k]),R([3.6*k,-4.8*k]),R([-3.6*k,-4.8*k]),R([-4.3*k,-4.2*k])],p.arm,p.armHi,p.armLo);
   const bd=hm.band||[p.trim,p.trimHi];for(let x=-4;x<=4;x+=.5)B.set(...R([x*k,-3.4*k]),bd[0],2);for(let x=-3.5;x<=3.5;x+=1.4)B.set(...R([x*k,-3.4*k]),bd[1],2);
-  for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,-.4*k]),hm.glow||OUT,2);for(let y=-2;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2);
+  for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,-.4*k]),P.eyeOff?(P.eyeOff>=1?OUT:mix(hm.glow||OUT,OUT,P.eyeOff)):(hm.glow||OUT),2);for(let y=-2;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2);
   for(let i=0;i<3;i++)for(let j=0;j<2;j++)B.set(...R([(1.2+j*1.2)*k,(1.6+i*.9)*k]),OUT,2);
   for(const d of (hm.dents||[]))for(let i=0;i<3;i++)B.set(...R([(d[0]+i*.4)*k,(d[1]+(i===1?.4:0))*k]),p.armLo,2);
   if(hm.cracks)for(const c of hm.cracks)B.set(...R([c[0]*k,c[1]*k]),hm.crackCol||'#4e2c70',2)}
@@ -64,7 +64,7 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   for(let x=-4;x<=.6;x+=.5)B.set(...R([x*k,-.3*k]),OUT,2);for(let x=-3.6;x<=.4;x+=.5)B.set(...R([x*k,.2*k]),p.armLo,2);
   for(let y=-5;y<=-1;y+=.5)B.set(...R([-1.4*k,y*k]),p.armHi,2);for(let i=0;i<3;i++)B.set(...R([(-2.6+i*1)*k,2*k]),OUT,2)}
  if(hm.type==='crest'&&hm.detail){for(let y=-6;y<=-1.5;y+=.5)B.set(...R([-1.2*k,y*k]),p.armHi,2);for(const r of[[3,-3],[3,0],[3,3]])B.set(...R([r[0]*k,r[1]*k]),p.trimHi,2)}
- if(hm.extra)hm.extra(B,R,k,T,P)}
+ if(hm.extra&&!(P.eyeOff>0&&hm.eyeExtra))hm.extra(B,R,k,T,P)}
 function drawArm(B,S,sh,el,hd,front){const k=S.k,p=S.pal;const U=p.under||p.armLo,UH=p.underHi||p.arm,UL=p.underLo||OUT;B.thick(sh,el,1.7*k,front?U:UL,front?UH:U,UL);B.thick([lerp(el[0],hd[0],.1),lerp(el[1],hd[1],.1)],[lerp(el[0],hd[0],.75),lerp(el[1],hd[1],.75)],1.9*k,front?p.arm:p.armLo,front?p.armHi:p.arm,p.armLo);B.disc(hd[0],hd[1],1.9*k,p.glove||p.armLo,p.arm,OUT);B.poly([[sh[0]-4*k,sh[1]+2*k],[sh[0]-3.5*k,sh[1]-2.5*k],[sh[0],sh[1]-3.5*k],[sh[0]+3.5*k,sh[1]-2.5*k],[sh[0]+4*k,sh[1]+2*k],[sh[0],sh[1]+3*k]],front?p.arm:p.armLo,front?p.armHi:p.arm,p.armLo)}
 function drawBlade(B,S,hd,ang,W,front){const k=S.k,len=W.len*k,wd=(W.w||1.4)*k,u=dir(ang,1),n=[-u[1],u[0]],P=(a,b)=>[hd[0]+u[0]*a+n[0]*b,hd[1]+u[1]*a+n[1]*b];
  B.thick(P(-3*k,0),P(-1*k,0),1.1*k,W.grip||'#3a2420',W.grip||'#5a3a30',OUT);B.disc(...P(-3.6*k,0),1.3*k,W.pom||W.guard,W.guard,OUT);if(W.ring){B.disc(...P(-5.6*k,0),1.9*k,W.ring,W.ringHi||W.ring,OUT);B.disc(...P(-5.6*k,0),.8*k,OUT,null,null)}

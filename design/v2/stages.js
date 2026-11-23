@@ -29,11 +29,11 @@ if(open)for(let i=0;i<3;i++){const y0=gy+48+i*14;for(let x=gx-4;x<gx+12;x+=2)B.s
  stoneFloor(B,'#1a1220','#140e18','#2a1e30');
  /* 門の下から漏れるくらやみ */for(let x=gx-30;x<SW;x++){const h=Math.max(0,Math.round((1-Math.abs(x-(gx+gw/2))/90)*(open?6:3)+Math.sin(x*.4+t*.05)));for(let y=SFL;y<SFL+h;y++)B.set(x,y,y===SFL?INK.hi:INK.col,6)}};
 /* 誓いの間：天窓から一本の光。床には挑んで敗れた者たちの剣が墓標のように刺さる。奥に赤い旗 */
-STG.red=(B,t,rage)=>{rect(B,0,0,SW,SH,(x,y)=>dith('#160e12','#1e1418',y/SFL,x,y));
+STG.red=(B,t,rage,lwo)=>{rect(B,0,0,SW,SH,(x,y)=>dith('#160e12','#1e1418',y/SFL,x,y));
  for(let i=0;i<5;i++){const x=10+i*52;rect(B,x,0,14,SFL,'#241a1e');rect(B,x+1,0,1,SFL,'#34262a');rect(B,x-2,0,18,5,'#2a1e22')}
  /* 赤い旗：本気では落ちている */if(!rage){rect(B,178,8,24,56,'#7a1422');rect(B,178,8,24,2,'#a82a34');for(let i=0;i<24;i+=4)B.set(178+i,64,'#7a1422',6);/* 旗の紋章も「閉じた門」：ぬしと同じ誓い */rect(B,184,26,12,16,'#d8b050');for(let a=0;a<=3.14;a+=.1)B.set(Math.round(190-Math.cos(a)*6),Math.round(26-Math.sin(a)*4),'#d8b050',6);rect(B,189,22,2,20,'#5a0e1c');rect(B,186,30,8,12,'#7a1422');rect(B,189,30,2,12,'#d8b050')}
  else{rect(B,170,SFL-4,36,4,'#5a0e1c');rect(B,170,SFL-4,36,1,'#8a2030')}
- /* 天窓の光：本気では細く、彼だけを照らす */const lx=176,lw=rage?12:34;for(let y=0;y<SFL+6;y++)for(let x=lx-lw/2-y*.12;x<lx+lw/2+y*.12;x++){const xx=Math.round(x);if((xx+y)%(rage?2:3)===0)B.set(xx,y,mix(B.get(xx,y)||'#1e1418','#ffe0c0',rage?.25:.16),6)}
+ /* 天窓の光：本気では細く、彼だけを照らす */const lx=176,lw=lwo!=null?lwo:rage?12:34;for(let y=0;y<SFL+6;y++)for(let x=lx-lw/2-y*.12;x<lx+lw/2+y*.12;x++){const xx=Math.round(x);if((xx+y)%(rage?2:3)===0)B.set(xx,y,mix(B.get(xx,y)||'#1e1418','#ffe0c0',rage?.25:.16),6)}
  stoneFloor(B,'#2a1c1e','#20161a','#3a2a2c');
  /* 墓標の剣 */for(let i=0;i<9;i++){const x=14+i*24+(i%3)*5,y=SFL+2+(i%2)*6,a=(i%3-1)*.15;for(let j=0;j<12;j++)B.set(Math.round(x+Math.sin(a)*j),y-j,j<9?'#8a8a98':'#5a4a40',6);for(let j=-2;j<=2;j++)B.set(x+j+Math.round(Math.sin(a)*9),y-9,'#5a4a40',6)}};
 /* 穴の底：沈んだ誓いの間。剣は水面の下で逆さに映り、旗は水に沈む。光は頭上の穴からだけ */
@@ -54,10 +54,24 @@ const STAGES=[
  {id:'s_hole',n:'穴の底',st:'hole',who:[['fallen',{}]],cap:'沈んだ誓いの間。剣の墓標は水に逆さに映り、旗は水の底。光は頭上の穴から細く。',why:'赤い騎士の部屋が、くらやみに沈んだ姿。部屋の作りが同じなので「同じ人」だとわかる。'},
  {id:'s_hole2',n:'穴の底（第二形態）',st:'hole',deep:1,who:[['fallen2',{}]],refl:true,cap:'水面の下に門のアーチが透ける。水には、のまれる前の赤い騎士が映る。',why:'映り姿は、とどめの演出で本体と入れかわる。最後の一撃の意味を、戦う前から背景に置いておく。'},
 ];
-function stageFrame(s,t){const B=new Buf(SW,SH);STG[s.st](B,t,s.open||s.rage||s.deep);
+function stageFrame(s,t){if(s.custom)return s.custom(t);const B=new Buf(SW,SH);STG[s.st](B,t,s.open||s.rage||s.deep);
  const H=new Buf(SW,SH);knight(H,SW-62,SFL,SPEC.hero,{},t);B.blit(H,true);
  for(const[w,P]of s.who){const S=SPEC[w];knight(B,176,SFL,S,P,t);if(w==='lord')pool(B,joints(176,SFL,S,Object.assign({},PDEF,S.pose)),t,16)}
  B.outline();for(const[w]of s.who)if(SPEC[w].aura)aura(B,SPEC[w].aura,t);
  if(s.refl){const R=new Buf(SW,SH);knight(R,176,SFL,SPEC.red,{},t);for(let y=0;y<SH;y++)for(let x=0;x<SW;x++){const c=R.c[y*SW+x];if(!c)continue;const yy=SFL+2+Math.round((SFL-y)*.5),xx=x+Math.round(Math.sin(yy*.5+t*.12));if(yy>SFL+1&&yy<SH&&(xx+yy)%2===0)B.set(xx,yy,mix(c,'#0c0a14',.4),8)}}
  if(s.st==='hole')for(let x=0;x<SW;x++)if(B.tag(x,SFL)!==1)B.set(x,SFL,Math.sin(x*.3+t*.1)>.5?'#3a2a50':'#1a1428',6);
  return B}
+
+/* 赤い騎士を倒したあと：誓いの間の光が細くなり、騎士は構えたまま闇に溶け、部屋も暗くなる。最後は主人公の輪郭だけ */
+const VST2={ua:2.35,fa:-1.25,sw:-1.57,ua2:2.15,fa2:-1.45,sheath:0,cr:1,lean:.02,hd:.08,eyeOff:1};
+function redEnd(t){t=t%300;const cl=(a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
+ const lw=12*(1-cl(20,150)),dk=cl(50,170),dd=cl(90,210),hr=cl(170,230);
+ const B=new Buf(SW,SH);STG.red(B,t,1,lw);
+ const K=new Buf(SW,SH);knight(K,176,SFL,SPEC.red2,VST2,0);K.outline();
+ for(let i=0;i<K.c.length;i++){if(!K.c[i])continue;const x=i%SW,y=i/SW|0,n=((x*73+y*151)%97)/97;if(n<dk*.9)continue;B.set(x,y,mix(K.c[i],'#060406',Math.min(1,dk*1.15)),1)}
+ const H=new Buf(SW,SH);knight(H,SW-62,SFL,SPEC.hero,{},t);H.outline();const HF=new Buf(SW,SH);HF.blit(H,true);
+ /* 部屋ごと暗く */for(let i=0;i<B.c.length;i++){if(B.c[i])B.c[i]=mix(B.c[i],'#020102',Math.min(1,dd*1.05))}
+ for(let i=0;i<HF.c.length;i++){if(!HF.c[i])continue;const inner=HF.t[i]!==3;let c=HF.c[i];if(inner)c=mix(c,'#06050a',hr*.9);else c=hr>0?mix(OUT,'#c8ccd8',hr*.85):c;B.set(i%SW,i/SW|0,c,HF.t[i])}
+ /* 剣と兜のふちにだけ、ほのかな光 */if(hr>.5)for(let i=0;i<HF.c.length;i++){const x=i%SW,y=i/SW|0;if(HF.t[i]===3&&y<SFL-24&&((x+y+(t>>4))%7===0))B.set(x,y,'#ffffff',3)}
+ return B}
+STAGES.push({id:'s_red_end',n:'誓いの間（赤い騎士のあと）',custom:redEnd,cap:'倒したあと、天窓の光がゆっくり細くなり、構えたままの赤い騎士が闇に溶けていく。部屋ごと暗くなり、最後は主人公の輪郭だけが残る。',why:'勝ったのに、何も明るくならない。光が消えた部屋に、ただ一人だけが立っている。この闇の先に「穴」が開く。'});

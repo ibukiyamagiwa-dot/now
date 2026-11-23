@@ -40,7 +40,7 @@ function heroShield(B,J,V){const k=J.k*1.55,c=add(J.hdB,[V.front?-.5*k:2.6*k,V.f
  if(V.notch)for(let i=0;i<V.notch;i++){const x=c[0]-3*k+i*1.5*k;B.set(x,c[1]-4.4*k,'#e8eaf0',2);B.set(x,c[1]-3.9*k,fl,2)}
  for(const m of (V.marks||[]))m(B,c,k,V)}
 const HV={};/* 差分。体つき・兜の形・剣の長さ・マントの位置は変えない */
-SPEC.hero={k:.72,hk:1.45,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:20,wide:1.5,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:19}),
+SPEC.hero={k:.72,hk:1.45,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:20,wide:1.5,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:24,w:1.25}),
  mid:(B,J,T,P)=>{heroShield(B,J,Object.assign({front:P.shieldFront},P.V||{}))},
  pose:{ua:2.4,fa:2.2,sw:-2.5,ua2:1.75,fa2:1.95,ff:-5,fb:5}};
 /* 鞘：赤い騎士の腰。ふだんは空のまま。本気になると剣が納まる */
@@ -131,7 +131,7 @@ SPEC.red={hk:1.1,lk:.9,tk:.95,name:'赤い騎士',k:1.25,pal:PAL.red,helm:redHel
  w:W_RED,sheath:sheathDraw,front:(B,J,T)=>redDetail(B,J,T,'#d8b050','#ffe080'),
  pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.5,fa2:2.3,ff:-9,fb:7,cr:1.5}};
 SPEC.red2={hk:1.1,lk:.9,tk:.95,name:'本気の赤い騎士',k:1.25,pal:PAL.redW,
- helm:Object.assign({},redHelm,{glow:'#ffffff',extra:(B,R,k,T)=>{/* 目の光が白い尾を引く */for(let i=1;i<7;i++)B.set(...R([(-4+i*1.6)*k,(-.4+i*.12)*k]),i<3?'#ffffff':'#bfe8ff',5)}}),
+ helm:Object.assign({},redHelm,{glow:'#ffffff',eyeExtra:true,extra:(B,R,k,T)=>{/* 目の光が白い尾を引く */for(let i=1;i<7;i++)B.set(...R([(-4+i*1.6)*k,(-.4+i*.12)*k]),i<3?'#ffffff':'#bfe8ff',5)}}),
  tabard:RED_TAB,tabardFront:true,chest:sealIntact,
  w:W_RED,sheath:sheathDraw,front:(B,J,T)=>redDetail(B,J,T,'#d8b050','#ffe080'),
  pose:{ua:1.7,fa:2.2,sw:null,sheath:1,ua2:1.4,fa2:2.6,ff:-12,fb:8,cr:4.5,lean:.18,hd:.1}};

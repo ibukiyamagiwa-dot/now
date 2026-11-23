@@ -71,7 +71,6 @@ function redEnd(t){t=t%300;const cl=(a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
  for(let i=0;i<K.c.length;i++){if(!K.c[i])continue;const x=i%SW,y=i/SW|0,n=((x*73+y*151)%97)/97;if(n<dk*.9)continue;B.set(x,y,mix(K.c[i],'#060406',Math.min(1,dk*1.15)),1)}
  const H=new Buf(SW,SH);knight(H,SW-62,SFL,SPEC.hero,{},t);H.outline();const HF=new Buf(SW,SH);HF.blit(H,true);
  /* 部屋ごと暗く */for(let i=0;i<B.c.length;i++){if(B.c[i])B.c[i]=mix(B.c[i],'#020102',Math.min(1,dd*1.05))}
- for(let i=0;i<HF.c.length;i++){if(!HF.c[i])continue;const inner=HF.t[i]!==3;let c=HF.c[i];if(inner)c=mix(c,'#06050a',hr*.9);else c=hr>0?mix(OUT,'#c8ccd8',hr*.85):c;B.set(i%SW,i/SW|0,c,HF.t[i])}
- /* 剣と兜のふちにだけ、ほのかな光 */if(hr>.5)for(let i=0;i<HF.c.length;i++){const x=i%SW,y=i/SW|0;if(HF.t[i]===3&&y<SFL-24&&((x+y+(t>>4))%7===0))B.set(x,y,'#ffffff',3)}
+ /* 主人公も最後は闇に沈む。真っ暗な部屋だけが残る */for(let i=0;i<HF.c.length;i++){if(!HF.c[i])continue;B.set(i%SW,i/SW|0,mix(HF.c[i],'#020102',Math.min(1,dd*1.05)),HF.t[i])}
  return B}
-STAGES.push({id:'s_red_end',n:'誓いの間（赤い騎士のあと）',custom:redEnd,cap:'倒したあと、天窓の光がゆっくり細くなり、構えたままの赤い騎士が闇に溶けていく。部屋ごと暗くなり、最後は主人公の輪郭だけが残る。',why:'勝ったのに、何も明るくならない。光が消えた部屋に、ただ一人だけが立っている。この闇の先に「穴」が開く。'});
+STAGES.push({id:'s_red_end',n:'誓いの間（赤い騎士のあと）',custom:redEnd,cap:'倒したあと、天窓の光がゆっくり細くなり、構えたままの赤い騎士が闇に溶けていく。部屋ごと暗くなり、最後は何も見えなくなる。',why:'勝ったのに、何も明るくならない。光も、騎士も、部屋も消える。この闇の先に「穴」が開く。'});

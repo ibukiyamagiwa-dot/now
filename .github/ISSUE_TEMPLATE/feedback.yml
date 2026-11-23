@@ -1,0 +1,19 @@
+name: 感想
+description: 遊んだ人の感想（LINEでもらったものを貼ってもいい）
+labels: [感想]
+body:
+  - type: input
+    id: who
+    attributes: { label: だれの感想か, placeholder: 例）たかし }
+  - type: dropdown
+    id: where
+    attributes:
+      label: どこの話か
+      options: [チュートリアル, ふつうの敵, 中ボス, ボス, 打ち合い, 道場, メニュー・操作, 全体]
+  - type: textarea
+    id: body
+    attributes: { label: 感想そのまま, description: 言われたとおりに貼る（要約しない） }
+    validations: { required: true }
+  - type: input
+    id: device
+    attributes: { label: 遊んだ環境, placeholder: 例）iPhone・縦持ち／PC・キーボード }

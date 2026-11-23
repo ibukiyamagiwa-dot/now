@@ -1,0 +1,14 @@
+name: 不具合
+description: 動きがおかしい、止まった、表示が崩れた
+labels: [不具合]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: 何が起きたか, description: スクショや画面録画があれば貼る }
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes: { label: その直前にしていたこと, placeholder: 例）覚悟2の6階で、黒い門番の触手を弾いた直後 }
+  - type: input
+    id: device
+    attributes: { label: 遊んだ環境, placeholder: 例）Android・Chrome／PC・Safari }

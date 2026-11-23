@@ -487,7 +487,7 @@ CL('fallen2','f2_tsubame','r2_tsubame',{n:'つばめ返し（タン・タン）'
  for(const id in fix){const m=MV.find(x=>x.id===id);if(!m)continue;m.cues=(m.cues||[]).slice();for(const h of m.hits||[])if(!m.cues.some(c=>c.col!=='p'&&c.t===h-28))m.cues.push({t:h-28,col:fix[id]});m.cues.sort((a,b)=>a.t-b.t)}})();
 /* ---------- くらやみの竜 ---------- */
 const DI={cr:0,nx:0,ny:0,hy:0,jaw:0,wing:0};
-const lamps=(B,J,t,beats)=>{/* 拍を数える灯り：竜の上に三つ。ゴン・ゴン・ゴンで一つずつ灯る */for(let i=0;i<3;i++){const x=J.sc[0]-8+i*8,y=J.sc[1]-40,on=t>=beats[i];B.disc(x,y,2,on?'#ffd080':'#3a2a40',on?'#fff0c0':'#4a3a50','#140a10',4)}};
+const lamps=(B,J,t,beats)=>{/* 拍を数える灯り：竜の上に三つ。ゴン・ゴン・ゴンで一つずつ灯る */for(let i=0;i<3;i++){const x=J.sc[0]-8+i*8,y=(J.top!=null?J.top-6:J.sc[1]-40),on=t>=beats[i];B.disc(x,y,2,on?'#ffd080':'#3a2a40',on?'#fff0c0':'#4a3a50','#140a10',4)}};
 const thud=(B,t,beats)=>{for(const b of beats)if(t>=b&&t<b+5)for(let x=EXX-30;x<EXX+30;x+=3)B.set(x,FL-((x+t)%2),'#8a8090',4)};
 mv({f:'dragon',id:'d_enter',n:'登場：くらやみから形になる',bg:'lord',len:160,noHero:true,cap:'床のくらやみが盛り上がり、竜の形になる。最後に三つの目が開き、首のちぎれた金のかせが鳴る。',why:'くらやみが、初めて形を持った姿。だから最初は形がない。首のかせは、昔これを門のぬしがつないでいた証。',
  keys:[K(0,Object.assign({},DI,{lift:-20,cr:6,eyes:0})),K(90,Object.assign({},DI,{lift:0,cr:2,eyes:0}),'out'),K(110,Object.assign({},DI,{eyes:1,hy:-2})),K(160,DI)],pp:(P,t)=>{P.eyes=t>=110?1:0},
@@ -498,7 +498,7 @@ mv({f:'dragon',id:'d_slam',n:'のしかかり（拍）',bg:'lord',len:150,cap:'�
  keys:[K(0,DI),K(14,{lift:10,cr:-2,ny:6,hy:-4,wing:.6}),K(50,{lift:12,cr:-2,ny:8,hy:-6,wing:.7}),K(52,{lift:0,cr:4,x:-26,ny:-4,hy:6,wing:.2},'in'),K(90,{lift:0,cr:4,x:-26,ny:-4,hy:6}),K(140,DI)],
  cues:[{t:14,col:'w',at:J=>J.head}],hits:[52],fx:(B,J,t)=>{if(t>=14&&t<60)lamps(B,J,t,[22,32,42]);thud(B,t,[22,32,42])}});
 mv({f:'dragon',id:'d_stab',n:'三度の噛みつき',bg:'lord',len:150,cap:'首を引いて白く光り、噛みつく。続けて二度。口元の光が、一回ごとに出る。',why:'光ってから当たるまでは、いつも同じ。数ではなく、一回ずつの光を見る。',
- keys:[K(0,DI),K(14,{nx:-8,ny:2,jaw:.3}),K(40,{nx:-8,ny:2,jaw:.6}),K(42,{nx:14,ny:-4,hy:6,jaw:0,x:-10},'in'),K(50,{nx:-6,ny:2,jaw:.6,x:-6}),K(72,{nx:14,ny:-6,hy:8,jaw:0,x:-10},'in'),K(86,{nx:-6,ny:2,jaw:.6,x:-6}),K(108,{nx:14,ny:-2,hy:4,jaw:0,x:-10},'in'),K(120,DI)],
+ keys:[K(0,DI),K(14,{nx:-6,ny:-2,jaw:.4}),K(40,{nx:-6,ny:-2,jaw:.7}),K(42,{nx:12,ny:26,hy:4,jaw:0,x:-10},'in'),K(50,{nx:-2,ny:6,jaw:.7,x:-6}),K(72,{nx:12,ny:24,hy:6,jaw:0,x:-10},'in'),K(86,{nx:-2,ny:6,jaw:.7,x:-6}),K(108,{nx:12,ny:28,hy:4,jaw:0,x:-10},'in'),K(120,DI)],
  cues:[{t:14,col:'w',at:J=>J.mouth},{t:44,col:'w',at:J=>J.mouth},{t:80,col:'w',at:J=>J.mouth}],hits:[42,72,108]});
 mv({f:'dragon',id:'d_tail',n:'尾の薙ぎ払い（拍）',bg:'lord',len:150,cap:'尾を高く巻き上げて白く光る。尾で地面を三回叩く。三つ灯った次の拍で、低く薙ぎ払う。',why:'のしかかりと同じ拍のルールを、別の体の部分で見せる。',
  keys:[K(0,DI),K(14,{tail:-1.2,cr:1}),K(46,{tail:-1.2,cr:1}),K(50,{tail:1.5,cr:3,x:-14},'in'),K(80,{tail:1.5,cr:3,x:-14}),K(140,DI)],
@@ -510,7 +510,7 @@ mv({f:'dragon',id:'d_breath',n:'赤い炎（拍・重い）',bg:'lord',len:160,c
  cues:[{t:14,col:'r',at:J=>J.mouth}],hits:[50],hitCol:'r',fx:(B,J,t)=>{if(t>=14&&t<58)lamps(B,J,t,[23,32,41]);for(const b of[23,32,41])if(t>=b&&t<b+6)glow(B,Math.round(J.mouth[0]+6),Math.round(J.mouth[1]),3,'#ff6030');
   if(t>=48&&t<70){const u=Math.min(1,(t-48)/4);for(let i=0;i<40*u;i++){const x=J.mouth[0]-i*1.6,y=J.mouth[1]+i*.6+Math.sin(i+t)*2;B.disc(x,y,1.5+i*.06,i%3?'#ff6030':'#ffd040','#fff0a0','#a02010',4)}}}});
 mv({f:'dragon',id:'d_chainwhip',n:'かせの鎖',bg:'lord',len:130,cap:'首をひねって白く光る。首に残ったちぎれた金の鎖が、鞭のように飛んでくる。',why:'昔つながれていた鎖が、今は武器。門のぬしの鎖と同じ金が、竜の正体の手がかり。',
- keys:[K(0,DI),K(14,{nx:8,ny:4,hy:-4}),K(40,{nx:8,ny:4,hy:-4}),K(42,{nx:-10,ny:-2,hy:4,x:-6},'in'),K(70,{nx:-10,ny:-2,hy:4,x:-6}),K(120,DI)],cues:[{t:14,col:'w',at:J=>J.head}],hits:[42],
+ keys:[K(0,DI),K(14,{nx:-8,ny:-4,hy:-4}),K(40,{nx:-8,ny:-4,hy:-4}),K(42,{nx:10,ny:8,hy:4,x:-6},'in'),K(70,{nx:10,ny:8,hy:4,x:-6}),K(120,DI)],cues:[{t:14,col:'w',at:J=>J.head}],hits:[42],
  fx:(B,J,t)=>{if(t>=38&&t<60){const u=Math.min(1,(t-38)/4)*(t<46?1:1-(t-46)/14),a=add(J.head,[6,10]);for(let i=0;i<18;i++){const s=i/18;B.set(lerp(a[0],HXX+8,s*u),lerp(a[1],FL-12,s*u)-Math.sin(s*3.14)*6,i%2?'#b8902a':'#f0c850',4)}}}});
 mv({f:'dragon',id:'d_dive',n:'影もぐり',bg:'lord',len:150,cap:'竜が自分の影に沈む。こちらの足元の床に、白い光がにじむ。そこから首が突き上がる。見る場所は、自分の足元。',why:'くらやみそのものだから、影の中を通れる。見る場所が竜から足元へ変わる。',
  keys:[K(0,DI),K(10,Object.assign({},DI,{lift:-6,cr:4})),K(30,Object.assign({},DI,{lift:-40,cr:8})),K(100,Object.assign({},DI,{lift:-40,cr:8})),K(130,DI)],cues:[{t:20,col:'w',at:J=>[HXX+4,FL-2]}],hits:[48],

@@ -1,0 +1,6 @@
+<html><body style="background:#141018;margin:0"><canvas id=c></canvas>
+<script src="engine.js"></script><script src="rig.js"></script><script src="motion.js"></script><script src="specs.js"></script><script src="hero.js"></script><script src="cards.js"></script><script src="dragon.js"></script><script src="moves.js"></script>
+<script>
+function show(list,sc){const W=120,H=110,c=document.getElementById('c');c.width=W*sc*list.length;c.height=H*sc;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+ list.forEach((o,i)=>{const B=new Buf(W,H);drawDragon(B,64,H-4,{k:1},o,o.T||0);B.outline();aura(B,SPEC.dragon.aura,0);const t=document.createElement('canvas');t.width=W;t.height=H;B.toCanvas(t.getContext('2d'));x.drawImage(t,i*W*sc,0,W*sc,H*sc)})}
+</script></body></html>

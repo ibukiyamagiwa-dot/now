@@ -14,8 +14,8 @@ function stageCard(s){const c=el('figure','card stage');const cv=el('canvas');cv
  c.appendChild(el('figcaption','',`<div class="row"><b>ステージ：${s.n}</b><span class="tag nw">専用ステージ</span></div><p class="read"><span class="k">見えるもの</span>${s.cap}</p><p class="why"><span class="k">意味</span>${s.why}</p>`));
  const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){stageFrame(s,Math.floor(this.t)).toCanvas(this.ctx)}};cv.onclick=()=>{a.pause=!a.pause;c.classList.toggle('paused',a.pause)};ANIM.push(a);a.draw();return c}
 /* 立ち絵：大きく、地面だけ */
-function standCanvas(key,w,h,ox,sc){const cv=el('canvas','stand');cv.width=w;cv.height=h;const S=SPEC[key];const idle=MV.find(m=>m.f===key&&/idle/.test(m.id));
- const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);const P=idle?poseAt0(idle,tt%idle.len,Object.assign({},PDEF,S.pose)):{};if(idle&&idle.pp)idle.pp(P,tt%idle.len);P.chainL=P.chainL||22;
+function standCanvas(key,w,h,ox,sc,ext){const cv=el('canvas','stand');cv.width=w;cv.height=h;const S=SPEC[key];const idle=MV.find(m=>m.f===key&&/idle/.test(m.id));
+ const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);const P=idle?poseAt0(idle,tt%idle.len,Object.assign({},PDEF,S.pose)):{};if(idle&&idle.pp)idle.pp(P,tt%idle.len);if(ext)Object.assign(P,ext);P.chainL=P.chainL||22;
    (S.draw||knight)(B,ox,h-6,S,P,tt);if(key==='lord'||key==='lord2')pool(B,joints(ox,h-6,S,Object.assign({},PDEF,S.pose)),tt,key==='lord'?16:24);B.outline();if(S.aura)aura(B,S.aura,tt);const ctx=this.ctx;ctx.clearRect(0,0,w,h);B.toCanvas(ctx)}};ANIM.push(a);a.draw();return cv}
 function ladder(keys,notes){const wrap=el('div','ladder');keys.forEach((k,i)=>{const col=el('div','step');const S=SPEC[k];col.appendChild(standCanvas(k,80,104,44));col.appendChild(el('div','lname',S.name));col.appendChild(el('div','ladd',notes[i]));wrap.appendChild(col);if(i<keys.length-1)wrap.appendChild(el('div','arrow','→'))});return wrap}
 function build(){const root=document.getElementById('book');
@@ -25,6 +25,8 @@ function build(){const root=document.getElementById('book');
   const top=el('div','ftop');const art=el('div','art');art.appendChild(standCanvas(F.key,110,120,62));if(F.old)art.appendChild(el('div','old',`<img src="${OLDIMG[F.old]}" alt=""><span>いまのゲーム</span>`));top.appendChild(art);
   const txt=el('div','ftxt');txt.appendChild(el('p','lore',F.lore));
   const pl=el('div','pal');F.pal.forEach(p=>pl.appendChild(el('div','chip',`<i style="background:${p[0]}"></i><b>${p[1]}</b><span>${p[2]}</span>`)));txt.appendChild(pl);top.appendChild(txt);sec.appendChild(top);
+  if(F.variants){sec.appendChild(el('h3','','覚悟による色の段 <small>のまれていく段階</small>'));sec.appendChild(el('p','note','ゲームでは覚悟2から体の色が変わる（赤い→黒い→紫の）。色の段は「くらやみにのまれていく段階」なので、色だけでなく、のまれた分だけ部品も増やす。怒りのひびと炎の赤は、どの段でも同じ明るさで光り、体の色より目立つ。'));
+   const w=el('div','ladder');F.variants.forEach(([t,n],i)=>{const col=el('div','step');col.appendChild(standCanvas(F.key,110,112,62,null,{tint:t}));col.appendChild(el('div','lname',DTINT[t].lbl));col.appendChild(el('div','ladd','<b>'+DTINT[t].name+'</b><br>'+n));w.appendChild(col);if(i<F.variants.length-1)w.appendChild(el('div','arrow','→'))});sec.appendChild(w)}
   const tb=el('table','parts');tb.innerHTML='<tr><th>部品</th><th>意味</th></tr>'+F.parts.map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td></tr>`).join('');sec.appendChild(tb);
   sec.appendChild(el('h3','',`モーション <small>${MOVES_OF[F.key].length}</small>`));const g=el('div','grid');MOVES_OF[F.key].forEach(id=>g.appendChild(moveCard(MV.find(m=>m.id===id))));sec.appendChild(g);
   if(F.stage.length){sec.appendChild(el('h3','','専用ステージ'));const sg=el('div','sgrid');F.stage.forEach(id=>sg.appendChild(stageCard(STAGES.find(s=>s.id===id))));sec.appendChild(sg)}

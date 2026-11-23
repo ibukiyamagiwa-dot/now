@@ -640,7 +640,7 @@ function redTurn(){if(G.rp){G.en.tn=(G.en.tn||0)+1;return rpMake()}const e=G.en,
  else if(mv==='tri')L=[{pre:P2(16),mv:'thr',m:1},{gap:R+4,cl:R,mv:'thr',m:1},{gap:R+4,cl:R,mv:'thr',m:1.5,red:true}];
  /* 遅らせ突き：構えたまま長く溜める。動きではなく光で押す */
  else if(mv==='delay')L=[{pre:P2(50),mv:'thr',m:1.5}];
- else{const n=r?5:4;L=rallyList(n,false,r&&Math.random()<.5?n-1:n,{vary:true,heavy:true,feint:r?.8:.5})}
+ else{const n=r?5:4;L=rallyList(n,false,r&&Math.random()<.5?n-1:n,{vary:true,heavy:true,feint:r?[.5,.22,.08]:[.35,.12,.03]})}
  /* 反撃：こちらが「たたかう」で斬った直後のターンは、まず素早いひと振りを返してくる */
  if(e.lastAtk&&!G.pmv&&!dbg.lordMv&&Math.random()<(r?.75:.5)){e.lastAtk=false;text(EXc(),FLOOR-70,'切り返し！','#ff9a9a',true);return[{pre:2,mv:'cut2',m:.9}].concat(L)}
  return L}
@@ -672,7 +672,7 @@ function lordPhase2(quiet){const e=G.en;e.p2=true;e.finale=false;e.finFail=0;e.h
 /* ===== 打ち合い道場（別ページ）：門のぬし・赤い騎士・赤い門のぬしの打ち合いだけを、種類を選んで繰り返す ===== */
 const RP_PAGE=false;
 const RP_BOSS=[{id:'lordA',key:'lord',l:'門のぬし',h:'3合　押し合いは最後',n:3},{id:'lordB',key:'lord',B:1,l:'暗い門のぬし',h:'4合　2合目は腕の触手',n:4,arm:1,real:{vary:true,heavy:true}},
- {id:'red',key:'red',l:'赤い騎士',h:'4合',n:4,real:{vary:true,heavy:true,feint:.5}},{id:'red2',key:'red',rage:1,l:'赤い騎士（本気）',h:'5合　押し合いの位置が変わる',n:5,lockVar:1,real:{vary:true,heavy:true,feint:.8}},
+ {id:'red',key:'red',l:'赤い騎士',h:'4合',n:4,real:{vary:true,heavy:true,feint:[.35,.12,.03]}},{id:'red2',key:'red',rage:1,l:'赤い騎士（本気）',h:'5合　押し合いの位置が変わる',n:5,lockVar:1,real:{vary:true,heavy:true,feint:[.5,.22,.08]}},
  {id:'fallen',key:'fallen',l:'赤い門のぬし',h:'5合　腕の触手入り　押し合いの位置が変わる',n:5,arm:1,lockVar:1,real:{vary:true,heavy:true,feint:.6}}];
 const RP_TYPE=[['real','本番どおり','間合い・重い一撃・フェイントが本番と同じようにまざる'],['even','等間隔','間合いがいつも同じ　まずはこれで拍をつかむ'],['tsume','詰め','弾いた直後に、もう次の光'],['tame','溜め','一拍待ってから次の光'],
  ['alt','詰めと溜めが交互','緩急に慣れる'],['heavy','重い一撃入り','途中に赤い光の突き　盾で受け止める'],['feint','フェイント入り','途中に紫の輪の空振り　押さずに待つ'],['lock','押し合いが早い','最後のひとつ前で押し合い、一拍遅れる']];
@@ -698,10 +698,14 @@ function cancelS(x){if(!x.done){x.done=true;x.cx=true;x.cued=true}}
 function rallyList(n,arm,dl,o){o=o||{};{const e=G.en;if(e&&e.finale&&!G.rp){const k=Math.floor((e.finFail||0)/2);if(k){const n2=Math.max(2,n-k);if(dl>=n2)dl=n2;n=n2}}}const R=P.cueF,L=[{pre:18,mv:'cut',m:1,rally:true,rallyOpen:true,nc:true}];
  /* 2合目以降の間合い：ふつう(+12)・詰め(+6)・溜め(+26)。最初・押し合い・最後は固定 */
  const mid=[];for(let i=2;i<n;i++)if(i!==dl)mid.push(i);
- const heavyAt=o.heavy&&mid.length?pick(mid):-1,feintAt=o.feint&&mid.length&&Math.random()<o.feint?pick(mid.filter(i=>i!==heavyAt).concat(mid.length===1?mid:[])):-1;
+ const heavyAt=o.heavy&&mid.length?pick(mid):-1;
+ /* フェイント：数で渡すと1回（その確率）。配列 [1回,2回,3回] で渡すと、回数ごとの確率で選び、入れる合をばらす（入れる合が足りなければその数まで） */
+ let feints=new Set();
+ if(Array.isArray(o.feint)){const r=Math.random();let acc=0,k=0;for(let j=o.feint.length-1;j>=0;j--){acc+=o.feint[j];if(r<acc){k=j+1;break}}k=Math.min(k,mid.length);if(k)feints=new Set(shuffle(mid.slice()).slice(0,k))}
+ else if(o.feint&&mid.length&&Math.random()<o.feint)feints.add(pick(mid.filter(i=>i!==heavyAt).concat(mid.length===1?mid:[])));
  for(let i=1;i<=n;i++){const end=i===n,lk=i===dl,m2=arm&&i===2?'arm':i%2?'cut2':'cut';
   let g=R+(i===1?20:12)+(lk?18:0);if((o.vary||o.gapAll||o.gapAlt)&&i>=2&&!lk&&!end){const k=o.gapAll||(o.gapAlt?(i%2?'t':'m'):pick(['n','t','t','m']));g=k==='t'?R+6:k==='m'?R+26:g}
-  if(i===feintAt){L.push({fake:true,pre:6,mv:i%2?'cut':'cut2'});g=Math.max(g,R+32)}
+  if(feints.has(i)){L.push({fake:true,pre:6,mv:i%2?'cut':'cut2'});g=Math.max(g,R+32)}
   const hv=i===heavyAt;L.push({gap:g,cl:R,pre:12,mv:end?'cut':hv?'thr':m2,m:end?1.6:hv?1.5:1.2,red:end||hv,rally:true,rallyEnd:end,lock:lk,nc:true})}
  tipOnce('rally','金に光るひと振りを弾くと「打ち合い」が始まる　ぶつかるたびに構え直して光る　押し合いのあとのひと振りまで弾ききれ');return L}
 function mkStrike(impact,o){const cl=P.cueF;return Object.assign({impact,cue:impact-cl,cl,beat:false,mv:'cut',proj:false,melee:false,start:impact-cl-8,ft:0,m:1,feint:false,red:false,boom:false,counter:false,dark:false,back:0,rhythm:false,rally:false,nc:false,res:null,done:false,cued:false},o)}

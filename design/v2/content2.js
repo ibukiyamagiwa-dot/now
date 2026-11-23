@@ -38,8 +38,8 @@ const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg
  lord2:['l2_open','l2_idle','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_rally','l2_whip','l2_pool','l2_doors','l2_gate','l2_down'],
  red:['r_idle','r_seal','r_stance','r_two','r_swap','r_three','r_delay','r_thrust','r_feint','r_combo4','r_parry','r_push','r_zanshin','r_rage'],
  red2:['r2_idle','r2_iai','r2_double','r2_rally','r2_last'],
- fallen:['f_rise','f_idle','f_kneel','f_cutten','f_back','f_arm','f_sa','f_reach','f_maw','f_dark','f_double','f_shift','f_rally','f_swallow'],
- fallen2:['f2_idle','f2_look','f2_ring','f2_four','f2_core','f2_reflect','f2_rally','f2_end']};
+ fallen:['f_rise','f_idle','f_kneel','f_cutten','f_back','f_arm','f_sa','f_reach','f_maw','f_dark','f_double','f_shift','f_twin','f_iai','f_cage','f_rally','f_swallow'],
+ fallen2:['f2_idle','f2_look','f2_ring','f2_four','f2_core','f2_reflect','f2_close','f2_pulse','f2_rally','f2_end']};
 const EXMV={g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い',r_two:'二連撃',r_swap:'逆の二連撃',r_three:'三段突き',r_delay:'遅らせ突き',r_thrust:'突き',r_feint:'フェイント',r_combo4:'四連撃',r_push:'打ち合い',r2_double:'二重のフェイント',r2_rally:'打ち合い',f_cutten:'剣と触手',f_back:'背中の触手',f_arm:'腕の触手',f_sa:'剣と触手の三連',f_reach:'伸びる刃',f_maw:'胸の口',f_dark:'ささやき',f_double:'二重のフェイント',f_rally:'打ち合い',f2_ring:'背中の触手',f2_four:'四連撃',f2_core:'胸の口',f2_rally:'打ち合い'};
 const KSTAND=['l_plant','l_seal','l2_threat','dg_state','r_seal','f_kneel','f2_look'],KSHOW=['g_enter','g_kneel','dg_turn','dg_down2','l_enter','l_kneel','l2_open','l2_down','r_rage','r2_last','f_rise','f_swallow','f2_end'];
 const KINDOF=id=>/_idle$/.test(id)?'main':KSTAND.includes(id)?'stand':KSHOW.includes(id)?'show':'atk';

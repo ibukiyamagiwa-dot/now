@@ -112,6 +112,10 @@ const SPEC_F2_BEHIND=(B,J,T,P)=>{const k=J.k,c=add(J.sc,[4*k,-4*k]),R0=19*k;/* �
   for(let i=1;i<pts.length-1;i+=3){const p=pts[i],o=dir(Math.atan2(p[1]-c[1],p[0]-c[0])+Math.sin(T*.06+i)*.4,7*k);tentacle(B,p,add(p,[o[0]*.6-1,o[1]*.6]),add(p,o),1.3*k,.4*k,false)}
   for(let i=2;i<pts.length-1;i+=4)B.set(...pts[i].map(Math.round),((T/7|0)+i)%5?INK.eye2:'#140a10',2)};
 /* ===== 赤の系統：のまれなかった世界線の門のぬし ===== */
+/* 赤い鎧の作りこみ：肩当ての鋲、肘とひざの金の縁、胸板の筋、籠手の金 */
+function redDetail(B,J,T,g1,g2){const k=J.k;rivets(B,J.shF,k,3.2,5,g1);for(const K of[J.kneeF,J.elF])for(let a=0;a<6.28;a+=.45)B.set(K[0]+Math.cos(a)*1.9*k,K[1]+Math.sin(a)*1.9*k,(a*3|0)%2?g1:g2,2);
+ for(let i=0;i<3;i++){const y=J.sc[1]+(2+i*1.6)*k;B.set(J.sc[0]-4.5*k,y,g1,2);B.set(J.sc[0]-5*k,y,'#5e1626',2)}
+ const h=J.hdF;for(let a=-1.2;a<=1.2;a+=.4)B.set(h[0]+Math.cos(a)*1.7*k,h[1]+Math.sin(a)*1.7*k,g1,2)}
 const W_RED=Object.assign({},W_LONG,{len:27,ring:'#d8b050',ringHi:'#ffe080',guard:'#2a1a22',guardHi:'#6a4a50'});
 /* ひびのない封印：のまれなかった世界線では、封印は割れていない */
 const sealIntact=(B,R,k)=>{const c=R([0,-9*k]);B.disc(c[0],c[1],3.2*k,'#d8b050','#ffe080','#8a6a20');B.disc(c[0],c[1],1.5*k,'#a8303a','#d85a58','#5e1626')};
@@ -121,14 +125,14 @@ const RED_TAB={len:14,w:5,col:'#6a1020',hi:'#922030',lo:'#3a0812',edge:'#e0c070'
 const redHelm={type:'bucket',band:['#d8b050','#ffe080'],glow:'#ffe08a',dents:[[2,1]],plume:'#e8e0d0',plumeHi:'#ffffff',plumeLo:'#9a9080'};
 SPEC.red={hk:1.1,lk:.9,tk:.95,name:'赤い騎士',k:1.25,pal:PAL.red,helm:redHelm,
  tabard:RED_TAB,tabardFront:true,chest:sealIntact,
- cape:{len:28,wide:1.2,col:'#5a0e1c',hi:'#8a2030',lo:'#2a0610'},
- w:W_RED,sheath:sheathDraw,
+ cape:{len:28,wide:1.2,col:'#5a0e1c',hi:'#8a2030',lo:'#2a0610',extra:(B,J,T,c)=>{/* マントの裏地は金：誓いの金 */for(let i=0;i<=8;i++){const t=i/8;B.set(lerp(c.b[0],c.d[0],t),lerp(c.b[1],c.d[1],t),'#b8902a',2)}}},
+ w:W_RED,sheath:sheathDraw,front:(B,J,T)=>redDetail(B,J,T,'#d8b050','#ffe080'),
  pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.5,fa2:2.3,ff:-9,fb:7,cr:1.5}};
 SPEC.red2={hk:1.1,lk:.9,tk:.95,name:'本気の赤い騎士',k:1.25,pal:PAL.redW,
  helm:Object.assign({},redHelm,{glow:'#ffffff',extra:(B,R,k,T)=>{/* 目の光が白い尾を引く */for(let i=1;i<7;i++)B.set(...R([(-4+i*1.6)*k,(-.4+i*.12)*k]),i<3?'#ffffff':'#bfe8ff',5)}}),
  tabard:RED_TAB,tabardFront:true,chest:sealIntact,
- w:W_RED,sheath:sheathDraw,
- pose:{ua:1.7,fa:2.2,sw:null,sheath:1,ua2:1.4,fa2:2.6,ff:-11,fb:8,cr:4,lean:-.15}};
+ w:W_RED,sheath:sheathDraw,front:(B,J,T)=>redDetail(B,J,T,'#d8b050','#ffe080'),
+ pose:{ua:1.7,fa:2.2,sw:null,sheath:1,ua2:1.4,fa2:2.6,ff:-12,fb:8,cr:4.5,lean:.18,hd:.1}};
 const fallenCape=(n)=>(B,J,T,P)=>{const k=J.k;/* 斬り捨てたマントの代わりに、くらやみの触手がマントになった */for(let i=0;i<n;i++){const r=add(J.shB,[(1+i)*k,(1+i)*k]),w=Math.sin(T*.07+i*1.3)*3;tentacle(B,r,[r[0]+(6+i*2)*k+w,r[1]+12*k],[r[0]+(4+i*3)*k+w*1.6,r[1]+(24-i*2)*k],1.8*k,.5*k,i===1)}};
 const backTen=(B,J,T,P,base)=>{const k=J.k,ten=P.ten||[0,0,0];for(let i=0;i<3;i++){const r=add(J.sc,[4*k,(-4+i*3)*k]),w=Math.sin(T*.06+i*2)*3,ex=Math.max(-1,Math.min(1,ten[i]||0)),rest=[r[0]+(9+i*3)*k,r[1]-(14-i*6)*k+w],tgt=[HXX+8,FL-14],tip=ex>=0?[lerp(rest[0],tgt[0],ex),lerp(rest[1],tgt[1],ex)]:rest,mid=ex>0?[lerp(r[0]+(13+i*2)*k,(r[0]+tgt[0])/2,ex),r[1]-(18+i*4)*k*ex-(6-i*4)*k*(1-ex)]:[r[0]+(13+i*2)*k,r[1]-(6-i*4)*k];tentacle(B,r,mid,tip,2.1*k,.6*k,false);B.set(...tip.map(Math.round),P.eyeOn&&P.eyeOn[i]?'#ffffff':INK.eye,2)}};
 const fallenHelm={type:'bhorn',sides:[1],band:['#6a5020','#9a7a30'],glow:'#ff3050',dents:[[-3,-1],[1,2]],cracks:[[-2,-4],[-1.5,-3],[-2,-2],[-1.5,-1]],crackCol:'#9a5ad0',horn:'#2a2434',hornHi:'#6e6680',hornLo:'#120e18',rings:'#8a6a2a',
@@ -138,7 +142,8 @@ SPEC.fallen={hk:1.1,lk:.9,tk:.95,name:'赤い門のぬし',k:1.25,pal:PAL.fallen
  chest:(B,R,k,P)=>{if(P.door>0){const o=P.door,c=R([0,-9*k]);B.disc(c[0],c[1],3.6*k,'#0a0306',null,null);for(let i=-3;i<=3;i+=2){B.set(c[0]+i*k,c[1]-3*k,'#e8e0d0',2);B.set(c[0]+i*k,c[1]+3*k,'#e8e0d0',2)}B.disc(c[0],c[1],1.6*k,'#ff3050','#ffb0a0','#a01030');for(const s of[-1,1]){const h=R([s*3.5*k,-9*k]),e=[h[0]+s*o*3.5*k,h[1]];B.poly([[h[0],h[1]-3.5*k],[e[0],h[1]-4.5*k],[e[0],h[1]+4.5*k],[h[0],h[1]+3.5*k]],'#6e1a2a','#9a3040','#30081a')}}else sealCracked(B,R,k,P)},
  w:W_RED,tentB:true,sheath:sheathDraw,
  behind:(B,J,T,P)=>{fallenCape(4)(B,J,T,P);if(P.ten)backTen(B,J,T,P)},
- mid:(B,J,T)=>{const k=J.k;/* 赤い鎧のひびから、くらやみがにじむ */crack(B,[add(J.sc,[-4*k,1*k]),add(J.sc,[-2*k,4*k]),add(J.sc,[-3*k,8*k])],INK.eye);crack(B,[add(J.kneeF,[-1*k,1*k]),add(J.kneeF,[0,4*k])],INK.eye);smoke(B,J.sc[0]+2,J.sc[1]-4,T,6,'#5e3a88')},
+ mid:(B,J,T)=>{const k=J.k;/* 赤い鎧のひびから、くらやみがにじむ */crack(B,[add(J.sc,[-4*k,1*k]),add(J.sc,[-2*k,4*k]),add(J.sc,[-3*k,8*k])],INK.eye);crack(B,[add(J.kneeF,[-1*k,1*k]),add(J.kneeF,[0,4*k])],INK.eye);crack(B,[add(J.shF,[-2*k,-1*k]),add(J.shF,[0,2*k]),add(J.shF,[-1*k,4*k])],INK.eye);smoke(B,J.sc[0]+2,J.sc[1]-4,T,9,'#5e3a88');mail(B,J,PAL.fallen.under,'#4e2c70')},
+ front:(B,J,T)=>{redDetail(B,J,T,'#6a5020','#9a7a30');drips(B,add(J.elF,[0,1*J.k]),J.k,T,2,INK.col);/* 銀の剣の柄に、まだ金の鍵の輪 */},
  aura:{r:3,c1:'#3a1430',c2:'#22102a',rim:'#c04070'},
  pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.3,fa2:2.0,ff:-9,fb:7,cr:1.5}};
 SPEC.fallen2={hk:1.1,lk:.9,tk:.95,name:'赤い門のぬし 第二形態',k:1.35,pal:PAL.hollow,

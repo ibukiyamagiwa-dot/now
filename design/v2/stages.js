@@ -31,7 +31,7 @@ if(open)for(let i=0;i<3;i++){const y0=gy+48+i*14;for(let x=gx-4;x<gx+12;x+=2)B.s
 /* 誓いの間：天窓から一本の光。床には挑んで敗れた者たちの剣が墓標のように刺さる。奥に赤い旗 */
 STG.red=(B,t,rage)=>{rect(B,0,0,SW,SH,(x,y)=>dith('#160e12','#1e1418',y/SFL,x,y));
  for(let i=0;i<5;i++){const x=10+i*52;rect(B,x,0,14,SFL,'#241a1e');rect(B,x+1,0,1,SFL,'#34262a');rect(B,x-2,0,18,5,'#2a1e22')}
- /* 赤い旗：本気では落ちている */if(!rage){rect(B,178,8,24,56,'#7a1422');rect(B,178,8,24,2,'#a82a34');for(let i=0;i<24;i+=4)B.set(178+i,64,'#7a1422',6);rect(B,189,18,2,28,'#d8dce8');rect(B,185,22,10,2,'#d8dce8')}
+ /* 赤い旗：本気では落ちている */if(!rage){rect(B,178,8,24,56,'#7a1422');rect(B,178,8,24,2,'#a82a34');for(let i=0;i<24;i+=4)B.set(178+i,64,'#7a1422',6);/* 旗の紋章も「閉じた門」：ぬしと同じ誓い */rect(B,184,26,12,16,'#d8b050');for(let a=0;a<=3.14;a+=.1)B.set(Math.round(190-Math.cos(a)*6),Math.round(26-Math.sin(a)*4),'#d8b050',6);rect(B,189,22,2,20,'#5a0e1c');rect(B,186,30,8,12,'#7a1422');rect(B,189,30,2,12,'#d8b050')}
  else{rect(B,170,SFL-4,36,4,'#5a0e1c');rect(B,170,SFL-4,36,1,'#8a2030')}
  /* 天窓の光：本気では細く、彼だけを照らす */const lx=176,lw=rage?12:34;for(let y=0;y<SFL+6;y++)for(let x=lx-lw/2-y*.12;x<lx+lw/2+y*.12;x++){const xx=Math.round(x);if((xx+y)%(rage?2:3)===0)B.set(xx,y,mix(B.get(xx,y)||'#1e1418','#ffe0c0',rage?.25:.16),6)}
  stoneFloor(B,'#2a1c1e','#20161a','#3a2a2c');

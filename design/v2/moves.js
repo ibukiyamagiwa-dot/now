@@ -212,12 +212,14 @@ mv({f:'fallen2',id:'f2_rally',n:'五合の打ち合い',bg:'hole',len:180,cap:'�
  keys:MV.find(m=>m.id==='r2_rally').keys.map(k=>K(k.t,Object.assign({},k.p,{sheath:0}),k.e)),cues:[0,1,2,3,4].map(i=>({t:14+i*28,col:'g'})),hits:[0,1,2,3,4].map(i=>26+i*28),hitCol:'g',
  fx:(B,J,t)=>{if(J.tip&&t>=14&&t<150)glow(B,Math.round(J.tip[0]),Math.round(J.tip[1]),3,'g')},
  post:(B,J,t)=>{water(B,t);const base=Object.assign({},PDEF,SPEC.red.pose);reflection(B,t,'red',poseAt0(MV.find(m=>m.id==='f2_rally'),t,base),EXX)}});
-mv({f:'fallen2',id:'f2_end',n:'とどめ：映り姿と入れかわる',bg:'hole',len:200,noHero:true,cap:'打ち返しの白黒の一瞬に、本体と水面の映り姿が入れかわる。くらやみは水に沈み、赤い騎士が水面に立つ。',why:'白黒赤のとどめ演出の「反転」を、物語の反転にも使う。勝った瞬間に、救えたことがわかる。',
+mv({f:'fallen2',id:'f2_end',n:'とどめ：入れかわり、塵になる',bg:'hole',len:240,noHero:true,cap:'打ち返しの白黒赤の一瞬に、本体と水面の映り姿が入れかわる。くらやみは水に沈み、赤い騎士が水面に立つ。そして、そのまま塵になって崩れる。',why:'最後に一瞬だけ、本当の姿が見える。救えたように見えて、何も残らない。白い羽根だけが主人公の手に残る。',
  fAt:t=>t<90?'fallen2':'red',
- keys:[K(0,F2I),K(60,Object.assign({},F2I,{lean:.3,cr:4})),K(89,Object.assign({},F2I,{lean:.3,cr:4})),K(90,{ua:2.3,fa:1.4,sw:1.57,ua2:2.1,fa2:1.2,cr:3,hd:-.35,lean:.1,capeOff:1}),K(200,{ua:2.3,fa:1.4,sw:1.57,ua2:2.1,fa2:1.2,cr:3,hd:-.35,lean:.1,capeOff:1})],
- post:(B,J,t)=>{water(B,t);if(t<90)reflection(B,t,'red',{},EXX);else reflection(B,t,'fallen2',{},EXX);
-  if(t>=60&&t<90){/* 白黒赤：とどめの瞬間 */for(let i=0;i<B.c.length;i++){if(!B.c[i])continue;const c=rgb(B.c[i]),l=c[0]*.3+c[1]*.59+c[2]*.11;B.c[i]=(c[0]>150&&c[1]<90)?'#ff2040':l>60?'#ffffff':'#0c0a10'}}}});
-
+ keys:[K(0,F2I),K(60,Object.assign({},F2I,{lean:.3,cr:4})),K(89,Object.assign({},F2I,{lean:.3,cr:4})),K(90,{ua:2.3,fa:1.4,sw:1.57,ua2:2.1,fa2:1.2,cr:3,hd:-.35,lean:.1,capeOff:1}),K(240,{ua:2.3,fa:1.4,sw:1.57,ua2:2.1,fa2:1.2,cr:3,hd:-.35,lean:.1,capeOff:1})],
+ post:(B,J,t)=>{water(B,t);if(t<90)reflection(B,t,'red',{},EXX);else if(t<150)reflection(B,t,'fallen2',{},EXX);
+  if(t>=60&&t<90){for(let i=0;i<B.c.length;i++){if(!B.c[i])continue;const c=rgb(B.c[i]),l=c[0]*.3+c[1]*.59+c[2]*.11;B.c[i]=(c[0]>150&&c[1]<90)?'#ff2040':l>60?'#ffffff':'#0c0a10'}}
+  if(t>=140){/* 塵：上から崩れ、灰色の粒が舞い上がる */const u=Math.min(1,(t-140)/70);for(let i=0;i<B.c.length;i++){if(B.t[i]!==1&&B.t[i]!==2&&B.t[i]!==3)continue;const x=i%CW,y=i/CW|0;if(y<FL-70+u*80&&((x*7+y*13)%11)/11<u*1.3){B.c[i]=((x+y)%4===0&&u<.8)?'#8a8090':0;B.t[i]=B.c[i]?4:0}}
+   for(let p=0;p<20;p++){const x=EXX-10+((p*37)%24),y=FL-20-((t-140)*.6+p*7)%60;if(u>.1)B.set(x+Math.sin(t*.05+p)*3,y,p%3?'#6a6070':'#a8a0b0',4)}
+   if(t>=200){const f=t-200;for(let i=0;i<5;i++)B.set(EXX-2+i,FL-4+Math.min(3,f/10),'#e8e0d0',4)}}}});
 /* ===== 門の系統：新しいモーションと派生の立ち絵 ===== */
 const XG=Object.assign({},X);
 mv({f:'gate',id:'g_enter',n:'登場：剣を交差させる',bg:'gate',len:130,noHero:false,cap:'歩み出て、二本の剣を目の前で打ち合わせ、交差させる。',why:'最初に「通行止め」の構えを見せる。この先のボスはみな、この構えの意味を受けつぐ。',
@@ -275,3 +277,34 @@ mv({f:'lord2',id:'l2_pool',n:'足元の溜まりから',bg:'lord',len:130,cap:'�
 mv({f:'lord2',id:'l2_doors',n:'扉のかみ合わせ',bg:'lord',len:120,cap:'胸の扉を大きく開いたまま前に出る。赤く光ったら、扉があごのように閉じて挟みにくる。重い。',why:'扉＝門。閉じる門に挟まれる。胸の口（回復）とは別の、扉そのものの技。',
  keys:[K(0,L2I),K(16,Object.assign({},L2I,{door:2,lean:-.1})),K(34,Object.assign({},L2I,{door:2.2,lean:.2,x:-14})),K(44,Object.assign({},L2I,{door:.2,lean:.35,x:-18}),'in'),K(70,Object.assign({},L2I,{door:.2,lean:.35,x:-18})),K(112,L2I)],
  cues:[{t:16,col:'r',at:J=>add(J.sc,[0,9*J.k])}],hits:[44],hitCol:'r'});
+
+/* ===== 赤の系統（第2版） ===== */
+mv({f:'red',id:'r_delay',n:'遅らせ突き',bg:'red',len:130,cap:'剣先を引いたまま長く溜める。体ではなく、光で押す。',why:'溜めの長さで焦らせる。剣を極めた者は「待つ」ことも技にする。',
+ keys:[K(0,RI),K(14,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(60,{ua:1.2,fa:3.0,sw:3.14,x:5,cr:3.5}),K(80,RTH,'in'),K(100,RTH),K(126,RI)],cues:[{t:52,col:'w'}],hits:[80],trails:[[77,82,'w']]});
+mv({f:'red',id:'r_swap',n:'逆の二連撃',bg:'red',len:110,cap:'構えのまま白く光る。すくい上げから入り、打ち下ろしで終わる。',why:'門のぬしと同じ技。同じ人だから、同じ型を持っている。',
+ keys:[K(0,RI),K(14,RG),K(36,RG),K(42,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4}),'in'),K(48,R8),K(56,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-46}),'in'),K(84,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-46})),K(104,RI)],cues:[{t:14,col:'w'}],hits:[42,56],trails:[[39,44,'w'],[52,58,'w']]});
+mv({f:'red',id:'r_thrust',n:'突き',bg:'red',len:110,cap:'剣先を引いて赤く光る。まっすぐ一突き。重い。',why:'ぬしの「解錠」の突きと同じ動き。ただし鍵は回さない。この世界線では、門を開ける必要がないから。',
+ keys:[K(0,RI),K(18,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(32,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(46,RTH,'in'),K(70,RTH),K(104,RI)],cues:[{t:18,col:'r'}],hits:[46],hitCol:'r',trails:[[43,48,'r']]});
+mv({f:'red',id:'r_combo4',n:'四連撃',bg:'red',len:150,cap:'白く光ったら四連。打ち下ろし、すくい上げ、打ち下ろし、最後の突きだけ赤い光。',why:'型を四つつなげても、一つも崩れない。剣を極めた者の正確さ。',
+ keys:[K(0,RI),K(12,R8),K(28,R8),K(40,RCUT,'in'),K(46,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4})),K(52,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9}),'in'),K(58,R8),K(64,RCUT,'in'),K(70,{ua:1.2,fa:3.0,sw:3.14,x:-30}),K(78,RTH,'in'),K(100,RTH),K(140,RI)],
+ cues:[{t:12,col:'w'},{t:50,col:'r'}],hits:[40,52,64,78],trails:[[37,42,'w'],[49,54,'w'],[61,66,'w'],[75,80,'r']]});
+mv({f:'red',id:'r_seal',n:'派生の立ち絵：ひびのない封印',bg:'red',len:120,noHero:true,keys:[K(0,{}),K(120,{})],
+ cap:'胸に、門のぬしと同じ金の封印。ただし、ひびがない。中には赤。',why:'同じ人の、のまれなかった姿。ぬしの封印のひびの奥に見えた赤は、ここから来ている。',fx:(B,J,t)=>{if((t%60)<30)glow(B,Math.round(J.sc[0]),Math.round(J.sc[1]+5*J.k),3,'#ffe080')}});
+
+/* 赤い門のぬし：二つの世界線が重なった姿。門のぬしの技を受けつぐ */
+const FW=(id,src,extra)=>{const m=MV.find(x=>x.id===src);const o=Object.assign({},m,{f:'fallen',id,bg:'hole'},extra||{});const post0=o.post;o.post=(B,J,t,S)=>{if(post0)post0(B,J,t,S);water(B,t)};return mv(o)};
+FW('f_back','l2_back',{n:'背中の触手：目の順に',cap:'背中の触手の先の目が、白く光った順に来る。ぬしと同じ技。',why:'世界線が重なり、ぬしの体の技が赤い騎士の体に出てきた。'});
+FW('f_arm','l2_arm',{n:'腕の触手',cap:'左腕だった触手がしなる。白く光ったら、のびてくる。ときどき赤い光。',why:'暗い門のぬしと同じ腕。のまれた世界線の腕が、こちらの世界線の騎士についた。'});
+FW('f_sa','l2_tri',{n:'剣と触手の三連',cap:'白く光ったら三連。打ち下ろし、すくい上げ、最後に左腕の触手。',why:'剣は赤い騎士、触手はぬし。一つの攻撃に二つの世界線が混ざる。'});
+FW('f_reach','l2_ext',{n:'伸びる刃',cap:'銀の刃の先から、くらやみがのびる。赤なら本物、紫の輪ならふり。',why:'刃は銀のまま（のまれていない）。のびる部分だけが、くらやみ。'});
+FW('f_maw','l2_maw',{n:'胸の口',cap:'ひびの入った封印が扉のように開いて赤く光る。かみつく。当たると回復される。',why:'ひびのなかった封印が、ここで割れる。のまれなかった世界線の最後の守りが開く。'});
+mv({f:'fallen',id:'f_shift',n:'ずれた斬撃',bg:'hole',len:130,cap:'白く光ると、のまれる前の赤い騎士の影が、半歩先に斬る。本物はその影をなぞって来る。見るのは影ではなく光。',why:'二つの世界線が重なっている。のまれなかった方の動きが、一瞬だけ先に見える。',
+ keys:[K(0,FI),K(14,R8),K(30,R8),K(42,RCUT,'in'),K(70,RCUT),K(120,FI)],cues:[{t:14,col:'w'}],hits:[42],trails:[[39,44,'w']],pp:(P,t)=>glitch(P,t),
+ pre:(B,t,S,P)=>{if(t>=20&&t<44){const G=new Buf(CW,CH);const P2=poseAt0(MV.find(m=>m.id==='f_shift'),Math.min(t+8,42),Object.assign({},PDEF,SPEC.red.pose));knight(G,EXX-4,FL,SPEC.red,P2,t);for(let i=0;i<G.c.length;i++){const x=i%CW,y=i/CW|0;if(G.c[i]&&(x+y+t)%3===0)B.set(x,y,mix(G.c[i],'#1a1428',.35),8)}}},post:(B,J,t)=>water(B,t)});
+mv({f:'fallen',id:'f_kneel',n:'派生の立ち絵：剣を支えに',bg:'hole',len:120,noHero:true,keys:sway({kn:1,lean:.35,ua:2.3,fa:1.4,sw:1.57,hd:-.3},{kn:1,lean:.4,ua:2.3,fa:1.4,sw:1.57,hd:-.35},120,2),
+ cap:'片膝をつき、銀の剣を床に突いて体を支える。立ち上がるたびに、くらやみが増える。',why:'本気の赤い騎士の「立ったままの最期」の、のまれた側の続き。',post:(B,J,t)=>water(B,t)});
+mv({f:'fallen2',id:'f2_reflect',n:'映り姿の居合',bg:'hole',len:130,cap:'足元の水面の、赤い騎士の映り姿の目が白く光る。いつもの間で、水の中から居合が来る。',why:'映り姿も、もう味方ではない。救いはどこにもない。',
+ keys:[K(0,F2I),K(130,F2I)],cues:[{t:14,col:'w',at:J=>[EXX-3,FL+12]}],hits:[42],
+ post:(B,J,t)=>{water(B,t);if(t<42||t>=60)reflection(B,t,'red',{},EXX);else{reflection(B,t,'red2',{ua:3.1,fa:3.0,sw:.15,sheath:0,lean:.2,cr:5},EXX-50)}if(t>=42&&t<50)for(let x=0;x<CW;x++)if((x+t)%9<6)B.set(x,FL+6,'#ffffff',4)}});
+mv({f:'fallen2',id:'f2_look',n:'派生の立ち絵：水面を見下ろす',bg:'hole',len:120,noHero:true,keys:sway({hd:-.5,lean:.2,cr:2},{hd:-.55,lean:.22,cr:2.5},120,2),
+ cap:'門になった騎士が、水面に映る自分を見下ろしている。',why:'見下ろしているのか、気づいてもいないのか。それはわからない。',post:(B,J,t)=>{water(B,t);reflection(B,t,'red',{hd:.3},EXX)}});

@@ -46,8 +46,9 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   B.poly([R([-5*k,-.5*k]),R([1*k,-.5*k]),R([1*k,.8*k]),R([-5*k,.8*k])],OUT,null,null);B.poly([R([-3*k,.8*k]),R([-2*k,.8*k]),R([-2*k,3.5*k]),R([-3*k,3.5*k])],OUT,null,null);
   for(let i=0;i<2;i++)B.set(...R([(-4+i)*k,0]),p.eye,2)}
  if(hm.type==='bucket'||hm.type==='bhorn'){
-  if(hm.type==='bhorn')for(const sd of[-1,1]){const pts=[];for(let i=0;i<=10;i++){const t=i/10,a=t*Math.PI*.95;pts.push(R([sd*(3+Math.sin(a)*4.5)*k,(-5-(1-Math.cos(a))*4.2)*k]))}for(let i=0;i<10;i++)B.thick(pts[i],pts[i+1],(1.5-i*.08)*k,hm.horn,hm.hornHi,hm.hornLo);if(hm.rings)for(const i of[2,5]){B.set(...pts[i],hm.rings,2);B.set(pts[i][0]+1,pts[i][1],hm.rings,2)}
+  if(hm.type==='bhorn')for(const sd of (hm.sides||[-1,1])){const pts=[];for(let i=0;i<=10;i++){const t=i/10,a=t*Math.PI*.95;pts.push(R([sd*(3+Math.sin(a)*4.5)*k,(-5-(1-Math.cos(a))*4.2)*k]))}for(let i=0;i<10;i++)B.thick(pts[i],pts[i+1],(1.5-i*.08)*k,hm.horn,hm.hornHi,hm.hornLo);if(hm.rings)for(const i of[2,5]){B.set(...pts[i],hm.rings,2);B.set(pts[i][0]+1,pts[i][1],hm.rings,2)}
    const lp=R([sd*7.3*k,-8.5*k]);B.line(lp[0],lp[1],lp[0],lp[1]+2*k,'#5e566e');B.disc(lp[0],lp[1]+3*k,1.1*k,'#8a6a2a','#b8902a','#4a3414')}
+  if(hm.plume){const w=Math.sin(T*.08)*1.2;for(let i=0;i<6;i++){const t=i/5;B.disc(...R([(.5+t*8)*k,(-5.4-1.2+t*t*5+w*t)*k]),(1.5-t*.6)*k,hm.plume,hm.plumeHi,hm.plumeLo)}}
   /* 筒形の兜：門番の兜は、ぬしの兜をまねた形（主従の印） */
   B.poly([R([-4.3*k,4.2*k]),R([4.3*k,4.2*k]),R([4.3*k,-4.2*k]),R([3.6*k,-4.8*k]),R([-3.6*k,-4.8*k]),R([-4.3*k,-4.2*k])],p.arm,p.armHi,p.armLo);
   const bd=hm.band||[p.trim,p.trimHi];for(let x=-4;x<=4;x+=.5)B.set(...R([x*k,-3.4*k]),bd[0],2);for(let x=-3.5;x<=3.5;x+=1.4)B.set(...R([x*k,-3.4*k]),bd[1],2);
@@ -66,7 +67,7 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
  if(hm.extra)hm.extra(B,R,k,T,P)}
 function drawArm(B,S,sh,el,hd,front){const k=S.k,p=S.pal;const U=p.under||p.armLo,UH=p.underHi||p.arm,UL=p.underLo||OUT;B.thick(sh,el,1.7*k,front?U:UL,front?UH:U,UL);B.thick([lerp(el[0],hd[0],.1),lerp(el[1],hd[1],.1)],[lerp(el[0],hd[0],.75),lerp(el[1],hd[1],.75)],1.9*k,front?p.arm:p.armLo,front?p.armHi:p.arm,p.armLo);B.disc(hd[0],hd[1],1.9*k,p.glove||p.armLo,p.arm,OUT);B.poly([[sh[0]-4*k,sh[1]+2*k],[sh[0]-3.5*k,sh[1]-2.5*k],[sh[0],sh[1]-3.5*k],[sh[0]+3.5*k,sh[1]-2.5*k],[sh[0]+4*k,sh[1]+2*k],[sh[0],sh[1]+3*k]],front?p.arm:p.armLo,front?p.armHi:p.arm,p.armLo)}
 function drawBlade(B,S,hd,ang,W,front){const k=S.k,len=W.len*k,wd=(W.w||1.4)*k,u=dir(ang,1),n=[-u[1],u[0]],P=(a,b)=>[hd[0]+u[0]*a+n[0]*b,hd[1]+u[1]*a+n[1]*b];
- B.thick(P(-3*k,0),P(-1*k,0),1.1*k,W.grip||'#3a2420',W.grip||'#5a3a30',OUT);B.disc(...P(-3.6*k,0),1.3*k,W.pom||W.guard,W.guard,OUT);
+ B.thick(P(-3*k,0),P(-1*k,0),1.1*k,W.grip||'#3a2420',W.grip||'#5a3a30',OUT);B.disc(...P(-3.6*k,0),1.3*k,W.pom||W.guard,W.guard,OUT);if(W.ring){B.disc(...P(-5.6*k,0),1.9*k,W.ring,W.ringHi||W.ring,OUT);B.disc(...P(-5.6*k,0),.8*k,OUT,null,null)}
  if(W.type==='key'){
   /* 鍵の大剣：門を閉じる鍵そのもの。歯の形が刃先に残る */
   B.poly([P(1*k,-wd*1.4),P(len*.86,-wd*1.1),P(len,0),P(len*.86,wd*1.1),P(1*k,wd*1.4)],W.col,W.hi,W.lo);

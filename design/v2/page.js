@@ -38,8 +38,11 @@ function heroSec(){const s=el('section','hero');s.id='hero';s.appendChild(el('di
  const g=el('div','hgrid');HVARS.forEach(v=>{const c=el('figure','card hv');const S=heroVar(v.o||{});const cv=standCanvas2(S,60,56,34);c.appendChild(cv);c.appendChild(el('figcaption','',`<div class="row"><b>${v.n}</b><span class="tag ex">${v.how}</span></div><p class="why">${v.why}</p>`));g.appendChild(c)});s.appendChild(g);return s}
 function standCanvas2(S,w,h,ox){const cv=el('canvas','stand');cv.width=w;cv.height=h;const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);knight(B,ox,h-4,S,{V:S.V},tt);B.outline();const F=new Buf(w,h);F.blit(B,true);this.ctx.clearRect(0,0,w,h);F.toCanvas(this.ctx)}};ANIM.push(a);a.draw();return cv}
 function ladderSec(){const s=el('section','lad');s.id='ladder';
- s.appendChild(el('h2','','門の系統：禍々しさの階段'));s.appendChild(el('p','lead','同じ土台（筒形の兜、紺と金の前垂れ、「閉じた門」の紋章）に、段ごとに部品を足す。そして一本の鎖が、全員をつなぐ。'));
+ s.appendChild(el('h2','','禍々しさの階段'));s.appendChild(el('p','lead','同じ土台（筒形の兜、前垂れ、「閉じた門」の紋章）に、段ごとに部品を足す。門の系統は一本の鎖が、赤の系統は「ないはずのもの」が、全員をつなぐ。'));s.appendChild(el('h4','','門の系統'));
  s.appendChild(ladder(['gate','dgate','lord','lord2'],['手首のかせと短い鎖','鎖が長く黒く床を引きずる　＋兜の目3つ ＋裾の触手','鎖が門までつながる　＋門の角 ＋鍵 ＋封印 ＋影の目 ＋溜まり　約4頭身','鎖がちぎれる　＋開いた胸 ＋一つ目 ＋背の触手 ＋腕の触手']));
+
+ s.appendChild(el('h4','','赤の系統'));s.appendChild(ladder(['red','red2','fallen','fallen2'],['ぬしと同じ兜・封印・前垂れ　ただし角なし、ひびなし、鎖なし','−マント　ただ一つ「捨てる」段','＋片方の角 ＋割れた封印 ＋触手のマント ＋背と腕の触手','＋門のアーチ ＋核 ＋両方の角　鎧は殻だけ']));
+ s.appendChild(el('p','note','<b>二つの世界線</b>：赤い騎士は、のまれなかった世界線の門のぬし。だから兜・封印・前垂れの形はぬしと同じで、違うのは「角・ひび・鎖があるかないか」だけ。赤い門のぬしで、ないはずのものが一つずつ生えてくる。'));
  s.appendChild(el('p','note','<b>鎖の一本線</b>：かせ → 長く黒い鎖 → 門までつながる鎖 → ちぎれた鎖。どの段にいても、鎖を見れば「門に仕える者」の系統だとわかる。<br><b>黒い門番 ＜ 門のぬし</b>：黒い門番は人の形のまま。くらやみの元は、ぬしの足元の溜まり。'));
  return s}
 window.addEventListener('DOMContentLoaded',build);

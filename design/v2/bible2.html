@@ -458,7 +458,7 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  /* 共通：合図の光と、当たった瞬間の火花 */
  for(const c of (M.cues||[])){const d=tt-c.t;if(d>=0&&d<18){const tp=c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF;if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
- for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])trail(B,S,M,tt,ox,oy,4,tr[2]||'w',tr[3]);
+ for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])(tr[4]==='line'?lineTrail:tr[4]==='arc'?arcTrail:trail)(B,S,M,tt,ox,oy,tr[4]?8:4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);
  B.outline();if(S.aura&&!(M.auraOff&&M.auraOff(tt)))aura(B,S.aura,tt);return B}
 
@@ -468,6 +468,13 @@ function cueStar(B,x,y,d,col){const R=[4,7,9,10,10,9,9,8,7,6,5,5,4,3,3,2,2,1][d]
  for(let i=-R;i<=R;i++){const a=Math.abs(i)<R*.45?c2:c1;B.set(x+i,y,a,4);B.set(x,y+i,a,4);if(Math.abs(i)<R*.3){B.set(x+i,y-1,c2,4);B.set(x+i,y+1,c2,4);B.set(x-1,y+i,c2,4);B.set(x+1,y+i,c2,4)}}
  const dd=Math.round(R*.5);for(let i=-dd;i<=dd;i++){B.set(x+i,y+i,c1,4);B.set(x+i,y-i,c1,4)}
  B.set(x,y,'#ffffff',4);B.set(x+1,y,'#ffffff',4);B.set(x,y+1,'#ffffff',4);B.set(x-1,y,'#ffffff',4);B.set(x,y-1,'#ffffff',4)}
+
+/* 剣の軌跡の二つの形。弧＝振り（円を描く）、直線＝突き・一文字（まっすぐ） */
+function tipsOf(S,M,t,ox,oy,n,which){const base=Object.assign({},PDEF,S.pose),out=[];for(let i=n;i>=0;i--){const P=Object.assign({},base,poseAt0(M,t-i,base));if(M.pp)M.pp(P,t-i);const tp=tipOf(S,P,ox,oy,which);if(tp)out.push(tp)}return out}
+function arcTrail(B,S,M,t,ox,oy,n,col,which){/* 弧：太い三日月。外側ほど明るい */const c=FXC[col]||FXC.w;const base=Object.assign({},PDEF,S.pose);let prev=null;for(let i=n;i>=0;i--){const P=Object.assign({},base,poseAt0(M,t-i,base));const tp=tipOf(S,P,ox,oy,which);if(!tp)continue;const J=joints(ox,oy,S,P),hd=which===2?J.hdB:J.hdF;
+  if(prev){for(const s of[.55,.65,.75,.85,.95,1.05]){B.line(lerp(prev[1][0],prev[0][0],s),lerp(prev[1][1],prev[0][1],s),lerp(hd[0],tp[0],s),lerp(hd[1],tp[1],s),s>.9?c[1]:s>.7?c[0]:mix(c[0],'#000000',.4),4)}}prev=[tp,hd]}}
+function lineTrail(B,S,M,t,ox,oy,n,col,which){/* 直線：切っ先の通り道に細い一本線と、平行な速さの線 */const c=FXC[col]||FXC.w;const T=tipsOf(S,M,t,ox,oy,n,which);if(T.length<2)return;const a=T[0],b=T[T.length-1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+  B.line(a[0],a[1],b[0],b[1],c[1],4);B.line(a[0]+nx,a[1]+ny,b[0]+nx,b[1]+ny,c[0],4);for(const o of[-3,3,5]){const s=.3+Math.abs(o)*.06;B.line(lerp(a[0],b[0],s)+nx*o,lerp(a[1],b[1],s)+ny*o,b[0]+nx*o-dx*.1,b[1]+ny*o-dy*.1,c[0],4)}}
 
 /* ===== 全モーション =====
    f:だれ  n:名前  cap:読み方（プレイヤーは何を見ればいいか）  why:この動きにした理由
@@ -851,6 +858,28 @@ mv({f:'red2',id:'r2_seefeint',n:'フェイントを見抜かれる（本気）',
  cues:[{t:16,col:'p',at:J=>add(J.head,[-3,0])},{t:34,col:'r',at:J=>add(J.head,[-3,0])}],hits:[62],hitCol:'r',
  fx:(B,J,t)=>{if(t>=62&&t<70){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-62)*.6)B.set(x,FL-14,'#ffffff',4)}}});
 
+/* ===== 本気の赤い騎士：居合以外の技。弧の技と直線の技でメリハリをつける ===== */
+const R2D={ua:1.95,fa:2.7,sw:3.5,ua2:1.5,fa2:2.3,sheath:0,cr:3,lean:.15};
+mv({f:'red2',id:'r2_moon',n:'満月（弧）',bg:'red',len:140,cap:'鞘から抜いて頭上へ。白く光ったら、剣先が大きな円を描いて振り下ろされる。軌跡は太い三日月。',why:'居合の「線」に対して、こちらは「円」。同じ白い光でも、来る形がまるで違う。',
+ keys:[K(0,R2S),K(10,R2D),K(14,{ua:-2.6,fa:-2.2,sw:.2,sheath:0,cr:2,lean:-.1}),K(42,{ua:3.0,fa:2.6,sw:2.1,x:-46,lean:.3,ff:-13,fb:9,sheath:0},'in'),K(70,{ua:3.0,fa:2.6,sw:2.1,x:-46,lean:.3,ff:-13,fb:9,sheath:0}),K(100,R2D),K(130,R2S)],
+ cues:[{t:14,col:'w'}],hits:[42],trails:[[34,46,'w',0,'arc']]});
+mv({f:'red2',id:'r2_tsubame',n:'つばめ返し（弧が二つ）',bg:'red',len:150,cap:'白く光ったら、上からの円弧、すぐに下からの円弧。燕が宙で向きを変えるように、二つの弧が逆向きに来る。',why:'円の技を二つ、向きを逆にしてつなぐ。二撃目の光は、一撃目の終わりに出る。',
+ keys:[K(0,R2S),K(10,R2D),K(14,R8),K(42,Object.assign({},RCUT,{x:-46}),'in'),K(46,Object.assign({},RCUT,{x:-46,ua:2.4,fa:2.0,sw:1.6})),K(56,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2}),'in'),K(84,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2})),K(140,R2S)],
+ cues:[{t:14,col:'w'},{t:28,col:'w'}],hits:[42,56],trails:[[36,44,'w',0,'arc'],[49,58,'w',0,'arc']]});
+mv({f:'red2',id:'r2_ichi',n:'一文字（直線）',bg:'red',len:130,cap:'剣を水平に構えて白く光る。体ごとまっすぐ滑りこみ、刃は一本の線を引く。軌跡は細い一本線。',why:'弧ではなく、まっすぐ。返し斬りと同じ「線」の仲間。剣の重さではなく、速さで斬る。',
+ keys:[K(0,R2S),K(10,{ua:1.4,fa:2.9,sw:3.14,ua2:1.3,fa2:2.6,sheath:0,cr:4,lean:.15,x:6}),K(36,{ua:1.4,fa:2.9,sw:3.14,ua2:1.3,fa2:2.6,sheath:0,cr:4,lean:.15,x:6}),K(42,{ua:2.0,fa:3.1,sw:3.14,ua2:1.6,fa2:2.8,sheath:0,cr:4.5,lean:.3,x:-50,ff:-14,fb:10},'in'),K(76,{ua:2.0,fa:3.1,sw:3.14,ua2:1.6,fa2:2.8,sheath:0,cr:4.5,lean:.3,x:-50,ff:-14,fb:10}),K(124,R2S)],
+ cues:[{t:14,col:'w'}],hits:[42],trails:[[38,44,'w',0,'line']]});
+mv({f:'red2',id:'r2_pierce',n:'貫き（直線・重い）',bg:'red',len:130,cap:'剣先をこちらに向けたまま、赤く光る。一直線に、遠くから貫いてくる。重い。',why:'直線の技の中でいちばん重いもの。剣先が一点しか動かないので、軌跡は短い一本の線。',
+ keys:[K(0,R2S),K(10,{ua:1.2,fa:3.0,sw:3.14,sheath:0,x:8,cr:4}),K(38,{ua:1.2,fa:3.0,sw:3.14,sheath:0,x:10,cr:4.5,lean:-.1}),K(42,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-56,lean:.3,ff:-15,fb:10,sheath:0},'in'),K(80,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-56,lean:.3,ff:-15,fb:10,sheath:0}),K(124,R2S)],
+ cues:[{t:14,col:'r'}],hits:[42],hitCol:'r',trails:[[38,44,'r',0,'line']]});
+/* 打ち合い：溜めは大きな弧、詰めはまっすぐな線 */
+const RLY=(f,id,n,bg,seq,cap,why,extra)=>{const ks=[K(0,f==='red2'?R2S:RI)],cues=[],hits=[],trs=[];let t=10;
+ seq.forEach((g,i)=>{const arc=g==='tame';cues.push({t,col:'g'});const wind=arc?{ua:-2.6,fa:-2.2,sw:.2,cr:2,lean:-.1,sheath:0}:{ua:1.2,fa:3.0,sw:3.14,x:2,cr:3,sheath:0};const gap=arc?40:20;const hit=t+gap;
+  ks.push(K(t,wind));ks.push(K(hit-2,wind));ks.push(K(hit,arc?{ua:3.0,fa:2.6,sw:2.1,x:-30,lean:.3,ff:-12,fb:9,sheath:0}:{ua:3.1,fa:3.12,sw:3.14,x:-30,lean:.25,ff:-12,fb:9,sheath:0},'in'));hits.push(hit);trs.push([hit-(arc?8:4),hit+2,'g',0,arc?'arc':'line']);t=hit+10});
+ ks.push(K(t+20,f==='red2'?R2S:RI));return mv(Object.assign({f,id,n,bg,len:t+30,cap,why,keys:ks,cues,hits,hitCol:'g',trails:trs},extra||{}))};
+RLY('red2','r2_rallyx','打ち合い：溜めは弧、詰めは線','red',['tume','tame','tume','tume','tame'],'金に光ったら打ち合い。長く溜めた合は、頭上から大きな弧。間の短い「詰め」の合は、まっすぐな突き。軌跡の形で、次の合の間がわかる。','溜めと詰めで、剣の通る道まで変わる。耳（間）と目（軌跡）の両方で、打ち合いのリズムを読ませる。');
+RLY('red','r_rallyx','打ち合い：溜めは弧、詰めは線','red',['tume','tame','tume'],'金に光ったら打ち合い。溜めの合は大きな弧、詰めの合はまっすぐな突き。','本気の五合の前に、三合で同じ決まりを見せておく。');
+
 /* ===== 専用ステージ（ゲームと同じ 240×135） ===== */
 const SW=240,SH=135,SFL=106;
 function rect(B,x,y,w,h,c,tag=6){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)B.set(xx,yy,typeof c==='function'?c(xx,yy):c,tag)}
@@ -966,11 +995,11 @@ const FORMS=[
 const MOVES_OF={gate:['g_idle','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_chain','dg_beat','dg_down2'],
  lord:['l_enter','l_idle','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_rally','l_pull','l_kneel'],
  lord2:['l2_open','l2_idle','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_rally','l2_whip','l2_pool','l2_doors','l2_gate','l2_down'],
- red:['r_idle','r_seal','r_kamae','r_stance','r_two','r_swap','r_three','r_delay','r_thrust','r_feint','r_combo4','r_parry','r_counter','r_seefeint','r_push','r_zanshin','r_zanpunish','r_rage'],
- red2:['r2_idle','r2_iai','r2_iai2','r2_hold','r2_thrust','r2_double','r2_seefeint','r2_rally','r2_last'],
+ red:['r_idle','r_seal','r_kamae','r_stance','r_two','r_swap','r_three','r_delay','r_thrust','r_feint','r_combo4','r_parry','r_counter','r_seefeint','r_push','r_rallyx','r_zanshin','r_zanpunish','r_rage'],
+ red2:['r2_idle','r2_iai','r2_iai2','r2_hold','r2_thrust','r2_moon','r2_tsubame','r2_ichi','r2_pierce','r2_double','r2_seefeint','r2_rally','r2_rallyx','r2_last'],
  fallen:['f_rise','f_idle','f_kneel','f_cutten','f_back','f_arm','f_sa','f_reach','f_maw','f_dark','f_double','f_shift','f_twin','f_iai','f_cage','f_rally','f_swallow'],
  fallen2:['f2_idle','f2_look','f2_ring','f2_four','f2_core','f2_reflect','f2_close','f2_pulse','f2_rally','f2_end']};
-const EXMV={g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い',r_two:'二連撃',r_swap:'逆の二連撃',r_three:'三段突き',r_delay:'遅らせ突き',r_thrust:'突き',r_feint:'フェイント',r_combo4:'四連撃',r_push:'打ち合い',r2_double:'二重のフェイント',r2_rally:'打ち合い',f_cutten:'剣と触手',f_back:'背中の触手',f_arm:'腕の触手',f_sa:'剣と触手の三連',f_reach:'伸びる刃',f_maw:'胸の口',f_dark:'ささやき',f_double:'二重のフェイント',f_rally:'打ち合い',f2_ring:'背中の触手',f2_four:'四連撃',f2_core:'胸の口',f2_rally:'打ち合い'};
+const EXMV={g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い',r_two:'二連撃',r_swap:'逆の二連撃',r_three:'三段突き',r_delay:'遅らせ突き',r_thrust:'突き',r_feint:'フェイント',r_combo4:'四連撃',r_push:'打ち合い',r2_double:'二重のフェイント',r2_rally:'打ち合い',f_cutten:'剣と触手',f_back:'背中の触手',f_arm:'腕の触手',f_sa:'剣と触手の三連',f_reach:'伸びる刃',f_maw:'胸の口',f_dark:'ささやき',f_double:'二重のフェイント',f_rally:'打ち合い',f2_ring:'背中の触手',f2_four:'四連撃',f2_core:'胸の口',f2_rally:'打ち合い',r2_rallyx:'打ち合い',r_rallyx:'打ち合い'};
 const KSTAND=['r_kamae','l_plant','l_seal','l2_threat','dg_state','r_seal','f_kneel','f2_look'],KSHOW=['g_enter','g_kneel','dg_turn','dg_down2','l_enter','l_kneel','l2_open','l2_down','r_rage','r2_last','f_rise','f_swallow','f2_end'];
 const KINDOF=id=>/_idle$/.test(id)?'main':KSTAND.includes(id)?'stand':KSHOW.includes(id)?'show':'atk';
 

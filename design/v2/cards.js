@@ -18,7 +18,7 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  /* 共通：合図の光と、当たった瞬間の火花 */
  for(const c of (M.cues||[])){const d=tt-c.t;if(d>=0&&d<18){const tp=c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF;if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
- for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])trail(B,S,M,tt,ox,oy,4,tr[2]||'w',tr[3]);
+ for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])(tr[4]==='line'?lineTrail:tr[4]==='arc'?arcTrail:trail)(B,S,M,tt,ox,oy,tr[4]?8:4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);
  B.outline();if(S.aura&&!(M.auraOff&&M.auraOff(tt)))aura(B,S.aura,tt);return B}
 
@@ -28,3 +28,10 @@ function cueStar(B,x,y,d,col){const R=[4,7,9,10,10,9,9,8,7,6,5,5,4,3,3,2,2,1][d]
  for(let i=-R;i<=R;i++){const a=Math.abs(i)<R*.45?c2:c1;B.set(x+i,y,a,4);B.set(x,y+i,a,4);if(Math.abs(i)<R*.3){B.set(x+i,y-1,c2,4);B.set(x+i,y+1,c2,4);B.set(x-1,y+i,c2,4);B.set(x+1,y+i,c2,4)}}
  const dd=Math.round(R*.5);for(let i=-dd;i<=dd;i++){B.set(x+i,y+i,c1,4);B.set(x+i,y-i,c1,4)}
  B.set(x,y,'#ffffff',4);B.set(x+1,y,'#ffffff',4);B.set(x,y+1,'#ffffff',4);B.set(x-1,y,'#ffffff',4);B.set(x,y-1,'#ffffff',4)}
+
+/* 剣の軌跡の二つの形。弧＝振り（円を描く）、直線＝突き・一文字（まっすぐ） */
+function tipsOf(S,M,t,ox,oy,n,which){const base=Object.assign({},PDEF,S.pose),out=[];for(let i=n;i>=0;i--){const P=Object.assign({},base,poseAt0(M,t-i,base));if(M.pp)M.pp(P,t-i);const tp=tipOf(S,P,ox,oy,which);if(tp)out.push(tp)}return out}
+function arcTrail(B,S,M,t,ox,oy,n,col,which){/* 弧：太い三日月。外側ほど明るい */const c=FXC[col]||FXC.w;const base=Object.assign({},PDEF,S.pose);let prev=null;for(let i=n;i>=0;i--){const P=Object.assign({},base,poseAt0(M,t-i,base));const tp=tipOf(S,P,ox,oy,which);if(!tp)continue;const J=joints(ox,oy,S,P),hd=which===2?J.hdB:J.hdF;
+  if(prev){for(const s of[.55,.65,.75,.85,.95,1.05]){B.line(lerp(prev[1][0],prev[0][0],s),lerp(prev[1][1],prev[0][1],s),lerp(hd[0],tp[0],s),lerp(hd[1],tp[1],s),s>.9?c[1]:s>.7?c[0]:mix(c[0],'#000000',.4),4)}}prev=[tp,hd]}}
+function lineTrail(B,S,M,t,ox,oy,n,col,which){/* 直線：切っ先の通り道に細い一本線と、平行な速さの線 */const c=FXC[col]||FXC.w;const T=tipsOf(S,M,t,ox,oy,n,which);if(T.length<2)return;const a=T[0],b=T[T.length-1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+  B.line(a[0],a[1],b[0],b[1],c[1],4);B.line(a[0]+nx,a[1]+ny,b[0]+nx,b[1]+ny,c[0],4);for(const o of[-3,3,5]){const s=.3+Math.abs(o)*.06;B.line(lerp(a[0],b[0],s)+nx*o,lerp(a[1],b[1],s)+ny*o,b[0]+nx*o-dx*.1,b[1]+ny*o-dy*.1,c[0],4)}}

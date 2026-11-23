@@ -379,3 +379,25 @@ mv({f:'red2',id:'r2_seefeint',n:'フェイントを見抜かれる（本気）',
  keys:[K(0,R2S),K(16,Object.assign({},R2S,{cr:5.2,lean:.22})),K(22,R2S),K(61,R2S),K(62,Object.assign({},IAI,{}),'snap'),K(100,IAI),K(101,R2S,'snap'),K(150,R2S)],
  cues:[{t:16,col:'p',at:J=>add(J.head,[-3,0])},{t:34,col:'r',at:J=>add(J.head,[-3,0])}],hits:[62],hitCol:'r',
  fx:(B,J,t)=>{if(t>=62&&t<70){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-62)*.6)B.set(x,FL-14,'#ffffff',4)}}});
+
+/* ===== 本気の赤い騎士：居合以外の技。弧の技と直線の技でメリハリをつける ===== */
+const R2D={ua:1.95,fa:2.7,sw:3.5,ua2:1.5,fa2:2.3,sheath:0,cr:3,lean:.15};
+mv({f:'red2',id:'r2_moon',n:'満月（弧）',bg:'red',len:140,cap:'鞘から抜いて頭上へ。白く光ったら、剣先が大きな円を描いて振り下ろされる。軌跡は太い三日月。',why:'居合の「線」に対して、こちらは「円」。同じ白い光でも、来る形がまるで違う。',
+ keys:[K(0,R2S),K(10,R2D),K(14,{ua:-2.6,fa:-2.2,sw:.2,sheath:0,cr:2,lean:-.1}),K(42,{ua:3.0,fa:2.6,sw:2.1,x:-46,lean:.3,ff:-13,fb:9,sheath:0},'in'),K(70,{ua:3.0,fa:2.6,sw:2.1,x:-46,lean:.3,ff:-13,fb:9,sheath:0}),K(100,R2D),K(130,R2S)],
+ cues:[{t:14,col:'w'}],hits:[42],trails:[[34,46,'w',0,'arc']]});
+mv({f:'red2',id:'r2_tsubame',n:'つばめ返し（弧が二つ）',bg:'red',len:150,cap:'白く光ったら、上からの円弧、すぐに下からの円弧。燕が宙で向きを変えるように、二つの弧が逆向きに来る。',why:'円の技を二つ、向きを逆にしてつなぐ。二撃目の光は、一撃目の終わりに出る。',
+ keys:[K(0,R2S),K(10,R2D),K(14,R8),K(42,Object.assign({},RCUT,{x:-46}),'in'),K(46,Object.assign({},RCUT,{x:-46,ua:2.4,fa:2.0,sw:1.6})),K(56,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2}),'in'),K(84,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2})),K(140,R2S)],
+ cues:[{t:14,col:'w'},{t:28,col:'w'}],hits:[42,56],trails:[[36,44,'w',0,'arc'],[49,58,'w',0,'arc']]});
+mv({f:'red2',id:'r2_ichi',n:'一文字（直線）',bg:'red',len:130,cap:'剣を水平に構えて白く光る。体ごとまっすぐ滑りこみ、刃は一本の線を引く。軌跡は細い一本線。',why:'弧ではなく、まっすぐ。返し斬りと同じ「線」の仲間。剣の重さではなく、速さで斬る。',
+ keys:[K(0,R2S),K(10,{ua:1.4,fa:2.9,sw:3.14,ua2:1.3,fa2:2.6,sheath:0,cr:4,lean:.15,x:6}),K(36,{ua:1.4,fa:2.9,sw:3.14,ua2:1.3,fa2:2.6,sheath:0,cr:4,lean:.15,x:6}),K(42,{ua:2.0,fa:3.1,sw:3.14,ua2:1.6,fa2:2.8,sheath:0,cr:4.5,lean:.3,x:-50,ff:-14,fb:10},'in'),K(76,{ua:2.0,fa:3.1,sw:3.14,ua2:1.6,fa2:2.8,sheath:0,cr:4.5,lean:.3,x:-50,ff:-14,fb:10}),K(124,R2S)],
+ cues:[{t:14,col:'w'}],hits:[42],trails:[[38,44,'w',0,'line']]});
+mv({f:'red2',id:'r2_pierce',n:'貫き（直線・重い）',bg:'red',len:130,cap:'剣先をこちらに向けたまま、赤く光る。一直線に、遠くから貫いてくる。重い。',why:'直線の技の中でいちばん重いもの。剣先が一点しか動かないので、軌跡は短い一本の線。',
+ keys:[K(0,R2S),K(10,{ua:1.2,fa:3.0,sw:3.14,sheath:0,x:8,cr:4}),K(38,{ua:1.2,fa:3.0,sw:3.14,sheath:0,x:10,cr:4.5,lean:-.1}),K(42,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-56,lean:.3,ff:-15,fb:10,sheath:0},'in'),K(80,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-56,lean:.3,ff:-15,fb:10,sheath:0}),K(124,R2S)],
+ cues:[{t:14,col:'r'}],hits:[42],hitCol:'r',trails:[[38,44,'r',0,'line']]});
+/* 打ち合い：溜めは大きな弧、詰めはまっすぐな線 */
+const RLY=(f,id,n,bg,seq,cap,why,extra)=>{const ks=[K(0,f==='red2'?R2S:RI)],cues=[],hits=[],trs=[];let t=10;
+ seq.forEach((g,i)=>{const arc=g==='tame';cues.push({t,col:'g'});const wind=arc?{ua:-2.6,fa:-2.2,sw:.2,cr:2,lean:-.1,sheath:0}:{ua:1.2,fa:3.0,sw:3.14,x:2,cr:3,sheath:0};const gap=arc?40:20;const hit=t+gap;
+  ks.push(K(t,wind));ks.push(K(hit-2,wind));ks.push(K(hit,arc?{ua:3.0,fa:2.6,sw:2.1,x:-30,lean:.3,ff:-12,fb:9,sheath:0}:{ua:3.1,fa:3.12,sw:3.14,x:-30,lean:.25,ff:-12,fb:9,sheath:0},'in'));hits.push(hit);trs.push([hit-(arc?8:4),hit+2,'g',0,arc?'arc':'line']);t=hit+10});
+ ks.push(K(t+20,f==='red2'?R2S:RI));return mv(Object.assign({f,id,n,bg,len:t+30,cap,why,keys:ks,cues,hits,hitCol:'g',trails:trs},extra||{}))};
+RLY('red2','r2_rallyx','打ち合い：溜めは弧、詰めは線','red',['tume','tame','tume','tume','tame'],'金に光ったら打ち合い。長く溜めた合は、頭上から大きな弧。間の短い「詰め」の合は、まっすぐな突き。軌跡の形で、次の合の間がわかる。','溜めと詰めで、剣の通る道まで変わる。耳（間）と目（軌跡）の両方で、打ち合いのリズムを読ませる。');
+RLY('red','r_rallyx','打ち合い：溜めは弧、詰めは線','red',['tume','tame','tume'],'金に光ったら打ち合い。溜めの合は大きな弧、詰めの合はまっすぐな突き。','本気の五合の前に、三合で同じ決まりを見せておく。');

@@ -29,10 +29,11 @@ function build(){const root=document.getElementById('book');
   sec.appendChild(el('h3','',`モーション <small>${MOVES_OF[F.key].length}</small>`));const g=el('div','grid');MOVES_OF[F.key].forEach(id=>g.appendChild(moveCard(MV.find(m=>m.id===id))));sec.appendChild(g);
   sec.appendChild(el('h3','','専用ステージ'));const sg=el('div','sgrid');F.stage.forEach(id=>sg.appendChild(stageCard(STAGES.find(s=>s.id===id))));sec.appendChild(sg);
   root.appendChild(sec)});
+ root.appendChild(orderSec());
  const io=new IntersectionObserver(es=>es.forEach(e=>{const a=ANIM.find(a=>a.cv===e.target);if(a)a.vis=e.isIntersecting}),{rootMargin:'100px'});ANIM.forEach(a=>io.observe(a.cv));
  let last=0;const loop=ts=>{requestAnimationFrame(loop);if(ts-last<32)return;const dt=(ts-last)/16.67;last=ts;if(!SPD)return;for(const a of ANIM)if(a.vis&&!a.pause){a.t+=Math.min(4,dt)*SPD;a.draw()}};requestAnimationFrame(loop);
  document.querySelectorAll('#spd button').forEach(b=>b.onclick=()=>{SPD=+b.dataset.s;document.querySelectorAll('#spd button').forEach(x=>x.classList.toggle('on',x===b))});
- document.getElementById('nav').innerHTML='<a href="#hero">主人公</a><a href="#ladder">階段</a>'+FORMS.map((F,i)=>`<a href="#${F.key}">${F.ttl}</a>`).join('')+'<a href="#next">この先</a>'}
+ document.getElementById('nav').innerHTML='<a href="#hero">主人公</a><a href="#ladder">階段</a>'+FORMS.map((F,i)=>`<a href="#${F.key}">${F.ttl}</a>`).join('')+'<a href="#order">強さの順</a><a href="#next">この先</a>'}
 function heroSec(){const s=el('section','hero');s.id='hero';s.appendChild(el('div','fhead','<div class="num">00</div><div><div class="en">THE KNIGHT</div><h2>主人公</h2></div>'));
  s.appendChild(el('p','lead','名実ともに騎士。顔は見せない。だれもが自分を重ねられる。盾は顔の代わりで、キャラクターの中心。最初は何も描かれていない盾に、歩んだ道のりが刻まれていく。'));
  const g=el('div','hgrid');HVARS.forEach(v=>{const c=el('figure','card hv');const S=heroVar(v.o||{});const cv=standCanvas2(S,60,56,34);c.appendChild(cv);c.appendChild(el('figcaption','',`<div class="row"><b>${v.n}</b><span class="tag ex">${v.how}</span></div><p class="why">${v.why}</p>`));g.appendChild(c)});s.appendChild(g);return s}
@@ -45,4 +46,12 @@ function ladderSec(){const s=el('section','lad');s.id='ladder';
  s.appendChild(el('p','note','<b>二つの世界線</b>：赤い騎士は、のまれなかった世界線の門のぬし。だから兜・封印・前垂れの形はぬしと同じで、違うのは「角・ひび・鎖があるかないか」だけ。赤い門のぬしで、ないはずのものが一つずつ生えてくる。'));
  s.appendChild(el('p','note','<b>鎖の一本線</b>：かせ → 長く黒い鎖 → 門までつながる鎖 → ちぎれた鎖。どの段にいても、鎖を見れば「門に仕える者」の系統だとわかる。<br><b>黒い門番 ＜ 門のぬし</b>：黒い門番は人の形のまま。くらやみの元は、ぬしの足元の溜まり。'));
  return s}
+function orderSec(){const s=el('section','ord');s.id='order';s.appendChild(el('h2','','強さの順'));
+ s.appendChild(el('p','lead','後に出る者ほど手ごわく。前の者を弱くするのではなく、後の者に技と読み方を足して並べた。数は攻撃の技だけ（立ち絵・演出は除く）。'));
+ const rows=[['門番','gate','覚悟0のボス'],['黒い門番','dgate','中ボス'],['門のぬし','lord','覚悟4'],['暗い門のぬし','lord2','第二形態'],['赤い騎士','red','ぬしの次'],['本気の赤い騎士','red2','第二形態'],['赤い門のぬし','fallen','いちばん奥'],['第二形態','fallen2','最後']];
+ let h='<tr><th>だれ</th><th>技</th><th>連撃</th><th>最大</th><th>赤</th><th>紫の輪</th><th>光らない</th><th>押せば罰</th><th>打ち合い</th></tr>';
+ for(const[n,k,w]of rows){const ids=MOVES_OF[k].filter(id=>KINDOF(id)==='atk');let mh=0,mu=0,r=0,f=0,d=0,pu=0,ra=0;for(const id of ids){const m=MV.find(x=>x.id===id),hc=(m.hits||[]).length,cs=m.cues||[];mh=Math.max(mh,hc);if(hc>1)mu++;if(cs.some(c=>c.col==='r')||m.hitCol==='r')r++;if(cs.some(c=>c.col==='p'))f++;if(hc&&!cs.length)d++;if(m.heroP||/zanshin|zanpunish|seefeint|counter/.test(id))pu++;if(cs.some(c=>c.col==='g'))ra++}
+  h+=`<tr><td><b>${n}</b><br><small>${w}</small></td><td>${ids.length}</td><td>${mu}</td><td>${mh}</td><td>${r}</td><td>${f}</td><td>${d}</td><td>${pu}</td><td>${ra}</td></tr>`}
+ const t=el('table','parts');t.innerHTML=h;s.appendChild(t);
+ s.appendChild(el('p','note','<b>数だけでは決まらない</b>：本気の赤い騎士は、体の動きで読めない居合が中心で、光らない技と「溜め＋ふり」がある。赤い門のぬしは、赤い騎士の決まり（見抜く・返す・残心）とぬしの触手を両方持つ。第二形態は「光らない＋拍」「水面＋フェイント」「光らない＋水面」のように、読み方を二つ重ねた技がある。重ねるのは、それぞれ先に教わった読み方だけ。'));return s}
 window.addEventListener('DOMContentLoaded',build);

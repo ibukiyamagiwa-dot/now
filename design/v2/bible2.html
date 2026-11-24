@@ -359,12 +359,12 @@ SPEC.red={hk:1.1,lk:.9,tk:.95,name:'赤い騎士',k:1.25,pal:PAL.red,helm:redHel
  tabard:RED_TAB,tabardFront:true,chest:sealIntact,
  cape:{len:28,wide:1.2,col:'#5a0e1c',hi:'#8a2030',lo:'#2a0610',extra:(B,J,T,c)=>{/* マントの裏地は金：誓いの金 */for(let i=0;i<=8;i++){const t=i/8;B.set(lerp(c.b[0],c.d[0],t),lerp(c.b[1],c.d[1],t),'#b8902a',2)}}},
  w:W_RED,sheath:sheathDraw,front:(B,J,T)=>redDetail(B,J,T,'#d8b050','#ffe080'),
- pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.5,fa2:2.3,ff:-9,fb:7,cr:1.5}};
+ pose:{ua:2.05,fa:2.55,sw:3.35,ua2:1.65,fa2:2.25,ff:-10,fb:8,cr:2.6,lean:.1}};
 SPEC.red2={hk:1.1,lk:.9,tk:.95,name:'本気の赤い騎士',k:1.25,pal:PAL.redW,
  helm:Object.assign({},redHelm,{glow:'#ffffff',eyeExtra:true,extra:(B,R,k,T)=>{/* 目の光が白い尾を引く */for(let i=1;i<7;i++)B.set(...R([(-4+i*1.6)*k,(-.4+i*.12)*k]),i<3?'#ffffff':'#bfe8ff',5)}}),
  tabard:RED_TAB,tabardFront:true,chest:sealIntact,
  w:W_RED,sheath:sheathDraw,front:(B,J,T)=>redDetail(B,J,T,'#d8b050','#ffe080'),
- pose:{ua:1.7,fa:2.2,sw:null,sheath:1,ua2:1.4,fa2:2.6,ff:-12,fb:8,cr:4.5,lean:.18,hd:.1}};
+ pose:{ua:2.45,fa:1.85,sw:2.7,ua2:2.25,fa2:1.75,cr:4.5,lean:.22,ff:-11,fb:9,sheath:0}};
 const fallenCape=(n)=>(B,J,T,P)=>{const k=J.k;/* 斬り捨てたマントの代わりに、くらやみの触手がマントになった */for(let i=0;i<n;i++){const r=add(J.shB,[(1+i)*k,(1+i)*k]),w=Math.sin(T*.07+i*1.3)*3;tentacle(B,r,[r[0]+(6+i*2)*k+w,r[1]+12*k],[r[0]+(4+i*3)*k+w*1.6,r[1]+(24-i*2)*k],1.8*k,.5*k,i===1)}};
 const backTen=(B,J,T,P,base)=>{const k=J.k,ten=P.ten||[0,0,0];for(let i=0;i<3;i++){const r=add(J.sc,[4*k,(-4+i*3)*k]),w=Math.sin(T*.06+i*2)*3,ex=Math.max(-1,Math.min(1,ten[i]||0)),rest=[r[0]+(9+i*3)*k,r[1]-(14-i*6)*k+w],tgt=[HXX+8,FL-14],tip=ex>=0?[lerp(rest[0],tgt[0],ex),lerp(rest[1],tgt[1],ex)]:rest,mid=ex>0?[lerp(r[0]+(13+i*2)*k,(r[0]+tgt[0])/2,ex),r[1]-(18+i*4)*k*ex-(6-i*4)*k*(1-ex)]:[r[0]+(13+i*2)*k,r[1]-(6-i*4)*k];tentacle(B,r,mid,tip,2.1*k,.6*k,false);B.set(...tip.map(Math.round),P.eyeOn&&P.eyeOn[i]?'#ffffff':INK.eye,2)}};
 const fallenHelm={type:'bhorn',sides:[1],band:['#6a5020','#9a7a30'],glow:'#ff3050',dents:[[-3,-1],[1,2]],cracks:[[-2,-4],[-1.5,-3],[-2,-2],[-1.5,-1]],crackCol:'#9a5ad0',horn:'#2a2434',hornHi:'#6e6680',hornLo:'#120e18',rings:'#8a6a2a',
@@ -758,54 +758,62 @@ mv({f:'lord2',id:'l2_down',n:'たおれる：門が開く',bg:'lord',len:160,noH
  post:(B,J,t)=>{if(t>90){const u=Math.min(1,(t-90)/50);const W0=new Set([W_KEY.col,W_KEY.hi,W_KEY.lo,'#5e4a78','#9a80c0','#22142e',W_KEY.guard,W_KEY.guardHi]);for(let i=0;i<B.c.length;i++){if(B.t[i]===1&&!W0.has(B.c[i])){const x=i%CW,y=i/CW|0;if(((x*13+y*7)%17)/17<u){B.c[i]=y>FL-3?INK.col:0;B.t[i]=B.c[i]?5:0}}}}}});
 
 /* ---------- 赤い騎士 ---------- */
-const RI={ua:1.95,fa:2.7,sw:3.5,ua2:1.5,fa2:2.3};
+const RI={ua:2.05,fa:2.55,sw:3.35,ua2:1.65,fa2:2.25,cr:2.6,lean:.1,ff:-10,fb:8};   /* 力んだ構え：肩をいからせ、前のめり */
 const R8={ua:-.9,fa:-2.6,sw:-1.3,ua2:-.6,fa2:-2.8,cr:2};          /* 八相：上から */
 const RG={ua:2.1,fa:2.4,sw:2.35,ua2:1.9,fa2:2.6,cr:3};           /* 下段：下から */
 const RW={ua:1.2,fa:.6,sw:.45,ua2:1.0,fa2:.9,cr:2.5,lean:-.1};   /* 脇：剣を隠す */
 const RCUT={ua:3.0,fa:2.7,sw:2.5,ua2:2.9,fa2:2.6,x:-44,lean:.25,ff:-12,fb:9};
-mv({f:'red',id:'r_idle',n:'立ち絵：切っ先が動かない',bg:'red',len:120,keys:[K(0,{}),K(120,{})],
- cap:'息をしても、マントがゆれても、切っ先だけは一度も動かない。',why:'ほかのボスはみな揺れている。一体だけ止まっている＝剣を極めた者の「静」。動かないことが一番の強さの表現。'});
+/* 本気は抜き身の正眼で構える（冷静さを取り戻した、低く静かな構え）。居合は技を使うときだけ、剣を鞘に納めて構える */
+const R2G={ua:2.45,fa:1.85,sw:2.7,ua2:2.25,fa2:1.75,cr:4.5,lean:.22,ff:-11,fb:9,sheath:0},R2B={ua:1.7,fa:2.2,sw:3.05,ua2:1.4,fa2:2.6,cr:4,lean:.15,ff:-11,fb:8,sheath:0};
+mv({f:'red',id:'r_idle',n:'立ち絵：震える切っ先',bg:'red',len:120,keys:[K(0,{}),K(120,{})],
+ cap:'肩をいからせ、剣を両手で強く握りしめている。肩で速く息をしていて、切っ先が小刻みに震える。',why:'彼から見れば、主人公は「決して開けてはならない門」を開けて入ってきた侵略者。倒さねばという力みが、震える切っ先と荒い息に出る。本気になると、この震えが止まる。'});
 mv({f:'red',id:'r_stance',n:'構えの切り替え',bg:'red',len:200,noHero:true,cap:'正眼→八相→下段→脇。構えで次の技が決まる。上なら打ち下ろし、下ならすくい上げ、脇なら見えない間合い。',why:'剣を極めた者は、技の前に「構え」を選ぶ。プレイヤーは構えを読めるようになると一段うまくなる。',
  keys:[K(0,RI),K(40,RI),K(50,R8,'out'),K(90,R8),K(100,RG,'out'),K(140,RG),K(150,RW,'out'),K(190,RW),K(200,RI)]});
-mv({f:'red',id:'r_two',n:'予備動作のない二連撃',bg:'red',len:110,cap:'構えのまま白く光り、振りかぶらずに来る。見るのは体ではなく光。',why:'振りかぶりが無い＝体の動きでは読めない。だからこそ光の合図が頼り。「光を見る」ゲームの最終試験。',
- keys:[K(0,RI),K(14,RI),K(36,Object.assign({},RI,{cr:2.5})),K(42,RCUT,'in'),K(48,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4})),K(56,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-46}),'in'),K(84,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-46})),K(104,RI)],
+mv({f:'red',id:'r_two',n:'振りかぶりすぎる二連撃',bg:'red',len:110,cap:'白く光ると、剣を背中に倒れるほど大きく振りかぶり、体ごと打ち下ろす。勢いあまって前へ泳いだ体を、すくい上げで無理やり引き戻す。',why:'力みは振りの大きさに出る。大きいぶん読みやすい＝最初のボス戦らしい手ごわさ。本気になると、同じ二連から振りかぶりが消える。',
+ keys:[K(0,RI),K(14,Object.assign({},R8,{ua:-1.2,fa:-2.9,sw:-.6,lean:-.2,cr:3,x:6}),'out'),K(36,Object.assign({},R8,{ua:-1.25,fa:-2.95,sw:-.5,lean:-.22,cr:3.2,x:7})),K(39,{ua:-2.4,fa:-2.5,sw:-2.0,ua2:-2.2,fa2:-2.6,x:-10,lean:.15,cr:3},'in'),K(42,Object.assign({},RCUT,{lean:.38,ff:-14,cr:3.5}),'in'),K(48,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4})),K(56,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-46}),'in'),K(84,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-46})),K(104,RI)],
  cues:[{t:14,col:'w'}],hits:[42,56],trails:[[39,44,'w'],[52,58,'w']]});
 const RTH={ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-40,lean:.2,ff:-13,fb:9};
 mv({f:'red',id:'r_three',n:'三段突き',bg:'red',len:130,cap:'剣先を引いて光る。同じ高さに三回、間はすべて同じ。三回目だけ赤い光＝重い。',why:'三回とも同じ間隔＝リズムを読めばよい。剣を極めた者は「同じ動きを同じように」繰り返せる。',
  keys:[K(0,RI),K(14,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(30,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(42,RTH,'in'),K(46,Object.assign({},RTH,{ua:2.0,fa:3.0,x:-36})),K(54,RTH,'in'),K(58,Object.assign({},RTH,{ua:2.0,fa:3.0,x:-36})),K(66,RTH,'in'),K(90,RTH),K(122,RI)],
  cues:[{t:14,col:'w'},{t:26,col:'w'},{t:38,col:'r'}],hits:[42,54,66],trails:[[40,43,'w'],[52,55,'w'],[64,67,'r']]});
-mv({f:'red',id:'r_parry',n:'片手でいなす',bg:'red',len:100,cap:'こちらの攻撃を、片手で払う。もう片方の手は腰のまま。',why:'あなたがしてきたパリィを、相手が片手でやる。「自分より上」が一目でわかる。',
- keys:[K(0,RI),K(20,RI),K(30,{ua:2.6,fa:-2.3,sw:-2.2,ua2:1.0,fa2:2.0,lean:-.05}),K(40,{ua:2.6,fa:-2.3,sw:-2.2,ua2:1.0,fa2:2.0}),K(90,RI)],
+mv({f:'red',id:'r_parry',n:'両手で叩き払う',bg:'red',len:100,cap:'こちらの攻撃を、両手で力いっぱい叩き払う。払った勢いで体が半歩前へ泳ぎ、あわてて構え直す。',why:'あなたがしてきたパリィを、相手もやる。ただし力ずく。払いが強すぎて体が流れる＝力み。本気の払いは、刃の角度だけで済ませる。',
+ keys:[K(0,RI),K(20,RI),K(26,{ua:2.85,fa:-2.6,sw:-2.0,ua2:2.65,fa2:-2.7,lean:.22,cr:3,x:-6},'in'),K(40,{ua:2.85,fa:-2.6,sw:-2.0,ua2:2.65,fa2:-2.7,lean:.28,cr:3.2,x:-9,ff:-11}),K(60,RI,'io'),K(90,RI)],
  fx:(B,J,t)=>{if(t>=26&&t<34&&J.tip)spark(B,Math.round(J.tip[0]+2),Math.round(J.tip[1]+6),t-26,'w');if(t>=18&&t<30){/* あなたの斬撃 */for(let i=0;i<6;i++)B.set(HXX+20+(t-18)*3+i,FL-24+i,'#bfe8ff',4)}}});
-mv({f:'red',id:'r_feint',n:'気配だけのフェイント',bg:'red',len:100,cap:'体はほとんど動かない。肩がわずかに沈み、紫の輪だけが出る。押したら負け。',why:'剣を極めた者は、動かずに「来る」と思わせられる。動きが無いぶん、色のルールだけが頼り。',
- keys:[K(0,RI),K(18,RI),K(22,Object.assign({},RI,{cr:2.6,lean:.06})),K(32,RI),K(100,RI)],cues:[{t:20,col:'p',at:J=>add(J.head,[-3,0])}]});
+mv({f:'red',id:'r_feint',n:'踏みこみのフェイント',bg:'red',len:100,cap:'肩をいからせて半歩踏み出し、剣を振りかぶりかけて紫の輪。そこで止まる。押したら負け。',why:'力みが体に出る＝ふりも大きい。踏みこみの大きさに釣られずに、色を見る。本気になると、ふりは肩がわずかに沈むだけになる。',
+ keys:[K(0,RI),K(18,RI),K(22,Object.assign({},R8,{ua:-.5,fa:-2.3,sw:-1.0,x:-6,lean:.12,cr:3}),'out'),K(34,Object.assign({},R8,{ua:-.5,fa:-2.3,sw:-1.0,x:-6,lean:.12,cr:3})),K(50,RI,'io'),K(100,RI)],cues:[{t:20,col:'p',at:J=>add(J.head,[-3,0])}]});
 mv({f:'red',id:'r_push',n:'押し合い：刃の位置で押す',bg:'red',len:130,cap:'金に光ったら打ち合い。刃が合わさる高さが毎回ちがう。',why:'力ではなく刃の位置で押してくる。だから押し合いの場所が毎回変わる（本気では五回）。',
  keys:[K(0,RI),K(12,R8),K(26,Object.assign({},RCUT,{x:-30}),'in'),K(36,Object.assign({},RCUT,{x:-26,sw:2.9})),K(50,RG),K(64,Object.assign({},RCUT,{x:-30,ua:2.6,fa:-2.8,sw:-2.7}),'in'),K(74,Object.assign({},RCUT,{x:-26,ua:2.6,fa:-2.9,sw:-2.9})),K(120,RI)],
  cues:[{t:12,col:'g'},{t:50,col:'g'}],hits:[26,64],hitCol:'g',trails:[[23,28,'g'],[61,66,'g']],
  fx:(B,J,t)=>{if(J.tip&&t>=12&&t<80)glow(B,Math.round(J.tip[0]),Math.round(J.tip[1]),3,'g')}});
-mv({f:'red',id:'r_zanshin',n:'残心',bg:'red',len:130,cap:'振り抜いたあと、長く止まる。すきに見えるが、すきではない。ここで何かを押すと、もう一撃来る（次の「残心に手を出す」）。待てば、構えを解く。',why:'剣の心得のない者には、すきに見える。でも本当は真逆で、いちばん気を張っている瞬間。「構え中に斬ると返される」は居合のおかしらで先に教わっている。',
+mv({f:'red',id:'r_zanshin',n:'残心',bg:'red',len:130,cap:'振り抜いたあと、肩で息をしながら長く止まる。すきに見えるが、すきではない。ここで何かを押すと、もう一撃来る（次の「残心に手を出す」）。待てば、構えを解く。',why:'剣の心得のない者には、すきに見える。でも本当は真逆で、いちばん気を張っている瞬間。「構え中に斬ると返される」は居合のおかしらで先に教わっている。',
  keys:[K(0,RI),K(14,R8),K(28,R8),K(40,Object.assign({},RCUT,{sw:2.2,ua:2.6,fa:2.3}),'in'),K(100,Object.assign({},RCUT,{sw:2.2,ua:2.6,fa:2.3})),K(126,RI)],
  cues:[{t:12,col:'w'}],hits:[40],trails:[[36,42,'w']],fx:(B,J,t)=>{if(t>=50&&t<96&&(t/6|0)%2)B.set(J.head[0]-6,J.head[1]-8,'#ffd040',4)}});
-mv({f:'red',id:'r_rage',n:'本気を出す：マントを斬る',bg:'red',len:180,noHero:true,cap:'自分のマントを斬り落とし、剣を鞘に納める。目の光が白くなる。',why:'飾りを捨てる＝本気。鞘に納める＝次は居合。白い目＝「もう光でしか見えない速さ」の予告。',
+mv({f:'red',id:'r_rage',n:'本気を出す：マントを斬る',bg:'red',len:190,noHero:true,cap:'自分のマントを斬り落とす。剣を下ろし、肩で大きく一つ息を吐く。震えていた切っ先が止まり、目の光が白くなる。腰を深く落として、低い正眼に構え直す。',why:'飾りを捨てる＝本気。息を吐く＝力みを捨て、冷静さを取り戻す。止まった切っ先は、もう震えない。それでも腰は低く、体ごと斬りにくる。白い目＝「もう光でしか見えない速さ」の予告。',
  fAt:t=>t<120?'red':'red2',
- keys:[K(0,RI),K(20,{ua:-1.0,fa:-.4,sw:.3}),K(30,{ua:2.4,fa:1.2,sw:.2,capeOff:0},'in'),K(60,{ua:2.4,fa:1.2,sw:.2,capeOff:1}),K(90,{ua:1.7,fa:2.2,sw:0,cr:2}),K(118,{ua:1.7,fa:2.2,sw:0,cr:3}),K(120,{ua:1.7,fa:2.2,sw:null,sheath:1,ff:-12,fb:8,cr:4.5,lean:.18,hd:.1}),K(180,{ua:1.7,fa:2.2,sw:null,sheath:1,ff:-12,fb:8,cr:4.5,lean:.18,hd:.1})],
+ keys:[K(0,RI),K(20,{ua:-1.0,fa:-.4,sw:.3}),K(30,{ua:2.4,fa:1.2,sw:.2,capeOff:0},'in'),K(60,{ua:2.4,fa:1.2,sw:.2,capeOff:1}),K(78,{ua:1.6,fa:1.7,sw:2.15,ua2:1.4,fa2:1.8,cr:1,lean:-.08,hd:-.1},'io'),K(96,{ua:1.6,fa:1.7,sw:2.15,ua2:1.4,fa2:1.8,cr:3,lean:.1,hd:.15},'io'),K(118,{ua:1.6,fa:1.7,sw:2.15,ua2:1.4,fa2:1.8,cr:3,lean:.1,hd:.15}),K(146,R2G,'io'),K(190,R2G)],
  pp:(P,t)=>{if(t>=30)P.capeOff=1},
  pre:(B,t)=>{if(t>=30){/* 斬り落とされたマントが床に落ちる */const u=Math.min(1,(t-30)/26),x=EXX+10,y=lerp(FL-24,FL-2,u*u);B.poly([[x,y],[x+12,y-6+u*6],[x+16,y+2],[x+3,y+3]],'#5a0e1c','#8a2030','#2a0610')}},
- fx:(B,J,t)=>{if(t>=28&&t<36)for(let i=0;i<14;i++)B.set(J.sc[0]+2+i,J.sc[1]-4+i,'#ffffff',4)}});
+ fx:(B,J,t)=>{if(t>=28&&t<36)for(let i=0;i<14;i++)B.set(J.sc[0]+2+i,J.sc[1]-4+i,'#ffffff',4);if(t>=80&&t<100&&J.head&&t%3===0){/* 吐く息 */const d=(t-80)/3;B.set(J.head[0]-4-d,J.head[1]+2-d*.3,'#8a8098',4)}}});
 
 /* ---------- 本気の赤い騎士 ---------- */
-const R2I={ua:1.7,fa:2.2,sw:null,sheath:1};
+const R2N={ua:1.7,fa:2.2,sw:null,sheath:1,ua2:1.4,fa2:2.6,ff:-12,fb:8,cr:4.5,lean:.18,hd:.1};
 const IAI={ua:3.1,fa:3.0,sw:.15,ua2:.9,fa2:.6,sheath:0,x:-66,lean:.2,cr:5,ff:-14,fb:10};
-mv({f:'red2',id:'r2_idle',n:'立ち絵：納刀',bg:'red',len:120,keys:[K(0,{}),K(120,{})],cap:'低く構え、手は柄に。目の光が白い尾を引く。',why:'剣が見えない＝光でしか読めない。尾を引く目は、速さの予告。'});
-mv({f:'red2',id:'r2_iai',n:'居合',bg:'red',len:120,cap:'目が白く光った瞬間から数えて、いつもの間で来る。見えるのは光と、斬ったあとだけ。',why:'途中の動きを描かない＝「見えない速さ」。でも合図から当たるまでの間は他と同じ。理不尽ではない。',
- keys:[K(0,R2I),K(40,R2I),K(41,IAI,'snap'),K(90,IAI),K(91,R2I,'snap'),K(120,R2I)],cues:[{t:14,col:'w',at:J=>add(J.head,[-3,0])}],hits:[42],
+const chinRing=(B,J,t,s)=>{const d=t-s;if(d<0||d>12||!J.hip)return;const c=add(J.hip,[-1*J.k,1*J.k]);for(let q=0;q<2;q++){const r=2+d*1.1+q*3;for(let a=-.8;a<=.8;a+=.16){B.set(c[0]-Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#d8dce8',4);B.set(c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#d8dce8',4)}}};
+/* 居合の技：正眼から剣を鞘に納め（チン）、居合の構えに入る。納刀そのものが「居合が来る」の予告。D フレームぶん後ろへずらす */
+const IAIWRAP=(id,D)=>{const o=MV.find(x=>x.id===id),N=k=>k.p===R2N||k.p.sheath===1,lh=Math.max(...o.hits);
+ let ks=o.keys.map(k=>K(k.t+D,k.p,k.e)).filter(k=>k.t>10);const cut=ks.findIndex(k=>k.t>lh+D&&N(k));if(cut>0){const tEnd=ks[cut-1].t;ks=ks.slice(0,cut).concat([K(tEnd+18,R2G,'io'),K(o.len+D,R2G)])}
+ o.keys=[K(0,R2G),K(8,R2B,'io'),K(10,R2N,'snap')].concat(ks);o.len+=D;
+ if(o.cues)o.cues=o.cues.map(c=>Object.assign({},c,{t:c.t+D}));o.hits=o.hits.map(h=>h+D);if(o.trails)o.trails=o.trails.map(r=>[r[0]+D,r[1]+D].concat(r.slice(2)));
+ const fx0=o.fx;o.fx=(B,J,t)=>{chinRing(B,J,t,10);if(fx0&&t>=D)fx0(B,J,t-D)}};
+mv({f:'red2',id:'r2_idle',n:'立ち絵：抜き身の正眼',bg:'red',len:120,keys:[K(0,{}),K(120,{})],cap:'抜き身の剣を両手で握り、腰を深く落とした低い正眼。切っ先はこちらの目に向いたまま、一度も動かない。ゆっくり深く息をしている。目の光が白い尾を引く。',why:'赤い騎士の切っ先は力んで震えていた。本気は止まる＝冷静さを取り戻した。それでも腰は低く、体ごと斬りにくる構え。尾を引く目は、速さの予告。'});
+mv({f:'red2',id:'r2_iai',n:'居合',bg:'red',len:120,cap:'正眼から一度、剣を鞘に納める（チン、と小さな音の輪）。腰を落として柄に手をかけ、目が白く光った瞬間から数えて、いつもの間で来る。見えるのは光と、斬ったあとだけ。斬り終えたら、抜き身のまま正眼に戻る。',why:'居合は、技を使うときだけ構える。納刀そのものが「居合が来る」の予告。途中の動きを描かない＝「見えない速さ」。でも合図から当たるまでの間は他と同じ。理不尽ではない。',
+ keys:[K(0,R2N),K(40,R2N),K(41,IAI,'snap'),K(90,IAI),K(91,R2N,'snap'),K(120,R2N)],cues:[{t:14,col:'w',at:J=>add(J.head,[-3,0])}],hits:[42],
  fx:(B,J,t)=>{if(t>=41&&t<50){/* 一閃：画面を横切る白い線 */const y=FL-14;for(let x=0;x<CW;x++){if((x+t)%9<7-(t-41)*.6)B.set(x,y,'#ffffff',4)}for(let x=HXX;x<EXX;x++)if(t<44)B.set(x,y-1,'#bfe8ff',4)}}});
-mv({f:'red2',id:'r2_double',n:'二重フェイント',bg:'red',len:140,cap:'紫の輪が二回。二回とも押さない。三回目の赤い光で本物の居合。',why:'通常の一回から増えた。確率で二回、まれに三回。「何回来るか」ではなく「色を見る」を最後まで試す。',
- keys:[K(0,R2I),K(16,Object.assign({},R2I,{cr:5,lean:-.05})),K(22,R2I),K(42,Object.assign({},R2I,{cr:5,lean:-.05})),K(48,R2I),K(96,R2I),K(97,IAI,'snap'),K(124,IAI),K(125,R2I,'snap')],
- cues:[{t:16,col:'p',at:J=>add(J.head,[-3,0])},{t:42,col:'p',at:J=>add(J.head,[-3,0])},{t:68,col:'r',at:J=>add(J.head,[-3,0])}],hits:[96],hitCol:'r',
- fx:(B,J,t)=>{if(t>=97&&t<104){for(let x=0;x<CW;x++)if((x+t)%9<6)B.set(x,FL-14,'#ffffff',4)}}});
+mv({f:'red2',id:'r2_double',n:'二重フェイント',bg:'red',len:140,cap:'正眼のまま、肩がほんのわずかに沈んで紫の輪。二回とも押さない。三回目は赤い光。八相へ短く上げて、重い斬り下ろし。',why:'通常の一回から増えた。確率で二回、まれに三回。本気のふりは動きが小さいぶん、色だけが頼り。「何回来るか」ではなく「色を見る」を最後まで試す。',
+ keys:[K(0,R2G),K(16,Object.assign({},R2G,{cr:5.2,lean:.26})),K(22,R2G),K(42,Object.assign({},R2G,{cr:5.2,lean:.26})),K(48,R2G),K(68,R2G),K(76,Object.assign({},R8,{sheath:0,cr:4,ff:-11,fb:9}),'out'),K(94,Object.assign({},R8,{sheath:0,cr:4,ff:-11,fb:9})),K(96,Object.assign({},RCUT,{x:-48,cr:5,lean:.35,sheath:0}),'in'),K(118,Object.assign({},RCUT,{x:-48,cr:5,lean:.35,sheath:0})),K(140,R2G,'io')],
+ cues:[{t:16,col:'p',at:J=>add(J.head,[-3,0])},{t:42,col:'p',at:J=>add(J.head,[-3,0])},{t:68,col:'r',at:J=>add(J.head,[-3,0])}],hits:[96],hitCol:'r',trails:[[92,98,'r']]});
 mv({f:'red2',id:'r2_rally',n:'五合の打ち合い',bg:'red',len:180,cap:'金に光ったら打ち合い。五回、刃の高さを変えてくる。',why:'押し合いの位置が変わる、を五回。最後の打ち合いが最長＝ここを越えれば勝ち、の山場。',
- keys:(()=>{const ks=[K(0,R2I),K(8,{ua:1.95,fa:2.7,sw:3.5,sheath:0})];const hs=[R8,RG,RI,R8,RG];hs.forEach((h,i)=>{const t=14+i*28;ks.push(K(t,Object.assign({},h,{sheath:0})));ks.push(K(t+12,Object.assign({},RCUT,{x:-28,sw:[2.4,-2.6,3.1,2.4,-2.6][i],fa:[2.6,-2.8,3.0,2.6,-2.8][i],sheath:0}),'in'))});ks.push(K(170,Object.assign({},RI,{sheath:0})));return ks})(),
+ keys:(()=>{const ks=[K(0,R2G),K(8,{ua:1.95,fa:2.7,sw:3.5,sheath:0})];const hs=[R8,RG,RI,R8,RG];hs.forEach((h,i)=>{const t=14+i*28;ks.push(K(t,Object.assign({},h,{sheath:0})));ks.push(K(t+12,Object.assign({},RCUT,{x:-28,sw:[2.4,-2.6,3.1,2.4,-2.6][i],fa:[2.6,-2.8,3.0,2.6,-2.8][i],sheath:0}),'in'))});ks.push(K(170,Object.assign({},RI,{sheath:0})));return ks})(),
  cues:[0,1,2,3,4].map(i=>({t:14+i*28,col:'g'})),hits:[0,1,2,3,4].map(i=>26+i*28),hitCol:'g',
  fx:(B,J,t)=>{if(J.tip&&t>=14&&t<150)glow(B,Math.round(J.tip[0]),Math.round(J.tip[1]),3,'g')}});
 mv({f:'red2',id:'r2_last',n:'最期：構えたまま',bg:'red',len:220,noHero:true,cap:'鞘から抜いた剣を、顔の前に縦に立てて構える。美しい構えのまま、目の光だけがゆっくり消えていく。倒れない。',why:'剣を極めた者は、構えのまま終わる。この構えは、のちに水面から現れる姿と同じになる。',
@@ -944,13 +952,13 @@ mv({f:'lord2',id:'l2_doors',n:'扉のかみ合わせ',bg:'lord',len:120,cap:'胸
  cues:[{t:16,col:'r',at:J=>add(J.sc,[0,9*J.k])}],hits:[44],hitCol:'r'});
 
 /* ===== 赤の系統（第2版） ===== */
-mv({f:'red',id:'r_delay',n:'遅らせ突き',bg:'red',len:130,cap:'剣先を引いたまま長く溜める。体ではなく、光で押す。',why:'溜めの長さで焦らせる。剣を極めた者は「待つ」ことも技にする。',
+mv({f:'red',id:'r_delay',n:'遅らせ突き',bg:'red',len:130,cap:'剣先を引いたまま長く溜める。溜めるほど切っ先の震えが大きくなる。体ではなく、光で押す。',why:'溜めの長さで焦らせる。早く斬りたい力みが、震えになって漏れる。本気の溜めは、震えない。',
  keys:[K(0,RI),K(14,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(60,{ua:1.2,fa:3.0,sw:3.14,x:5,cr:3.5}),K(80,RTH,'in'),K(100,RTH),K(126,RI)],cues:[{t:52,col:'w'}],hits:[80],trails:[[77,82,'w']]});
 mv({f:'red',id:'r_swap',n:'逆の二連撃',bg:'red',len:110,cap:'構えのまま白く光る。すくい上げから入り、打ち下ろしで終わる。',why:'門のぬしと同じ技。同じ人だから、同じ型を持っている。',
  keys:[K(0,RI),K(14,RG),K(36,RG),K(42,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4}),'in'),K(48,R8),K(56,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-46}),'in'),K(84,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-46})),K(104,RI)],cues:[{t:14,col:'w'}],hits:[42,56],trails:[[39,44,'w'],[52,58,'w']]});
 mv({f:'red',id:'r_thrust',n:'突き',bg:'red',len:110,cap:'剣先を引いて赤く光る。まっすぐ一突き。重い。',why:'ぬしの「解錠」の突きと同じ動き。ただし鍵は回さない。この世界線では、門を開ける必要がないから。',
  keys:[K(0,RI),K(18,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(32,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(46,RTH,'in'),K(70,RTH),K(104,RI)],cues:[{t:18,col:'r'}],hits:[46],hitCol:'r',trails:[[43,48,'r']]});
-mv({f:'red',id:'r_combo4',n:'四連撃',bg:'red',len:150,cap:'白く光ったら四連。打ち下ろし、すくい上げ、打ち下ろし、最後の突きだけ赤い光。',why:'型を四つつなげても、一つも崩れない。剣を極めた者の正確さ。',
+mv({f:'red',id:'r_combo4',n:'四連撃',bg:'red',len:150,cap:'白く光ったら四連。打ち下ろし、すくい上げ、打ち下ろし、最後の突きだけ赤い光。',why:'型を四つつなげる。後になるほど振りが大きく、踏みこみが深くなる＝力みで前へ前へ出る。それでも合図から当たりまでの間は同じ。',
  keys:[K(0,RI),K(12,R8),K(28,R8),K(40,RCUT,'in'),K(46,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4})),K(52,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9}),'in'),K(58,R8),K(64,RCUT,'in'),K(70,{ua:1.2,fa:3.0,sw:3.14,x:-30}),K(78,RTH,'in'),K(100,RTH),K(140,RI)],
  cues:[{t:12,col:'w'},{t:50,col:'r'}],hits:[40,52,64,78],trails:[[37,42,'w'],[49,54,'w'],[61,66,'w'],[75,80,'r']]});
 mv({f:'red',id:'r_seal',n:'派生の立ち絵：ひびのない封印',bg:'red',len:120,noHero:true,keys:[K(0,{}),K(120,{})],
@@ -993,18 +1001,16 @@ mv({f:'fallen2',id:'f2_pulse',n:'核の拍',bg:'hole',len:150,cap:'胸の核が3
  fx:(B,J,t)=>{for(const b of[20,32,44]){const d=t-b;if(d>=0&&d<12){const c=add(J.sc,[0,5*J.k]);for(let a=0;a<48;a++){const th=a/48*6.28,r=4+d*2.2;if(a%2)B.set(c[0]+Math.cos(th)*r,c[1]+Math.sin(th)*r,d<6?'#ff3050':'#a01030',4)}}}},post:(B,J,t)=>{water(B,t);reflection(B,t,'red',J.P||{},EXX)}});
 
 /* ===== 本気の赤い騎士：居合の技を足す ===== */
-const R2S={ua:1.7,fa:2.2,sw:null,sheath:1};
-mv({f:'red2',id:'r2_iai2',n:'弐の居合（すれちがい・後ろから・タン……タン）',bg:'red',len:170,cap:'【構え】後ろ足を大きく引き、低く前のめりに構える（走り抜ける構え）。居合で斬り抜けて、こちらの後ろへ抜ける。背後で「カチン」と納刀の音。振り返りざまに、後ろからもう一度。2撃の間が長い（タン……タン）。見るのは目の光。',why:'騎士が画面の反対側へ抜けて、逆の向きから来る。参段の居合（その場から動かない）とは、騎士の位置でひと目で分かれる。',
- keys:[K(0,R2S),K(12,Object.assign({},R2S,{cr:4,lean:.38,fb:15,ff:-5,x:4}),'out'),K(41,Object.assign({},R2S,{cr:4,lean:.38,fb:15,ff:-5,x:4})),K(42,IAI,'snap'),K(60,IAI),K(61,Object.assign({},R2S,{x:-62}),'snap'),K(83,Object.assign({},R2S,{x:-62})),K(84,Object.assign({},IAI,{x:0,lean:-.1}),'snap'),K(110,Object.assign({},IAI,{x:0})),K(111,R2S,'snap'),K(170,R2S)],
+mv({f:'red2',id:'r2_iai2',n:'弐の居合（すれちがい・後ろから・タン……タン）',bg:'red',len:170,cap:'【構え】正眼から剣を鞘に納め（チン）、後ろ足を大きく引き、低く前のめりに構える（走り抜ける構え）。居合で斬り抜けて、こちらの後ろへ抜ける。背後で「カチン」と納刀の音。振り返りざまに、後ろからもう一度。2撃の間が長い（タン……タン）。見るのは目の光。斬り終えたら、抜き身のまま正眼に戻る。',why:'騎士が画面の反対側へ抜けて、逆の向きから来る。参段の居合（その場から動かない）とは、騎士の位置でひと目で分かれる。',
+ keys:[K(0,R2N),K(12,Object.assign({},R2N,{cr:4,lean:.38,fb:15,ff:-5,x:4}),'out'),K(41,Object.assign({},R2N,{cr:4,lean:.38,fb:15,ff:-5,x:4})),K(42,IAI,'snap'),K(60,IAI),K(61,Object.assign({},R2N,{x:-62}),'snap'),K(83,Object.assign({},R2N,{x:-62})),K(84,Object.assign({},IAI,{x:0,lean:-.1}),'snap'),K(110,Object.assign({},IAI,{x:0})),K(111,R2N,'snap'),K(170,R2N)],
  cues:[{t:14,col:'w',at:J=>add(J.head,[-3,0])},{t:56,col:'w',at:J=>add(J.head,[-3,0])}],hits:[42,84],
  fx:(B,J,t)=>{for(const h of[42,84])if(t>=h&&t<h+8){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-h)*.6)B.set(x,FL-14,'#ffffff',4)}
   if(t>=62&&t<76){/* 背後の納刀の音 */const c=add(J.hip,[-1*J.k,1*J.k]);for(let q=0;q<2;q++){const r=3+(t-62)*1.2+q*4;for(let a=-.9;a<=.9;a+=.15){B.set(c[0]-Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#a8a0b0',4);B.set(c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#a8a0b0',4)}}}}});
-mv({f:'red2',id:'r2_hold',n:'溜め居合',bg:'red',len:180,cap:'柄に手をかけたまま、長く動かない。じれて押せば負け。目が白く光ってから、いつもの間で来る。',why:'遅らせ突きの居合版。待つのも技。光が出るまでは、何も始まっていない。',
- keys:[K(0,R2S),K(20,Object.assign({},R2S,{cr:5.5,lean:.22})),K(105,Object.assign({},R2S,{cr:5.5,lean:.22})),K(106,IAI,'snap'),K(140,IAI),K(141,R2S,'snap'),K(180,R2S)],
- cues:[{t:78,col:'w',at:J=>add(J.head,[-3,0])}],hits:[106],
- fx:(B,J,t)=>{if(t>=106&&t<114){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-106)*.6)B.set(x,FL-14,'#ffffff',4)}}});
-mv({f:'red2',id:'r2_thrust',n:'抜き突き',bg:'red',len:140,cap:'目が赤く光ったら、鞘から抜きざまに一直線の突き。重い。',why:'居合は横に斬るもの、という思いこみを崩す。光の色（赤）だけは嘘をつかない。',
- keys:[K(0,R2S),K(14,Object.assign({},R2S,{cr:5,lean:.2})),K(41,Object.assign({},R2S,{cr:5,lean:.2})),K(42,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-52,lean:.3,ff:-15,fb:10,sheath:0,cr:4},'snap'),K(80,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-52,lean:.3,ff:-15,fb:10,sheath:0,cr:4}),K(81,R2S,'snap'),K(140,R2S)],
+mv({f:'red2',id:'r2_hold',n:'溜め（切っ先が動かない）',bg:'red',len:180,cap:'正眼のまま、さらに腰を沈めて長く動かない。切っ先も肩も止まっている。じれて押せば負け。目が白く光ってから、いつもの間で、引きのない両手突き。',why:'赤い騎士の遅らせ突きは、溜めるあいだ切っ先が力んで震えていた。本気は震えずに待てる。光が出るまでは、何も始まっていない。',
+ keys:[K(0,R2G),K(20,Object.assign({},R2G,{cr:5.5,lean:.28})),K(105,Object.assign({},R2G,{cr:5.5,lean:.28})),K(106,{ua:3.1,fa:3.12,sw:3.14,ua2:2.85,fa2:2.95,x:-54,lean:.38,ff:-15,fb:11,cr:4.5,sheath:0},'in'),K(140,{ua:3.1,fa:3.12,sw:3.14,ua2:2.85,fa2:2.95,x:-54,lean:.38,ff:-15,fb:11,cr:4.5,sheath:0}),K(160,R2G,'io'),K(180,R2G)],
+ cues:[{t:78,col:'w',at:J=>add(J.head,[-3,0])}],hits:[106],trails:[[103,108,'w',0,'line']]});
+mv({f:'red2',id:'r2_thrust',n:'伸び突き（赤・片手）',bg:'red',len:140,cap:'両手で剣を腰まで深く引き、低く沈んで目が赤く光る。突く瞬間に左手を離し、左腕を後ろへ振って、体を一本の線に伸ばし切る片手突き。遠くから届く。重い。',why:'本気が片手になるのは赤のときだけ。両手では届かない半歩を、捨て身で届かせる。光の色（赤）だけは嘘をつかない。',
+ keys:[K(0,R2G),K(14,{ua:1.2,fa:3.0,sw:3.14,ua2:1.0,fa2:2.8,x:8,cr:5.5,lean:-.1,ff:-12,fb:10,sheath:0},'out'),K(41,{ua:1.2,fa:3.0,sw:3.14,ua2:1.0,fa2:2.8,x:8,cr:5.5,lean:-.1,ff:-12,fb:10,sheath:0}),K(42,{ua:3.05,fa:3.0,sw:3.14,ua2:.35,fa2:.6,lean:.45,ff:-16,fb:12,cr:4.5,x:-56,sheath:0},'in'),K(80,{ua:3.05,fa:3.0,sw:3.14,ua2:.35,fa2:.6,lean:.45,ff:-16,fb:12,cr:4.5,x:-56,sheath:0}),K(110,R2G,'io'),K(140,R2G)],
  cues:[{t:14,col:'r',at:J=>add(J.head,[-3,0])}],hits:[42],hitCol:'r',
  fx:(B,J,t)=>{if(t>=42&&t<50&&J.tip)for(let x=Math.round(J.tip[0]);x<EXX;x++)if((x+t)%4)B.set(x,Math.round(J.tip[1]),'#ffb0a0',4)}});
 
@@ -1021,8 +1027,8 @@ mv({f:'red',id:'r_counter',n:'返し斬り',bg:'red',len:140,heroP:t=>t>=14&&t<3
  cues:[{t:32,col:'r'}],hits:[60],hitCol:'r',trails:[[57,62,'r']],
  fx:(B,J,t)=>{if(t>=24&&t<32&&J.tip)spark(B,Math.round(J.tip[0]),Math.round(J.tip[1]),t-24,'w')}});
 mv({f:'red',id:'r_seefeint',n:'フェイントを見抜かれる',bg:'red',len:140,heroP:t=>t>=28&&t<44?HG:null,
- cap:'紫の輪（ふり）のときに、まもるを押してしまうと、見抜かれる。すぐに赤い光、いつもの間で本物の一撃。打ち合いの中のふりは別。',why:'剣を極めた者は、相手が構えた瞬間を逃さない。ふりは「待つ」ことを試す。押せば、その迷いを斬られる。',
- keys:[K(0,RI),K(18,RI),K(22,Object.assign({},RI,{cr:2.6,lean:.06})),K(30,RI),K(34,R8),K(60,R8),K(62,RCUT,'in'),K(92,RCUT),K(132,RI)],
+ cap:'紫の輪（ふり）のときに、まもるを押してしまうと、見抜かれる。すぐに赤い光、いつもの間で本物の一撃。打ち合いの中のふりは別。',why:'倒さねばと張りつめているから、相手が構えた瞬間に飛びかかる。ふりは「待つ」ことを試す。押せば、その迷いを斬られる。',
+ keys:[K(0,RI),K(18,RI),K(22,Object.assign({},R8,{ua:-.5,fa:-2.3,sw:-1.0,x:-6,lean:.12,cr:3}),'out'),K(30,Object.assign({},R8,{ua:-.5,fa:-2.3,sw:-1.0,x:-6,lean:.12,cr:3})),K(34,R8),K(60,R8),K(62,RCUT,'in'),K(92,RCUT),K(132,RI)],
  cues:[{t:20,col:'p',at:J=>add(J.head,[-3,0])},{t:34,col:'r'}],hits:[62],hitCol:'r',trails:[[59,64,'r']],
  fx:(B,J,t)=>{if(t>=30&&t<36)B.set(J.head[0]-4,J.head[1],'#ffffff',4)}});
 mv({f:'red',id:'r_zanpunish',n:'残心に手を出す',bg:'red',len:150,heroP:t=>t>=56&&t<72?HA:null,
@@ -1030,37 +1036,38 @@ mv({f:'red',id:'r_zanpunish',n:'残心に手を出す',bg:'red',len:150,heroP:t=
  keys:[K(0,RI),K(12,R8),K(28,R8),K(40,Object.assign({},RCUT,{sw:2.2,ua:2.6,fa:2.3}),'in'),K(60,Object.assign({},RCUT,{sw:2.2,ua:2.6,fa:2.3})),K(66,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4})),K(92,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4})),K(94,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-48}),'in'),K(120,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,x:-48})),K(146,RI)],
  cues:[{t:12,col:'w'},{t:66,col:'r'}],hits:[40,94],trails:[[36,42,'w'],[91,96,'r']]});
 mv({f:'red2',id:'r2_seefeint',n:'フェイントを見抜かれる（本気）',bg:'red',len:150,heroP:t=>t>=30&&t<46?HG:null,
- cap:'紫の輪のときに、まもるを押してしまうと、すぐに目が赤く光る。抜きざまに斬り下ろし、赤い角ばった軌跡を残す。いつもの間で来る。',why:'迷いを見抜いたときだけ、居合ではなく、赤い騎士のころの重い斬り下ろしで来る。赤い角ばった軌跡は「見抜かれた」印。',
- keys:[K(0,R2S),K(16,Object.assign({},R2S,{cr:5.2,lean:.22})),K(22,R2S),K(34,Object.assign({},R8,{sheath:0})),K(58,Object.assign({},R8,{sheath:0})),K(62,Object.assign({},RCUT,{x:-46,sheath:0}),'in'),K(96,Object.assign({},RCUT,{x:-46,sheath:0})),K(130,R2S),K(150,R2S)],
+ cap:'紫の輪のときに、まもるを押してしまうと、すぐに目が赤く光る。八相へ短く上げ、体ごと斬り下ろす。赤い角ばった軌跡が残る。いつもの間で来る。',why:'迷いを見抜いた瞬間を、冷静に斬る。赤い角ばった軌跡は「見抜かれた」印。',
+ keys:[K(0,R2G),K(16,Object.assign({},R2G,{cr:5.2,lean:.26})),K(22,R2G),K(34,Object.assign({},R8,{sheath:0,cr:4,ff:-11,fb:9}),'out'),K(58,Object.assign({},R8,{sheath:0,cr:4,ff:-11,fb:9})),K(62,Object.assign({},RCUT,{x:-46,cr:5,lean:.35,sheath:0}),'in'),K(96,Object.assign({},RCUT,{x:-46,cr:5,lean:.35,sheath:0})),K(130,R2G,'io'),K(150,R2G)],
  cues:[{t:16,col:'p',at:J=>add(J.head,[-3,0])},{t:34,col:'r'}],hits:[62],hitCol:'r',trails:[[58,64,'r']]});
 
 /* ===== 本気の赤い騎士：居合以外の技。弧の技と直線の技でメリハリをつける ===== */
 const R2D={ua:1.95,fa:2.7,sw:3.5,ua2:1.5,fa2:2.3,sheath:0,cr:3,lean:.15};
-mv({f:'red2',id:'r2_moon',n:'満月（弧）',bg:'red',len:140,cap:'鞘から抜いて頭上へ大きく振りかぶり、剣先が白く光る。大きな円を描いて振り下ろす。見るのは剣先。',why:'居合ばかりの中に混ざる、読みやすい一撃。緊張の続く本気の戦いの中の「緩」。',
- keys:[K(0,R2S),K(10,R2D),K(14,{ua:-2.6,fa:-2.2,sw:.2,sheath:0,cr:2,lean:-.1}),K(42,{ua:3.0,fa:2.6,sw:2.1,x:-46,lean:.3,ff:-13,fb:9,sheath:0},'in'),K(70,{ua:3.0,fa:2.6,sw:2.1,x:-46,lean:.3,ff:-13,fb:9,sheath:0}),K(100,R2D),K(130,R2S)],
+mv({f:'red2',id:'r2_moon',n:'満月（弧）',bg:'red',len:140,cap:'正眼から頭上へ大きく振りかぶり、剣先が白く光る。大きな円を描いて、体ごと振り下ろす。見るのは剣先。',why:'予備動作のない技の多い本気の中で、ただ一つ大きく見せる一撃。緊張の続く戦いの中の「緩」。',
+ keys:[K(0,R2G),K(10,R2D),K(14,{ua:-2.6,fa:-2.2,sw:.2,sheath:0,cr:2,lean:-.1}),K(34,{ua:-2.6,fa:-2.2,sw:.2,sheath:0,cr:2.2,lean:-.12}),K(39,{ua:-2.7,fa:-2.75,sw:-2.0,ua2:-2.5,fa2:-2.8,x:-24,lean:.1,cr:3,sheath:0},'in'),K(42,{ua:3.0,fa:2.6,sw:2.1,x:-46,lean:.3,ff:-13,fb:9,sheath:0},'in'),K(70,{ua:3.0,fa:2.6,sw:2.1,x:-46,lean:.3,ff:-13,fb:9,sheath:0}),K(100,R2D),K(130,R2G)],
  cues:[{t:14,col:'w'}],hits:[42],trails:[[34,46,'w',0,'arc']]});
 mv({f:'red2',id:'r2_tsubame',n:'つばめ返し（弧が二つ）',bg:'red',len:150,cap:'白く光ったら、上からの円弧、続けて下からの円弧。2撃の間はふつう（タン・タン）。見るのは剣先。',why:'円の技を二つ、向きを逆にしてつなぐ。二撃目の光は、一撃目の終わりに出る。',
- keys:[K(0,R2S),K(10,R2D),K(14,R8),K(42,Object.assign({},RCUT,{x:-46}),'in'),K(46,Object.assign({},RCUT,{x:-46,ua:2.4,fa:2.0,sw:1.6})),K(56,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2}),'in'),K(84,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2})),K(140,R2S)],
+ keys:[K(0,R2G),K(10,R2D),K(14,R8),K(42,Object.assign({},RCUT,{x:-46}),'in'),K(46,Object.assign({},RCUT,{x:-46,ua:2.4,fa:2.0,sw:1.6})),K(56,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2}),'in'),K(84,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2})),K(140,R2G)],
  cues:[{t:14,col:'w'},{t:28,col:'w'}],hits:[42,56],trails:[[36,44,'w',0,'arc'],[49,58,'w',0,'arc']]});
-mv({f:'red2',id:'r2_juji',n:'十文字（タタン・重い）',bg:'red',len:150,cap:'抜いて剣を脇に引き、目が赤く光る。横一文字に薙いで、間を置かずに真上から唐竹割り。赤い角ばった軌跡が十字に残る。2撃とも重く、間が短い（タタン）。',why:'赤い角ばった軌跡は「重い一撃」の印。横と縦、二本の赤い線が交わって十字になる。弾き切れば、二度大きく返せる。',
- keys:[K(0,R2S),K(10,Object.assign({},RW,{sheath:0,cr:4})),K(38,Object.assign({},RW,{sheath:0,cr:4.5,x:4})),K(42,{ua:3.0,fa:3.0,sw:3.0,ua2:2.6,fa2:2.8,x:-44,lean:.25,ff:-13,fb:9,cr:4,sheath:0},'in'),K(44,{ua:-2.2,fa:-1.7,sw:-1.3,x:-44,lean:-.05,cr:3,sheath:0}),K(50,{ua:2.8,fa:2.5,sw:2.0,x:-48,lean:.35,ff:-13,fb:9,cr:5,sheath:0},'in'),K(84,{ua:2.8,fa:2.5,sw:2.0,x:-48,lean:.35,ff:-13,fb:9,cr:5,sheath:0}),K(144,R2S)],
+mv({f:'red2',id:'r2_juji',n:'十文字（タタン・重い）',bg:'red',len:150,cap:'正眼から剣を脇に引き、目が赤く光る。横一文字に薙いで、間を置かずに真上から唐竹割り。赤い角ばった軌跡が十字に残る。2撃とも重く、間が短い（タタン）。',why:'赤い角ばった軌跡は「重い一撃」の印。横と縦、二本の赤い線が交わって十字になる。弾き切れば、二度大きく返せる。',
+ keys:[K(0,R2G),K(10,Object.assign({},RW,{sheath:0,cr:4})),K(38,Object.assign({},RW,{sheath:0,cr:4.5,x:4})),K(42,{ua:3.0,fa:3.0,sw:3.0,ua2:2.6,fa2:2.8,x:-44,lean:.25,ff:-13,fb:9,cr:4,sheath:0},'in'),K(44,{ua:-2.2,fa:-1.7,sw:-1.3,x:-44,lean:-.05,cr:3,sheath:0}),K(50,{ua:2.8,fa:2.5,sw:2.0,x:-48,lean:.35,ff:-13,fb:9,cr:5,sheath:0},'in'),K(84,{ua:2.8,fa:2.5,sw:2.0,x:-48,lean:.35,ff:-13,fb:9,cr:5,sheath:0}),K(144,R2G)],
  cues:[{t:14,col:'r'},{t:22,col:'r'}],hits:[42,50],hitCol:'r',trails:[[38,43,'r'],[45,51,'r']]});
 mv({f:'red2',id:'r2_pierce',n:'貫き（直線・重い）',bg:'red',len:130,cap:'剣先をこちらに向けたまま、赤く光る。一直線に、遠くから貫いてくる。重い。',why:'直線の技の中でいちばん重いもの。剣先が一点しか動かないので、軌跡は短い一本の線。',
- keys:[K(0,R2S),K(10,{ua:1.2,fa:3.0,sw:3.14,sheath:0,x:8,cr:4}),K(38,{ua:1.2,fa:3.0,sw:3.14,sheath:0,x:10,cr:4.5,lean:-.1}),K(42,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-56,lean:.3,ff:-15,fb:10,sheath:0},'in'),K(80,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-56,lean:.3,ff:-15,fb:10,sheath:0}),K(124,R2S)],
+ keys:[K(0,R2G),K(10,{ua:1.2,fa:3.0,sw:3.14,sheath:0,x:8,cr:4}),K(38,{ua:1.2,fa:3.0,sw:3.14,sheath:0,x:10,cr:4.5,lean:-.1}),K(42,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-56,lean:.3,ff:-15,fb:10,sheath:0},'in'),K(80,{ua:3.1,fa:3.12,sw:3.14,ua2:2.8,fa2:2.9,x:-56,lean:.3,ff:-15,fb:10,sheath:0}),K(124,R2G)],
  cues:[{t:14,col:'r'}],hits:[42],hitCol:'r',trails:[[38,44,'r',0,'line']]});
 /* 打ち合い：溜めは大きな弧、詰めはまっすぐな線 */
-const RLY=(f,id,n,bg,seq,cap,why,extra)=>{const ks=[K(0,f==='red2'?R2S:RI)],cues=[],hits=[],trs=[];let t=10;
+const RLY=(f,id,n,bg,seq,cap,why,extra)=>{const ks=[K(0,f==='red2'?R2G:RI)],cues=[],hits=[],trs=[];let t=10;
  seq.forEach((g,i)=>{const arc=g==='tame';cues.push({t,col:'g'});const wind=arc?{ua:-2.6,fa:-2.2,sw:.2,cr:2,lean:-.1,sheath:0}:{ua:1.2,fa:3.0,sw:3.14,x:2,cr:3,sheath:0};const gap=arc?40:20;const hit=t+gap;
   ks.push(K(t,wind));ks.push(K(hit-2,wind));ks.push(K(hit,arc?{ua:3.0,fa:2.6,sw:2.1,x:-30,lean:.3,ff:-12,fb:9,sheath:0}:{ua:3.1,fa:3.12,sw:3.14,x:-30,lean:.25,ff:-12,fb:9,sheath:0},'in'));hits.push(hit);trs.push([hit-(arc?8:4),hit+2,'g',0,arc?'arc':'line']);t=hit+10});
- ks.push(K(t+20,f==='red2'?R2S:RI));return mv(Object.assign({f,id,n,bg,len:t+30,cap,why,keys:ks,cues,hits,hitCol:'g',trails:trs},extra||{}))};
+ ks.push(K(t+20,f==='red2'?R2G:RI));return mv(Object.assign({f,id,n,bg,len:t+30,cap,why,keys:ks,cues,hits,hitCol:'g',trails:trs},extra||{}))};
 RLY('red2','r2_rallyx','打ち合い：溜めは弧、詰めは線','red',['tume','tame','tume','tume','tame'],'金に光ったら打ち合い。長く溜めた合は、頭上から大きな弧。間の短い「詰め」の合は、まっすぐな突き。軌跡の形で、次の合の間がわかる。','溜めと詰めで、剣の通る道まで変わる。耳（間）と目（軌跡）の両方で、打ち合いのリズムを読ませる。');
 RLY('red','r_rallyx','打ち合い：溜めは弧、詰めは線','red',['tume','tame','tume'],'金に光ったら打ち合い。溜めの合は大きな弧、詰めの合はまっすぐな突き。','本気の五合の前に、三合で同じ決まりを見せておく。');
 
-mv({f:'red2',id:'r2_silent',n:'無音の居合（光らない）',bg:'red',len:140,cap:'合図の光は出ない。腰の鞘から「チャキ」と鯉口を切る音がする。その音から、いつもの間で来る。見るのは光ではなく、鞘と音。',why:'光らない攻撃は、ゆうれいの中ボスで先に教わっている。光に頼りきったプレイヤーへの、剣の達人からの試験。',
- keys:[K(0,R2S),K(14,Object.assign({},R2S,{cr:4.8})),K(41,Object.assign({},R2S,{cr:4.8})),K(42,IAI,'snap'),K(90,IAI),K(91,R2S,'snap'),K(140,R2S)],hits:[42],
+mv({f:'red2',id:'r2_silent',n:'無音の居合（光らない）',bg:'red',len:140,cap:'正眼から剣を鞘に納める（チン）。そのあと合図の光は出ない。腰の鞘から「チャキ」と鯉口を切る音がする。その音から、いつもの間で来る。見るのは光ではなく、鞘と音。',why:'光らない攻撃は、ゆうれいの中ボスで先に教わっている。光に頼りきったプレイヤーへの、剣の達人からの試験。',
+ keys:[K(0,R2N),K(14,Object.assign({},R2N,{cr:4.8})),K(41,Object.assign({},R2N,{cr:4.8})),K(42,IAI,'snap'),K(90,IAI),K(91,R2N,'snap'),K(140,R2N)],hits:[42],
  fx:(B,J,t)=>{if(t>=14&&t<30){/* 音の輪：光ではない（灰色の弧が三重に広がる） */const c=add(J.hip,[-1*J.k,1*J.k]);for(let q=0;q<3;q++){const r=3+(t-14)*1.1+q*4;if(r>22)continue;for(let a=-.9;a<=.9;a+=.12){B.set(c[0]-Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#a8a0b0',4);B.set(c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#a8a0b0',4)}}}
   if(t>=42&&t<50){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-42)*.6)B.set(x,FL-14,'#d8dce8',4)}}});
 
+IAIWRAP('r2_iai',20);IAIWRAP('r2_iai2',20);IAIWRAP('r2_silent',20);
 /* 本気の返しの構え：鯉口を切り、刃が少しだけ見えている＝もう抜いている */
 const R2K={ua:1.75,fa:2.3,sw:null,sheath:1,ua2:1.3,fa2:2.4,cr:5.5,lean:.25,ff:-13,fb:9,hd:.12};
 const bladePeek=(B,J)=>{const k=J.k,h=J.hip,a=add(h,[-1*k,1*k]);for(let i=0;i<4;i++){B.set(a[0]-2*k-i*1.1*k,a[1]+1*k+i*.4*k,i%2?'#ffffff':'#d8dce8',2)}};
@@ -1149,7 +1156,7 @@ RLY('fallen2','f2_rallyx','五合：溜めは弧、詰めは線','hole',['tume',
 
 /* 強さの順を整える（2）：本気と第二形態にも、見抜く・残心の決まりを受けつがせる */
 const CL=(f,id,src,extra,kmap)=>{const m=MV.find(x=>x.id===src);const o=Object.assign({},m,{f,id},extra||{});if(kmap)o.keys=m.keys.map(k=>K(k.t,kmap(k.p),k.e));return mv(o)};
-CL('red2','r2_zanpunish','r_zanpunish',{n:'残心に手を出す（本気）',cap:'抜いて振り抜いたあとの残心。ここで何かを押すと、もう一撃（赤）。待てば、鞘に納める。',why:'本気になっても、残心は残る。むしろ、いちばん鋭い。'},p=>Object.assign({},p,{sheath:0}));
+CL('red2','r2_zanpunish','r_zanpunish',{n:'残心に手を出す（本気）',cap:'振り抜いたあと、息ひとつ乱さずに長く止まる残心。ここで何かを押すと、もう一撃（赤）。待てば、低い正眼に戻る。',why:'本気になっても、残心は残る。赤い騎士は肩で息をしながら止まっていた。本気は静かに止まる。むしろ、いちばん鋭い。'},p=>p===RI?R2G:Object.assign({},p,{sheath:0}));
 const W2=(B,J,t)=>{water(B,t);reflection(B,t,'red',J.P||{},EXX)};
 CL('fallen2','f2_seefeint','r_seefeint',{n:'フェイントを見抜かれる',bg:'hole',post:W2,cap:'紫の輪でまもるを押すと、見抜かれる。赤い光、本物の斬り下ろし。水面の映り姿も同じく斬る。'});
 CL('fallen2','f2_zanpunish','r_zanpunish',{n:'残心に手を出す',bg:'hole',post:W2,cap:'残心の最中に何かを押すと、もう一撃（赤）。待てば構えを解く。'});
@@ -1158,15 +1165,14 @@ mv({f:'fallen2',id:'f2_dfeint',n:'水面の二重フェイント',bg:'hole',len:
  cues:[{t:16,col:'p',at:J=>[EXX-6,FL+14]},{t:42,col:'p',at:J=>[EXX-6,FL+14]},{t:70,col:'r',at:J=>add(J.head,[-3,0])}],hits:[98],hitCol:'r',trails:[[95,100,'r']],post:W2});
 
 /* 強さの順を整える（3）：数でも後の者が上になるように */
-const IAIS=(y)=>({ua:3.1,fa:3.0+y*.15,sw:3.14+y*.2,ua2:.9,fa2:.6,sheath:0,x:-4,lean:.25,cr:5,ff:-12,fb:9});
-mv({f:'red2',id:'r2_three',n:'参段の居合（その場・上中下・タン・タタン）',bg:'red',len:170,cap:'【構え】腰を落とさず、まっすぐ立ったまま肘を張って柄を握る。動かずに、その場で三度抜き打つ。刃は飛ぶ斬撃になって、上・中・下の三つの高さで飛んでくる。1撃目のあと少し間があり、2撃目と3撃目は続けて来る（タン・タタン）。',why:'弐の居合は「すれちがって、後ろから」。参段は「その場から、飛ぶ斬撃が三つ」。騎士が動くか動かないかで、ひと目で見分けられる。',
- keys:[K(0,R2S),K(10,Object.assign({},R2S,{cr:.5,lean:-.12,ua:2.5,fa:1.1,ff:-2,fb:2}),'out'),K(24,Object.assign({},R2S,{cr:.5,lean:-.12,ua:2.5,fa:1.1,ff:-2,fb:2})),K(26,Object.assign({},R2S,{cr:5.5})),K(30,IAIS(-1),'snap'),K(40,IAIS(-1)),K(44,Object.assign({},R2S,{cr:5.5}),'snap'),K(58,Object.assign({},R2S,{cr:5.5})),K(60,IAIS(0),'snap'),K(64,IAIS(0)),K(66,IAIS(1),'snap'),K(78,IAIS(1)),K(84,R2S,'snap'),K(170,R2S)],
+const IAIS=(y)=>({ua:3.1,fa:3.0+y*.15,sw:3.14+y*.2,ua2:2.9,fa2:2.85+y*.15,sheath:0,x:-4,lean:.28,cr:5,ff:-12,fb:9});
+mv({f:'red2',id:'r2_three',n:'参段（その場・上中下・タン・タタン）',bg:'red',len:170,cap:'【構え】足をそろえて腰を伸ばし、肘を張って剣を胸の高さに水平に構える（本気の中で、ただ一つ腰が高い構え）。そこから低く沈み、その場から一歩も動かずに三度、短く振る。刃は飛ぶ斬撃になって、上・中・下の三つの高さで飛んでくる。1撃目のあと少し間があり、2撃目と3撃目は続けて来る（タン・タタン）。振りは小さく、体は揺れない。',why:'弐の居合は「納刀して、すれちがって、後ろから」。参段は「抜き身のまま、その場から飛ぶ斬撃が三つ」。鞘に納めたかどうかと、騎士が動くかどうかで、ひと目で見分けられる。一撃で来る溜めとは、構えの腰の高さで見分ける（溜めは深く沈む、参段は一度まっすぐ立つ）。',
+ keys:[K(0,R2G),K(10,Object.assign({},R2G,{cr:.5,lean:-.12,ff:-3,fb:3,ua:2.45,fa:3.0,sw:3.14,ua2:2.3,fa2:2.95}),'out'),K(24,Object.assign({},R2G,{cr:.5,lean:-.12,ff:-3,fb:3,ua:2.45,fa:3.0,sw:3.14,ua2:2.3,fa2:2.95})),K(28,Object.assign({},R2G,{cr:5}),'in'),K(29,Object.assign({},R2G,{cr:5})),K(30,IAIS(-1),'snap'),K(40,IAIS(-1)),K(44,Object.assign({},R2G,{cr:5}),'io'),K(59,Object.assign({},R2G,{cr:5})),K(60,IAIS(0),'snap'),K(64,IAIS(0)),K(66,IAIS(1),'snap'),K(78,IAIS(1)),K(96,R2G,'io'),K(170,R2G)],
  cues:[{t:14,col:'w',at:J=>add(J.head,[-3,0])},{t:42,col:'w',at:J=>add(J.head,[-3,0])},{t:50,col:'w',at:J=>add(J.head,[-3,0])}],hits:[42,70,78],
- fx:(B,J,t)=>{/* 飛ぶ斬撃：抜いた瞬間に出て、当たる瞬間にこちらへ届く三日月 */[[30,42,FL-26],[60,70,FL-15],[66,78,FL-5]].forEach(([s,h,y])=>{if(t>=s&&t<h+4){const u=Math.min(1,(t-s)/(h-s)),x=lerp(EXX-14,HXX+6,u);for(let a=-1.1;a<=1.1;a+=.12){const px=x+Math.cos(a)*5-5,py=y+Math.sin(a)*7;B.set(px,py,'#ffffff',4);B.set(px+1,py,'#bfe8ff',4)}for(let k=1;k<4;k++)B.set(x+k*4,y,'#8a90a8',4)}})}});
-mv({f:'red2',id:'r2_holdfeint',n:'溜めの中のふり',bg:'red',len:190,cap:'柄に手をかけて長く溜める。途中で一度、紫の輪（ふり）。押さずに待つと、目が白く光って本物の居合。',why:'「待つ」と「押さない」を重ねた。じれた心に、ふりが刺さる。押せば見抜かれる。',
- keys:[K(0,R2S),K(20,Object.assign({},R2S,{cr:5.5,lean:.22})),K(48,Object.assign({},R2S,{cr:5.2,lean:.15})),K(54,Object.assign({},R2S,{cr:5.5,lean:.22})),K(121,Object.assign({},R2S,{cr:5.5,lean:.22})),K(122,IAI,'snap'),K(150,IAI),K(151,R2S,'snap'),K(190,R2S)],
- cues:[{t:48,col:'p',at:J=>add(J.head,[-3,0])},{t:94,col:'w',at:J=>add(J.head,[-3,0])}],hits:[122],
- fx:(B,J,t)=>{if(t>=122&&t<130){for(let x=0;x<CW;x++)if((x+t)%9<7-(t-122)*.6)B.set(x,FL-14,'#ffffff',4)}}});
+ fx:(B,J,t)=>{/* 飛ぶ斬撃：振った瞬間に出て、当たる瞬間にこちらへ届く三日月 */[[30,42,FL-26],[60,70,FL-15],[66,78,FL-5]].forEach(([s,h,y])=>{if(t>=s&&t<h+4){const u=Math.min(1,(t-s)/(h-s)),x=lerp(EXX-14,HXX+6,u);for(let a=-1.1;a<=1.1;a+=.12){const px=x+Math.cos(a)*5-5,py=y+Math.sin(a)*7;B.set(px,py,'#ffffff',4);B.set(px+1,py,'#bfe8ff',4)}for(let k=1;k<4;k++)B.set(x+k*4,y,'#8a90a8',4)}})}});
+mv({f:'red2',id:'r2_holdfeint',n:'溜めの中のふり',bg:'red',len:190,cap:'正眼で長く溜める。途中で一度、肩がほんのわずかに沈んで紫の輪（ふり）。押さずに待つと、目が白く光って、引きのない両手突き。',why:'「待つ」と「押さない」を重ねた。じれた心に、ふりが刺さる。押せば見抜かれる。',
+ keys:[K(0,R2G),K(20,Object.assign({},R2G,{cr:5.5,lean:.28})),K(48,Object.assign({},R2G,{cr:5.9,lean:.32})),K(54,Object.assign({},R2G,{cr:5.5,lean:.28})),K(121,Object.assign({},R2G,{cr:5.5,lean:.28})),K(122,{ua:3.1,fa:3.12,sw:3.14,ua2:2.85,fa2:2.95,x:-54,lean:.38,ff:-15,fb:11,cr:4.5,sheath:0},'in'),K(150,{ua:3.1,fa:3.12,sw:3.14,ua2:2.85,fa2:2.95,x:-54,lean:.38,ff:-15,fb:11,cr:4.5,sheath:0}),K(170,R2G,'io'),K(190,R2G)],
+ cues:[{t:48,col:'p',at:J=>add(J.head,[-3,0])},{t:94,col:'w',at:J=>add(J.head,[-3,0])}],hits:[122],trails:[[119,124,'w',0,'line']]});
 CL('fallen2','f2_counter','r_counter',{n:'返し斬り',bg:'hole',post:W2,cap:'剣を引いて待つ構えに斬りかかると、アーチの触手が受け止め、赤い光の返し斬り。水面の映り姿も同じく返す。弾けば居合返し。'});
 mv({f:'fallen2',id:'f2_silentiai',n:'水の中の無音の居合',bg:'hole',len:140,cap:'光らない。水面の映り姿の鞘から「チャキ」と音の輪が広がる。その音から、いつもの間で、本体が斬る。',why:'「光らない」と「見る場所（水面）」を重ねた。本気の赤い騎士の無音の居合を、映り姿が覚えている。',
  keys:[K(0,F2I),K(14,R8),K(41,R8),K(42,RCUT,'in'),K(80,RCUT),K(134,F2I)],hits:[42],trails:[[39,44,'w',0,'line']],
@@ -1402,7 +1408,7 @@ for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?
    本気は余裕ではない。主人公を心の底から倒しにくる。だから両手で握り、腰を深く落とし、体ごと斬る。
    頂きは「楽に勝てる」ことではなく「全部を一太刀に乗せられる」こと：予備動作がない、止まるところは震えずに止まる、刃の角度まで操る。
    片手になるのは赤（重い合・十文字）だけ。両手では届かない半歩を、左腕を後ろへ振って体を一本の線に伸ばし切って届かせる。 */
-QSTY.red2={f:'red2',bg:'red',I:R2S,tag:'本気'};
+QSTY.red2={f:'red2',bg:'red',I:R2G,tag:'本気'};
 const Z0={sheath:0},ZP=p=>Object.assign({},p,Z0),ZDEEP=p=>ZP(Object.assign({},p,{cr:(p.cr||2.5)+1.3,ff:(p.ff!=null?p.ff:-6)-3,fb:(p.fb!=null?p.fb:5)+3})),
  ZSAL=ZP({ua:2.0,fa:.3,sw:-1.57,ua2:1.6,fa2:2.0,cr:1,x:0,lean:0,hd:.1}),
  ZRI=ZP({ua:2.45,fa:1.85,sw:2.7,ua2:2.25,fa2:1.75,x:QX-2,cr:4.5,lean:.22,ff:-11,fb:9}),
@@ -1415,8 +1421,8 @@ const Z0={sheath:0},ZP=p=>Object.assign({},p,Z0),ZDEEP=p=>ZP(Object.assign({},p,
 const ghostArc=(B,J,t,h)=>{for(let g=1;g<=3;g++)rsl(B,J,t-g,h,'g',4.4,2.4)};
 /* 踏みこみの土ぼこり：体ごと斬った重さを、前足で見せる */
 const stomp=(B,J,t,h)=>{const d=t-h;if(d<0||d>8||!J.footF)return;const x0=J.footF[0],y=Math.round(J.footF[1]);for(let i=0;i<5;i++){const s=(i-2)*1.6,x=x0+s*(1+d*.45),yy=y-Math.round(Math.abs(s)*.2+d*.35*(i%2));if(d>5&&(i+t)%2)continue;B.set(x,yy,d<3?'#8a6a6a':'#5a4048',4)}};
-QR('red2','r2_q_open','打ち合い：一礼と誘いのひと振り（金）',180,[K(0,R2S),K(6,ZSAL,'out'),K(18,ZSAL),K(32,ZDEEP(QOPEN),'io'),K(70,ZDEEP(QOPEN)),K(72,ZDEEP(QOPENH),'in'),K(82,ZDEEP(QOPENH)),K(94,ZRI,'out'),K(180,ZRI)],[{t:44,col:'g'}],[72],'g',t=>t>=72&&t<82?HRP:t>=82?HRG:null,
- '剣を抜き、刃を顔の前にまっすぐ立てて一礼する。礼を解くと、刃は立てたまま右肩の上へすべり、同時に腰が深く落ちて八相になる。そこで完全に止まり、間をおいて刃が金に光る。体ごと袈裟の一振り。弾けば踏みこみ、画面が締まる。振り抜いたあと、切っ先をこちらの目に向けた低い構えに収まり、以後はこの構えから打ち合う。','一礼は見下す礼ではなく、倒すべき相手と認めた礼。赤い騎士（立ったまま構える）より腰が低いのは、体ごと斬る覚悟。',(B,J,t)=>{clash(B,t-72,CXP[0],CXP[1]);stomp(B,J,t,72);if(t>=8&&t<18&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')},{bars:t=>t<74?0:Math.min(10,(t-74)*.6)});
+QR('red2','r2_q_open','打ち合い：一礼と誘いのひと振り（金）',180,[K(0,R2G),K(6,ZSAL,'out'),K(18,ZSAL),K(32,ZDEEP(QOPEN),'io'),K(70,ZDEEP(QOPEN)),K(72,ZDEEP(QOPENH),'in'),K(82,ZDEEP(QOPENH)),K(94,ZRI,'out'),K(180,ZRI)],[{t:44,col:'g'}],[72],'g',t=>t>=72&&t<82?HRP:t>=82?HRG:null,
+ '正眼から、刃を顔の前にまっすぐ立てて一礼する。礼を解くと、刃は立てたまま右肩の上へすべり、同時に腰が深く落ちて八相になる。そこで完全に止まり、間をおいて刃が金に光る。体ごと袈裟の一振り。弾けば踏みこみ、画面が締まる。振り抜いたあと、切っ先をこちらの目に向けた低い構えに収まり、以後はこの構えから打ち合う。','一礼は見下す礼ではなく、倒すべき相手と認めた礼。赤い騎士（立ったまま構える）より腰が低いのは、体ごと斬る覚悟。',(B,J,t)=>{clash(B,t-72,CXP[0],CXP[1]);stomp(B,J,t,72);if(t>=8&&t<18&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')},{bars:t=>t<74?0:Math.min(10,(t-74)*.6)});
 QR('red2','r2_q_tame','打ち合い：溜めの合（上段の静止・弧）',120,[K(0,ZRI),K(8,ZUP,'out'),K(46,ZUP),K(48,ZDEEP(QTAMEH),'in'),K(58,ZDEEP(QTAMEH)),K(84,ZRI,'io'),K(120,ZRI)],[{t:20,col:'g'}],[48],'g',t=>t>=48&&t<56?HRP:HRG,
  '両手で剣を頭上に立てた上段。息を深く吸って肩が上がり、そこで止まる。剣先はふるえない（赤い騎士は引きしぼってふるえる）。金に光ってから、吐く息と一緒に腰を落とし、頭上を越える大きな弧。刃のあとに三本の残像。前足が床を打つ。','溜めは弧。本気は力みで震えるかわりに、息で溜める。止まっている時間そのものが溜め。',(B,J,t)=>{clash(B,t,CXP[0],CXP[1]);clash(B,t-48,CXP[0],CXP[1]-6);ghostArc(B,J,t,48);stomp(B,J,t,48)},{trails:[[44,50,'g',0,'arc']],pp:(P,t)=>{if(t>=8&&t<48)P.cr-=.7*Math.min(1,(t-8)/14)}});
 QR('red2','r2_q_tsume','打ち合い：詰めの合（予備動作なしの突き）',80,[K(0,ZRI),K(33,ZRI),K(34,ZTH,'snap'),K(44,ZTH),K(60,ZRI,'io'),K(80,ZRI)],[{t:6,col:'g'}],[34],'g',t=>t>=34&&t<42?HRP:HRG,
@@ -1446,12 +1452,14 @@ tfe('lord','l_r_tfeint',LRI,LLO,half(LLO,LJAB),LJAB,'lord','鍵を腰に引き�
 tfe('lord2','l2_r_tfeint',L2X(LRI),L2X(LLO),L2X(half(LLO,LJAB)),L2X(LJAB),'lord','鍵の歯が紫の輪に光り、突きかけて止まる。止めた瞬間、背中の触手だけが前へのびかける。間をおいて金の本物。','突きのフェイント。触手につられて押さない。',(B,J,t)=>tentLash(B,J,t,26,40));
 for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?'f':'f2',S=QSTY[st];tfe(S.f,p+'_q_tfeint',QRI,QTSU,half(QTSU,QTSUH),QTSUH,S.bg,'剣を引き、切っ先が紫の輪に光る。突きかけて、切っ先がこちらの鍔の手前でぴたりと止まる。'+(S.dark?'止めた瞬間、触手だけが前へ出かける。':'')+'引き戻して、間をおいて金の本物の突き。','突きのフェイント。斬りのフェイントと同じく、紫の輪＝押さずに待つ。',S.dark?(B,J,t)=>T8(B,J,t,26,40):null)}
 tfe('red2','r2_q_tfeint',ZRI,ZRI,half(ZRI,ZTH),ZTH,'red','低い構えのまま動かず、切っ先だけが紫の輪に光る。両手突きが走り、切っ先がこちらの鍔に触れる寸前、髪一本の距離で止まる。そのまま切っ先で鍔をコツンと叩いて引く。間をおいて金の本物。','突きのフェイント。本気は全力の突きを「触れる寸前」で止められる。押せば、その距離からそのまま崩される。',(B,J,t)=>{if(t===40&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')});
-/* 本気の角度は、いつも近い回り道で補間する。角度の差が半周をこえると、腕や剣が体の後ろを大回りして、
+/* 赤い騎士と本気の角度は、いつも近い回り道で補間する。角度の差が半周をこえると、腕や剣が体の後ろを大回りして、
    振ってもいない「ひと振り」が一瞬見えてしまう（構えを移すだけの場面で、剣を振ったように見えた）。 */
-for(const M of MV)if(M.f==='red2'&&/_q_/.test(M.id)){M.keys=M.keys.map(k=>Object.assign({},k,{p:Object.assign({},k.p)}));for(let i=1;i<M.keys.length;i++){const a=M.keys[i-1].p,b=M.keys[i].p;for(const q of['ua','fa','sw','ua2','fa2']){const A=a[q]!=null?a[q]:PDEF[q];if(typeof b[q]!=='number'||typeof A!=='number')continue;while(b[q]-A>Math.PI)b[q]-=6.2832;while(b[q]-A<-Math.PI)b[q]+=6.2832}}}
-/* 本気の息：構えているあいだは、ゆっくり深く息をしている（体が上下にわずかに動く）。斬るときは吐く息と一緒に腰が沈む。
-   余裕のある者は息をしているように見えない。全部を出している者は、息が見える */
-for(const M of MV)if(M.f==='red2'&&/_q_/.test(M.id)){const p0=M.pp,hs=M.hits||[];M.pp=(P,t)=>{if(p0)p0(P,t);P.cr=(P.cr||0)+Math.sin(t*.075)*.3;for(const h of hs){const d=t-h;if(d>=0&&d<12)P.cr+=1.0*(1-d/12)}}}
+for(const M of MV)if(M.f==='red'||M.f==='red2'){M.keys=M.keys.map(k=>Object.assign({},k,{p:Object.assign({},k.p)}));for(let i=1;i<M.keys.length;i++){const a=M.keys[i-1].p,b=M.keys[i].p;for(const q of['ua','fa','sw','ua2','fa2']){const A=a[q]!=null?a[q]:PDEF[q];if(typeof b[q]!=='number'||typeof A!=='number')continue;while(b[q]-A>Math.PI)b[q]-=6.2832;while(b[q]-A<-Math.PI)b[q]+=6.2832}}}
+/* 赤い騎士の力みと、本気の静けさ（すべての技にかける）
+   赤い騎士：肩で速く息をし（約35Fで一往復）、切っ先が小刻みに震える。侵略者を倒さねばという力み。
+   本気：ゆっくり深く息をし（約84Fで一往復）、切っ先は震えない。斬るときは吐く息と一緒に腰が沈む。冷静に、でも全力。 */
+for(const M of MV){if(M.f==='red'){const p0=M.pp;M.pp=(P,t)=>{if(p0)p0(P,t);if(M.id==='r_rage'&&t>=78)return;P.cr=(P.cr||0)+Math.sin(t*.18)*.35;if(P.sw!=null)P.sw+=Math.sin(t*1.9)*.035+Math.sin(t*3.1)*.015}}
+ else if(M.f==='red2'&&M.id!=='r2_last'){const p0=M.pp,hs=M.hits||[];M.pp=(P,t)=>{if(p0)p0(P,t);P.cr=(P.cr||0)+Math.sin(t*.075)*.3;for(const h of hs){const d=t-h;if(d>=0&&d<12)P.cr+=1.0*(1-d/12)}}}}
 /* 拍の攻撃は、合図から当たりまでが拍のぶん長い（ゲームと同じ）。のしかかり38F、尾と炎36F */
 for(const id of ['d_slam','d_tail','d_breath','h_spit','h_crawl'])MV.find(m=>m.id===id).beat=true;
 
@@ -1552,11 +1560,11 @@ const FORMS=[
  pal:[['#140e1a','もっと深い黒','封印がほどけた'],['#ff3050','胸の口の赤','いちばん重い場所'],['#22142e','くらやみの触手','門の向こうのもの']]},
 {key:'red',ttl:'赤い騎士',en:'THE RED KNIGHT',old:'red',stage:['s_red'],
  lore:'門のぬしが、くらやみに飲まれなかった場合の、あり得た別の姿。同じ人の、もう一つの世界線。ぬしがきれいに倒れた瞬間、門が一度だけ揺らぎ、向こうの世界線から歩み出てくる。彼の世界では、門は決して開けてはならないもの。主人公は、たった今その門を開けた者だ。',
- parts:[['ぬしと同じ筒形の兜（角が生える前）','同じ人だから、同じ兜。角はない＝門と一つになっていない'],['一本の白い羽根','ただ一つの飾り。後ろへ流れる＝いつも前へ出る者。主人公が最後に受けつぐもの'],['全身の赤','門に誓った者の色。のまれた世界線では、ぬしの封印のひびの奥に「赤い目」としてだけ残っている'],['ひびのない金の封印','ぬしと同じ封印。割れていない＝くらやみを閉じこめていない'],['赤い前垂れと「閉じた門」','ぬしと同じ形、同じ紋章。色だけが誓いの赤'],['鍵の輪の柄頭を持つ細い剣','のまれなかったので、鍵は大剣にならず細い剣のまま。銀＝のまれないもの'],['手首にかせも鎖もない','鎖でつながれる必要がなかった'],['動かない切っ先','ほかのボスはみな揺れている。一体だけ止まっている＝剣を極めた「静」'],['長いマント','本気のときに自分で斬り落とす']],
+ parts:[['ぬしと同じ筒形の兜（角が生える前）','同じ人だから、同じ兜。角はない＝門と一つになっていない'],['一本の白い羽根','ただ一つの飾り。後ろへ流れる＝いつも前へ出る者。主人公が最後に受けつぐもの'],['全身の赤','門に誓った者の色。のまれた世界線では、ぬしの封印のひびの奥に「赤い目」としてだけ残っている'],['ひびのない金の封印','ぬしと同じ封印。割れていない＝くらやみを閉じこめていない'],['赤い前垂れと「閉じた門」','ぬしと同じ形、同じ紋章。色だけが誓いの赤'],['鍵の輪の柄頭を持つ細い剣','のまれなかったので、鍵は大剣にならず細い剣のまま。銀＝のまれないもの'],['手首にかせも鎖もない','鎖でつながれる必要がなかった'],['震える切っ先と荒い息','門を開けて入ってきた侵略者を、倒さねばという力み。肩で速く息をし、切っ先が小刻みに震える。本気になると、この震えが止まる'],['長いマント','本気のときに自分で斬り落とす']],
  pal:[['#a8303a','漆の赤','門への誓い'],['#d8b050','明るい金','曇っていない誇り'],['#e8e0d0','白い羽根','唯一の飾り'],['#d8dce8','銀の刃','のまれないもの']]},
 {key:'red2',ttl:'本気の赤い騎士',en:'THE RED KNIGHT — RESOLVED',old:null,stage:['s_red2','s_red_end'],
- lore:'マントを斬り捨て、剣を鞘に納めた赤い騎士。ぬしの「裏に目のあるマント」への拒絶——ああはならない。ここから先は居合。',
- parts:[['マントがない','飾りを捨てた＝本気。背景の赤い旗も同時に落ちる'],['剣は鞘の中','剣が見えない＝体の動きでは読めない。読めるのは光だけ'],['白い目と、その尾','金から白へ。目そのものが合図になる'],['低い構え','居合の形'],['最期は構えたまま','剣を顔の前に縦に立てた、美しい構えのまま、目の光が消える。倒れない']],
+ lore:'マントを斬り捨て、大きく一つ息を吐いた赤い騎士。力みが消え、震えていた切っ先が止まる。ぬしの「裏に目のあるマント」への拒絶——ああはならない。冷静さを取り戻したが、手加減はしない。低い正眼から、体ごと斬りにくる。居合は、技を使うときだけ鞘に納めて構える。',
+ parts:[['マントがない','飾りを捨てた＝本気。背景の赤い旗も同時に落ちる'],['抜き身の低い正眼','両手で握り、腰を深く落とす。切っ先は相手の目に向いたまま動かない＝冷静さを取り戻した。それでも体ごと斬る構え'],['ゆっくり深い息','赤い騎士は肩で速く息をしていた。本気は深く静か。斬るときは吐く息と一緒に腰が沈む'],['居合は技のときだけ','正眼から剣を鞘に納める「チン」が、居合が来る予告。納刀を見たら、目の光に集中する'],['片手は赤のときだけ','左手を離し、体を一本の線に伸ばし切る捨て身。両手では届かない半歩を届かせる'],['白い目と、その尾','金から白へ。目そのものが合図になる'],['最期は構えたまま','剣を顔の前に縦に立てた、美しい構えのまま、目の光が消える。倒れない']],
  pal:[['#ffffff','白い目','合図そのもの'],['#a8303a','漆の赤','変わらない']]},
 {key:'fallen',ttl:'赤い門のぬし',en:'WHERE THE LINES MEET',old:'fallen',stage:['s_hole'],
  lore:'赤い騎士が倒れると、床に穴が開き、二つの世界線がそこで重なる。くらやみは彼をのみこみ、彼は結局、ぬしと同じものになっていく。どの世界線を選んでも、くらやみに行き着く。',

@@ -129,12 +129,12 @@ SPEC.red={hk:1.1,lk:.9,tk:.95,name:'赤い騎士',k:1.25,pal:PAL.red,helm:redHel
  tabard:RED_TAB,tabardFront:true,chest:sealIntact,
  cape:{len:28,wide:1.2,col:'#5a0e1c',hi:'#8a2030',lo:'#2a0610',extra:(B,J,T,c)=>{/* マントの裏地は金：誓いの金 */for(let i=0;i<=8;i++){const t=i/8;B.set(lerp(c.b[0],c.d[0],t),lerp(c.b[1],c.d[1],t),'#b8902a',2)}}},
  w:W_RED,sheath:sheathDraw,front:(B,J,T)=>redDetail(B,J,T,'#d8b050','#ffe080'),
- pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.5,fa2:2.3,ff:-9,fb:7,cr:1.5}};
+ pose:{ua:2.05,fa:2.55,sw:3.35,ua2:1.65,fa2:2.25,ff:-10,fb:8,cr:2.6,lean:.1}};
 SPEC.red2={hk:1.1,lk:.9,tk:.95,name:'本気の赤い騎士',k:1.25,pal:PAL.redW,
  helm:Object.assign({},redHelm,{glow:'#ffffff',eyeExtra:true,extra:(B,R,k,T)=>{/* 目の光が白い尾を引く */for(let i=1;i<7;i++)B.set(...R([(-4+i*1.6)*k,(-.4+i*.12)*k]),i<3?'#ffffff':'#bfe8ff',5)}}),
  tabard:RED_TAB,tabardFront:true,chest:sealIntact,
  w:W_RED,sheath:sheathDraw,front:(B,J,T)=>redDetail(B,J,T,'#d8b050','#ffe080'),
- pose:{ua:1.7,fa:2.2,sw:null,sheath:1,ua2:1.4,fa2:2.6,ff:-12,fb:8,cr:4.5,lean:.18,hd:.1}};
+ pose:{ua:2.45,fa:1.85,sw:2.7,ua2:2.25,fa2:1.75,cr:4.5,lean:.22,ff:-11,fb:9,sheath:0}};
 const fallenCape=(n)=>(B,J,T,P)=>{const k=J.k;/* 斬り捨てたマントの代わりに、くらやみの触手がマントになった */for(let i=0;i<n;i++){const r=add(J.shB,[(1+i)*k,(1+i)*k]),w=Math.sin(T*.07+i*1.3)*3;tentacle(B,r,[r[0]+(6+i*2)*k+w,r[1]+12*k],[r[0]+(4+i*3)*k+w*1.6,r[1]+(24-i*2)*k],1.8*k,.5*k,i===1)}};
 const backTen=(B,J,T,P,base)=>{const k=J.k,ten=P.ten||[0,0,0];for(let i=0;i<3;i++){const r=add(J.sc,[4*k,(-4+i*3)*k]),w=Math.sin(T*.06+i*2)*3,ex=Math.max(-1,Math.min(1,ten[i]||0)),rest=[r[0]+(9+i*3)*k,r[1]-(14-i*6)*k+w],tgt=[HXX+8,FL-14],tip=ex>=0?[lerp(rest[0],tgt[0],ex),lerp(rest[1],tgt[1],ex)]:rest,mid=ex>0?[lerp(r[0]+(13+i*2)*k,(r[0]+tgt[0])/2,ex),r[1]-(18+i*4)*k*ex-(6-i*4)*k*(1-ex)]:[r[0]+(13+i*2)*k,r[1]-(6-i*4)*k];tentacle(B,r,mid,tip,2.1*k,.6*k,false);B.set(...tip.map(Math.round),P.eyeOn&&P.eyeOn[i]?'#ffffff':INK.eye,2)}};
 const fallenHelm={type:'bhorn',sides:[1],band:['#6a5020','#9a7a30'],glow:'#ff3050',dents:[[-3,-1],[1,2]],cracks:[[-2,-4],[-1.5,-3],[-2,-2],[-1.5,-1]],crackCol:'#9a5ad0',horn:'#2a2434',hornHi:'#6e6680',hornLo:'#120e18',rings:'#8a6a2a',

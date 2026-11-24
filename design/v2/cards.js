@@ -18,7 +18,7 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  const J=(S.draw||knight)(B,ox,oy,S,P,tt);J.P=P;
  if(M.fx)M.fx(B,J,tt,S,M);
  /* 共通：合図の光と、当たった瞬間の火花 */
- for(const c of (M.cues||[])){const d=tt-c.t;if(d>=0&&d<18){const tp=c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF;if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
+ for(const c of (M.cues||[])){const d=tt-c.t;if(d>=0&&d<18){const tp=cueAnchor(M,S,c,base,ox,oy)||(c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF);if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
  for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])(tr[4]==='line'?lineTrail:tr[4]==='arc'?arcTrail:trail)(B,S,M,tt,ox,oy,tr[4]?8:4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);
@@ -52,3 +52,8 @@ function liftTip(S,M,P,ox){if(!S||(S.draw&&!S.knightLike)||PLANT.has(M.id)||M.pl
 /* 踏みこんでも、主人公に体を重ねない（手前で止める）。剣は届いてよい。すれちがって後ろへ抜ける居合だけは例外 */
 const PASS=new Set(['r2_iai','r2_iai2','r2_silent','f_silent','f_iai']),NEAR=HXX+8;
 function fixPose(S,M,P,ox){if(!S||(S.draw&&!S.knightLike))return;if(!M.noHero&&!PASS.has(M.id)){const J=joints(ox,FL,S,Object.assign({},PDEF,S.pose,P)),f=Math.min(J.hip[0],J.sc[0],J.head[0],J.footF[0],J.kneeF[0],J.shF[0]);if(f<NEAR)P.x=(P.x||0)+(NEAR-f)}liftTip(S,M,P,ox)}
+
+/* 合図の光は、剣先についていかず、光った場所に残る（振っている最中に光が動くと読みにくい）。光った瞬間の位置を一度だけ求めて覚えておく */
+function cueAnchor(M,S,c,base,ox,oy){if(!M._cueP)M._cueP=new Map();if(M._cueP.has(c))return M._cueP.get(c);let tp=null;
+ try{const P=poseAt0(M,c.t,base);if(M.pp)M.pp(P,c.t);fixPose(S,M,P,ox);const W=new Buf(CW,CH),J=(S.draw||knight)(W,ox,oy,S,P,c.t);J.P=P;tp=c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF;tp=tp?[tp[0],tp[1]]:null}catch(e){tp=null}
+ M._cueP.set(c,tp);return tp}

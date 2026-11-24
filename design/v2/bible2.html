@@ -610,7 +610,7 @@ function bz2(h,t){const u=1-t;return[u*u*h[0][0]+2*u*t*h[1][0]+t*t*h[2][0],u*u*h
 /* ===== 三つ首の竜：竜の亡骸の胸の裂け目から出る、三本の「指」 =====
    竜の形は借り物、その借り物の体を、上位の存在が通り道に使う。首は指：節が三つ、関節のしわ、角に見える平たい白い爪、真ん中がいちばん長い、同じ向きにしか曲がらない、付け根が一列。
    肌は、どの生き物の色でもない灰紫。ぬれていない。乾いた、古い、死んだものの肌。 */
-/* 三本の指の個性：上＝人差し指（細く長い・せわしなく震える・はがれた爪）、まん中＝中指（いちばん長く太い・ゆっくり・まっすぐ）、下＝親指（太く短い・先の節が短い・ほかと逆へ反る・金の指輪・幅広の爪） */
+/* 三本の指の個性：上＝人差し指（細く長い・せわしなく震える・はがれた爪）、まん中＝中指（いちばん長く太い・ゆっくり・まっすぐ）、下＝親指（太く短い・先の節が短い・ほかよりゆるく曲がる・金の指輪・幅広の爪） */
 const HFG=[{L:[14,12,10],th:.82,nail:.85,tw:.06,tws:.9},{L:[17,16,13],th:1.06,nail:1,tw:.03,tws:.035},{L:[11,9,5],th:1.32,nail:1.3,tw:.02,tws:.02}];
 const HSK=['#14111a','#332d3d','#544b60','#7a7086','#a69cb0'],HPAD=['#3a2e3a','#5e4a58','#86707e'],HNAIL=['#8a8278','#c8c0b4','#ece6da','#ffffff'];
 function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,lit:[0,0,0],curl:0,fist:0,snap0:0,snap1:0,snap2:0,rift:1,emerge:1,grip:0,heads:1,press:0,cut:[0,0,0],stump:0,swap:0,spread:0,grab:0,tx0:0,ty0:0,tx1:0,ty1:0,tx2:0,ty2:0},S.pose||{});for(const[a,v]of Object.entries(P0||{}))if(v!==undefined&&!(typeof v==='number'&&!isFinite(v)))P[a]=v;
@@ -627,7 +627,7 @@ function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:
   for(let i=0;i<3;i++){const a=1.4+i*.5,s0=R([Math.cos(a)*rw,Math.sin(a)*rh]),s1=R([Math.cos(a)*(rw+4*ro),Math.sin(a)*(rh+2*ro)]);dTent(B,[s0,s1],.9,.3,HNAIL)}}
  /* ===== 三本の指 ===== */
  const fin=[],cut=P.cut||[0,0,0],order=[2,0,1];const pts=[];const palmC=add(c,[-5*k*P.emerge,-17*k*P.emerge]);if(P.fist>.05&&P.emerge>.03){const m=new Set(),pc=LP(c,palmC,P.fist);dCurve(m,t=>LP(c,pc,t),5*k,6.2*k,10,.03,4);dDisc(m,pc[0]+3,pc[1]+1,5.5*k*P.fist,.05,2);dShade(B,m,HSK,mix(HSK[4],'#d8cce0',.3),null,true)}
- for(let i=0;i<3;i++){const root=R([-rw*.5,(-6+i*6)*k]),L=HFG[i].L.map(v=>v*k*P.emerge*(1-P.curl*.65)),A0=[-2.05,-1.5,-1.0],a0=lerp(A0[i],A0[2-i],P.swap)+[-.55,0,.5][i]*P.spread+Math.sin(T*HFG[i].tws+i*2)*HFG[i].tw*(1-P.grip),bend=(i===2?.28:-.5)-P.curl*1.25-P.grip*.75-(P['snap'+i]||0)*.7;
+ for(let i=0;i<3;i++){const root=R([-rw*.5,(-6+i*6)*k]),L=HFG[i].L.map(v=>v*k*P.emerge*(1-P.curl*.65)),A0=[-2.05,-1.5,-2.75],a0=lerp(A0[i],A0[2-i],P.swap)+[-.55,0,.5][i]*P.spread+Math.sin(T*HFG[i].tws+i*2)*HFG[i].tw*(1-P.grip),bend=(i===2?.2:-.5)-P.curl*1.25-P.grip*.75-(P['snap'+i]||0)*.7;
   let ch=[root],a=a0;for(let j=0;j<3;j++){const p=ch[j];ch.push([p[0]+Math.cos(a)*L[j],p[1]+Math.sin(a)*L[j]]);a+=bend}
   if(P.fist>0){/* 握りこぶし：手首ごと裂け目から持ち上がり、三本とも三つの節を全部、同じ向きに折る。横から見た拳：指が縦に重なり、節が前に並び、白い爪が手のひら側に隠れる */const fr=add(palmC,[-1*k,(-7+i*6.2)*k]),fl=[8,8.5,7][i]*k,fc=[fr];let b=-3.1+Math.sin(T*.7)*.03*P.fist;for(let j=0;j<3;j++){const p=fc[j],l=fl*[1,.62,.55][j];fc.push([p[0]+Math.cos(b)*l,p[1]+Math.sin(b)*l]);b-=1.85}ch=ch.map((q,j)=>LP(q,fc[j],P.fist))}
   const f=P['f'+i]||0;if(f>0){const gT=[[HXX_+4,FL_-30],[HXX_+16,FL_-15],[HXX_+6,FL_-2]][i],tg0=P['tx'+i]?[P['tx'+i],P['ty'+i]]:[HXX_+12+i*1.5,FL_-14-i*3],tg=LP(tg0,gT,P.grab),bump=lerp(4,[18,3,-6][i],P.grab),Ls=L[0]+L[1]+L[2],dl=Math.hypot(tg[0]-root[0],tg[1]-root[1]);for(let j=1;j<=3;j++){const q=LP(root,tg,Math.min(1,(L.slice(0,j).reduce((x,y)=>x+y,0)/Ls)*(dl>0?1:0)));const mid=j<3?[q[0]+(P.grab&&i!==1?(i===0?-4:4)*P.grab*Math.sin(j/3*3.14):0),q[1]-Math.sin(j/3*3.14)*bump*k]:q;ch[j]=LP(ch[j],mid,f)}}
@@ -658,7 +658,7 @@ SPEC.dragon={name:'くらやみの竜',k:1,draw:drawDragon,pose:{},aura:{r:2,c1:
    動かすたびに節が鳴る（白い小さな破片＝関節の音）。 */
 function gateFinger(B,root,tgt,i,o){const k=o.k||1,T=o.T||0,u=o.u||0,L=HFG[i].L.map(v=>v*.88*k),Ls=L[0]+L[1]+L[2];
  const dx=tgt[0]-root[0],dy=tgt[1]-root[1],D=Math.hypot(dx,dy)||1,ux=dx/D,uy=dy/D,nx=-uy,ny=ux,reach=Math.min(D,lerp(Ls*.3,Math.max(D,Ls),u));/* 届かなければ、節が不気味に伸びる */
- /* 節の曲がり：伸びきるほどまっすぐ。のびる前は鉤のように曲がる */const bend=((1-u)*.9+.18)*(i===2?-.6:1)+(i===0?Math.sin(T*.9)*.06:0),ch=[root];let a=Math.atan2(uy,ux)-bend*1.2;const sc=reach/Ls;
+ /* 節の曲がり：伸びきるほどまっすぐ。のびる前は鉤のように曲がる */const bend=((1-u)*.9+.18)*(i===2?.45:1)+(i===0?Math.sin(T*.9)*.06:0),ch=[root];let a=Math.atan2(uy,ux)-bend*1.2;const sc=reach/Ls;
  for(let j=0;j<3;j++){const p=ch[j];ch.push([p[0]+Math.cos(a)*L[j]*sc*1.08,p[1]+Math.sin(a)*L[j]*sc*1.08]);a+=bend}
  const th=HFG[i].th,m=new Set(),segR=[[3.6*th,3*th],[3*th,2.6*th],[2.6*th,1.8*th]];for(let j=0;j<3;j++){dCurve(m,t=>LP(ch[j],ch[j+1],t),segR[j][0]*k,segR[j][1]*k,10,.02,i*3+j);dDisc(m,ch[j][0],ch[j][1],(segR[j][0]+.5)*k,.05,i+j)}
  dShade(B,m,HSK,mix(HSK[4],'#d8cce0',.3),null,true);

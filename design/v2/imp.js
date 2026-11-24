@@ -67,26 +67,26 @@ const IMHEAD={
   eye:[[4,7],[5,7],[6,7],[5,8],[6,8]],
   eyes:{wide:'epeee',shut:'xx1x2',daze:'xexxe'},
   vein:[[9,2],[10,3],[10,4],[11,5],[12,6]],third:[[7,3],[8,3]],more:[[[12,9],[13,9]],[[11,2],[12,2]]]},
- impM:{piv:[15,19],ctr:[11,10],
+ impM:{piv:[14,19],ctr:[11,9],front:15,
   face:[
-"........xxxxxx.........",
-"......xx4443332x.......",
-".....x44433322221x.....",
-"....x4433221111221x....",
-"...x443322222222221x...",
-"...x4332211111122221x..",
-"..x43322222222222221x..",
-".xuuuuu33222222222221x.",
-"xuuwwwwwv22222222221x..",
-".xvwvwvvx2222222222x...",
-"..x1epee12222222221x...",
-"..x1epee1s222222221x...",
-".x4311111s2222222221x..",
-"x4433x1222222222221x...",
-"x3k332x22222222221x....",
-"x32222xuuuuuuu12221x...",
-".x111uuuuuuuuuuu221x...",
-"..xuuuwuuuuwuuuuw121x..",
+"........xxxxxx........",
+"......xx4443332x......",
+".....x44433322221x....",
+"....x4433221111221x...",
+"...x443322222222221x..",
+"...x4332211111122221x.",
+"..x43322222222222221x.",
+".xuuuuu43222222222221x",
+"xuuwwwwwv22222222221x.",
+".xvwvwvvx12222222221x.",
+"..xx1eeesx12222222221x.",
+"..x3x111x1s222222221x..",
+".x43x11222222222221x...",
+"x443x22222222222221x...",
+"x3k2x1222222222221x....",
+"x3221xuuuuuuu12221x...",
+".x221uuuuuuuuuuu221x",
+"..x1xuwuuuuwuuuuw121x",
 ".xuwwwwuwwwwwwwwv121x..",
 ".xvxwvxwwvxwvxwvx1x....",
 "....xwwvwwvwwvwwx1x....",
@@ -120,8 +120,8 @@ const IMHEAD={
 ".xvxxmoomxxwvxwvx1x"],
    o:[
 ".xvxwxmmxwxwvxwvx1x"]},
-  eye:[[4,10],[5,10],[6,10],[7,10],[4,11],[5,11],[6,11],[7,11]],
-  eyes:{wide:'eeeeeeep',shut:'1xx1x11x',daze:'xeexexxe'},
+  eye:[[5,9],[6,9],[7,9],[5,10],[6,10]],
+  eyes:{wide:'epeee',shut:'xx1x2',daze:'xexxe'},
   vein:[[12,2],[13,3],[14,4],[15,5],[16,6],[17,7]],third:[[9,4],[10,4]],more:[[[16,11],[17,11]],[[14,1],[15,1]]],beard:[9,26]}};
 function imGrid(H,P){const g=H.face.map(r=>r.split(''));const put=(ox,oy,rows)=>rows.forEach((r,y)=>[...r].forEach((c,x)=>{if(c==='.')return;const Y=oy+y,X=ox+x;while(g.length<=Y)g.push([]);while(g[Y].length<=X)g[Y].push('.');g[Y][X]=c}));
  const ear=P.ear>=.5?H.earFlat:H.ear;put(ear.at[0],ear.at[1],ear.rows);
@@ -129,12 +129,13 @@ function imGrid(H,P){const g=H.face.map(r=>r.split(''));const put=(ox,oy,rows)=>
  const es=P.daze?'daze':P.ear>=.5?'wide':g2>=.9?'shut':null;if(es)H.eye.forEach(([x,y],i)=>{g[y][x]=H.eyes[es][i]});
  /* 外まわりの黒は描かない（体全体の輪郭線が引く）。内側の線だけ残す */
  const W=Math.max(...g.map(r=>r.length)),at=(x,y)=>(g[y]&&g[y][x])||'.';const o=g.map((r,y)=>r.map((c,x)=>c==='x'&&[[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>at(x+a,y+b)==='.')?'.':c));return o}
-function imStamp(B,H,P,at,a,V){const g=imGrid(H,P),sk=V.skin,col={'1':sk[0],'2':sk[1],'3':sk[2],'4':sk[3],x:OUT,p:OUT,e:IMEYE,m:IMMOUTH,t:IMTOOTH,n:mix(sk[0],'#9a4a4a',.45),o:IMTONGUE,w:IMHAIR[0],u:IMHAIR[1],v:IMHAIR[2],s:IMSCAR,k:sk[0]};
+function imStamp(B,H,P,at,a,V,y0){y0=y0||0;const g=imGrid(H,P),sk=V.skin,col={'1':sk[0],'2':sk[1],'3':sk[2],'4':sk[3],x:OUT,p:OUT,e:IMEYE,m:IMMOUTH,t:IMTOOTH,n:mix(sk[0],'#9a4a4a',.45),o:IMTONGUE,w:IMHAIR[0],u:IMHAIR[1],v:IMHAIR[2],s:IMSCAR,k:sk[0]};
  const ax=Math.round(at[0]),ay=Math.round(at[1]),[px,py]=H.piv,c=Math.cos(a),s=Math.sin(a),h=g.length,w=Math.max(...g.map(r=>r.length));
  const L2D=(lx,ly)=>{const dx=lx+.5-px,dy=ly+.5-py;return[ax+dx*c-dy*s,ay+dx*s+dy*c]};
- if(a===0){g.forEach((r,y)=>r.forEach((ch,x)=>{if(ch!=='.')B.set(ax+x-px,ay+y-py,col[ch],1)}))}
- else{const R=Math.hypot(w,h)+2;for(let Y=Math.floor(ay-R);Y<=ay+R;Y++)for(let X=Math.floor(ax-R);X<=ax+R;X++){const dx=X+.5-ax,dy=Y+.5-ay,lx=Math.floor(dx*c+dy*s+px),ly=Math.floor(-dx*s+dy*c+py);const ch=g[ly]&&g[ly][lx];if(ch&&ch!=='.')B.set(X,Y,col[ch],1)}}
+ if(a===0){g.forEach((r,y)=>r.forEach((ch,x)=>{if(ch!=='.'&&y>=y0)B.set(ax+x-px,ay+y-py,col[ch],1)}))}
+ else{const R=Math.hypot(w,h)+2;for(let Y=Math.floor(ay-R);Y<=ay+R;Y++)for(let X=Math.floor(ax-R);X<=ax+R;X++){const dx=X+.5-ax,dy=Y+.5-ay,lx=Math.floor(dx*c+dy*s+px),ly=Math.floor(-dx*s+dy*c+py);const ch=ly>=y0&&g[ly]&&g[ly][lx];if(ch&&ch!=='.')B.set(X,Y,col[ch],1)}}
  const put=(x,y,cc)=>{const d=L2D(x,y);B.set(Math.floor(d[0]),Math.floor(d[1]),cc,1)};
+ if(y0)return{ctr:L2D(H.ctr[0],H.ctr[1]),L2D};
  /* 覚悟の段：頭に黒い筋、光らない目が増える */
  if(V.vein>=1)H.vein.forEach(([x,y])=>put(x,y,'#1a1220'));
  if(V.eyes>=1){put(H.third[0][0],H.third[0][1],IMEYE2);put(H.third[1][0],H.third[1][1],OUT)}
@@ -160,6 +161,8 @@ function imArm(B,sh,el,hd,k,sk,front){const b=front?sk[1]:sk[0],h=front?sk[2]:sk
  B.thick(sh,el,1.05*k,b,h,l);B.thick(lerpP(el,hd,.1),lerpP(el,hd,.8),1.35*k,b,h,l);B.disc(el[0],el[1],1.25*k,b,h,l);
  const u=[hd[0]-el[0],hd[1]-el[1]],L=Math.hypot(u[0],u[1])||1,d=[u[0]/L,u[1]/L],n=[-d[1],d[0]];B.disc(hd[0],hd[1],1.75*k,b,h,l);
  for(const s of[-1,0,1]){const p=[hd[0]+d[0]*2.2*k+n[0]*s*1.3*k,hd[1]+d[1]*2.2*k+n[1]*s*1.3*k];B.set(p[0],p[1],front?b:l,1);B.set(p[0]+d[0]*1.1,p[1]+d[1]*1.1,IMNAIL,1)}}
+function imHand(B,el,hd,k,sk,front){const b=front?sk[1]:sk[0],h=front?sk[2]:sk[1],l=sk[0];const u=[hd[0]-el[0],hd[1]-el[1]],L=Math.hypot(u[0],u[1])||1,d=[u[0]/L,u[1]/L],n=[-d[1],d[0]];B.disc(hd[0],hd[1],1.75*k,b,h,l);
+ for(const s of[-1,0,1]){const p=[hd[0]+d[0]*2.2*k+n[0]*s*1.3*k,hd[1]+d[1]*2.2*k+n[1]*s*1.3*k];B.set(p[0],p[1],b,1);B.set(p[0]+d[0]*1.1,p[1]+d[1]*1.1,IMNAIL,1)}}
 function imLeg(B,hp,kn,ft,k,sk,front){const b=front?sk[1]:sk[0],h=front?sk[2]:sk[1],l=sk[0];
  B.thick(hp,kn,1.55*k,b,h,l);const an=[ft[0]+.5*k,ft[1]-1.6*k];B.thick(kn,an,1.05*k,b,h,l);B.disc(kn[0],kn[1],1.3*k,b,h,l);
  B.poly([[ft[0]-5.5*k,ft[1]],[ft[0]+2.2*k,ft[1]],[ft[0]+1.8*k,ft[1]-2.4*k],[ft[0]-1.6*k,ft[1]-2.2*k],[ft[0]-4.5*k,ft[1]-1.2*k]],b,h,l);
@@ -199,12 +202,14 @@ function impFig(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{})
  /* おかしらのあごひげ：胸まで垂れ、体に遅れて揺れる。先を封印のかけらで結ぶ（削り取ったかけら）。手と石より奥に描く */
  if(HD.beard){const kk=k/.7,c0=ST.L2D(HD.beard[0],HD.beard[1]-.5),sw=Math.sin(T*.07)*1+P.lean*4,up=P.ear>=.5?1:0;
   const end=[c0[0]+sw+(up?-5*kk:1.5*kk),c0[1]+(up?2:3.5)*kk],mid=[lerp(c0[0],end[0],.5)+(up?-2:1.2)*kk,lerp(c0[1],end[1],.5)];
-  B.tube(c0,mid,end,1.1*kk,.5*kk,IMHAIR[0],IMHAIR[1],IMHAIR[2],1);for(let i=1;i<1;i++){const u=i/4,p=[(1-u)*(1-u)*c0[0]+2*u*(1-u)*mid[0]+u*u*end[0],(1-u)*(1-u)*c0[1]+2*u*(1-u)*mid[1]+u*u*end[1]];B.set(p[0]+(i%2?1:-1),p[1],IMHAIR[2],1)}
-  J.beard=[mid,end];B.set(end[0],end[1]-1,IMROPE,1);B.set(end[0]+1,end[1]-1,IMROPE,1);B.disc(end[0]+.5,end[1]+1.4,1.2*kk,SEAL[0],SEAL[1],SEAL[2],1);B.set(end[0]+.5,end[1]+1.4,SEALG,1)}
+  J.beard=[mid,end];J.beardDraw=()=>{  B.tube(c0,mid,end,1.1*kk,.5*kk,IMHAIR[0],IMHAIR[1],IMHAIR[2],1);for(let i=1;i<1;i++){const u=i/4,p=[(1-u)*(1-u)*c0[0]+2*u*(1-u)*mid[0]+u*u*end[0],(1-u)*(1-u)*c0[1]+2*u*(1-u)*mid[1]+u*u*end[1]];B.set(p[0]+(i%2?1:-1),p[1],IMHAIR[2],1)}
+  B.set(end[0],end[1]-1,IMROPE,1);B.set(end[0]+1,end[1]-1,IMROPE,1);B.disc(end[0]+.5,end[1]+1.4,1.2*kk,SEAL[0],SEAL[1],SEAL[2],1);B.set(end[0]+.5,end[1]+1.4,SEALG,1)}}
  /* ひげをなでる（おかしらの、ひまなとき） */
- if(P.stroke>0&&J.beard){const b=lerpP(J.beard[0],J.beard[1],.35+Math.sin(T*.22)*.3),hd=[b[0]-1,b[1]],d=Math.hypot(hd[0]-J.shF[0],hd[1]-J.shF[1]),L2=Math.max(7*k,d/2+.6),u2=Math.min(1,P.stroke);J.hdF=lerpP(J.hdF,hd,u2);J.elF=ik(J.shF,J.hdF,L2,L2,1)}
+ if(P.stroke>0&&J.beard){const b=ST.L2D(9,22.5+Math.sin(T*.22)*2.5),hd=[b[0]+1,b[1]],d=Math.hypot(hd[0]-J.shF[0],hd[1]-J.shF[1]),L2=Math.max(7*k,d/2+.6),u2=Math.min(1,P.stroke);J.hdF=lerpP(J.hdF,hd,u2);J.elF=ik(J.shF,J.hdF,L2,L2,1)}
  /* おかしらの首飾り：削り取った封印のかけら（くすんだ金の紋のかけら） */
  if(!P.bigUp)imArm(B,J.shF,J.elF,J.hdF,k,sk,true);
+ /* ひげは手前の腕より手前：腕はひげの奥を通る（貫通して見えない）。なでるときだけ、手をひげの上に出す */
+ if(HD.front){imStamp(B,HD,P,hb,a,V,HD.front);if(J.beardDraw)J.beardDraw();if(P.stroke>.5&&!P.bigUp)imHand(B,J.elF,J.hdF,k,sk,true)}
  if(V.vein>=2){for(const[a2,b2]of[[J.shF,J.elF],[J.elF,J.hdF]])for(let i=0;i<4;i++)B.set(lerp(a2[0],b2[0],i/4)+(i%2),lerp(a2[1],b2[1],i/4),'#1a1220',2)}
  if(S.front)S.front(B,J,T,P);
  return J}

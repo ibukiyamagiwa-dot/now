@@ -1,7 +1,7 @@
 /* ===== 騎士の骨組み =====
    P（姿勢）：角度は画面の向き。0＝右、π/2＝下、π＝左（敵から見て騎士の方）、-π/2＝上。
    すべての門の番人は左を向いて立つ。 */
-const PDEF={x:0,lean:0,cr:0,ff:-6,fb:5,kn:0,ua:1.95,fa:2.75,sw:3.4,ua2:1.75,fa2:1.9,sw2:null,hd:0,cw:0,lift:0,sheath:0,capeOff:0};
+const PDEF={x:0,lean:0,cr:0,ff:-6,fb:5,kn:0,ua:1.95,fa:2.75,sw:3.4,ua2:1.75,fa2:1.9,sw2:null,hd:0,cw:0,lift:0,sheath:0,capeOff:0,oh:0};
 const PRO={hk:1.45,lk:.74,tk:.86};
 function joints(ox,oy,S,P){const k=S.k,lk=S.lk||PRO.lk,tk=S.tk||PRO.tk,hk=S.hk||PRO.hk;
  const cr=P.cr+P.kn*9*k*lk,hip=[ox+P.x*k,oy-20*k*lk+cr-P.lift*k];

@@ -25,8 +25,10 @@ old,new=asyncio.run(get('old')),asyncio.run(get('new'))
 shutil.rmtree(OUT,ignore_errors=True);os.makedirs(OUT)
 F=ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',22);S=3;secs=[]
 for id in IDS:
-  o,n=old[id] or new[id],new[id]
-  def img(d,i):i=min(i,len(d['fr'])-1);return Image.open(io.BytesIO(base64.b64decode(d['fr'][i].split(',')[1]))).convert('RGB').resize((136*S,118*S),Image.NEAREST)
+  n=new[id];o=old[id] or {'fr':[],'t0':n['t0'],'hits':[]}
+  def img(d,i):
+    if not d['fr']:B=Image.new('RGB',(136*S,118*S),(24,24,28));ImageDraw.Draw(B).text((136*S//2-40,118*S//2-14),'新しい技',fill=(150,150,150),font=F);return B
+    i=min(i,len(d['fr'])-1);return Image.open(io.BytesIO(base64.b64decode(d['fr'][i].split(',')[1]))).convert('RGB').resize((136*S,118*S),Image.NEAREST)
   fs=[]
   for i in range(max(len(o['fr']),len(n['fr']))):
     A,Bm=img(o,i),img(n,i);diff=sum(1 for q in ImageChops.difference(A,Bm).getdata() if sum(q)>30)>200

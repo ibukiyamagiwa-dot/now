@@ -823,6 +823,37 @@ tfe('lord','l_r_tfeint',LRI,LLO,half(LLO,LJAB),LJAB,'lord','鍵を腰に引き�
 tfe('lord2','l2_r_tfeint',L2X(LRI),L2X(LLO),L2X(half(LLO,LJAB)),L2X(LJAB),'lord','鍵の歯が紫の輪に光り、突きかけて止まる。止めた瞬間、背中の触手だけが前へのびかける。間をおいて金の本物。','突きのフェイント。触手につられて押さない。',(B,J,t)=>tentLash(B,J,t,26,40));
 for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?'f':'f2',S=QSTY[st];tfe(S.f,p+'_q_tfeint',QRI,QTSU,half(QTSU,QTSUH),QTSUH,S.bg,'剣を引き、切っ先が紫の輪に光る。突きかけて、切っ先がこちらの鍔の手前でぴたりと止まる。'+(S.dark?'止めた瞬間、触手だけが前へ出かける。':'')+'引き戻して、間をおいて金の本物の突き。','突きのフェイント。斬りのフェイントと同じく、紫の輪＝押さずに待つ。',S.dark?(B,J,t)=>T8(B,J,t,26,40):null)}
 tfe('red2','r2_q_tfeint',ZRI,ZRI,half(ZRI,ZTH),ZTH,'red','低い構えのまま動かず、切っ先だけが紫の輪に光る。両手突きが走り、切っ先がこちらの鍔に触れる寸前、髪一本の距離で止まる。そのまま切っ先で鍔をコツンと叩いて引く。間をおいて金の本物。','突きのフェイント。本気は全力の突きを「触れる寸前」で止められる。押せば、その距離からそのまま崩される。',(B,J,t)=>{if(t===40&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')});
+/* ===== ひまなとき（大ボス）：こちらが攻めてこないと見せる、その者らしい待機。光らない＝攻撃ではない ===== */
+const GIB=MV.find(m=>m.id==='g_two').keys[0].p;
+const tap=(B,x,y,t,s)=>{const d=t-s;if(d<0||d>6)return;B.set(x-d,y,'#c8c0b4',4);B.set(x+d,y,'#c8c0b4',4);if(d<2)B.set(x,y-1,'#ffffff',4)};
+mv({f:'gate',id:'g_bored',n:'ひまなとき：門をふり返る',bg:'gate',len:200,cap:'剣先で床をこつ、こつと二度叩き、肩越しに背後の門をふり返る。門が閉じたままなのを確かめて、ほっとしたように構え直す。',why:'門番の仕事は、倒すことではなく門を守ること。こちらが来ないと、門の方が気になる。光らないので攻撃ではない。',
+ keys:[K(0,GIB),K(20,Object.assign({},GIB,{sw:2.2,fa:2.4,cr:1}),'io'),K(34,Object.assign({},GIB,{sw:2.0,fa:2.3,cr:1.2})),K(38,Object.assign({},GIB,{sw:2.2,fa:2.4,cr:1})),K(44,Object.assign({},GIB,{sw:2.0,fa:2.3,cr:1.2})),K(48,Object.assign({},GIB,{sw:2.2,fa:2.4,cr:1})),K(70,Object.assign({},GIB,{hd:-.35,lean:-.12,x:3}),'io'),K(120,Object.assign({},GIB,{hd:-.35,lean:-.12,x:3})),K(128,Object.assign({},GIB,{hd:.05,cr:.6}),'io'),K(150,GIB,'io'),K(200,GIB)],
+ fx:(B,J,t)=>{if(J.tip){tap(B,Math.round(J.tip[0]),FL,t,34);tap(B,Math.round(J.tip[0]),FL,t,44)}}});
+mv({f:'dragon',ox:4,id:'d_bored',n:'ひまなとき：形がほどける',bg:'lord',len:220,cap:'形を保つのに飽きたように、尾の側から床へ溶けかけ、くらやみの水たまりがじわりと広がる。我に返ったように形に戻ると、あごの触手を逆立てて空気をなめ、こちらのにおいを探す。三つの目が、ばらばらにまばたく。',why:'くらやみは、もともと形を持たない。気をゆるめると、ほどける。光らないので攻撃ではない。',
+ keys:[K(0,DI),K(50,Object.assign({},DI,{melt:.32,ny:2,hy:2,cr:1.5}),'io'),K(90,Object.assign({},DI,{melt:.32,ny:2,hy:2,cr:1.5})),K(104,Object.assign({},DI,{melt:0,ny:-2,hy:-2}),'out'),K(130,Object.assign({},DI,{feel:.55,nx:-2,ny:-3,jaw:.25}),'io'),K(170,Object.assign({},DI,{feel:.4,nx:-1,ny:-2,jaw:.15})),K(220,DI,'io')],
+ pp:(P,t)=>{if((t>60&&t<66)||(t>150&&t<155))P.eyes=1;else if(t>110&&t<115)P.eyes=2}});
+const LDRAG=Object.assign({},LI,{sw:2.0,fa:2.2,cr:1.5});
+mv({f:'lord',id:'l_bored',n:'ひまなとき：鍵を引きずる',bg:'lord',len:220,cap:'大きな鍵の先を床に下ろし、半歩さがってから、ゆっくり半歩前へ出る。鍵の先が床をこすって、火花が細く散る（ギィ……）。それを二度くり返して、構え直す。',why:'門を開けるための鍵を、いまは持て余している。前へ出たいのに、門の前から離れられない。光らないので攻撃ではない。',
+ keys:[K(0,LI),K(24,LDRAG,'io'),K(50,Object.assign({},LDRAG,{x:7,lean:-.08}),'io'),K(84,Object.assign({},LDRAG,{x:-2,lean:.08}),'io'),K(110,Object.assign({},LDRAG,{x:7,lean:-.08}),'io'),K(144,Object.assign({},LDRAG,{x:-2,lean:.08}),'io'),K(180,LI,'io'),K(220,LI)],
+ fx:(B,J,t)=>{if(J.tip&&((t>54&&t<84)||(t>114&&t<144))&&t%3===0){const x=Math.round(J.tip[0]);B.set(x+2,FL,'#ffd27a',4);B.set(x+4,FL-1,'#d88a2a',4)}}});
+mv({f:'lord2',id:'l2_bored',n:'ひまなとき：ささやきを聞く',bg:'lord',len:220,cap:'背中の触手の一本が、するすると兜の耳もとへ寄っていく。ぬしは首をかしげ、じっと動かずにささやきを聞いている。ほかの触手は、聞き耳を立てるように止まる。やがて触手が離れ、ぬしはこちらへ向き直る。',why:'暗い門のぬしは、もう一人で考えていない。門の向こうの何かが、ささやいて決めている。光らないので攻撃ではない。',
+ keys:[K(0,L2I),K(70,Object.assign({},L2I,{hd:.32,lean:-.06}),'io'),K(150,Object.assign({},L2I,{hd:.36,lean:-.06})),K(176,Object.assign({},L2I,{hd:0}),'io'),K(220,L2I,'io')],
+ fx:(B,J,t)=>{if(!J.head||!J.sc)return;const u=t<40?0:t<70?(t-40)/30:t<150?1:t<176?1-(t-150)/26:0;if(u>0){const s=add(J.sc,[5*J.k,-1*J.k]),e=add(J.head,[(5+Math.sin(t*.2))*J.k,(-1+Math.sin(t*.13))*J.k]),tip=LP(add(s,[8*J.k,-6*J.k]),e,u);tentacle(B,s,LP(s,add(s,[12*J.k,-16*J.k]),u),tip,1.6*J.k,.5*J.k,false);B.set(tip[0],tip[1],'#c070ff',2)}
+  if(t>=80&&t<150&&(t>>3)%2){const h=J.head;B.set(h[0]+3,h[1]-4,'#8a7aa8',4);B.set(h[0]+5,h[1]-6,'#4e2c70',4)}}});
+const RIB=Object.assign({},RI);
+mv({f:'red',id:'r_bored',n:'ひまなとき：来いと招く',bg:'red',len:180,cap:'構えたまま、前足で床をドン、ドンと二度踏み鳴らす。切っ先をくいっ、くいっと二度跳ね上げて「来い」と招く。待つのが苦手な、力みの裏返し。',why:'彼は門を守るために、侵略者を倒しに来ている。待っていられない。光らないので攻撃ではない。',
+ keys:[K(0,RIB),K(16,Object.assign({},RIB,{ff:-13,cr:2,lift:2}),'out'),K(20,Object.assign({},RIB,{ff:-11,cr:3.2,lift:0}),'in'),K(30,Object.assign({},RIB,{ff:-13,cr:2,lift:2}),'out'),K(34,Object.assign({},RIB,{ff:-11,cr:3.2,lift:0}),'in'),
+  K(56,RIB),K(60,Object.assign({},RIB,{sw:3.95,fa:2.75}),'out'),K(66,RIB,'in'),K(74,RIB),K(78,Object.assign({},RIB,{sw:3.95,fa:2.75}),'out'),K(84,RIB,'in'),K(124,RIB,'io'),K(180,RIB)],
+ fx:(B,J,t)=>{for(const s of[20,34])if(J.footF){const d=t-s;if(d>=0&&d<6){B.set(J.footF[0]-3-d,FL,'#8a6a6a',4);B.set(J.footF[0]+3+d,FL,'#8a6a6a',4)}}}});
+mv({f:'red2',id:'r2_bored',n:'ひまなとき：目を閉じて待つ',bg:'red',len:240,cap:'低い正眼のまま、目の白い光をすっと消す。息だけが深く、ゆっくり続く。切っ先は少しも動かない。しばらくして、目の光がふっと戻る。',why:'焦らない。待つことができるのも、取り戻した冷静さ。目を閉じても構えは解けていない。光らないので攻撃ではない（合図の白い光とは逆に、光が消える）。',
+ keys:[K(0,R2G),K(240,R2G)],pp:(P,t)=>{P.eyeOff=t<30?0:t<50?(t-30)/20:t<170?1:t<176?1-(t-170)/6:0;P.cr=(P.cr||0)+(t>=50&&t<170?Math.sin((t-50)*.04)*.35:0)}});
+mv({f:'fallen',id:'f_bored',n:'ひまなとき：のまれる前の影',bg:'hole',len:220,cap:'となりに、のまれる前の赤い騎士の影がうっすら現れ、刃を顔の前に立てて一礼しようとする。本体は首をぎくりとそちらへ向け、背の触手が影に巻きつく。影はくらやみに引きずりこまれて消え、本体は何事もなかったように構え直す。',why:'二つの世界線は、まだせめぎ合っている。騎士の誇りは、ときどき顔を出しては、くらやみに引き戻される。光らないので攻撃ではない。',
+ keys:[K(0,FI),K(60,FI),K(66,Object.assign({},FI,{hd:-.3,lean:-.1}),'snap'),K(140,Object.assign({},FI,{hd:-.3,lean:-.1})),K(160,FI,'io'),K(220,FI)],pp:(P,t)=>glitch(P,t),
+ pre:(B,t)=>{if(t>=20&&t<150){const a=t<40?(t-20)/20:t<110?1:1-(t-110)/40,G=new Buf(CW,CH);knight(G,EXX+16,FL,SPEC.red,{ua:2.0,fa:.3,sw:-1.57,ua2:1.6,fa2:2.0,cr:1,hd:.1,lean:t>110?(t-110)*.01:0},t);for(let i=0;i<G.c.length;i++){const x=i%CW,y=i/CW|0;if(G.c[i]&&(x+y+t)%3<a*2)B.set(x,y,mix(G.c[i],'#1a1428',.4),8)}
+  if(t>=96){const k=Math.min(1,(t-96)/14);for(let q=0;q<3;q++)B.tube([EXX+2,FL-34+q*6],[EXX+10,FL-44+q*8],[lerp(EXX+10,EXX+18,k),FL-30+q*9],1.4,.4,'#4e2c70','#9a5ad0','#22142e',1)}}},post:(B,J,t)=>water(B,t)});
+mv({f:'fallen2',id:'f2_bored',n:'ひまなとき：映り姿が手を伸ばす',bg:'hole',len:220,cap:'門になった騎士は動かない。足元の水面の映り姿の赤い騎士だけが、ゆっくりと左手を上へ、水面へ向かって伸ばしてくる。指先が水面に触れたところで波紋が広がり、映り姿はもとの構えに戻る。',why:'映り姿は、のまれる前の自分。水面の向こうから、まだ手を伸ばしている。それは救いか、引きずりこもうとしているのか、分からない。光らないので攻撃ではない。',
+ keys:[K(0,F2I),K(220,F2I)],
+ post:(B,J,t)=>{water(B,t);const u=t<40?0:t<110?(t-40)/70:t<140?1:Math.max(0,1-(t-140)/40);reflection(B,t,'red',Object.assign({},J.P||{},{ua2:lerp(1.2,-1.6,u),fa2:lerp(1.8,-1.7,u),hd:-.2*u}),EXX);if(t>=110&&t<150){const d=t-110;for(let a=0;a<6.28;a+=.25){const r=2+d*.9;B.set(EXX-8+Math.cos(a)*r,FL+1+Math.sin(a)*r*.25,d<20?'#8a7aa8':'#4a3a60',6)}}}});
 /* ===== 連撃は「静と動」で組み直す =====
    説明文どおりの向きで振る（打ち下ろし＝頭上から前下へ、すくい上げ＝前下から前上へ、突き＝まっすぐ前）。
    一撃ごとに：当たったポーズで3F止まる（止め）→次の構えへ2〜4Fで素早く移る→構えで止まる（静）→最後の3Fで振る（動）。

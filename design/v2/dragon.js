@@ -150,7 +150,7 @@ function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:
   for(let i=0;i<3;i++){const a=1.4+i*.5,s0=R([Math.cos(a)*rw,Math.sin(a)*rh]),s1=R([Math.cos(a)*(rw+4*ro),Math.sin(a)*(rh+2*ro)]);dTent(B,[s0,s1],.9,.3,HNAIL)}}
  /* ===== 三本の指 ===== */
  const fin=[],cut=P.cut||[0,0,0],order=[2,0,1];const pts=[];const palmC=add(c,[-5*k*P.emerge,-17*k*P.emerge]);if(P.fist>.05&&P.emerge>.03){const m=new Set(),pc=LP(c,palmC,P.fist);dCurve(m,t=>LP(c,pc,t),5*k,6.2*k,10,.03,4);dDisc(m,pc[0]+3,pc[1]+1,5.5*k*P.fist,.05,2);dShade(B,m,HSK,mix(HSK[4],'#d8cce0',.3),null,true)}
- for(let i=0;i<3;i++){const root=R([-rw*.5,(-6+i*6)*k]),L=HFG[i].L.map(v=>v*k*P.emerge*(1-P.curl*.65)),A0=[-2.05,-1.5,-2.75],a0=lerp(A0[i],A0[2-i],P.swap)+[-.55,0,.5][i]*P.spread+Math.sin(T*HFG[i].tws+i*2)*HFG[i].tw*(1-P.grip),bend=(i===2?.2:-.5)-P.curl*1.25-P.grip*.75-(P['snap'+i]||0)*.7;
+ for(let i=0;i<3;i++){const root=R([-rw*.5,(-6+i*6)*k]),L=HFG[i].L.map(v=>v*k*P.emerge*(1-P.curl*.65)),A0=[-2.05,-1.5,-2.75],a0=lerp(lerp(A0[i],A0[2-i],P.swap)+[-.55,0,.5][i]*P.spread+Math.sin(T*HFG[i].tws+i*2)*HFG[i].tw*(1-P.grip)*(1-(P.away||0)),[-.95,-.45,.05][i],P.away||0),/* away：こちらから目を離し、三本そろって裂け目の奥（向こう側）をふり向く */bend=(i===2?.2:-.5)-P.curl*1.25-P.grip*.75-(P['snap'+i]||0)*.7;
   let ch=[root],a=a0;for(let j=0;j<3;j++){const p=ch[j];ch.push([p[0]+Math.cos(a)*L[j],p[1]+Math.sin(a)*L[j]]);a+=bend}
   if(P.fist>0){/* 握りこぶし：手首ごと裂け目から持ち上がり、三本とも三つの節を全部、同じ向きに折る。横から見た拳：指が縦に重なり、節が前に並び、白い爪が手のひら側に隠れる */const fr=add(palmC,[-1*k,(-7+i*6.2)*k]),fl=[8,8.5,7][i]*k,fc=[fr];let b=-3.1+Math.sin(T*.7)*.03*P.fist;for(let j=0;j<3;j++){const p=fc[j],l=fl*[1,.62,.55][j];fc.push([p[0]+Math.cos(b)*l,p[1]+Math.sin(b)*l]);b-=1.85}ch=ch.map((q,j)=>LP(q,fc[j],P.fist))}
   const f=P['f'+i]||0;if(f>0){const gT=[[HXX_+4,FL_-30],[HXX_+16,FL_-15],[HXX_+6,FL_-2]][i],tg0=P['tx'+i]?[P['tx'+i],P['ty'+i]]:[HXX_+12+i*1.5,FL_-14-i*3],tg=LP(tg0,gT,P.grab),bump=lerp(4,[18,3,-6][i],P.grab),Ls=L[0]+L[1]+L[2],dl=Math.hypot(tg[0]-root[0],tg[1]-root[1]);for(let j=1;j<=3;j++){const q=LP(root,tg,Math.min(1,(L.slice(0,j).reduce((x,y)=>x+y,0)/Ls)*(dl>0?1:0)));const mid=j<3?[q[0]+(P.grab&&i!==1?(i===0?-4:4)*P.grab*Math.sin(j/3*3.14):0),q[1]-Math.sin(j/3*3.14)*bump*k]:q;ch[j]=LP(ch[j],mid,f)}}
@@ -173,7 +173,7 @@ function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:
  /* 裂け目のふちの触手：指の付け根の前を、ぬれて動く */if(ro>.2){for(let q=0;q<9;q++){const a=q/9*6.28+.3,p=R([Math.cos(a)*(rw+1),Math.sin(a)*(rh+1)]),o=a+Math.sin(T*.07+q*1.7)*.6,L=(3+(q%3))*k*ro;tentacle(B,p,add(p,dir(o,L*.5)),add(p,dir(o+.5*Math.sin(T*.05+q),L)),.9*k,.3,q%4===0)}}
  /* くらやみのしたたり */if(ro>.3)for(let i=0;i<3;i++){const p=R([(-2+i*2)*k,rh]),ph=(T*.3+i*17)%20;B.set(p[0],p[1]+ph*.6,INK.hi,4)}
  J.fingers=fin;J.heads=fin;return J}
-Object.assign(PDEF,DPDEF,{fist:0,snap0:0,snap1:0,snap2:0,f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,curl:0,fist:0,snap0:0,snap1:0,snap2:0,rift:1,emerge:1,grip:0,heads:1,press:0,stump:0,swap:0,spread:0,grab:0,tx0:0,ty0:0,tx1:0,ty1:0,tx2:0,ty2:0,cjaw:0});
+Object.assign(PDEF,{away:0});Object.assign(PDEF,DPDEF,{fist:0,snap0:0,snap1:0,snap2:0,f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,curl:0,fist:0,snap0:0,snap1:0,snap2:0,rift:1,emerge:1,grip:0,heads:1,press:0,stump:0,swap:0,spread:0,grab:0,tx0:0,ty0:0,tx1:0,ty1:0,tx2:0,ty2:0,cjaw:0});
 SPEC.dragon={name:'くらやみの竜',k:1,draw:drawDragon,pose:{},aura:{smoke:1,r:2,c1:'#1e1228',c2:'#160c1e',rim:'#6a3a90'}};
 /* ===== 門の向こうの指（三つ首の竜と同じ手の指）=====
    暗い門のぬし・第二形態の「門から指」の技で使う。三つ首の竜の指と同じ作り：灰紫の皮、三つの節と節ごとの横じわ、内側の肉色の腹、白い平たい爪。

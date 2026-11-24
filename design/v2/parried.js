@@ -263,17 +263,19 @@ recoverCard({id:'d_rec',f:'dragon',ox:4,bg:'lord',n:'ブレイク：斬られて
 /* ---------- 三つ首の竜：弾かれた指だけが縮む ---------- */
 const H_ORDER=[2,0,1];
 const H_KIT=(kind,th,P,w,i)=>{const f=H_ORDER[i];return kind==='s'?{['f'+f]:.12,['j'+f]:1}:{f0:0,f1:0,f2:0,j0:1,j1:1,j2:1,spread:.8,quiver:1}};
-const H_BRK=t=>{const b=Math.sin(t*TAU_/110);return{rift:1,spread:-.2+b*.05,curl:.35+b*.04,j0:.3,j1:.3,j2:.3,quiver:t%46<6?.3:0}};
+/* ブレイク：痛みで崩れるのではなく、上位の存在が一瞬こちらから目を離す。三本は動きを止め、指先の目はそろって裂け目の奥をふり向き、放っておかれた亡骸の頭ががくんと垂れる */
+const H_BRK=t=>({rift:1,away:1,f0:0,f1:0,f2:0,j0:.1,j1:.1,j2:.1,spread:0,curl:0,quiver:0,droopC:1.2});
 parriedCard({id:'h_pry',src:'h_order',n:'パリィされ：鳴いた数（小・小→大）',kit:H_KIT,rx:[{kind:'s'},{kind:'s'},{kind:'b'}],
  pp:(P,t,Hc,stop)=>{Hc.forEach((H,i)=>{const d=t-H;if(d>=0&&d<6)P['snap'+H_ORDER[i]]=1})},
  cap:'弾かれた指だけが、関節を鳴らして（ポキッ）付け根まで縮み、口が開く。ほかの指は止まらずに次の噛みつきへ。最後の指を弾かれると、三本ともいっせいに縮んで広がり、手がふるえる。',
  why:'弾かれ方も「別々の指」。痛みも驚きも、弾かれた一本にしか届かない。最後の大で「三本は一つの手」だとわかる（手の手がかり）。'});
-parriedCard({id:'h_brk',src:'h_one',n:'ブレイク：指が垂れる',len:200,kit:H_KIT,rx:[{kind:'b'}],brk:{at:6,P:H_BRK,star:J=>J.fingers?add(J.fingers[1],[0,-10]):null},
- cap:'四度目を弾かれると、三本の指が力なく垂れて、指先の口が半開きのまま。ときどき手全体が小さくふるえる。頭の上（まん中の指の上）を、うすい青の星が回る。',
- why:'たおしたときの「垂れる」と同じ形の、手前で止まる。竜の亡骸は何も感じないので崩れない（崩れるのは指だけ）。'});
-recoverCard({id:'h_rec',f:'hydra',bg:'hole',n:'ブレイク：斬られて、指が起き上がる',P:H_BRK,idle:()=>Object.assign({},HI),star:J=>J.fingers?add(J.fingers[1],[0,-10]):null,
- react:(P,a,b)=>{const A=kb(a,6),Bk=kb(b,8);P.quiver=Math.max(P.quiver||0,A,Bk);P.snap1=a>=0&&a<6||b>=0&&b<6?1:0},
- cap:'斬られた指が関節を鳴らし、二太刀目のあと、三本がいっせいに関節を一つずつ鳴らして起き上がり、構えに戻る。',why:'起き上がりも「関節の音」。この敵の動きは、いつも指の音でできている。'});
+parriedCard({id:'h_brk',src:'h_one',n:'ブレイク：こちらから目を離す',len:200,kit:H_KIT,rx:[{kind:'b'}],brk:{at:6,P:H_BRK,star:J=>J.fingers?add(J.fingers[1],[0,-10]):null},
+ cap:'四度目を弾かれると、三本の指がぴたりと止まり、指先の目がそろって裂け目の奥（向こう側）をふり向く。持ち主に放っておかれた竜の亡骸の頭が、がくんと垂れる。何も動かない。頭の上を、うすい青の星が回る。',
+ why:'上位の存在は、こちらの攻撃で弱ったりしない。すきは「こちらが強いから」ではなく「向こうが見ていないから」生まれる（上位の存在は、どの枝にも気づいていない）。「目」は上位の存在の視線。指が弱って垂れる形にすると、上位の存在が安く見える。'});
+recoverCard({id:'h_rec',f:'hydra',bg:'hole',n:'ブレイク：目が、一瞬でこちらへ戻る',P:H_BRK,idle:()=>Object.assign({},HI,{away:0,droopC:0}),snap:3,star:J=>J.fingers?add(J.fingers[1],[0,-10]):null,
+ react:(P,a,b)=>{P.snap1=a>=0&&a<6||b>=0&&b<6?1:0},
+ cap:'斬られても、三本はふり向いたまま。斬られた指が関節を一度鳴らすだけ。二太刀目のあと、三本の指先の目が、一瞬でいっせいにこちらへ向き直る。亡骸の頭も、糸で吊られたように持ち上がる。',
+ why:'戻りはゆっくりにしない（すきが閉じたことを一瞬で見せる）。ずっと向こうを見ていたものが、急にこちらを見る。'});
 
 
 /* 種類に入れる（イノシシの「壁に激突」は、やられではなく、パリィされ（大）） */

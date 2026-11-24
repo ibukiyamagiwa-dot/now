@@ -41,7 +41,7 @@ function parriedCard(o){const src=typeof o.src==='string'?MV.find(m=>m.id===o.sr
  const wOf=(r,t)=>{const d=t-r.H;if(d<0)return 0;if(d<stop)return Math.min(1,(d+1)/4);const e=d-stop;if(r.kind==='s')return 1-easeIO(e/(r.th?8:6));if(o.brk&&r.H===Hc[last])return 1;return e<10?1:1-easeIO((e-10)/18)};
  return mv({f:src.f,ox:src.ox,id:o.id,n:o.n,bg:src.bg,len,keys,hits:[],gifHits:Hc,gifEnd:o.brk?Hc[last]+stop+o.brk.at+80:null,cat:o.brk?'break':'parried',
   fAt:src.fAt?t=>src.fAt(srcT(t)):null,
-  cues:(src.cues||[]).map(c=>Object.assign({},c,{t:sh(c.t)})),trails:(src.trails||[]).map(r=>[sh(r[0]),Math.min(sh(r[1]),sh(r[0])+(r[1]-r[0])),...r.slice(2)]),
+  cueOf:src.cueOf||src.id,cues:(src.cues||[]).map(c=>Object.assign({},c,{t:sh(c.t),_src:c._src||c})),trails:(src.trails||[]).map(r=>[sh(r[0]),Math.min(sh(r[1]),sh(r[0])+(r[1]-r[0])),...r.slice(2)]),
   heroP:t=>poseAt0({keys:hk},t,hbase()),
   pp:(P,t)=>{if(src.pp)src.pp(P,srcT(t));
    for(const r of RX){if(!r)continue;const w=wOf(r,t);blendP(P,r.T,w);const d=t-r.H;if(d>=0&&d<stop)P.x=(P.x||0)+((t&1)?1:-1)*(r.kind==='b'?2:1.4)*(1-d/stop)}/* 弾かれた側を大きく、横にだけ、だんだん小さく */

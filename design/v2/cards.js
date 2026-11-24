@@ -1,5 +1,13 @@
 /* 覚悟の段（ページ全体で切りかえる）：n ふつう／r 赤い／k 黒い／v 紫の。段を描いてある敵（tintable）だけ変わる */
 let KTINT=null;
+/* いちばん大事な原則：連撃の二撃目以降の合図は出さない（数と間は構えで読む）。覚悟「みならい」（MINARAI）だけは全部出す。
+   ふだんも残す合図：フェイントの紫の輪、別の「見る場所」に出る合図（目・首・輪・尾など、at のあるもの）、残心に手を出したときの一撃（決まった連撃ではない）。
+   同じ場所にもう一度出る合図は、at があっても隠す（CUE_HIDE）。 */
+let MINARAI=false;
+const CUE_KEEP=new Set(['r_zanpunish','r2_zanpunish','f_zanpunish','f2_zanpunish']),CUE_HIDE=new Set(['d_stab','smM_ni','r2_three']);
+function cueHidden(M,c){const id=M.cueOf||M.id,src=M.cueOf?MV.find(m=>m.id===M.cueOf):M,c0=c._src||c;if(!src||CUE_KEEP.has(id)||c0.col==='p')return false;
+ const hs=(src.hits||[]).slice().sort((a,b)=>a-b);if(hs.length<2)return false;const i=hs.findIndex(h=>Math.abs(h-(c0.t+28))<=3);if(i<1)return false;
+ return CUE_HIDE.has(id)||!c0.at}
 /* ===== カードの描画：一枚に「主人公」と「敵」と「床」 ===== */
 const CW=136,CH=118,FL=94,HXX_=26,FL_=94,EXX=92,HXX=26;
 const SKY={def:['#1c1824','#241e2e'],gate:['#1e2230','#262c3c'],lord:['#140c18','#1e1424'],red:['#1e1418','#2a1c20'],hole:['#08060c','#100c18']};
@@ -18,7 +26,7 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  const J=(S.draw||knight)(B,ox,oy,S,P,tt);J.P=P;
  if(M.fx)M.fx(B,J,tt,S,M);
  /* 共通：合図の光と、当たった瞬間の火花 */
- for(const c of (M.cues||[])){const d=tt-c.t;if(d>=0&&d<18){const tp=cueAnchor(M,S,c,base,ox,oy)||(c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF);if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
+ for(const c of (M.cues||[])){if(!MINARAI&&cueHidden(M,c))continue;const d=tt-c.t;if(d>=0&&d<18){const tp=cueAnchor(M,S,c,base,ox,oy)||(c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF);if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
  for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])(tr[4]==='line'?lineTrail:tr[4]==='arc'?arcTrail:trail)(B,S,M,tt,ox,oy,tr[4]?8:4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);

@@ -157,5 +157,5 @@ SPEC.fallen2={hk:1.1,lk:.9,tk:.95,name:'赤い門のぬし 第二形態',k:1.35,
  aura:{r:4,c1:'#46205e',c2:'#2a1238',rim:'#ff4a8a'},
  pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.2,fa2:1.8,ff:-9,fb:7,cr:2,lean:.05}};
 const ORDER=['gate','dgate','lord','lord2','red','red2','fallen','fallen2'];
-/* 赤い騎士の目：切れ込みを鼻先へ下げて、力んだ怒りの目に（本気は水平のまま＝冷静） */
-SPEC.red.helm=Object.assign({},SPEC.red.helm,{slant:.12});
+/* 赤い騎士の兜：本気と同じ、まっすぐな目の切れ込みと上から下まで貫く縦の線。息穴だけは出さない（点が目に見えて、情けない顔に見えたため） */
+SPEC.red.helm=Object.assign({},SPEC.red.helm,{noHoles:true});

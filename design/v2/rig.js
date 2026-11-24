@@ -53,9 +53,8 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   B.poly([R([-4.3*k,4.2*k]),R([4.3*k,4.2*k]),R([4.3*k,-4.2*k]),R([3.6*k,-4.8*k]),R([-3.6*k,-4.8*k]),R([-4.3*k,-4.2*k])],p.arm,p.armHi,p.armLo);
   const bd=hm.band||[p.trim,p.trimHi];for(let x=-4;x<=4;x+=.5)B.set(...R([x*k,-3.4*k]),bd[0],2);for(let x=-3.5;x<=3.5;x+=1.4)B.set(...R([x*k,-3.4*k]),bd[1],2);
   const ec=P.eyeOff?(P.eyeOff>=1?OUT:mix(hm.glow||OUT,OUT,P.eyeOff)):(hm.glow||OUT);
-  if(hm.slant){/* 赤い騎士：細い1画素の切れ込み。鼻先へわずかに下がる（困り眉の向きにしない）。上に線は足さない。縦の線は目の下から（目の上へ突き抜けると「へ」の字に見える） */const sl=hm.slant;for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,(-.4-(x+1.5)*sl)*k]),ec,2);for(let y=.6;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2)}
-  else{for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,-.4*k]),ec,2);for(let y=-2;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2)}
-  if(!hm.slant)for(let i=0;i<3;i++)for(let j=0;j<2;j++)B.set(...R([(1.2+j*1.2)*k,(1.6+i*.9)*k]),OUT,2);
+  for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,-.4*k]),ec,2);for(let y=-2;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2);/* 目の切れ込みと、上から下まで貫く縦の線（赤の系統で共通） */
+  if(!hm.noHoles)for(let i=0;i<3;i++)for(let j=0;j<2;j++)B.set(...R([(1.2+j*1.2)*k,(1.6+i*.9)*k]),OUT,2);
   for(const d of (hm.dents||[]))for(let i=0;i<3;i++)B.set(...R([(d[0]+i*.4)*k,(d[1]+(i===1?.4:0))*k]),p.armLo,2);
   if(hm.cracks)for(const c of hm.cracks)B.set(...R([c[0]*k,c[1]*k]),hm.crackCol||'#4e2c70',2)}
  if(hm.type==='round'){

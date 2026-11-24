@@ -3279,7 +3279,7 @@ function dlTorso(B,T0,k,W,P,T,big){const tk=PRO.tk,Q=v=>T0([v[0],v[1]*(v[1]<0?tk
  B.poly([Q([-5*k,-6.2*k]),Q([5.2*k,-6.2*k]),Q([6.4*k,-14.4*k]),Q([-6*k,-14.4*k])],W[1],W[3],W[0]);/* 胸の箱 */
  for(let y=-13.6;y<=-7;y+=.5)B.set(...Q([1.6*k,y*k]),W[0],2);/* 板の継ぎ目 */
  /* ランプ四つ：横一列。消えていると暗い琥珀、灯るとくすんだ橙。光らない（目盛り） */
- const n=Math.round(P.dlLamp||0),s=big?2:1,gp=1,w=4*s+3*gp,c=Q([-.6*k,-10.6*k]),x0=Math.round(c[0]-w/2),y0=Math.round(c[1]-s/2);
+ const n=Math.round(P.dlLamp||0),s=big?2:1,gp=1,w=4*s+3*gp,c=Q([(big?1.7:.9)*k,-10.6*k]),x0=Math.round(c[0]-w/2),y0=Math.round(c[1]-s/2);
  for(let y=-1;y<=s;y++)for(let x=-1;x<=w;x++)B.set(x0+x,y0+y,'#1e120c',2);
  for(let i=0;i<4;i++){const on=i<n;for(let y=0;y<s;y++)for(let x=0;x<s;x++)B.set(x0+i*(s+gp)+x,y0+y,on?(x+y===0&&s>1?DLLAMP[2]:DLLAMP[1]):DLLAMP[0],2)}}
 /* 関節のしみ（覚悟の段）：関節のすき間から黒い泥がにじむ */
@@ -3326,11 +3326,11 @@ for(const k of['doll','dollM'])SPEC[k+'@w']=flashSpec(k);
 /* ===== 構え =====
    一回（モブ）：片腕の刃を頭上に掲げる。2回続ける（大）：二本の刃を頭上で交差。数え直し（大）：首をかしげたまま止まり、もう片腕がだらりと垂れる。 */
 const DLI=20,DLPRE=24;/* 拍の長さ（ゲームの1ターン目）と、構えてから「キリッ」まで */
-const DL_IDLE={ua:1.9,fa:4.03,sw:4.03,ua2:1.62,fa2:1.5,lean:.02,ff:-5,fb:5,hd:0};
-const DLM_IDLE={ua:1.75,fa:5.48,sw:5.48,ua2:1.45,fa2:3.93,sw2:3.93,lean:.02,ff:-5,fb:5,hd:0};/* 交差の構え（門番のまね） */
+const DL_IDLE={ua:2.35,fa:4.2,sw:4.2,ua2:1.62,fa2:1.5,lean:.02,ff:-5,fb:5,hd:0};
+const DLM_IDLE={ua:2.3,fa:1.05,sw:1.05,ua2:1.3,fa2:2.25,sw2:2.25,lean:.02,ff:-5,fb:5,hd:0};/* 交差の構え（門番のまね）。胸のランプを隠さないよう、腰の前で下向きに交差させる */
 const DL_UP={ua:4.23,fa:4.93,sw:4.93,ua2:1.62,fa2:1.5,lean:-.04,hd:-.05,ff:-6,fb:6};/* 一回：片腕を頭上に */
 const DLM_X={ua:3.98,fa:5.43,sw:5.43,ua2:5.33,fa2:3.98,sw2:3.98,lean:-.04,hd:-.05,ff:-6,fb:6};/* 2回続ける：頭上で交差 */
-const DLM_X1={ua:1.95,fa:1.6,sw:1.6,ua2:5.13,fa2:4.73,sw2:4.73,lean:0,hd:-.05,ff:-6,fb:6};/* 一本斬ったあと：残りの一本だけ頭上（あと一回） */
+const DLM_X1={ua:2.4,fa:2.1,sw:2.1,ua2:5.13,fa2:4.73,sw2:4.73,lean:0,hd:-.05,ff:-6,fb:6};/* 一本斬ったあと：残りの一本だけ頭上（あと一回） */
 const DLM_TILT={ua:4.23,fa:4.93,sw:4.93,ua2:1.4,fa2:1.42,sw2:1.42,lean:.1,hd:.95,ff:-5,fb:5,cr:1};/* 数え直し：首をかしげ、片腕が垂れる（壊れかけ） */
 const DL_CHOP={ua:2.35,fa:2.8,sw:2.8,x:-46,lean:.22,ff:-10,fb:5};
 const DLM_CHOP1={ua:2.35,fa:2.8,sw:2.8,x:-40,lean:.22,ff:-10,fb:5};
@@ -3341,18 +3341,18 @@ const dlLampN=(t,c0,I)=>t<c0?0:Math.min(4,Math.floor((t-c0)/(I||DLI)));
 function dlCards(f,pre,isM){const ox=isM?6:10,bg='gate',S=SPEC[f],IDLE=isM?DLM_IDLE:DL_IDLE;
  const idlePP=(P,t)=>{const b=Math.floor(t/24),e=t-b*24;P.dlKey=(b+Math.min(1,e/4))*Math.PI/6;if(e<3)P.hd=(P.hd||0)+.06};
  mv({f,ox,id:pre+'_idle',n:isM?'立ち絵：交差の構え':'立ち絵',bg,len:96,keys:[K(0,IDLE),K(96,IDLE)],pp:idlePP,
-  cap:isM?'二本の刃を体の前で交差させて立つ（門番の交差の構えのまね）。木と真鍮の体、門番の兜をまねた木の面。背中にぜんまいの鍵、胸にランプ四つ、空洞の腹に歯車。':'木と真鍮の人形。門番の筒形の兜をまねた木の面。目の切れ込みは彫ってあるだけで、奥には何もない。片腕の先が刃。背中にぜんまいの鍵（柄はぬしの鍵と同じ輪）。胸にランプ四つ。空洞の腹に歯車がのぞく。',
+  cap:isM?'二本の刃を腰の前で下向きに交差させて立つ（門番の交差の構えのまね。胸のランプは隠さない）。木と真鍮の体、門番の兜をまねた木の面。背中にぜんまいの鍵、胸にランプ四つ、空洞の腹に歯車。':'木と真鍮の人形。門番の筒形の兜をまねた木の面。目の切れ込みは彫ってあるだけで、奥には何もない。片腕の先が刃。背中にぜんまいの鍵（柄はぬしの鍵と同じ輪）。胸にランプ四つ。空洞の腹に歯車がのぞく。',
   why:'門番がのまれたあと、ぬしが代わりに作らせた番人。形だけをまねている。面の切れ込みが途中で一段ずれているのは、まねきれていないから。'});
  mv({f,ox,id:pre+'_bored',n:'ひまなとき：門をふり返る（門番のまね）',bg,len:200,
-  keys:[K(0,IDLE),K(20,IDLE),K(28,Object.assign({},IDLE,{ua:1.7,fa:1.7,sw:1.7}),'io'),K(34,Object.assign({},IDLE,{ua:1.7,fa:1.55,sw:1.55})),K(40,Object.assign({},IDLE,{ua:1.7,fa:1.7,sw:1.7})),K(46,Object.assign({},IDLE,{ua:1.7,fa:1.55,sw:1.55})),K(52,Object.assign({},IDLE,{ua:1.7,fa:1.7,sw:1.7})),
-   K(70,Object.assign({},IDLE,{ua:1.7,fa:1.7,sw:1.7,dlFace:0}),'io'),K(74,Object.assign({},IDLE,{ua:1.7,fa:1.7,sw:1.7,dlFace:1}),'snap'),K(130,Object.assign({},IDLE,{ua:1.7,fa:1.7,sw:1.7,dlFace:1})),K(134,Object.assign({},IDLE,{ua:1.7,fa:1.7,sw:1.7,dlFace:0}),'snap'),K(160,IDLE,'io'),K(200,IDLE)],
+  keys:[K(0,IDLE),K(20,IDLE),K(28,Object.assign({},IDLE,{ua:2.1,fa:1.75,sw:1.75}),'io'),K(34,Object.assign({},IDLE,{ua:2.1,fa:1.6,sw:1.6})),K(40,Object.assign({},IDLE,{ua:2.1,fa:1.75,sw:1.75})),K(46,Object.assign({},IDLE,{ua:2.1,fa:1.6,sw:1.6})),K(52,Object.assign({},IDLE,{ua:2.1,fa:1.75,sw:1.75})),
+   K(70,Object.assign({},IDLE,{ua:2.1,fa:1.75,sw:1.75,dlFace:0}),'io'),K(74,Object.assign({},IDLE,{ua:2.1,fa:1.75,sw:1.75,dlFace:1}),'snap'),K(130,Object.assign({},IDLE,{ua:2.1,fa:1.75,sw:1.75,dlFace:1})),K(134,Object.assign({},IDLE,{ua:2.1,fa:1.75,sw:1.75,dlFace:0}),'snap'),K(160,IDLE,'io'),K(200,IDLE)],
   pp:(P,t)=>{idlePP(P,t);if(t>=70&&t<78||t>=130&&t<138)P.hd=(P.hd||0)+((t>>1)&1?.12:-.12)},
   fx:(B,J,t)=>{for(const t0 of[34,46])if(t>=t0&&t<t0+5&&J.tip)for(let i=0;i<4;i++)B.set(J.tip[0]-3+i*2,FL-((t+i)%2),'#6a6278',5)},
   cap:'刃の先で床をこつ、こつと二度たたき、首だけがカクンと真後ろへ回って、背後の門を見る。しばらく見つめて、またカクンと戻る。光らない。',
   why:'門番のひまなとき（床をたたき、門をふり返る）をまねている。ただ、人形には首の筋がないので、首だけが真後ろまで回る。'});
  mv({f,ox,id:pre+'_enter',n:isM?'出現：ぜんまいが巻かれ、刃を交差させる':'出現：ぜんまいが巻かれる',bg,len:isM?150:130,
   keys:[K(0,{ua:1.45,fa:1.55,sw:1.55,ua2:1.55,fa2:1.6,sw2:1.6,lean:.32,hd:.55,cr:3}),K(40,{ua:1.45,fa:1.55,sw:1.55,ua2:1.55,fa2:1.6,sw2:1.6,lean:.32,hd:.55,cr:3}),K(46,{ua:1.45,fa:1.55,sw:1.55,ua2:1.55,fa2:1.6,sw2:1.6,lean:.05,hd:-.1,cr:0},'snap'),K(64,IDLE,'out')].concat(isM?[K(84,Object.assign({},IDLE,{ua:2.4,fa:5.08,sw:5.08,ua2:.9,fa2:4.28,sw2:4.28})),K(88,IDLE,'in'),K(150,IDLE)]:[K(130,IDLE)]),
-  pp:(P,t)=>{if(t<40){P.dlKey=t*t*.004;P.dlGear=t/40}else if(t<64){P.dlKey=6.4+(t-40)*.3;P.dlLamp=t<58?Math.min(4,Math.floor((t-46)/3)+1):0;if(t<46)P.dlLamp=0}else idlePP(P,t)},
+  pp:(P,t)=>{if(t<40){P.dlKey=t*t*.004;P.dlGear=t/40}else if(t<64){P.dlKey=6.4+(t-40)*.3;P.dlLamp=t<62?Math.min(4,Math.floor((t-50)/3)+1):0;if(t<50)P.dlLamp=0}else idlePP(P,t)},
   fx:(B,J,t)=>{if(isM&&t>=88&&t<96&&J.tip){const c=lerpP(J.tip,J.tip2||J.tip,.5);for(let i=0;i<6;i++){const a=i/6*TAU_,r=1+(t-88)*.8;B.set(c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r,DLBR[2],5)}}},
   cap:isM?'うなだれて止まっている。背中の鍵がひとりでに回りはじめ（キリキリ）、ランプが四つ順に点いて消えると、首がカクンと起き上がる。二本の刃を打ち合わせて、体の前で交差させる。':'うなだれて止まっている。背中の鍵がひとりでに回りはじめ（キリキリ）、ランプが四つ順に点いて消えると、首がカクンと起き上がって構える。',
   why:isM?'門番の登場（剣を打ち合わせて交差）のまね。打ち合わせの火花はくすんだ真鍮の色で、合図の光とは取り違えない。':'だれかが巻いているのではない。鍵は勝手に回る。'});
@@ -3380,7 +3380,7 @@ function dlCards(f,pre,isM){const ox=isM?6:10,bg='gate',S=SPEC[f],IDLE=isM?DLM_I
    why:'交差は門番の「閉じた門」のまね。掲げている刃の数＝残りの数。一本斬ると頭上の刃が一本になるので、あと一回だと見える。'});
   const R1=C0+3*DLI,HR=C0+8*DLI;
   mv({f,ox,id:pre+'_recount',n:'数え直し（ランプが途中で消える）',bg,len:HR+46,
-   keys:[K(0,IDLE),K(10,DLM_TILT,'out'),K(R1,DLM_TILT),K(R1+2,Object.assign({},DLM_TILT,{hd:1.2,cr:2}),'out'),K(R1+10,DLM_TILT,'io'),K(HR-DLI,DLM_TILT),K(HR-11,Object.assign({},DLM_TILT,{x:-40,lean:.12}),'io'),K(HR-3,Object.assign({},DLM_TILT,{x:-40,lean:.12})),K(HR,Object.assign({},DLM_TILT,DLM_CHOP1),'in'),K(HR+16,Object.assign({},DLM_TILT,DLM_CHOP1)),K(HR+40,IDLE,'io'),K(HR+46,IDLE)],
+   keys:[K(0,IDLE),K(10,DLM_TILT,'out'),K(R1,DLM_TILT),K(R1+2,Object.assign({},DLM_TILT,{hd:.98,cr:2}),'out'),K(R1+10,DLM_TILT,'io'),K(HR-DLI,DLM_TILT),K(HR-11,Object.assign({},DLM_TILT,{x:-40,lean:.12}),'io'),K(HR-3,Object.assign({},DLM_TILT,{x:-40,lean:.12})),K(HR,Object.assign({},DLM_TILT,DLM_CHOP1),'in'),K(HR+16,Object.assign({},DLM_TILT,DLM_CHOP1)),K(HR+40,IDLE,'io'),K(HR+46,IDLE)],
    pp:(P,t)=>{if(t<C0){const s=Math.floor(t/5),e=t-s*5;P.dlKey=-(s*.5+(e<2?e*.25:.5))+(e>=2&&e<4?.25:0);P.dlLamp=0}
     else if(t<R1){dlTick(P,t,C0,2);P.dlLamp=dlLampN(t,C0)}
     else if(t<C0+4*DLI){P.dlLamp=0;const e=t-R1;P.dlKey=Math.PI-Math.min(1,e/4)*Math.PI*.75+(e>=4&&e<8?((e>>1)&1)*.2:0)}

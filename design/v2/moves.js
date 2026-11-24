@@ -755,14 +755,14 @@ const Z0={sheath:0},ZP=p=>Object.assign({},p,Z0),ZDEEP=p=>ZP(Object.assign({},p,
  ZUP=ZP({ua:-2.95,fa:-2.95,sw:-1.57,ua2:-2.8,fa2:-2.8,cr:4,lean:.1,x:QX+2,ff:-10,fb:9}),
  ZTH=ZP({ua:3.05,fa:3.0,sw:3.14,ua2:2.85,fa2:2.9,x:QX-14,lean:.38,ff:-15,fb:11,cr:4}),
  ZLUNGE=ZP({ua:3.05,fa:3.0,sw:3.14,ua2:.35,fa2:.6,lean:.45,ff:-16,fb:12,cr:4.5,x:QX-16}),
- ZLV=ZP({ua:1.3,fa:1.9,sw:2.0,ua2:1.15,fa2:1.8,x:QX+10,cr:4.5,lean:-.05,ff:-11,fb:9}),
+ ZLV=ZP({ua:1.5,fa:2.2,sw:2.55,ua2:1.35,fa2:2.1,x:QX+10,cr:4.5,lean:-.05,ff:-11,fb:9}),
  ZLK=ZDEEP(Object.assign({},QLK,{lean:.48})),ZLK2=ZDEEP(Object.assign({},QLK2,{lean:.55,cr:5})),
  ZKN=ZP(Object.assign({},QKN,{ua:-2.8,fa:-2.4,sw:1.68-6.2832,ua2:-2.95,fa2:-2.5,lean:.25}));
 const ghostArc=(B,J,t,h)=>{for(let g=1;g<=3;g++)rsl(B,J,t-g,h,'g',4.4,2.4)};
 /* 踏みこみの土ぼこり：体ごと斬った重さを、前足で見せる */
 const stomp=(B,J,t,h)=>{const d=t-h;if(d<0||d>8||!J.footF)return;const x0=J.footF[0],y=Math.round(J.footF[1]);for(let i=0;i<5;i++){const s=(i-2)*1.6,x=x0+s*(1+d*.45),yy=y-Math.round(Math.abs(s)*.2+d*.35*(i%2));if(d>5&&(i+t)%2)continue;B.set(x,yy,d<3?'#8a6a6a':'#5a4048',4)}};
-QR('red2','r2_q_open','打ち合い：一礼と誘いのひと振り（金）',170,[K(0,R2S),K(6,ZSAL,'out'),K(18,ZSAL),K(26,ZRI,'io'),K(30,ZRI),K(34,ZDEEP(QOPEN),'out'),K(60,ZDEEP(QOPEN)),K(62,ZDEEP(QOPENH),'in'),K(72,ZDEEP(QOPENH)),K(84,ZRI,'out'),K(170,ZRI)],[{t:34,col:'g'}],[62],'g',t=>t>=62&&t<72?HRP:t>=72?HRG:null,
- '剣を抜き、刃を顔の前にまっすぐ立てて一礼する。礼を解くと同時に腰が深く落ち、両手で握った切っ先がこちらの目に向く。もう軽い動きは一度もしない。八相に移し、刃が金に光る。体ごと袈裟の一振り。弾けば踏みこみ、画面が締まる。','一礼は見下す礼ではなく、倒すべき相手と認めた礼。赤い騎士（立ったまま構える）より腰が低いのは、体ごと斬る覚悟。',(B,J,t)=>{clash(B,t-62,CXP[0],CXP[1]);stomp(B,J,t,62);if(t>=8&&t<18&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')},{bars:t=>t<64?0:Math.min(10,(t-64)*.6)});
+QR('red2','r2_q_open','打ち合い：一礼と誘いのひと振り（金）',180,[K(0,R2S),K(6,ZSAL,'out'),K(18,ZSAL),K(26,ZRI,'io'),K(34,ZRI),K(44,ZDEEP(QOPEN),'io'),K(70,ZDEEP(QOPEN)),K(72,ZDEEP(QOPENH),'in'),K(82,ZDEEP(QOPENH)),K(94,ZRI,'out'),K(180,ZRI)],[{t:44,col:'g'}],[72],'g',t=>t>=72&&t<82?HRP:t>=82?HRG:null,
+ '剣を抜き、刃を顔の前にまっすぐ立てて一礼する。礼を解くと同時に腰が深く落ち、両手で握った切っ先がこちらの目に向く。もう軽い動きは一度もしない。八相に移し、刃が金に光る。体ごと袈裟の一振り。弾けば踏みこみ、画面が締まる。','一礼は見下す礼ではなく、倒すべき相手と認めた礼。赤い騎士（立ったまま構える）より腰が低いのは、体ごと斬る覚悟。',(B,J,t)=>{clash(B,t-72,CXP[0],CXP[1]);stomp(B,J,t,72);if(t>=8&&t<18&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')},{bars:t=>t<74?0:Math.min(10,(t-74)*.6)});
 QR('red2','r2_q_tame','打ち合い：溜めの合（上段の静止・弧）',120,[K(0,ZRI),K(8,ZUP,'out'),K(46,ZUP),K(48,ZDEEP(QTAMEH),'in'),K(58,ZDEEP(QTAMEH)),K(84,ZRI,'io'),K(120,ZRI)],[{t:20,col:'g'}],[48],'g',t=>t>=48&&t<56?HRP:HRG,
  '両手で剣を頭上に立てた上段。息を深く吸って肩が上がり、そこで止まる。剣先はふるえない（赤い騎士は引きしぼってふるえる）。金に光ってから、吐く息と一緒に腰を落とし、頭上を越える大きな弧。刃のあとに三本の残像。前足が床を打つ。','溜めは弧。本気は力みで震えるかわりに、息で溜める。止まっている時間そのものが溜め。',(B,J,t)=>{clash(B,t,CXP[0],CXP[1]);clash(B,t-48,CXP[0],CXP[1]-6);ghostArc(B,J,t,48);stomp(B,J,t,48)},{trails:[[44,50,'g',0,'arc']],pp:(P,t)=>{if(t>=8&&t<48)P.cr-=.7*Math.min(1,(t-8)/14)}});
 QR('red2','r2_q_tsume','打ち合い：詰めの合（予備動作なしの突き）',80,[K(0,ZRI),K(33,ZRI),K(34,ZTH,'snap'),K(44,ZTH),K(60,ZRI,'io'),K(80,ZRI)],[{t:6,col:'g'}],[34],'g',t=>t>=34&&t<42?HRP:HRG,
@@ -780,7 +780,7 @@ const crossCut=(B,t,h)=>{const d=t-h;if(d<0||d>16)return;const c=[HXX+10,FL-20],
 FINALE({f:'red2',id:'r2_q_last',n:'打ち合い：最後のひと振り「十文字」（赤）と打ち返し',bg:'red',I:ZDEEP(QSH),W:ZUP,H:ZLUNGE,R:ZKN,R2:ZSAL,cx:-18,
  cap:'突き放したあと、両手の上段でいちど大きく息を吸い、止まる。目が赤く光る。左手を離し、体を一本の線に伸ばし切って、縦と横の二本の斬撃が同時に見える、たった一太刀の「十文字」。弾いた瞬間、時が止まり、暗転、主人公の一閃。遅れて金の三日月。彼は剣を床に突き立て、それにすがって片膝をつく。倒れはしない。剣を引き抜いて立ち、刃を顔の前に立てて、最初と同じ一礼をする。',
  why:'最後だけ赤。一太刀なのに二本見える＝剣の頂き。それでも当たりは一回、合図は一回。片膝をつく＝全部を出しきった代償。それでも倒れずに礼で終える＝騎士の誇り。始まりと終わりの一礼で、打ち合いが「決闘」だったと分かる。',ex:(B,J,t)=>{crossCut(B,t,40);stomp(B,J,t,40)}});
-CRUSH({f:'red2',id:'r2_q_crush',n:'打ち合い：くずし斬り「巻き落とし」（赤）',bg:'red',A:ZDEEP(QF),B:ZDEEP(Object.assign({},QLK,{sw:1.4,fa:.4,fa2:.3,lean:.25})),W:ZLV,H:ZDEEP(Object.assign({},QLASTH,{x:QX-12})),Z:ZRI,
+CRUSH({f:'red2',id:'r2_q_crush',n:'打ち合い：くずし斬り「巻き落とし」（赤）',bg:'red',A:ZDEEP(QF),B:ZDEEP(Object.assign({},QLK,{sw:2.3,fa:1.3,fa2:1.2,lean:.25})),W:ZLV,H:ZDEEP(Object.assign({},QLASTH,{x:QX-12})),Z:ZRI,
  cap:'途中の合で弾けないと、彼は刃をこちらの剣に絡めて、手首だけでくるりと巻き落とす。こちらの剣先が床を打ち、画面が赤くにじむ。締まりがほどけ、彼は両手の剣を下段に下ろし、低く沈んで赤く光る。床すれすれから斜め上へ、体ごと伸び上がる逆袈裟の一閃。',why:'崩しは「巻き落とし」、斬るのは逆袈裟。赤い騎士（柄頭と袈裟）と同じ罰の場面で、技の格がちがう。合図から当たりまではいつもと同じ。',
  ex:(B,J,t)=>{if(t>=0&&t<10){const a=t/10*6.28;for(let r=3;r<7;r++)B.set(CXP[0]+Math.cos(a)*r,CXP[1]+4+Math.sin(a)*r,'#fff3b0',4)}}});
 /* ===== 突きのフェイント（打ち合いの中）：引いて紫の輪、突きかけて、切っ先が鍔の手前で止まる ===== */
@@ -792,6 +792,9 @@ tfe('lord','l_r_tfeint',LRI,LLO,half(LLO,LJAB),LJAB,'lord','鍵を腰に引き�
 tfe('lord2','l2_r_tfeint',L2X(LRI),L2X(LLO),L2X(half(LLO,LJAB)),L2X(LJAB),'lord','鍵の歯が紫の輪に光り、突きかけて止まる。止めた瞬間、背中の触手だけが前へのびかける。間をおいて金の本物。','突きのフェイント。触手につられて押さない。',(B,J,t)=>tentLash(B,J,t,26,40));
 for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?'f':'f2',S=QSTY[st];tfe(S.f,p+'_q_tfeint',QRI,QTSU,half(QTSU,QTSUH),QTSUH,S.bg,'剣を引き、切っ先が紫の輪に光る。突きかけて、切っ先がこちらの鍔の手前でぴたりと止まる。'+(S.dark?'止めた瞬間、触手だけが前へ出かける。':'')+'引き戻して、間をおいて金の本物の突き。','突きのフェイント。斬りのフェイントと同じく、紫の輪＝押さずに待つ。',S.dark?(B,J,t)=>T8(B,J,t,26,40):null)}
 tfe('red2','r2_q_tfeint',ZRI,ZRI,half(ZRI,ZTH),ZTH,'red','低い構えのまま動かず、切っ先だけが紫の輪に光る。両手突きが走り、切っ先がこちらの鍔に触れる寸前、髪一本の距離で止まる。そのまま切っ先で鍔をコツンと叩いて引く。間をおいて金の本物。','突きのフェイント。本気は全力の突きを「触れる寸前」で止められる。押せば、その距離からそのまま崩される。',(B,J,t)=>{if(t===40&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')});
+/* 本気の角度は、いつも近い回り道で補間する。角度の差が半周をこえると、腕や剣が体の後ろを大回りして、
+   振ってもいない「ひと振り」が一瞬見えてしまう（構えを移すだけの場面で、剣を振ったように見えた）。 */
+for(const M of MV)if(M.f==='red2'&&/_q_/.test(M.id)){M.keys=M.keys.map(k=>Object.assign({},k,{p:Object.assign({},k.p)}));for(let i=1;i<M.keys.length;i++){const a=M.keys[i-1].p,b=M.keys[i].p;for(const q of['ua','fa','sw','ua2','fa2']){const A=a[q]!=null?a[q]:PDEF[q];if(typeof b[q]!=='number'||typeof A!=='number')continue;while(b[q]-A>Math.PI)b[q]-=6.2832;while(b[q]-A<-Math.PI)b[q]+=6.2832}}}
 /* 本気の息：構えているあいだは、ゆっくり深く息をしている（体が上下にわずかに動く）。斬るときは吐く息と一緒に腰が沈む。
    余裕のある者は息をしているように見えない。全部を出している者は、息が見える */
 for(const M of MV)if(M.f==='red2'&&/_q_/.test(M.id)){const p0=M.pp,hs=M.hits||[];M.pp=(P,t)=>{if(p0)p0(P,t);P.cr=(P.cr||0)+Math.sin(t*.075)*.3;for(const h of hs){const d=t-h;if(d>=0&&d<12)P.cr+=1.0*(1-d/12)}}}

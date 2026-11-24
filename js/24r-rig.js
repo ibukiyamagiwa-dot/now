@@ -90,10 +90,13 @@ const RIG=(()=>{
  /* ---- 姿勢（moves.js・parried.js・hurt.js の門番） ---- */
  const BASE=Object.assign({},PDEF,{ua:1.75,fa:-.5,sw:-2.25,ua2:1.4,fa2:-2.5,sw2:-.85,ff:-6,fb:6});/* 交差の構え */
  const KNEEL=Object.assign({},BASE,{kn:1,lean:.35,ua:1.5,fa:1.7,sw:1.45,ua2:1.7,fa2:1.4,sw2:1.2,hd:.3});
- const W1=Object.assign({},BASE,{ua:-2.4,fa:-1.6,sw:-1.2,ua2:1.0,fa2:.6,sw2:.2,x:4,cr:2});/* 一撃目の構え：前の剣を頭上へ */
- const S1=Object.assign({},BASE,{ua:2.8,fa:2.6,sw:2.2,ua2:1.0,fa2:.6,sw2:.2,lean:.3});/* 一撃目の当たり */
- const W2=Object.assign({},S1,{ua2:-2.2,fa2:-2.0,sw2:-1.4,lean:.2});/* 二撃目の構え：前の剣は下げたまま、後ろの剣を頭上へ */
- const S2=Object.assign({},BASE,{ua:2.6,fa:2.4,sw:2.0,ua2:2.9,fa2:2.8,sw2:2.5,lean:.35});/* 二撃目の当たり */
+ /* 後ろの腕（moves.js の g_two と同じ値）：BL＝剣を下げる、BU＝二撃目の構え（腕を後ろから頭上へ、剣は肩の後ろ）、BM＝振りの途中（頭上の前）、BS＝二撃目の当たり */
+ const BL={ua2:.8,fa2:.9,sw2:1.35},BU={ua2:-1.55,fa2:-.95,sw2:-.45},BM={ua2:3.13,fa2:-2.65,sw2:-2.12},BS={ua2:1.55,fa2:1.95,sw2:2.5};
+ const W1=Object.assign({},BASE,{ua:-2.4,fa:-1.6,sw:-1.2,x:4,cr:2},BL);/* 一撃目の構え：前の剣を頭上へ */
+ const S1=Object.assign({},BASE,{ua:2.8,fa:2.6,sw:2.2,lean:.3},BL);/* 一撃目の当たり */
+ const W2=Object.assign({},S1,BU,{lean:.2});/* 二撃目の構え：前の剣は下げたまま、後ろの剣を頭上へ（兜に腕を重ねない） */
+ const M2=Object.assign({},S1,BM,{lean:.28});/* 二撃目の振りの途中：頭上を越えて前へ（近い回り道だと体の後ろを回ってしまうので、ここを通す） */
+ const S2=Object.assign({},BASE,{ua:2.6,fa:2.4,sw:2.0,lean:.35},BS);/* 二撃目の当たり */
  const BRK=t=>Object.assign({},BASE,{ua:1.45,fa:1.75,sw:2.5+Math.sin(t*.05)*.05,ua2:1.25,fa2:.9,sw2:.75+Math.sin(t*.05+1)*.05,lean:.2,hd:.45+Math.sin(t*.09+1)*.06,cr:3.5+Math.sin(t*.09)*.6,x:2});/* 交差がほどけて、待つ */
  const IDLE=t=>Object.assign({},BASE,{cr:.5-.5*Math.cos(t/80*TAU)});/* 息で腰がわずかに上下する（80F） */
  const ANG=['ua','fa','sw','ua2','fa2','sw2'];
@@ -101,7 +104,11 @@ const RIG=(()=>{
  const cl01=u=>u<0?0:u>1?1:u;
  /* 角度は近い回り道で補間する（半周をこえる差は、体の後ろを大回りしてしまう） */
  function nearTo(from,to){const o=Object.assign({},to);for(const k of ANG)if(o[k]!=null&&from[k]!=null){while(o[k]-from[k]>Math.PI)o[k]-=TAU;while(o[k]-from[k]<-Math.PI)o[k]+=TAU}return o}
- function mixP(A,Bp,u){if(u<=0)return Object.assign({},A);const T=nearTo(A,Bp),o=Object.assign({},A);for(const k in T){if(typeof T[k]!=='number')continue;const a=A[k]==null?(PDEF[k]||0):A[k];o[k]=a+(T[k]-a)*u}return o}
+ const WR=a=>{while(a>Math.PI)a-=TAU;while(a<-Math.PI)a+=TAU;return a};
+ /* 後ろの腕は、ひじ（前腕−上腕）と手首（剣−前腕）の曲がりを補間する。角度をばらばらに補間すると、途中でひじや手首が逆に折れることがある */
+ function mixP(A,Bp,u){if(u<=0)return Object.assign({},A);const T=nearTo(A,Bp),o=Object.assign({},A);for(const k in T){if(typeof T[k]!=='number')continue;const a=A[k]==null?(PDEF[k]||0):A[k];o[k]=a+(T[k]-a)*u}
+  if([A.ua2,A.fa2,A.sw2,T.ua2,T.fa2,T.sw2].every(v=>typeof v==='number')){const e0=WR(A.fa2-A.ua2),e1=WR(T.fa2-T.ua2),w0=WR(A.sw2-A.fa2),w1=WR(T.sw2-T.fa2);o.fa2=o.ua2+e0+(e1-e0)*u;o.sw2=o.fa2+w0+(w1-w0)*u}
+  return o}
 
  /* 攻撃：構えて止まり、当たりの4F前から振る（番人系統の決まり）。当たったポーズで3F止まってから、次の構えか待機へ */
  const SWING=4,HOLD=3,RET=22,WIND=14;
@@ -112,7 +119,8 @@ const RIG=(()=>{
   const s=ss[i],d=G.et-s.impact;if(d>=0)return afterHit(s,d,t);
   const prev=ss[i-1],from=prev?afterHit(prev,s.start-prev.impact,t):IDLE(t),WU=s.mv==='cut2'?W2:W1,SW=s.mv==='cut2'?S2:S1;
   if(G.et<s.impact-SWING){const span=Math.max(1,Math.min(WIND,s.cue-s.start));return mixP(from,WU,ease.out(cl01((G.et-s.start)/span)))}
-  return mixP(WU,SW,ease.in(cl01((G.et-(s.impact-SWING))/SWING)))}
+  const u=ease.in(cl01((G.et-(s.impact-SWING))/SWING));if(s.mv==='cut2')return u<.5?mixP(WU,M2,u*2):mixP(M2,SW,(u-.5)*2);
+  return mixP(WU,SW,u)}
 
  /* パリィされ（knightKit）：小＝連撃の途中、前の剣だけがはね上がる／大＝最後の一撃、二本の剣がこじ開けられて体ごとのけぞる */
  const STOP=12;

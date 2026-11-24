@@ -12,7 +12,13 @@ const KNEEL={kn:1,lean:.35,ua:1.5,fa:1.7,sw:1.45,ua2:1.6,fa2:2.0,hd:.3};
 mv({f:'gate',id:'g_idle',n:'立ち絵：交差の構え',bg:'gate',len:80,keys:sway({cr:0},{cr:1},80,2),
  cap:'剣を交差させて立つ。ここは通さない、という姿。',why:'交差した二本の剣は「通行止め」の印。門番の仕事が一目でわかる。'});
 mv({f:'gate',id:'g_two',n:'二連撃',bg:'gate',len:100,cap:'白く光ったら、ふつうの二連撃。左右の剣が一本ずつ来る。',why:'交差をほどく動き＝構えが解ける瞬間が攻撃の始まり。二本の剣が順に来るので「二回」が見える。',
- keys:[K(0,X),K(14,{ua:-2.4,fa:-1.6,sw:-1.2,ua2:1.0,fa2:.6,sw2:.2,x:4,cr:2}),K(28,{ua:-2.4,fa:-1.6,sw:-1.2,ua2:1.0,fa2:.6,sw2:.2,x:4,cr:2}),K(42,{ua:2.8,fa:2.6,sw:2.2,x:-40,lean:.3},'in'),K(50,{ua:2.8,fa:2.6,sw:2.2,ua2:-2.2,fa2:-2.0,sw2:-1.4,x:-40,lean:.2}),K(56,{ua:2.6,fa:2.4,sw:2.0,ua2:2.9,fa2:2.8,sw2:2.5,x:-42,lean:.35},'in'),K(70,{ua:2.6,fa:2.4,sw:2.0,ua2:2.9,fa2:2.8,sw2:2.5,x:-40,lean:.3}),K(96,X)],
+ keys:(()=>{/* 後ろの腕は、ひじと手首が人の曲がる向き（ひじ 0〜+0.6、手首 +0.45〜+0.6）のまま動くよう、角度を回る向きどおりに続けて書く。
+   交差→下げる：前を通って剣先を下ろす。二撃目の構え：腕を後ろから頭上へ上げ、剣を肩の後ろへ寝かせる（兜に腕が重ならない）。振り：頭上を越えて前下へ（途中の54Fで頭上の前を通る）。 */
+  const BL={ua2:-5.48,fa2:-5.38,sw2:-4.93},BU={ua2:-7.83,fa2:-7.23,sw2:-6.73},BM={ua2:-9.43,fa2:-8.93,sw2:-8.4},BS={ua2:-11.02,fa2:-10.62,sw2:-10.07};
+  const F1={ua:-2.4,fa:-1.6,sw:-1.2,x:4,cr:2},H1={ua:2.8,fa:2.6,sw:2.2},H2={ua:2.6,fa:2.4,sw:2.0};
+  return[K(0,X),K(14,Object.assign({},F1,BL)),K(28,Object.assign({},F1,BL)),K(42,Object.assign({},H1,BL,{x:-40,lean:.3}),'in'),K(45,Object.assign({},H1,BL,{x:-40,lean:.3})),
+   K(49,Object.assign({},H1,BU,{x:-40,lean:.2}),'out'),K(52,Object.assign({},H1,BU,{x:-40,lean:.2})),K(54,Object.assign({},H1,BM,{x:-41,lean:.28}),'in'),K(56,Object.assign({},H2,BS,{x:-42,lean:.35}),'lin'),
+   K(70,Object.assign({},H2,BS,{x:-40,lean:.3})),K(96,Object.assign({},X,{ua2:1.4-12.566,fa2:-2.5-6.283,sw2:-.85-6.283}))]})(),
  cues:[{t:14,col:'w'}],hits:[42,56],trails:[[38,44,'w'],[52,58,'w',2]]});
 mv({f:'gate',id:'g_kneel',n:'膝をつく',bg:'gate',len:110,cap:'片膝をつき、剣を地面に突く。まだ交差はほどかない。',why:'倒れても剣を交差させたまま＝最後まで門を守ろうとした、という一瞬の物語。',
  keys:[K(0,X),K(10,Object.assign({},X,{lean:-.2,x:3})),K(34,Object.assign({},KNEEL,{sw2:1.2,ua2:1.7,fa2:1.4}),'out'),K(100,Object.assign({},KNEEL,{sw2:1.2,ua2:1.7,fa2:1.4}))],noHero:true});

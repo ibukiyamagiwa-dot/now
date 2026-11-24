@@ -48,6 +48,7 @@ Object.assign(PDEF,{flat:0,stretch:0,rip:0,cut:0,mimic:0});
 for(const k of['shade','shadeM'])SPEC[k+'@w']=flashSpec(k);
 
 /* 構え・振りかぶり・のびる斬り */
+/* 脇構え（剣を低く後ろへ）と、すくい上げ */const SHL={ua:1.25,fa:.75,sw:.45,lean:-.04,cr:3.2},SHR={ua:-2.55,fa:-2.75,sw:-2.65,lean:.22,cr:1,stretch:.85};
 const SHW={ua:-2.4,fa:-1.8,sw:-1.2,lean:-.12,cr:2.2},SHS={ua:2.75,fa:2.55,sw:2.3,lean:.32,cr:1,stretch:.85},SHU={ua:2.2,fa:2.0,sw:1.6,cr:3,lean:.2},SHS2={ua:3.6,fa:3.9,sw:4.2,lean:.25,cr:1.5,stretch:.8};
 /* ふり：のびかけて、途中で止まり、輪郭がゆらいで縮む */const SHF={ua:3.3,fa:3.5,sw:3.4,lean:.2,cr:1.5,stretch:.35,rip:1.6};
 const shIdlePP=(P,t)=>{P.rip=(t%90<10)?.6:0};
@@ -79,10 +80,11 @@ function shCards(f,pre,isM){const ox=isM?2:6,bg='gate',nm=isM?'うそつきの�
   cues:[{t:14,col:'p'},{t:64,col:'w'}],hits:[92],
   cap:'振りかぶって、紫の輪。のびかけるが、途中で止まり、輪郭がゆらいで縮む（ふり）。もう一度振りかぶって白く光り、今度は本当にのびて斬る。',
   why:'影はまねるだけ。剣士の動きをなぞるが、ふりには中身がない＝のびきらずに、ゆらいで崩れる。紫の輪はフェイントの合図（決まりどおり）。'});
- mv({f,ox,id:pre+'_two',n:'本物が2回続く',bg,len:130,keys:[K(0,{}),K(14,SHW,'out'),K(38,SHW),K(42,SHS,'in'),K(45,SHS),K(48,SHU,'out'),K(52,SHU),K(56,SHS2,'in'),K(64,SHS2),K(84,{},'io'),K(130,{})],
+ /* 本物が2回続く：一撃の「振りかぶり（剣が頭上）」とは構えを変える。剣を低く後ろへ引いた脇構え＝下から来る、二度来る */
+ mv({f,ox,id:pre+'_two',n:'本物が2回続く（脇構え）',bg,len:130,keys:[K(0,{}),K(14,SHL,'out'),K(38,SHL),K(42,SHR,'in'),K(45,SHR),K(48,SHW,'out'),K(52,SHW),K(56,SHS,'in'),K(64,SHS),K(84,{},'io'),K(130,{})],
   cues:[{t:14,col:'w'},{t:28,col:'w'}],hits:[42,56],
-  cap:'白く光って打ち下ろし（のびる）。縮みきらずに低く構え直して止まり、もう一度白く光ってすくい上げる。',
-  why:'フェイントを覚えたところで、「本物が続く」もある。紫の輪がなければ全部本物。'});
+  cap:'剣を低く後ろへ引いた脇構えで止まり（一撃のときの振りかぶりとは逆に、剣が下）、白く光る。すくい上げながらのびて斬り、のびたまま頭上で一瞬止まり、もう一度白く光ったぶん、打ち下ろす。',
+  why:'予兆までの形が一撃と同じだと、何回来るかが光るまで分からない。構えで数を見分けられるように、剣の高さを逆にした（上なら一撃、下なら二撃）。根拠：2022-11-11「攻撃モーションの内訳」（構えは相手に次の行動を促すポーズ）。'});
  if(isM)mv({f,ox,id:pre+'_dfeint',n:'二重フェイント（中ボスだけ）',bg,len:200,
   keys:[K(0,{}),K(14,SHW,'out'),K(38,SHW),K(42,SHF,'in'),K(48,Object.assign({},SHF,{stretch:0,rip:2})),K(56,SHW,'io'),K(88,SHW),K(92,SHF,'in'),K(98,Object.assign({},SHF,{stretch:0,rip:2})),K(106,SHW,'io'),K(138,SHW),K(142,SHS,'in'),K(150,SHS),K(170,{},'io'),K(200,{})],
   cues:[{t:14,col:'p'},{t:64,col:'p'},{t:114,col:'w'}],hits:[142],

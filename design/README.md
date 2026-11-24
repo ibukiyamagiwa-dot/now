@@ -21,7 +21,7 @@
 - `motion.js` `moves.js`：モーション＝キーの並び。合図の光（`cues`）と当たり（`hits`）は、合図から28Fで当たるように置く（打ち合いは別）
 - `stages.js`：専用ステージ（240×135）
 - `hurt.js`（v2）：全員の「やられ」、足りなかった出現、モーションの種類（出現・待機・攻撃・やられ・撃破）の分け方
-- `boar.js` `mobs.js`（v2）：中ボスとモブ。`boar.js` は四つ足の骨格、`mobs.js` は中ボスとモブの設計とモーション
+- `boar.js` `mobs.js` `shade.js` `iai.js`（v2）：中ボスとモブ。`boar.js` は四つ足の骨格、`mobs.js` は中ボスとモブの設計とモーション、`shade.js` は影の剣士、`iai.js` は居合の剣士
 - `content.js` `page.js` `shell.html`：資料集ページの文章とつくり
 
 ## 公開した資料

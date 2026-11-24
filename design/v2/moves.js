@@ -173,6 +173,7 @@ mv({f:'red2',id:'r2_last',n:'最期：構えたまま',bg:'red',len:220,noHero:t
  fx:(B,J,t)=>{if(t>=40&&t<56&&J.tip)star(B,Math.round(J.tip[0]),Math.round(J.tip[1]),[2,3,4,4,3,3,2,2,1,1,1,1,1,1,1,1][t-40],'w')}});
 /* ---------- 赤い門のぬし ---------- */
 const FI={ua:1.95,fa:2.7,sw:3.5,ua2:1.3,fa2:2.0};
+/* 剣と触手の構え：剣は前、触手の腕は腰の後ろへ低く引きしぼる（剣も触手も構える＝二撃） */const FC={ua:2.15,fa:2.45,sw:3.25,ua2:.55,fa2:.15,cr:3,lean:.14,ff:-9,fb:7};
 const glitch=(P,t)=>{const g=(t*7919)%97;if(g<6){P.x=(P.x||0)+(g%2?2:-2);P.hd=(P.hd||0)+.25}};
 /* 黒い水面：穴の底の床。体の下半分を水面で隠す */
 const water=(B,t)=>{for(let x=0;x<CW;x++){const w=Math.sin(x*.3+t*.1)>.6;B.set(x,FL,w?'#3a2a50':'#1a1428',6);B.set(x,FL+1,'#0c0a14',6)}};
@@ -181,8 +182,8 @@ mv({f:'fallen',id:'f_rise',n:'登場：穴の底の水から',bg:'hole',len:160,
  post:(B,J,t)=>{for(let y=FL+1;y<CH;y++)for(let x=0;x<CW;x++){if(B.t[y*CW+x]!==6){B.c[y*CW+x]=((x+y)%5?'#0c0a14':'#1a1428');B.t[y*CW+x]=6}}water(B,t)}});
 mv({f:'fallen',id:'f_idle',n:'立ち絵：ときどき、ずれる',bg:'hole',len:120,keys:[K(0,{}),K(120,{})],pp:(P,t)=>glitch(P,t),
  cap:'切っ先は動かない。でも、ときどき体ごと「ずれる」。',why:'赤い騎士の「静」を残したまま、くらやみの「乱れ」だけを足す。違和感で、のまれたことを伝える。',post:(B,J,t)=>water(B,t)});
-mv({f:'fallen',id:'f_cutten',n:'剣と触手',bg:'hole',len:130,cap:'白く光ったら、剣の一撃。そのすぐ後に、左腕の触手。',why:'剣は赤い騎士のまま正確。触手はくらやみのもの。一つの攻撃に二人ぶんのリズムが混ざる。',
- keys:[K(0,FI),K(14,FI),K(36,Object.assign({},FI,{cr:2.5})),K(42,RCUT,'in'),K(50,Object.assign({},RCUT,{ua2:-.4,fa2:-.9})),K(56,Object.assign({},RCUT,{ua2:3.0,fa2:3.1}),'in'),K(80,RCUT),K(120,FI)],
+mv({f:'fallen',id:'f_cutten',n:'剣と触手',bg:'hole',len:130,cap:'腰を落とし、触手の腕を腰の後ろへ低く引きしぼる（剣も触手も構えている）。白く光ったら、剣の一撃。そのすぐ後に、左腕の触手。',why:'剣は赤い騎士のまま正確。触手はくらやみのもの。一つの攻撃に二人ぶんのリズムが混ざる。',
+ keys:[K(0,FI),K(10,FC,'out'),K(36,Object.assign({},FC,{cr:3.5})),K(42,RCUT,'in'),K(50,Object.assign({},RCUT,{ua2:-.4,fa2:-.9})),K(56,Object.assign({},RCUT,{ua2:3.0,fa2:3.1}),'in'),K(80,RCUT),K(120,FI)],
  cues:[{t:14,col:'w'}],hits:[42,56],trails:[[39,44,'w']],pp:(P,t)=>glitch(P,t),post:(B,J,t)=>water(B,t),
  fx:(B,J,t)=>{if(t>=52&&t<66){const u=t<56?(t-52)/4:1-(t-56)/10;tentacle(B,J.hdB,add(J.hdB,[-10*u,-8]),[lerp(J.hdB[0],HXX+10,u),lerp(J.hdB[1],FL-12,u)],1.6,.5,true)}}});
 mv({f:'fallen',id:'f_dark',n:'ささやき：くらやみの中の正眼',bg:'hole',len:130,cap:'あたりが暗くなり、合図の光は出ない。見えるのは銀の切っ先だけ。切っ先が沈んだら来る。',why:'ぬしの「ささやき」を受けついだ技。でも赤い騎士は、切っ先（剣だけは、のまれていない銀）で読ませてくれる。',
@@ -204,15 +205,17 @@ mv({f:'fallen',id:'f_swallow',n:'のまれる：第二形態へ',bg:'hole',len:1
 /* 水面に映るのは、のまれる前の赤い騎士。勝ったとき、映り姿と本体が入れかわる */
 function reflection(B,t,spec,P,ox,alpha){const R=new Buf(CW,CH);knight(R,ox,FL,SPEC[spec||'red'],P||{},t);for(let y=0;y<CH;y++)for(let x=0;x<CW;x++){const c=R.c[y*CW+x];if(!c)continue;const yy=FL+2+Math.round((FL-y)*.5),xx=x+Math.round(Math.sin(yy*.5+t*.12)*1);if(yy>FL+1&&yy<CH&&((xx+yy)%2===0||alpha>1))B.set(xx,yy,mix(c,'#0c0a14',.45),8)}}
 const F2I={ua:1.95,fa:2.7,sw:3.5,ua2:1.2,fa2:1.8};
+/* 四連撃の構え：剣を腰の後ろへ低く引き（脇構え）、触手の腕は前へ低く。門の輪の触手の構え：触手の腕を背後のアーチへ掲げ、首をそらす */
+const RF4={ua:1.35,fa:.85,sw:.55,ua2:2.55,fa2:2.85,cr:5,lean:.2,ff:-13,fb:10},F2R={ua2:-1.35,fa2:-.75,hd:-.28,lean:-.1,cr:1};
 mv({f:'fallen2',id:'f2_idle',n:'立ち絵：水に映る本当の姿',bg:'hole',len:120,keys:sway({cr:2},{cr:3},120,2),
  cap:'背中の触手が門のアーチになり、その内側は門の向こう。足元の水面には、のまれる前の赤い騎士が映っている。',why:'彼はもう「門」そのもの。でも水面の中では、まだ赤い騎士のまま。倒す理由が、絵の中にある。',
  post:(B,J,t)=>{water(B,t);reflection(B,t,'red',J.P||{},EXX)}});
-mv({f:'fallen2',id:'f2_ring',n:'門の輪の触手',bg:'hole',len:140,cap:'輪の赤い目が一つずつ光る。光った順に、輪から触手が来る。',why:'門のぬしの「目の順」の総まとめ。ここまで覚えたルールが最後に全部効く。',
- keys:[K(0,F2I),K(130,F2I)],cues:[0,1,2].map(i=>({t:14+i*10,col:'w',at:J=>{const c=add(J.sc,[4*J.k,-4*J.k]),a=Math.PI+(2+i*4)/24*Math.PI;return add(c,dir(a,19*J.k))}})),hits:[42,52,62],
+mv({f:'fallen2',id:'f2_ring',n:'門の輪の触手',bg:'hole',len:140,cap:'触手の腕を背後のアーチへ掲げ、首をそらして輪を呼ぶ。輪の目が一つずつ光り、光った順に、輪から触手が来る。',why:'門のぬしの「目の順」の総まとめ。映り姿の居合（本体は動かず、水面が光る）と、光る前に見分けられるよう、本体がアーチを呼ぶ形を足した。',
+ keys:[K(0,F2I),K(10,Object.assign({},F2I,F2R),'out'),K(64,Object.assign({},F2I,F2R)),K(84,F2I,'io'),K(130,F2I)],cues:[0,1,2].map(i=>({t:14+i*10,col:'w',at:J=>{const c=add(J.sc,[4*J.k,-4*J.k]),a=Math.PI+(2+i*4)/24*Math.PI;return add(c,dir(a,19*J.k))}})),hits:[42,52,62],
  fx:(B,J,t)=>{for(let i=0;i<3;i++){const imp=42+i*10,d=t-imp;if(d>=-8&&d<12){const u=d<0?(d+8)/8:1-d/12,c=add(J.sc,[4*J.k,-4*J.k]),a=Math.PI+(2+i*4)/24*Math.PI,p=add(c,dir(a,19*J.k));tentacle(B,p,[lerp(p[0],60,u),p[1]-14],[lerp(p[0],HXX+8,u),lerp(p[1],FL-12,u)],2,.5,true)}}},
  post:(B,J,t)=>{water(B,t);reflection(B,t,'red',J.P||{},EXX)}});
-mv({f:'fallen2',id:'f2_four',n:'四連撃',bg:'hole',len:150,cap:'白く光ったら四連。剣、剣、触手、最後の一撃だけ赤い光で重い。',why:'赤い騎士の二連撃と、ぬしの三連の合体。「二人ぶん」がひとつの体で来る。',
- keys:[K(0,F2I),K(14,R8),K(28,R8),K(40,RCUT,'in'),K(46,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4})),K(52,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9}),'in'),K(58,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,ua2:3.0,fa2:3.1})),K(70,R8),K(76,RCUT,'in'),K(100,RCUT),K(140,F2I)],
+mv({f:'fallen2',id:'f2_four',n:'四連撃',bg:'hole',len:150,cap:'剣を腰の後ろへ低く引き（脇構え）、触手の腕を前へ低く出して、深く腰を落として止まる。白く光ったら四連。すくい上げ、打ち下ろし、触手、最後の打ち下ろしだけ赤い光で重い。',why:'赤い騎士の二連撃と、ぬしの三連の合体。「二人ぶん」がひとつの体で来る。構えも二人ぶん（剣と触手の両方が構える）。つばめ返し（八相＝剣が高い、剣だけが構える）と、剣の高さで光る前に見分けられる。',
+ keys:[K(0,F2I),K(14,RF4,'out'),K(28,RF4),K(40,RCUT,'in'),K(46,Object.assign({},RCUT,{ua:2.0,fa:-2.6,sw:-2.4})),K(52,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9}),'in'),K(58,Object.assign({},RCUT,{ua:3.1,fa:3.0,sw:2.9,ua2:3.0,fa2:3.1})),K(70,R8),K(76,RCUT,'in'),K(100,RCUT),K(140,F2I)],
  cues:[{t:12,col:'w'},{t:48,col:'r'}],hits:[40,52,62,76],trails:[[37,42,'w'],[49,54,'w'],[73,78,'r']],
  fx:(B,J,t)=>{if(t>=58&&t<70){const u=t<62?(t-58)/4:1-(t-62)/8;tentacle(B,J.hdB,add(J.hdB,[-10*u,-8]),[lerp(J.hdB[0],HXX+10,u),lerp(J.hdB[1],FL-12,u)],1.8,.5,true)}},
  post:(B,J,t)=>{water(B,t);reflection(B,t,'red',J.P||{},EXX)}});
@@ -869,20 +872,21 @@ const CB_TWO=new Set(['red','red2','fallen','fallen2']);
 const CBP={down:{W:{ua:-1.9,fa:-1.6,sw:-.7,lean:-.15,cr:2.5,dx:4},S:{ua:2.5,fa:2.2,sw:2.65,lean:.32,cr:3.6,ff:-13,fb:9},F:{ua:2.2,fa:1.95,sw:2.4,lean:.36,cr:4,ff:-13,fb:9}},
  up:{W:{ua:1.9,fa:1.4,sw:2.0,lean:.2,cr:4.2,dx:2},S:{ua:-2.75,fa:-2.9,sw:-2.3,lean:.05,cr:2.6,ff:-12,fb:9},F:{ua:-2.2,fa:-2.3,sw:-1.75,lean:-.05,cr:2.2,ff:-12,fb:9}},
  thrust:{W:{ua:1.2,fa:3.0,sw:3.14,lean:-.14,cr:3.2,dx:10},S:{ua:3.1,fa:3.12,sw:3.14,lean:.3,cr:3.6,ff:-14,fb:10},F:{ua:3.1,fa:3.12,sw:3.14,lean:.34,cr:3.8,ff:-14,fb:10}}};
-const COMBO=(id,seq)=>{const M=MV.find(m=>m.id===id);if(!M)return;const I=M.keys[0].p,two=CB_TWO.has(M.f),hs=M.hits;const xs=hs.map(h=>{const k=M.keys.find(k=>k.t===h);return k&&k.p.x!=null?k.p.x:-30});
+const COMBO=(id,seq,W0)=>{/* W0：最初の構え（予兆まで）を技ごとに変える。数の違う連撃が、同じ構えにならないように */const M=MV.find(m=>m.id===id);if(!M)return;const I=M.keys[0].p,two=CB_TWO.has(M.f),hs=M.hits;const xs=hs.map(h=>{const k=M.keys.find(k=>k.t===h);return k&&k.p.x!=null?k.p.x:-30});
  const mk=(o,x,extra)=>{const p=Object.assign({},o);delete p.dx;p.x=x;if(two){p.ua2=p.ua-.2;p.fa2=p.fa-.1}return Object.assign(p,extra||{})};
  let last=null;const ks=[K(0,I)];const c0=(M.cues&&M.cues[0]?M.cues[0].t:14);
  seq.forEach((T,i)=>{const h=hs[i],x=xs[i];let S,W;
   if(T==='tent'){const base=last||mk(CBP.down.F,x);W=Object.assign({},base,{ua2:-.4,fa2:-.9,lean:(base.lean||0)-.08});S=Object.assign({},base,{ua2:3.0,fa2:3.1,lean:(base.lean||0)+.18,x:(base.x||0)-4})}
   else{const P=CBP[T];W=mk(P.W,(i===0?0:(last&&last.x!=null?last.x:x))+P.W.dx);S=mk(P.S,x)}
-  if(i===0){ks.push(K(c0,W,'out'));ks.push(K(h-3,W))}
+  if(i===0&&W0){W=Object.assign({x:0},W0);delete W.via}
+  if(i===0){ks.push(K(c0,W,'out'));ks.push(K(h-3,W));if(W0&&W0.via)ks.push(K(h-1,mk(CBP[W0.via].W,x)))/* 脇構えからのすくい上げは、前の低いところを通す（頭上を回らない） */}
   else{const hp=hs[i-1],gap=h-hp;ks.push(K(hp+3,last));const g=Math.max(2,Math.min(4,Math.floor((gap-6)/2)));ks.push(K(Math.min(h-4,hp+3+g),W,'out'));ks.push(K(h-3,W))}
   ks.push(K(h,S,'in'));last=S});
  const T=seq[seq.length-1],hl=hs[hs.length-1],F=T==='tent'?Object.assign({},last,{ua2:last.ua2,fa2:last.fa2}):mk(CBP[T].F,xs[xs.length-1]);
  ks.push(K(hl+3,last));ks.push(K(hl+8,F,'out'));ks.push(K(Math.min(M.len-24,hl+30),F));ks.push(K(M.len-6,I,'io'));
  M.keys=ks.sort((a,b)=>a.t-b.t);M.trails=hs.map((h,i)=>seq[i]==='tent'?null:[h-4,h+2,(M.hitCol==='r'&&i===hs.length-1)||(M.trails||[]).some(r=>r&&r[0]<=h&&r[1]>=h&&r[2]==='r')?'r':'w',0,seq[i]==='thrust'?'line':'arc']).filter(Boolean);M.combo=seq};
 COMBO('l_two',['down','up']);COMBO('l_rev',['up','down']);COMBO('l2_tri',['down','up','tent']);COMBO('f_sa',['down','up','tent']);
-COMBO('r_swap',['up','down']);COMBO('r_combo4',['down','up','down','thrust']);COMBO('f2_four',['down','up','tent','down']);
+COMBO('r_swap',['up','down']);COMBO('r_combo4',['down','up','down','thrust']);COMBO('f2_four',['up','down','tent','down'],Object.assign({via:'up'},RF4));
 COMBO('r2_tsubame',['down','up']);COMBO('r_three',['thrust','thrust','thrust']);COMBO('f2_tsubame',['down','up']);
 /* ===== 剣は腕で振る（桜井流モーションの見直しを含む） =====
    手首（剣の向き−前腕の向き。画面で時計回りを＋）は、握りこぶしで無理なく取れる範囲 +0.45〜+2.4 に収める。

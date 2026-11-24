@@ -117,12 +117,13 @@ mv({f:'boarM',ox:BOAR.boarM.ox,id:'bM_enter',n:'登場：しんがりが来る',
  cap:'群れのあとから、ゆっくり重い足どりで歩いてくる。止まって頭を上げ、鼻を鳴らしてこちらのにおいを確かめ、首を振ってたてがみを鳴らしてから、頭を下げる。地はかかない。',
  why:'しんがりは走らない。群れを先に行かせてから来る。地をかくのは赤い溜め突進の合図なので、登場では決してかかない（合図の意味をにごさない）。'});
 
-/* ===== モーションの種類（出現・待機・攻撃・やられ・撃破） ===== */
+/* ===== モーションの種類（出現・待機・攻撃・パリィされ・ブレイク・やられ・撃破） ===== */
 const MCAT_ENTER={gate:['g_enter'],dgate:['dg_turn'],lord:['l_enter'],lord2:['l2_open'],red:['r_enter'],red2:['r_rage'],fallen:['f_rise'],fallen2:['f_swallow'],dragon:['d_enter'],hydra:['h_enter'],boarM:['bM_enter'],boar:['b_enter']};
 const MCAT_DOWN={gate:['g_kneel'],dgate:['dg_down2'],lord:['l_kneel'],lord2:['l2_down'],red:['r_rage'],red2:['r2_last'],fallen:['f_swallow'],fallen2:['f2_end'],dragon:['d_down'],hydra:['h_down'],boarM:['bM_down'],boar:['b_down']};
 const MCAT_HURT={gate:['g_hurt'],dgate:['dg_hurt'],lord:['l_hurt'],lord2:['l2_hurt'],red:['r_hurt'],red2:['r2_hurt'],fallen:['f_hurt'],fallen2:['f2_hurt'],dragon:['d_hurt'],hydra:['h_hurt'],boarM:['bM_hurt','bM_wall'],boar:['b_hurt','b_wall']};
-const MCATS=[['all','すべて'],['enter','出現'],['idle','待機'],['atk','攻撃'],['hurt','やられ'],['down','撃破']];
-function catOf(key,id){if((MCAT_ENTER[key]||[]).includes(id))return'enter';if((MCAT_DOWN[key]||[]).includes(id))return'down';if((MCAT_HURT[key]||[]).includes(id))return'hurt';
+const MCAT_PARRY={},MCAT_BREAK={};/* parried.js で入れる */
+const MCATS=[['all','すべて'],['enter','出現'],['idle','待機'],['atk','攻撃'],['parried','パリィされ'],['break','ブレイク'],['hurt','やられ'],['down','撃破']];
+function catOf(key,id){if((MCAT_ENTER[key]||[]).includes(id))return'enter';if((MCAT_DOWN[key]||[]).includes(id))return'down';if((MCAT_HURT[key]||[]).includes(id))return'hurt';if((MCAT_PARRY[key]||[]).includes(id))return'parried';if((MCAT_BREAK[key]||[]).includes(id))return'break';
  if(/_(idle|bored)$/.test(id)||KINDOF(id)==='stand'||['h_toy','bM_look','dg_state','r_stance','d_rage'].includes(id))return'idle';return'atk'}
 /* 一覧に入れる：出現→待機→攻撃→やられ→撃破の順。前の形態の演出（変身）は、次の形態の出現にも出す */
-function movesFor(key){const own=(MOVES_OF[key]||[]).slice(),all=[...new Set([...(MCAT_ENTER[key]||[]),...own,...(MCAT_HURT[key]||[]),...(MCAT_DOWN[key]||[])])].filter(id=>MV.find(m=>m.id===id));const ord={enter:0,idle:1,atk:2,hurt:3,down:4};return all.sort((a,b)=>ord[catOf(key,a)]-ord[catOf(key,b)])}
+function movesFor(key){const own=(MOVES_OF[key]||[]).slice(),all=[...new Set([...(MCAT_ENTER[key]||[]),...own,...(MCAT_PARRY[key]||[]),...(MCAT_BREAK[key]||[]),...(MCAT_HURT[key]||[]),...(MCAT_DOWN[key]||[])])].filter(id=>MV.find(m=>m.id===id));const ord={enter:0,idle:1,atk:2,parried:3,break:4,hurt:5,down:6};return all.sort((a,b)=>ord[catOf(key,a)]-ord[catOf(key,b)])}

@@ -104,6 +104,15 @@ function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{})
 function horn(B,R,k,s,hs,hm){const b=R([s*3.5*k,-5*k]),m=R([s*(7+hs*2.5)*k,-(9+hs*3)*k]),e=R([s*(3.5+hs)*k,-(15+hs*5)*k]);B.tube(b,m,e,2.2*k,.6*k,hm.horn||'#2a2434',hm.hornHi||'#6e6680',hm.hornLo||'#120e18');if(hm.hornTip)B.set(...e.map(Math.round),hm.hornTip,2)}
 
 /* くらやみのオーラ：暗い背景に溶けないよう、体のまわりに紫のにじみと、背中側のふちに光を置く */
+/* くらやみのまとう気配（竜・三つ首）：切り抜いたような縁取りをやめ、体にくっついた煙にする。
+   ちらつかない（模様は場所で決まり、時間で入れかわらない）。背の上から細い煙がゆっくり立ちのぼり、足元は床に黒くにじむ。
+   k（0〜1）で濃さを変え、たおれるときは少しずつ薄れて消える（ぱっと消えない）。 */
+function auraSmoke(B,A,T,k){const W=B.w,H=B.h,isB=i=>{const t=B.t[i];return t===1||t===2||t===3};const hs=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};if(k<=0)return;
+ const top=[],foot=new Set();for(let i=0;i<W*H;i++){if(!isB(i))continue;const x=i%W,y=i/W|0;if(y>0&&!isB(i-W))top.push([x,y]);if(y>=FL-3)foot.add(x)}
+ /* 縁のすぐ外：上半分だけ、うすく。場所で決まる点描 */for(const[x,y]of top){if(y>FL-10)continue;const h=hs(x,y);if(h<.55*k&&B.t[(y-1)*W+x]===0)B.set(x,y-1,A.c1,9)}
+ /* 立ちのぼる煙：背の上の決まった場所から、4Fに1ドットの速さでゆっくり上がり、上ほど途切れて消える */for(const[x,y]of top){const h=hs(x*3,y*7);if(h>.1*k||y>FL-12)continue;const ph=h*97,L=14;const o=((T*.25+ph)%L);const yy=y-2-o,xx=x+Math.round(Math.sin((T+ph*10)*.05)*1.2);const fade=o/L;if(hs(xx,Math.round(yy))<1-fade*1.1&&yy>2)B.set(xx,yy,fade<.4?A.c1:A.c2,9)}
+ /* 足元のにじみ */for(const x of foot)for(const dx of[-2,-1,0,1,2]){const xx=x+dx;if(xx<0||xx>=W)continue;if(hs(xx,FL+1)<.8*k)B.set(xx,FL+1,A.c1,9);if(Math.abs(dx)<2&&hs(xx,FL+2)<.5*k)B.set(xx,FL+2,A.c2,9)}
+ /* 背中側のふちの光（体の内側に描くので浮かない） */for(let i=0;i<W*H;i++){if(B.t[i]!==3)continue;const x=i%W,y=i/W|0;const rr=B.tag(x+1,y),u=B.tag(x,y-1);if(hs(x,y)>k)continue;if((rr!==1&&rr!==2&&rr!==3)&&(u!==1&&u!==2&&u!==3)&&B.tag(x-1,y)===1)B.set(x,y,A.rim,3);else if(rr!==1&&rr!==3&&B.tag(x-1,y)===1&&(x+y)%2)B.set(x,y,A.rim,3)}}
 function aura(B,A,T){const W=B.w,H=B.h,d=new Int8Array(W*H).fill(-1),q=[];for(let i=0;i<W*H;i++){const t=B.t[i];if(t===1||t===2||t===3){d[i]=0;q.push(i)}}
  for(let h=0;h<q.length;h++){const i=q[h];if(d[i]>=A.r)continue;const x=i%W,y=i/W|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(d[j]<0){d[j]=d[i]+1;q.push(j)}}}
  for(let i=0;i<W*H;i++){if(d[i]<=0)continue;const x=i%W,y=i/W|0,t=B.t[i];if(t===1||t===2||t===4)continue;const n=d[i],fl=((x*7+y*13+(T>>2))%11);

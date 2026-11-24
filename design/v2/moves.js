@@ -594,7 +594,7 @@ mv({f:'dragon',ox:4,id:'d_dive',n:'影もぐり',bg:'lord',len:150,cap:'竜の�
    B.line(...R([-10,-5]),...R([-1,0]),'#2a0612',1);for(let i=0;i<4;i++){B.set(...R([-8+i*2,-4+i*.5]),D.bone[3],1);B.set(...R([-7+i*2,1+i*.4]),D.bone[2],1)}B.set(...R([-4,-4]),D.eye,2);B.set(...R([-3,-4]),D.eye,2);B.set(...R([-1,-5]),D.eye,2);B.set(...R([-1,-3]),D.eye,2);
    for(let i=0;i<3;i++){const s=R([-5+i*2,3]);B.line(s[0],s[1],s[0]+Math.sin(t*.3+i),s[1]+4,D.sk[3],1)}}},
  post:(B,J,t)=>{for(let y=FL+1;y<CH;y++)for(let x=0;x<CW;x++){const i=y*CW+x;if(B.t[i]===1||B.t[i]===3){B.c[i]=((x+y)%5?'#1a1220':'#2a1e30');B.t[i]=6}}}});
-mv({f:'dragon',ox:4,id:'d_down',n:'たおれる：亡骸が残る',bg:'lord',len:210,noHero:true,cap:'のけぞって声にならない声で叫ぶ。前足が折れ、一度だけ起き上がろうとして、崩れ落ちる。扇は背にかぶさり、三つの目がばらばらに閉じる。最後に尾の先が一度だけ動く。亡骸の下から、くらやみがしみ出す。',why:'倒れたものは、くらやみに拾われる。この亡骸は消えない。次に「通り道」にされる。',
+mv({f:'dragon',ox:4,id:'d_down',auraK:t=>t<60?1:Math.max(0,1-(t-60)/120),n:'たおれる：亡骸が残る',bg:'lord',len:210,noHero:true,cap:'のけぞって声にならない声で叫ぶ。前足が折れ、一度だけ起き上がろうとして、崩れ落ちる。扇は背にかぶさり、三つの目がばらばらに閉じる。最後に尾の先が一度だけ動く。亡骸の下から、くらやみがしみ出す。',why:'倒れたものは、くらやみに拾われる。この亡骸は消えない。次に「通り道」にされる。',
  keys:[K(0,DI),K(6,{x:2,lift:7,hy:-9,ny:-7,jaw:1,wing:1,quiver:1},'out'),K(34,{x:1,lift:5,hy:-7,ny:-5,jaw:.8,wing:.8,quiver:.4}),K(58,{x:0,dead:.4,jaw:.5,wing:.2,fl:.3},'in'),K(70,{x:0,dead:.3,ny:-4,jaw:.4,quiver:.3}),K(92,{dead:1,wing:-1,jaw:.2},'in'),K(150,{dead:1}),K(156,{dead:1,twitch:1},'out'),K(166,{dead:1,twitch:0}),K(210,{dead:1})],
  pp:(P,t)=>{P.eyes=t<112?3:t<126?2:t<142?1:0},pre:(B,t)=>{if(t>=160)dpool(B,EXX+8,Math.round(Math.min(38,(t-160)*.8)),t)},fx:(B,J,t)=>{ddust(B,[EXX-6,FL],t-92,3);ddust(B,[EXX+20,FL],t-94,2)}});
 /* ---------- 三つ首の竜 ---------- */
@@ -627,7 +627,7 @@ mv({f:'hydra',id:'h_spit',n:'切り口の吐き出し（拍）',bg:'hole',len:15
  fx:(B,J,t)=>{const s=J.fingers[0]||J.rift;if(t>=20&&t<67){const u=(t-20)/46,x=lerp(s[0],HXX+6,u),y=lerp(s[1],FL-10,u)-Math.sin(u*3.14)*44,sh=Math.round(2+u*6);
    for(let xx=-sh;xx<=sh;xx++)if((xx+t)%2||u>.7)B.set(HXX+6+xx,FL,u>.7?'#000000':'#0a0610',6);
    const m=new Set();dDisc(m,x,y,4.2,.15,t*.3);dShade(B,m,['#05020a','#120a1e','#24143a','#3e2666','#6a46a0'],'#c8a2f4');B.set(x-1,y,'#ff3050',2);B.set(x,y,'#ff3050',2);B.set(x-1,y-1,'#2a0612',1);for(let i=0;i<3;i++)B.set(x+2-i*2,y+5+((t+i)%3),INK.hi,4)}}});
-mv({f:'hydra',id:'h_down',n:'たおす：握って、引っこむ',bg:'hole',len:240,noHero:true,cap:'最後の一撃で、三本がいっせいに口を開けて広がり、けいれんする。力が抜けて垂れ下がったあと、三本がゆっくり同じ向きに丸まり、手首ごと持ち上がって握りこぶしになる。こぶしが一度だけ震えて、そのまま裂け目の奥へ引きずりこまれる。裂け目が閉じ、竜の亡骸は塵になる。',why:'倒したのではない。引っこめさせただけ。こぶしを掲げて止まる一瞬に、初めて「手だった」と気づける。切った首は切り株のまま、こぶしに混ざる。',
+mv({f:'hydra',id:'h_down',auraK:t=>t<80?1:Math.max(0,1-(t-80)/140),n:'たおす：握って、引っこむ',bg:'hole',len:240,noHero:true,cap:'最後の一撃で、三本がいっせいに口を開けて広がり、けいれんする。力が抜けて垂れ下がったあと、三本がゆっくり同じ向きに丸まり、手首ごと持ち上がって握りこぶしになる。こぶしが一度だけ震えて、そのまま裂け目の奥へ引きずりこまれる。裂け目が閉じ、竜の亡骸は塵になる。',why:'倒したのではない。引っこめさせただけ。こぶしを掲げて止まる一瞬に、初めて「手だった」と気づける。切った首は切り株のまま、こぶしに混ざる。',
  keys:[K(0,HI),K(6,Object.assign({},HI,{spread:.8,j0:1,j1:1,j2:1,quiver:1}),'out'),K(30,Object.assign({},HI,{spread:.5,j0:.8,j1:.8,j2:.8,quiver:.6})),K(56,Object.assign({},HI,{spread:-.2,curl:.35,j0:.3,j1:.3,j2:.3,quiver:0}),'in'),K(70,Object.assign({},HI,{curl:.35,j0:.2,j1:.2,j2:.2})),
   K(104,Object.assign({},HI,{fist:1,curl:0,quiver:.15}),'io'),K(118,Object.assign({},HI,{fist:1,quiver:.4})),K(128,Object.assign({},HI,{fist:1,quiver:0})),K(160,{rift:1,fist:1,emerge:0},'in'),K(180,{rift:0,fist:1,emerge:0},'in'),K(240,{rift:0,fist:1,emerge:0})],
  pp:(P,t)=>{P.ceye=t<130?3:0;if(t>=6&&t<30)P.spread+=Math.sin(t*1.3)*.25},

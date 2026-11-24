@@ -122,7 +122,8 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  /* ===== 黒い段から：背から、くらやみがのぼる ===== */
  if(D.smoke&&dd<.5){for(let i=0;i<10*D.smoke;i++){const s=(i*37%100)/100,b=LP(LP(Q(-6,-30),Q(14,-24),s),Q(4,-31),.2),ph=(T*.35+i*13)%18,x=b[0]+Math.sin(ph*.4+i)*1.3,y=b[1]-ph-2;if(!B.get(Math.round(x),Math.round(y)))B.set(x,y,ph<9?INK.hi:INK.col,4)}}
  /* しずく：腹とあごから */if(dd<.5)for(let i=0;i<D.drip;i++){const p=[Q(-6,-12),Q(6,-13),Jw([-8,4])][i%3],ph=(T*.4+i*23)%26,y=p[1]+ph*.7;if(y<oy-1){B.set(p[0],y,D.sk[2],4);if(ph>3)B.set(p[0],y-1,D.sk[1],4)}}
- /* ===== シルエット：背中側（上と右）の外に明るいふちを一画素。暗い背景に溶けない ===== */if(dd<.6&&P.melt<=0){const oc=fd(D.out||D.rim),L=[];for(let y=1;y<B.h-1;y++)for(let x=1;x<B.w-1;x++){const i=y*B.w+x;if(B.t[i]!==0)continue;const b=B.t[i+B.w]===1,l=B.t[i-1]===1,bl=B.t[i+B.w-1]===1;if((b||l||bl)&&y<oy-1)L.push(i)}for(const i of L){B.c[i]=oc;B.t[i]=3}}
+ /* ===== シルエット：背中側（上と右）のふちを、体の内側の一画素だけ明るくする。外に線を足さないので浮かない。
+   死にゆくとき・溶けるときは、ふちの光が点々と少しずつ減って消える（ぱっと消えない） ===== */{const f=Math.max(0,Math.min(1,(.75-dd)/.35))*Math.max(0,1-(P.melt||0)*1.6);if(f>0){const oc=fd(D.out||D.rim),L=[];for(let y=1;y<B.h-1;y++)for(let x=1;x<B.w-1;x++){const i=y*B.w+x;if(B.t[i]!==1||y>=oy-1)continue;const up=B.t[i-B.w]===0,rt=B.t[i+1]===0;if((up||rt)&&hsh(x,y)<f)L.push(i)}for(const i of L){B.c[i]=mix(B.c[i],oc,.6);B.t[i]=3}}}
  /* ===== 溶ける／形になる：melt=1で床のくらやみだけ。上から消え、境目は液のしずく ===== */
  if(P.melt>0){const yT=oy-76*(1-P.melt);for(let y=0;y<B.h;y++)for(let x=0;x<B.w;x++){const i=y*B.w+x;if(B.t[i]!==1&&B.t[i]!==2)continue;const h=hsh(x,y);if(y<yT-h*3)dClr(B,x,y);else if(y<yT+3+h*2){B.c[i]=h<.5?INK.hi:INK.col;B.t[i]=1}}
   for(let x=Math.round(bx-30*k);x<bx+40*k;x++){const w=Math.sin((x-bx)*.15+T*.1);if(P.melt>.05&&B.get(x,oy-1)===0&&hsh(x,1)<.85)B.set(x,oy-1,w>0?INK.hi:INK.col,1)}}
@@ -173,7 +174,7 @@ function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:
  /* くらやみのしたたり */if(ro>.3)for(let i=0;i<3;i++){const p=R([(-2+i*2)*k,rh]),ph=(T*.3+i*17)%20;B.set(p[0],p[1]+ph*.6,INK.hi,4)}
  J.fingers=fin;J.heads=fin;return J}
 Object.assign(PDEF,DPDEF,{fist:0,snap0:0,snap1:0,snap2:0,f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,curl:0,fist:0,snap0:0,snap1:0,snap2:0,rift:1,emerge:1,grip:0,heads:1,press:0,stump:0,swap:0,spread:0,grab:0,tx0:0,ty0:0,tx1:0,ty1:0,tx2:0,ty2:0,cjaw:0});
-SPEC.dragon={name:'くらやみの竜',k:1,draw:drawDragon,pose:{},aura:{r:2,c1:'#22142e',c2:'#1a1024',rim:'#6a3a90'}};
+SPEC.dragon={name:'くらやみの竜',k:1,draw:drawDragon,pose:{},aura:{smoke:1,r:2,c1:'#1e1228',c2:'#160c1e',rim:'#6a3a90'}};
 /* ===== 門の向こうの指（三つ首の竜と同じ手の指）=====
    暗い門のぬし・第二形態の「門から指」の技で使う。三つ首の竜の指と同じ作り：灰紫の皮、三つの節と節ごとの横じわ、内側の肉色の腹、白い平たい爪。
    上の指は爪がはがれて赤黒い爪の床がむき出し、下の指には太い古い金の指輪。指先には目が一つ（光ると合図）。当たる瞬間、指先の腹が縦に裂けて口になる。
@@ -194,4 +195,4 @@ function gateFinger(B,root,tgt,i,o){const k=o.k||1,T=o.T||0,u=o.u||0,L=HFG[i].L.
  if(o.lit){const g=Rh([-1,-.5]);glow(B,Math.round(g[0]),Math.round(g[1]),4,'#ffffff');B.set(...Rh([-1.8,-.6]),'#ffffff',2);B.set(...Rh([-3.4,-.2]),'#ffffff',2)}else if(o.eye){B.set(...Rh([-1.8,-.6]),'#ff3050',2);B.set(...Rh([-3.4,-.2]),'#ff3050',2)}else B.line(...Rh([-3.6,-.4]),...Rh([-1.4,-.7]),HSK[0],1);
  if(o.crack){/* 節が鳴る：関節から白い小さな破片 */for(let j=1;j<3;j++){const p=ch[j];B.set(p[0]-1,p[1]-3,'#ece6da',4);B.set(p[0]+2,p[1]-4,'#ece6da',4);B.set(p[0]-3,p[1]-2,'#c8c0b4',4)}}
  return {tip:Rh([3.6,.6]),ch}}
-SPEC.hydra={name:'三つ首の竜',k:1,draw:drawHydra,pose:{},aura:{r:3,c1:'#2a1840',c2:'#1e1230',rim:'#c070ff'}};
+SPEC.hydra={name:'三つ首の竜',k:1,draw:drawHydra,pose:{},aura:{smoke:1,r:3,c1:'#22142e',c2:'#180e22',rim:'#c070ff'}};

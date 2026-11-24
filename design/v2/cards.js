@@ -20,7 +20,7 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
  for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])(tr[4]==='line'?lineTrail:tr[4]==='arc'?arcTrail:trail)(B,S,M,tt,ox,oy,tr[4]?8:4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);
- B.outline();if(S.aura&&!(M.auraOff&&M.auraOff(tt)))aura(B,S.aura,tt);return B}
+ B.outline();if(S.aura&&!(M.auraOff&&M.auraOff(tt))){if(S.aura.smoke)auraSmoke(B,S.aura,tt,M.auraK?M.auraK(tt):1);else aura(B,S.aura,tt)}return B}
 
 /* 合図の光：大きな十字の星＋斜めの光＋まわりのにじみ。画面でいちばん目立つもの */
 function cueStar(B,x,y,d,col){const R=[4,7,9,10,10,9,9,8,7,6,5,5,4,3,3,2,2,1][d]||1,[c1,c2]=FXC[col];

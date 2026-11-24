@@ -209,6 +209,15 @@ function knight(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{})
 function horn(B,R,k,s,hs,hm){const b=R([s*3.5*k,-5*k]),m=R([s*(7+hs*2.5)*k,-(9+hs*3)*k]),e=R([s*(3.5+hs)*k,-(15+hs*5)*k]);B.tube(b,m,e,2.2*k,.6*k,hm.horn||'#2a2434',hm.hornHi||'#6e6680',hm.hornLo||'#120e18');if(hm.hornTip)B.set(...e.map(Math.round),hm.hornTip,2)}
 
 /* くらやみのオーラ：暗い背景に溶けないよう、体のまわりに紫のにじみと、背中側のふちに光を置く */
+/* くらやみのまとう気配（竜・三つ首）：切り抜いたような縁取りをやめ、体にくっついた煙にする。
+   ちらつかない（模様は場所で決まり、時間で入れかわらない）。背の上から細い煙がゆっくり立ちのぼり、足元は床に黒くにじむ。
+   k（0〜1）で濃さを変え、たおれるときは少しずつ薄れて消える（ぱっと消えない）。 */
+function auraSmoke(B,A,T,k){const W=B.w,H=B.h,isB=i=>{const t=B.t[i];return t===1||t===2||t===3};const hs=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};if(k<=0)return;
+ const top=[],foot=new Set();for(let i=0;i<W*H;i++){if(!isB(i))continue;const x=i%W,y=i/W|0;if(y>0&&!isB(i-W))top.push([x,y]);if(y>=FL-3)foot.add(x)}
+ /* 縁のすぐ外：上半分だけ、うすく。場所で決まる点描 */for(const[x,y]of top){if(y>FL-10)continue;const h=hs(x,y);if(h<.55*k&&B.t[(y-1)*W+x]===0)B.set(x,y-1,A.c1,9)}
+ /* 立ちのぼる煙：背の上の決まった場所から、4Fに1ドットの速さでゆっくり上がり、上ほど途切れて消える */for(const[x,y]of top){const h=hs(x*3,y*7);if(h>.1*k||y>FL-12)continue;const ph=h*97,L=14;const o=((T*.25+ph)%L);const yy=y-2-o,xx=x+Math.round(Math.sin((T+ph*10)*.05)*1.2);const fade=o/L;if(hs(xx,Math.round(yy))<1-fade*1.1&&yy>2)B.set(xx,yy,fade<.4?A.c1:A.c2,9)}
+ /* 足元のにじみ */for(const x of foot)for(const dx of[-2,-1,0,1,2]){const xx=x+dx;if(xx<0||xx>=W)continue;if(hs(xx,FL+1)<.8*k)B.set(xx,FL+1,A.c1,9);if(Math.abs(dx)<2&&hs(xx,FL+2)<.5*k)B.set(xx,FL+2,A.c2,9)}
+ /* 背中側のふちの光（体の内側に描くので浮かない） */for(let i=0;i<W*H;i++){if(B.t[i]!==3)continue;const x=i%W,y=i/W|0;const rr=B.tag(x+1,y),u=B.tag(x,y-1);if(hs(x,y)>k)continue;if((rr!==1&&rr!==2&&rr!==3)&&(u!==1&&u!==2&&u!==3)&&B.tag(x-1,y)===1)B.set(x,y,A.rim,3);else if(rr!==1&&rr!==3&&B.tag(x-1,y)===1&&(x+y)%2)B.set(x,y,A.rim,3)}}
 function aura(B,A,T){const W=B.w,H=B.h,d=new Int8Array(W*H).fill(-1),q=[];for(let i=0;i<W*H;i++){const t=B.t[i];if(t===1||t===2||t===3){d[i]=0;q.push(i)}}
  for(let h=0;h<q.length;h++){const i=q[h];if(d[i]>=A.r)continue;const x=i%W,y=i/W|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(d[j]<0){d[j]=d[i]+1;q.push(j)}}}
  for(let i=0;i<W*H;i++){if(d[i]<=0)continue;const x=i%W,y=i/W|0,t=B.t[i];if(t===1||t===2||t===4)continue;const n=d[i],fl=((x*7+y*13+(T>>2))%11);
@@ -460,7 +469,7 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
  for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])(tr[4]==='line'?lineTrail:tr[4]==='arc'?arcTrail:trail)(B,S,M,tt,ox,oy,tr[4]?8:4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);
- B.outline();if(S.aura&&!(M.auraOff&&M.auraOff(tt)))aura(B,S.aura,tt);return B}
+ B.outline();if(S.aura&&!(M.auraOff&&M.auraOff(tt))){if(S.aura.smoke)auraSmoke(B,S.aura,tt,M.auraK?M.auraK(tt):1);else aura(B,S.aura,tt)}return B}
 
 /* 合図の光：大きな十字の星＋斜めの光＋まわりのにじみ。画面でいちばん目立つもの */
 function cueStar(B,x,y,d,col){const R=[4,7,9,10,10,9,9,8,7,6,5,5,4,3,3,2,2,1][d]||1,[c1,c2]=FXC[col];
@@ -600,7 +609,8 @@ function drawDragon(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,S.pose||{});f
  /* ===== 黒い段から：背から、くらやみがのぼる ===== */
  if(D.smoke&&dd<.5){for(let i=0;i<10*D.smoke;i++){const s=(i*37%100)/100,b=LP(LP(Q(-6,-30),Q(14,-24),s),Q(4,-31),.2),ph=(T*.35+i*13)%18,x=b[0]+Math.sin(ph*.4+i)*1.3,y=b[1]-ph-2;if(!B.get(Math.round(x),Math.round(y)))B.set(x,y,ph<9?INK.hi:INK.col,4)}}
  /* しずく：腹とあごから */if(dd<.5)for(let i=0;i<D.drip;i++){const p=[Q(-6,-12),Q(6,-13),Jw([-8,4])][i%3],ph=(T*.4+i*23)%26,y=p[1]+ph*.7;if(y<oy-1){B.set(p[0],y,D.sk[2],4);if(ph>3)B.set(p[0],y-1,D.sk[1],4)}}
- /* ===== シルエット：背中側（上と右）の外に明るいふちを一画素。暗い背景に溶けない ===== */if(dd<.6&&P.melt<=0){const oc=fd(D.out||D.rim),L=[];for(let y=1;y<B.h-1;y++)for(let x=1;x<B.w-1;x++){const i=y*B.w+x;if(B.t[i]!==0)continue;const b=B.t[i+B.w]===1,l=B.t[i-1]===1,bl=B.t[i+B.w-1]===1;if((b||l||bl)&&y<oy-1)L.push(i)}for(const i of L){B.c[i]=oc;B.t[i]=3}}
+ /* ===== シルエット：背中側（上と右）のふちを、体の内側の一画素だけ明るくする。外に線を足さないので浮かない。
+   死にゆくとき・溶けるときは、ふちの光が点々と少しずつ減って消える（ぱっと消えない） ===== */{const f=Math.max(0,Math.min(1,(.75-dd)/.35))*Math.max(0,1-(P.melt||0)*1.6);if(f>0){const oc=fd(D.out||D.rim),L=[];for(let y=1;y<B.h-1;y++)for(let x=1;x<B.w-1;x++){const i=y*B.w+x;if(B.t[i]!==1||y>=oy-1)continue;const up=B.t[i-B.w]===0,rt=B.t[i+1]===0;if((up||rt)&&hsh(x,y)<f)L.push(i)}for(const i of L){B.c[i]=mix(B.c[i],oc,.6);B.t[i]=3}}}
  /* ===== 溶ける／形になる：melt=1で床のくらやみだけ。上から消え、境目は液のしずく ===== */
  if(P.melt>0){const yT=oy-76*(1-P.melt);for(let y=0;y<B.h;y++)for(let x=0;x<B.w;x++){const i=y*B.w+x;if(B.t[i]!==1&&B.t[i]!==2)continue;const h=hsh(x,y);if(y<yT-h*3)dClr(B,x,y);else if(y<yT+3+h*2){B.c[i]=h<.5?INK.hi:INK.col;B.t[i]=1}}
   for(let x=Math.round(bx-30*k);x<bx+40*k;x++){const w=Math.sin((x-bx)*.15+T*.1);if(P.melt>.05&&B.get(x,oy-1)===0&&hsh(x,1)<.85)B.set(x,oy-1,w>0?INK.hi:INK.col,1)}}
@@ -651,7 +661,7 @@ function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:
  /* くらやみのしたたり */if(ro>.3)for(let i=0;i<3;i++){const p=R([(-2+i*2)*k,rh]),ph=(T*.3+i*17)%20;B.set(p[0],p[1]+ph*.6,INK.hi,4)}
  J.fingers=fin;J.heads=fin;return J}
 Object.assign(PDEF,DPDEF,{fist:0,snap0:0,snap1:0,snap2:0,f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,curl:0,fist:0,snap0:0,snap1:0,snap2:0,rift:1,emerge:1,grip:0,heads:1,press:0,stump:0,swap:0,spread:0,grab:0,tx0:0,ty0:0,tx1:0,ty1:0,tx2:0,ty2:0,cjaw:0});
-SPEC.dragon={name:'くらやみの竜',k:1,draw:drawDragon,pose:{},aura:{r:2,c1:'#22142e',c2:'#1a1024',rim:'#6a3a90'}};
+SPEC.dragon={name:'くらやみの竜',k:1,draw:drawDragon,pose:{},aura:{smoke:1,r:2,c1:'#1e1228',c2:'#160c1e',rim:'#6a3a90'}};
 /* ===== 門の向こうの指（三つ首の竜と同じ手の指）=====
    暗い門のぬし・第二形態の「門から指」の技で使う。三つ首の竜の指と同じ作り：灰紫の皮、三つの節と節ごとの横じわ、内側の肉色の腹、白い平たい爪。
    上の指は爪がはがれて赤黒い爪の床がむき出し、下の指には太い古い金の指輪。指先には目が一つ（光ると合図）。当たる瞬間、指先の腹が縦に裂けて口になる。
@@ -672,7 +682,7 @@ function gateFinger(B,root,tgt,i,o){const k=o.k||1,T=o.T||0,u=o.u||0,L=HFG[i].L.
  if(o.lit){const g=Rh([-1,-.5]);glow(B,Math.round(g[0]),Math.round(g[1]),4,'#ffffff');B.set(...Rh([-1.8,-.6]),'#ffffff',2);B.set(...Rh([-3.4,-.2]),'#ffffff',2)}else if(o.eye){B.set(...Rh([-1.8,-.6]),'#ff3050',2);B.set(...Rh([-3.4,-.2]),'#ff3050',2)}else B.line(...Rh([-3.6,-.4]),...Rh([-1.4,-.7]),HSK[0],1);
  if(o.crack){/* 節が鳴る：関節から白い小さな破片 */for(let j=1;j<3;j++){const p=ch[j];B.set(p[0]-1,p[1]-3,'#ece6da',4);B.set(p[0]+2,p[1]-4,'#ece6da',4);B.set(p[0]-3,p[1]-2,'#c8c0b4',4)}}
  return {tip:Rh([3.6,.6]),ch}}
-SPEC.hydra={name:'三つ首の竜',k:1,draw:drawHydra,pose:{},aura:{r:3,c1:'#2a1840',c2:'#1e1230',rim:'#c070ff'}};
+SPEC.hydra={name:'三つ首の竜',k:1,draw:drawHydra,pose:{},aura:{smoke:1,r:3,c1:'#22142e',c2:'#180e22',rim:'#c070ff'}};
 
 /* ===== 全モーション =====
    f:だれ  n:名前  cap:読み方（プレイヤーは何を見ればいいか）  why:この動きにした理由
@@ -1270,7 +1280,7 @@ mv({f:'dragon',ox:4,id:'d_dive',n:'影もぐり',bg:'lord',len:150,cap:'竜の�
    B.line(...R([-10,-5]),...R([-1,0]),'#2a0612',1);for(let i=0;i<4;i++){B.set(...R([-8+i*2,-4+i*.5]),D.bone[3],1);B.set(...R([-7+i*2,1+i*.4]),D.bone[2],1)}B.set(...R([-4,-4]),D.eye,2);B.set(...R([-3,-4]),D.eye,2);B.set(...R([-1,-5]),D.eye,2);B.set(...R([-1,-3]),D.eye,2);
    for(let i=0;i<3;i++){const s=R([-5+i*2,3]);B.line(s[0],s[1],s[0]+Math.sin(t*.3+i),s[1]+4,D.sk[3],1)}}},
  post:(B,J,t)=>{for(let y=FL+1;y<CH;y++)for(let x=0;x<CW;x++){const i=y*CW+x;if(B.t[i]===1||B.t[i]===3){B.c[i]=((x+y)%5?'#1a1220':'#2a1e30');B.t[i]=6}}}});
-mv({f:'dragon',ox:4,id:'d_down',n:'たおれる：亡骸が残る',bg:'lord',len:210,noHero:true,cap:'のけぞって声にならない声で叫ぶ。前足が折れ、一度だけ起き上がろうとして、崩れ落ちる。扇は背にかぶさり、三つの目がばらばらに閉じる。最後に尾の先が一度だけ動く。亡骸の下から、くらやみがしみ出す。',why:'倒れたものは、くらやみに拾われる。この亡骸は消えない。次に「通り道」にされる。',
+mv({f:'dragon',ox:4,id:'d_down',auraK:t=>t<60?1:Math.max(0,1-(t-60)/120),n:'たおれる：亡骸が残る',bg:'lord',len:210,noHero:true,cap:'のけぞって声にならない声で叫ぶ。前足が折れ、一度だけ起き上がろうとして、崩れ落ちる。扇は背にかぶさり、三つの目がばらばらに閉じる。最後に尾の先が一度だけ動く。亡骸の下から、くらやみがしみ出す。',why:'倒れたものは、くらやみに拾われる。この亡骸は消えない。次に「通り道」にされる。',
  keys:[K(0,DI),K(6,{x:2,lift:7,hy:-9,ny:-7,jaw:1,wing:1,quiver:1},'out'),K(34,{x:1,lift:5,hy:-7,ny:-5,jaw:.8,wing:.8,quiver:.4}),K(58,{x:0,dead:.4,jaw:.5,wing:.2,fl:.3},'in'),K(70,{x:0,dead:.3,ny:-4,jaw:.4,quiver:.3}),K(92,{dead:1,wing:-1,jaw:.2},'in'),K(150,{dead:1}),K(156,{dead:1,twitch:1},'out'),K(166,{dead:1,twitch:0}),K(210,{dead:1})],
  pp:(P,t)=>{P.eyes=t<112?3:t<126?2:t<142?1:0},pre:(B,t)=>{if(t>=160)dpool(B,EXX+8,Math.round(Math.min(38,(t-160)*.8)),t)},fx:(B,J,t)=>{ddust(B,[EXX-6,FL],t-92,3);ddust(B,[EXX+20,FL],t-94,2)}});
 /* ---------- 三つ首の竜 ---------- */
@@ -1303,7 +1313,7 @@ mv({f:'hydra',id:'h_spit',n:'切り口の吐き出し（拍）',bg:'hole',len:15
  fx:(B,J,t)=>{const s=J.fingers[0]||J.rift;if(t>=20&&t<67){const u=(t-20)/46,x=lerp(s[0],HXX+6,u),y=lerp(s[1],FL-10,u)-Math.sin(u*3.14)*44,sh=Math.round(2+u*6);
    for(let xx=-sh;xx<=sh;xx++)if((xx+t)%2||u>.7)B.set(HXX+6+xx,FL,u>.7?'#000000':'#0a0610',6);
    const m=new Set();dDisc(m,x,y,4.2,.15,t*.3);dShade(B,m,['#05020a','#120a1e','#24143a','#3e2666','#6a46a0'],'#c8a2f4');B.set(x-1,y,'#ff3050',2);B.set(x,y,'#ff3050',2);B.set(x-1,y-1,'#2a0612',1);for(let i=0;i<3;i++)B.set(x+2-i*2,y+5+((t+i)%3),INK.hi,4)}}});
-mv({f:'hydra',id:'h_down',n:'たおす：握って、引っこむ',bg:'hole',len:240,noHero:true,cap:'最後の一撃で、三本がいっせいに口を開けて広がり、けいれんする。力が抜けて垂れ下がったあと、三本がゆっくり同じ向きに丸まり、手首ごと持ち上がって握りこぶしになる。こぶしが一度だけ震えて、そのまま裂け目の奥へ引きずりこまれる。裂け目が閉じ、竜の亡骸は塵になる。',why:'倒したのではない。引っこめさせただけ。こぶしを掲げて止まる一瞬に、初めて「手だった」と気づける。切った首は切り株のまま、こぶしに混ざる。',
+mv({f:'hydra',id:'h_down',auraK:t=>t<80?1:Math.max(0,1-(t-80)/140),n:'たおす：握って、引っこむ',bg:'hole',len:240,noHero:true,cap:'最後の一撃で、三本がいっせいに口を開けて広がり、けいれんする。力が抜けて垂れ下がったあと、三本がゆっくり同じ向きに丸まり、手首ごと持ち上がって握りこぶしになる。こぶしが一度だけ震えて、そのまま裂け目の奥へ引きずりこまれる。裂け目が閉じ、竜の亡骸は塵になる。',why:'倒したのではない。引っこめさせただけ。こぶしを掲げて止まる一瞬に、初めて「手だった」と気づける。切った首は切り株のまま、こぶしに混ざる。',
  keys:[K(0,HI),K(6,Object.assign({},HI,{spread:.8,j0:1,j1:1,j2:1,quiver:1}),'out'),K(30,Object.assign({},HI,{spread:.5,j0:.8,j1:.8,j2:.8,quiver:.6})),K(56,Object.assign({},HI,{spread:-.2,curl:.35,j0:.3,j1:.3,j2:.3,quiver:0}),'in'),K(70,Object.assign({},HI,{curl:.35,j0:.2,j1:.2,j2:.2})),
   K(104,Object.assign({},HI,{fist:1,curl:0,quiver:.15}),'io'),K(118,Object.assign({},HI,{fist:1,quiver:.4})),K(128,Object.assign({},HI,{fist:1,quiver:0})),K(160,{rift:1,fist:1,emerge:0},'in'),K(180,{rift:0,fist:1,emerge:0},'in'),K(240,{rift:0,fist:1,emerge:0})],
  pp:(P,t)=>{P.ceye=t<130?3:0;if(t>=6&&t<30)P.spread+=Math.sin(t*1.3)*.25},
@@ -1684,7 +1694,7 @@ const STAGES=[
 function stageFrame(s,t){if(s.custom)return s.custom(t);const B=new Buf(SW,SH);STG[s.st](B,t,s.open||s.rage||s.deep);
  const H=new Buf(SW,SH);knight(H,SW-62,SFL,SPEC.hero,{},t);B.blit(H,true);
  for(const[w,P]of s.who){const S=SPEC[w];knight(B,176,SFL,S,P,t);if(w==='lord')pool(B,joints(176,SFL,S,Object.assign({},PDEF,S.pose)),t,16)}
- B.outline();for(const[w]of s.who)if(SPEC[w].aura)aura(B,SPEC[w].aura,t);
+ B.outline();for(const[w]of s.who)if(SPEC[w].aura){if(SPEC[w].aura.smoke)auraSmoke(B,SPEC[w].aura,t,1);else aura(B,SPEC[w].aura,t)}
  if(s.refl){const R=new Buf(SW,SH);knight(R,176,SFL,SPEC.red,{},t);for(let y=0;y<SH;y++)for(let x=0;x<SW;x++){const c=R.c[y*SW+x];if(!c)continue;const yy=SFL+2+Math.round((SFL-y)*.5),xx=x+Math.round(Math.sin(yy*.5+t*.12));if(yy>SFL+1&&yy<SH&&(xx+yy)%2===0)B.set(xx,yy,mix(c,'#0c0a14',.4),8)}}
  if(s.st==='hole')for(let x=0;x<SW;x++)if(B.tag(x,SFL)!==1)B.set(x,SFL,Math.sin(x*.3+t*.1)>.5?'#3a2a50':'#1a1428',6);
  return B}
@@ -1777,7 +1787,7 @@ function stageCard(s){const c=el('figure','card stage');const cv=el('canvas');cv
 /* 立ち絵：大きく、地面だけ */
 function standCanvas(key,w,h,ox,sc,ext){const cv=el('canvas','stand');cv.width=w;cv.height=h;const S=SPEC[key];const idle=MV.find(m=>m.f===key&&/idle/.test(m.id));
  const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);const P=idle?poseAt0(idle,tt%idle.len,Object.assign({},PDEF,S.pose)):{};if(idle&&idle.pp)idle.pp(P,tt%idle.len);if(ext)Object.assign(P,ext);P.chainL=P.chainL||22;
-   (S.draw||knight)(B,ox,h-6,S,P,tt);if(key==='lord'||key==='lord2')pool(B,joints(ox,h-6,S,Object.assign({},PDEF,S.pose)),tt,key==='lord'?16:24);B.outline();if(S.aura)aura(B,S.aura,tt);const ctx=this.ctx;ctx.clearRect(0,0,w,h);B.toCanvas(ctx)}};ANIM.push(a);a.draw();return cv}
+   (S.draw||knight)(B,ox,h-6,S,P,tt);if(key==='lord'||key==='lord2')pool(B,joints(ox,h-6,S,Object.assign({},PDEF,S.pose)),tt,key==='lord'?16:24);B.outline();if(S.aura)(S.aura.smoke?auraSmoke(B,S.aura,tt,1):aura(B,S.aura,tt));const ctx=this.ctx;ctx.clearRect(0,0,w,h);B.toCanvas(ctx)}};ANIM.push(a);a.draw();return cv}
 function ladder(keys,notes){const wrap=el('div','ladder');keys.forEach((k,i)=>{const col=el('div','step');const S=SPEC[k];col.appendChild(standCanvas(k,80,104,44));col.appendChild(el('div','lname',S.name));col.appendChild(el('div','ladd',notes[i]));wrap.appendChild(col);if(i<keys.length-1)wrap.appendChild(el('div','arrow','→'))});return wrap}
 function build(){const root=document.getElementById('book');
  root.appendChild(heroSec());root.appendChild(ladderSec());

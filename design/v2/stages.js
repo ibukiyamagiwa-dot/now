@@ -57,7 +57,7 @@ const STAGES=[
 function stageFrame(s,t){if(s.custom)return s.custom(t);const B=new Buf(SW,SH);STG[s.st](B,t,s.open||s.rage||s.deep);
  const H=new Buf(SW,SH);knight(H,SW-62,SFL,SPEC.hero,{},t);B.blit(H,true);
  for(const[w,P]of s.who){const S=SPEC[w];knight(B,176,SFL,S,P,t);if(w==='lord')pool(B,joints(176,SFL,S,Object.assign({},PDEF,S.pose)),t,16)}
- B.outline();for(const[w]of s.who)if(SPEC[w].aura)aura(B,SPEC[w].aura,t);
+ B.outline();for(const[w]of s.who)if(SPEC[w].aura){if(SPEC[w].aura.smoke)auraSmoke(B,SPEC[w].aura,t,1);else aura(B,SPEC[w].aura,t)}
  if(s.refl){const R=new Buf(SW,SH);knight(R,176,SFL,SPEC.red,{},t);for(let y=0;y<SH;y++)for(let x=0;x<SW;x++){const c=R.c[y*SW+x];if(!c)continue;const yy=SFL+2+Math.round((SFL-y)*.5),xx=x+Math.round(Math.sin(yy*.5+t*.12));if(yy>SFL+1&&yy<SH&&(xx+yy)%2===0)B.set(xx,yy,mix(c,'#0c0a14',.4),8)}}
  if(s.st==='hole')for(let x=0;x<SW;x++)if(B.tag(x,SFL)!==1)B.set(x,SFL,Math.sin(x*.3+t*.1)>.5?'#3a2a50':'#1a1428',6);
  return B}

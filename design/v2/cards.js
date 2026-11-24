@@ -26,7 +26,7 @@ function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH
  const J=(S.draw||knight)(B,ox,oy,S,P,tt);J.P=P;
  if(M.fx)M.fx(B,J,tt,S,M);
  /* 共通：合図の光と、当たった瞬間の火花 */
- for(const c of (M.cues||[])){if(!MINARAI&&cueHidden(M,c))continue;const d=tt-c.t;if(d>=0&&d<18){const tp=cueAnchor(M,S,c,base,ox,oy)||(c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF);if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
+ for(const c of (M.cues||[])){if(c.silent||(!MINARAI&&cueHidden(M,c)))continue;/* silent＝光らない予兆（音で読む）。点検用に時刻だけ持つ */const d=tt-c.t;if(d>=0&&d<18){const tp=cueAnchor(M,S,c,base,ox,oy)||(c.at?c.at(J):(c.w===2?J.tip2:J.tip)||J.hdF);if(c.col==='p'){ring(B,tp[0],tp[1],4+d*.9,'p');ring(B,tp[0],tp[1],3+d*.9,'p');if(d<8)ring(B,tp[0],tp[1],5+d*.9,'p')}else cueStar(B,Math.round(tp[0]),Math.round(tp[1]),d,c.col)}}
  for(const h of (M.hits||[])){const d=tt-h;if(d>=0&&d<8)spark(B,HXX+5,FL-12,d,M.hitCol||'w')}
  for(const tr of (M.trails||[]))if(tt>=tr[0]&&tt<=tr[1])(tr[4]==='line'?lineTrail:tr[4]==='arc'?arcTrail:trail)(B,S,M,tt,ox,oy,tr[4]?8:4,tr[2]||'w',tr[3]);
  if(M.post)M.post(B,J,tt,S);

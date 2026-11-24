@@ -1398,31 +1398,44 @@ for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?
   cap:'途中の合で弾けないと、柄頭の鍵の輪で刃を下からはね上げられる。画面が赤くにじみ、刃のまわりにひびが走る。締まりがほどけ、八相に戻した剣が赤い気配をまとう。'+(D?'背の触手が、獲物を見つけたようにざわめく。':'')+'まっすぐな袈裟。赤い三日月が咲き、画面が揺れる。',
   why:'崩しは柄頭、斬るのは刃。剣の扱いそのものが罰になる。合図から当たりまではいつもと同じ。',ex:D?(B,J,t)=>T8(B,J,t,20,46):null})}
 /* ===== 本気の赤い騎士：同じ騎士の型。でも剣の頂き =====
-   予備動作が消える。止まるところは完全に止まる。片手で足りる。刃の向きまで操る。始まりと終わりに一礼。 */
+   赤い騎士は「力み」、本気は「削ぎ落とし」。どちらも全力で、ちがうのは無駄の量。
+   本気は余裕ではない。主人公を心の底から倒しにくる。だから両手で握り、腰を深く落とし、体ごと斬る。
+   頂きは「楽に勝てる」ことではなく「全部を一太刀に乗せられる」こと：予備動作がない、止まるところは震えずに止まる、刃の角度まで操る。
+   片手になるのは赤（重い合・十文字）だけ。両手では届かない半歩を、左腕を後ろへ振って体を一本の線に伸ばし切って届かせる。 */
 QSTY.red2={f:'red2',bg:'red',I:R2S,tag:'本気'};
-const Z0={sheath:0},ZP=p=>Object.assign({},p,Z0),ZSAL=ZP({ua:2.0,fa:.3,sw:-1.57,ua2:1.6,fa2:2.0,cr:1,x:0,lean:0,hd:.1}),ZUP=ZP({ua:-2.95,fa:-2.95,sw:-1.57,ua2:-2.8,fa2:-2.8,cr:2.5,lean:-.05,x:QX+4}),
- ZRI=ZP(Object.assign({},QRI,{ua2:.25,fa2:1.9,oh:1})),ZONE=p=>ZP(Object.assign({},p,{ua2:.25,fa2:1.9,oh:1})),ZX2=ZP({ua:3.05,fa:3.0,sw:3.14,ua2:.25,fa2:1.9,oh:1,x:QX-14,lean:.35,ff:-14,fb:10,cr:3}),ZLV=ZP({ua:1.3,fa:1.9,sw:2.0,ua2:.25,fa2:1.9,oh:1,x:QX+10,cr:3.5,lean:-.1});
+const Z0={sheath:0},ZP=p=>Object.assign({},p,Z0),ZDEEP=p=>ZP(Object.assign({},p,{cr:(p.cr||2.5)+1.3,ff:(p.ff!=null?p.ff:-6)-3,fb:(p.fb!=null?p.fb:5)+3})),
+ ZSAL=ZP({ua:2.0,fa:.3,sw:-1.57,ua2:1.6,fa2:2.0,cr:1,x:0,lean:0,hd:.1}),
+ ZRI=ZP({ua:2.45,fa:1.85,sw:2.7,ua2:2.25,fa2:1.75,x:QX-2,cr:4.5,lean:.22,ff:-11,fb:9}),
+ ZUP=ZP({ua:-2.95,fa:-2.95,sw:-1.57,ua2:-2.8,fa2:-2.8,cr:4,lean:.1,x:QX+2,ff:-10,fb:9}),
+ ZTH=ZP({ua:3.05,fa:3.0,sw:3.14,ua2:2.85,fa2:2.9,x:QX-14,lean:.38,ff:-15,fb:11,cr:4}),
+ ZLUNGE=ZP({ua:3.05,fa:3.0,sw:3.14,ua2:.35,fa2:.6,lean:.45,ff:-16,fb:12,cr:4.5,x:QX-16}),
+ ZLV=ZP({ua:1.3,fa:1.9,sw:2.0,ua2:1.15,fa2:1.8,x:QX+10,cr:4.5,lean:-.05,ff:-11,fb:9}),
+ ZLK=ZDEEP(Object.assign({},QLK,{lean:.48})),ZLK2=ZDEEP(Object.assign({},QLK2,{lean:.55,cr:5})),
+ ZKN=ZP(Object.assign({},QKN,{ua:-2.8,fa:-2.4,sw:1.68-6.2832,ua2:-2.95,fa2:-2.5,lean:.25}));
 const ghostArc=(B,J,t,h)=>{for(let g=1;g<=3;g++)rsl(B,J,t-g,h,'g',4.4,2.4)};
-QR('red2','r2_q_open','打ち合い：一礼と誘いのひと振り（金）',150,[K(0,R2S),K(6,ZSAL,'out'),K(15,ZSAL),K(24,ZONE(QOPEN),'io'),K(40,ZONE(QOPEN)),K(42,ZONE(QOPENH),'in'),K(52,ZONE(QOPENH)),K(64,ZRI,'out'),K(150,ZRI)],[{t:14,col:'g'}],[42],'g',t=>t>=42&&t<52?HRP:t>=52?HRG:null,
- '剣を抜き、刃を顔の前にまっすぐ立てて一礼する。そのまま八相に移し、刃が金に光る。袈裟の一振り。弾けば踏みこみ、画面が締まる。踏みこんだあと、左手は背中の腰に軽く添える。','本気の打ち合いは一礼で始まる。片手で足りる、という宣言。赤い騎士と同じ型なのに、格の差が姿勢で分かる。',(B,J,t)=>{clash(B,t-42,CXP[0],CXP[1]);if(t>=8&&t<16&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')},{bars:t=>t<44?0:Math.min(10,(t-44)*.6)});
-QR('red2','r2_q_tame','打ち合い：溜めの合（上段の静止・弧）',120,[K(0,ZRI),K(8,ZUP,'out'),K(46,ZUP),K(48,ZP(QTAMEH),'in'),K(54,ZP(QTAMEH)),K(66,ZONE(QTAMEH),'out'),K(84,ZRI),K(120,ZRI)],[{t:20,col:'g'}],[48],'g',t=>t>=48&&t<56?HRP:HRG,
- '剣を頭上にまっすぐ立てた上段で、完全に止まる。剣先も肩も、ふるえ一つない（赤い騎士は溜めで引きしぼってふるえる）。金に光ってから、頭上を越える大きな弧。刃のあとに、三本の残像が重なる。両手で振り抜き、斬り終えてから左手をゆっくり腰の後ろへ戻す。','溜めは弧。本気は「ふるえない」。止まっている時間そのものが溜め。',(B,J,t)=>{clash(B,t,CXP[0],CXP[1]);clash(B,t-48,CXP[0],CXP[1]-6);ghostArc(B,J,t,48)},{trails:[[44,50,'g',0,'arc']]});
-QR('red2','r2_q_tsume','打ち合い：詰めの合（予備動作なしの突き）',80,[K(0,ZRI),K(33,ZRI),K(34,ZX2,'snap'),K(44,ZX2),K(58,ZRI),K(80,ZRI)],[{t:6,col:'g'}],[34],'g',t=>t>=34&&t<42?HRP:HRG,
- '構えのまま、まったく動かない。剣先だけが金に光り、次の瞬間には片手突きが届いている。引く動きがない。軌跡は細く長い一本の線。','詰めは線。本気は予備動作が消える。光だけが頼り＝光ってから当たるまでは同じ、をいちばん純粋に見せる合。',(B,J,t)=>{clash(B,t,CXP[0],CXP[1]);clash(B,t-34,CXP[0]-2,CXP[1]+2);if(t>=34&&t<40&&J.tip)for(let x=Math.round(J.tip[0]);x<EXX+QX;x++)if((x+t)%2)B.set(x,Math.round(J.tip[1]),'#fff3b0',4)});
-QR('red2','r2_q_feint','打ち合い：フェイント（刃を寝かせる）',140,[K(0,ZRI),K(8,ZONE(QF),'out'),K(14,ZONE(QF)),K(22,ZONE(QFM),'in'),K(30,ZONE(Object.assign({},QFM,{sw:2.4,fa:1.4}))),K(38,ZONE(Object.assign({},QFM,{sw:2.4,fa:1.4}))),K(46,ZONE(QF),'io'),K(76,ZONE(QF)),K(78,ZONE(QCUT),'in'),K(92,ZONE(QCUT)),K(118,ZRI),K(140,ZRI)],[{t:12,col:'p'},{t:50,col:'g'}],[78],'g',t=>t>=78&&t<86?HRP:HRG,
- '振り下ろしかけて、刃がこちらの剣に触れた瞬間に止め、手首を返して刃を寝かせ、こちらの剣の上にそっと乗せる。そのまま滑らせて離す。斬る気がないのに、斬れる位置にいた、と分からせる。間をおいて、金の本物。','フェイントの紫の輪は同じ。本気は「止める」だけでなく「乗せる」。押せば、乗せた刃でそのまま崩される。',(B,J,t)=>{clash(B,t-78,CXP[0],CXP[1]);if(t>=30&&t<38&&J.tip)B.set(J.tip[0],J.tip[1],'#ffffff',4)},{trails:[[74,80,'g',0,'arc']]});
-QR('red2','r2_q_heavy','打ち合い：重い合（片手の赤い突き）',110,[K(0,ZRI),K(10,ZONE(QHV),'out'),K(38,ZONE(QHV)),K(40,ZONE(Object.assign({},QHVH,{x:QX-16,lean:.45,ff:-16})),'in'),K(56,ZONE(Object.assign({},QHVH,{x:QX-16,lean:.45,ff:-16}))),K(90,ZRI),K(110,ZRI)],[{t:12,col:'r'}],[40],'r',t=>t>=40&&t<50?HRP:HRG,
- '左手を腰の後ろに添えたまま、片手で剣を体の後ろまで引き、低く沈んで赤く光る。片手のまま、体を一本の線にして突く。赤い騎士の両手の突きより半歩遠くから届く。','重い合は赤。構えは「深く引いて止まる」。本気は片手で、間合いが半歩遠い。',(B,J,t)=>clash(B,t-40,CXP[0]-2,CXP[1]+2),{trails:[[36,42,'r',0,'line']]});
-QR('red2','r2_q_lock','打ち合い：鍔迫り合い（片手で受ける）',110,[K(0,ZONE(QCUT)),K(6,ZONE(Object.assign({},QLK,{lean:.15,cr:3})),'out'),K(70,ZONE(Object.assign({},QLK,{lean:.15,cr:3}))),K(74,ZONE(Object.assign({},QLK,{sw:1.6,fa:.6,lean:.2})),'in'),K(80,ZONE(QSH),'out'),K(110,ZONE(QSH))],[],[],'g',
+/* 踏みこみの土ぼこり：体ごと斬った重さを、前足で見せる */
+const stomp=(B,J,t,h)=>{const d=t-h;if(d<0||d>8||!J.footF)return;const x0=J.footF[0],y=Math.round(J.footF[1]);for(let i=0;i<5;i++){const s=(i-2)*1.6,x=x0+s*(1+d*.45),yy=y-Math.round(Math.abs(s)*.2+d*.35*(i%2));if(d>5&&(i+t)%2)continue;B.set(x,yy,d<3?'#8a6a6a':'#5a4048',4)}};
+QR('red2','r2_q_open','打ち合い：一礼と誘いのひと振り（金）',170,[K(0,R2S),K(6,ZSAL,'out'),K(18,ZSAL),K(26,ZRI,'io'),K(30,ZRI),K(34,ZDEEP(QOPEN),'out'),K(60,ZDEEP(QOPEN)),K(62,ZDEEP(QOPENH),'in'),K(72,ZDEEP(QOPENH)),K(84,ZRI,'out'),K(170,ZRI)],[{t:34,col:'g'}],[62],'g',t=>t>=62&&t<72?HRP:t>=72?HRG:null,
+ '剣を抜き、刃を顔の前にまっすぐ立てて一礼する。礼を解くと同時に腰が深く落ち、両手で握った切っ先がこちらの目に向く。もう軽い動きは一度もしない。八相に移し、刃が金に光る。体ごと袈裟の一振り。弾けば踏みこみ、画面が締まる。','一礼は見下す礼ではなく、倒すべき相手と認めた礼。赤い騎士（立ったまま構える）より腰が低いのは、体ごと斬る覚悟。',(B,J,t)=>{clash(B,t-62,CXP[0],CXP[1]);stomp(B,J,t,62);if(t>=8&&t<18&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')},{bars:t=>t<64?0:Math.min(10,(t-64)*.6)});
+QR('red2','r2_q_tame','打ち合い：溜めの合（上段の静止・弧）',120,[K(0,ZRI),K(8,ZUP,'out'),K(46,ZUP),K(48,ZDEEP(QTAMEH),'in'),K(58,ZDEEP(QTAMEH)),K(84,ZRI,'io'),K(120,ZRI)],[{t:20,col:'g'}],[48],'g',t=>t>=48&&t<56?HRP:HRG,
+ '両手で剣を頭上に立てた上段。息を深く吸って肩が上がり、そこで止まる。剣先はふるえない（赤い騎士は引きしぼってふるえる）。金に光ってから、吐く息と一緒に腰を落とし、頭上を越える大きな弧。刃のあとに三本の残像。前足が床を打つ。','溜めは弧。本気は力みで震えるかわりに、息で溜める。止まっている時間そのものが溜め。',(B,J,t)=>{clash(B,t,CXP[0],CXP[1]);clash(B,t-48,CXP[0],CXP[1]-6);ghostArc(B,J,t,48);stomp(B,J,t,48)},{trails:[[44,50,'g',0,'arc']],pp:(P,t)=>{if(t>=8&&t<48)P.cr-=.7*Math.min(1,(t-8)/14)}});
+QR('red2','r2_q_tsume','打ち合い：詰めの合（予備動作なしの突き）',80,[K(0,ZRI),K(33,ZRI),K(34,ZTH,'snap'),K(44,ZTH),K(60,ZRI,'io'),K(80,ZRI)],[{t:6,col:'g'}],[34],'g',t=>t>=34&&t<42?HRP:HRG,
+ '低い構えのまま、まったく動かない。剣先だけが金に光り、次の瞬間には両手突きが届いている。引く動きも、振りかぶりもない。後ろ足で床を蹴った分だけ、体が前へ出ている。軌跡は細く長い一本の線。','詰めは線。本気は予備動作が消える。光だけが頼り＝光ってから当たるまでは同じ、をいちばん純粋に見せる合。',(B,J,t)=>{clash(B,t,CXP[0],CXP[1]);clash(B,t-34,CXP[0]-2,CXP[1]+2);stomp(B,J,t,34);if(t>=34&&t<40&&J.tip)for(let x=Math.round(J.tip[0]);x<EXX+QX;x++)if((x+t)%2)B.set(x,Math.round(J.tip[1]),'#fff3b0',4)});
+const ZFM2=ZDEEP(Object.assign({},QFM,{sw:2.4,fa:1.4,fa2:1.3}));
+QR('red2','r2_q_feint','打ち合い：フェイント（刃を乗せる）',140,[K(0,ZRI),K(8,ZDEEP(QF),'out'),K(14,ZDEEP(QF)),K(22,ZDEEP(QFM),'in'),K(30,ZFM2),K(38,ZFM2),K(46,ZDEEP(QF),'io'),K(76,ZDEEP(QF)),K(78,ZDEEP(QCUT),'in'),K(92,ZDEEP(QCUT)),K(118,ZRI,'io'),K(140,ZRI)],[{t:12,col:'p'},{t:50,col:'g'}],[78],'g',t=>t>=78&&t<86?HRP:HRG,
+ '振り下ろしかけて、刃がこちらの剣に触れた瞬間に止める。手首を返して刃を寝かせ、こちらの剣の上にそっと乗せる。そのまま滑らせて離す。斬る気がなかったのではない。斬れる位置まで来て、斬らなかった。間をおいて、金の本物。','フェイントの紫の輪は同じ。本気は「止める」だけでなく「乗せる」。全力で振った刃を、触れた瞬間に止められる＝剣の頂き。押せば、乗せた刃でそのまま崩される。',(B,J,t)=>{clash(B,t-78,CXP[0],CXP[1]);stomp(B,J,t,78);if(t>=30&&t<38&&J.tip)B.set(J.tip[0],J.tip[1],'#ffffff',4)},{trails:[[74,80,'g',0,'arc']]});
+QR('red2','r2_q_heavy','打ち合い：重い合（赤い片手突き）',110,[K(0,ZRI),K(10,ZDEEP(QHV),'out'),K(38,ZDEEP(QHV)),K(40,ZLUNGE,'in'),K(56,ZLUNGE),K(90,ZRI,'io'),K(110,ZRI)],[{t:12,col:'r'}],[40],'r',t=>t>=40&&t<50?HRP:HRG,
+ '両手で剣を体の後ろまで深く引き、低く沈んで赤く光る。突く瞬間に左手を柄から離し、左腕を後ろへ振って釣り合いをとり、体を頭から後ろ足まで一本の線に伸ばし切る。両手では届かない半歩を、片手で届かせる。','重い合は赤。構えは「深く引いて止まる」。片手は余裕ではなく、届かせるための捨て身。赤のときだけ片手になる。',(B,J,t)=>{clash(B,t-40,CXP[0]-2,CXP[1]+2);stomp(B,J,t,40)},{trails:[[36,42,'r',0,'line']]});
+QR('red2','r2_q_lock','打ち合い：鍔迫り合い（刃の角度で勝つ）',110,[K(0,ZDEEP(QCUT)),K(6,ZLK,'out'),K(22,Object.assign({},ZLK,{x:ZLK.x+3,lean:.42}),'out'),K(60,ZLK2,'io'),K(70,ZLK2),K(74,ZDEEP(Object.assign({},QLK,{sw:1.6,fa:.6,fa2:.5,lean:.3})),'in'),K(80,ZDEEP(QSH),'out'),K(110,ZDEEP(QSH))],[],[],'g',
  t=>t<4?HRP:t<74?Object.assign({},HRL,{x:HRL.x+Math.sin(t*1.3)*.6}):t<80?Object.assign({},HRL,{sw:.4,fa:.6,lean:.1}):t<88?Object.assign({},HRG,{x:-2,lean:-.2}):HRG,
- 'こちらが両手で押しこむ刃を、彼は片手で受け止める。左手は腰の後ろに添えたまま、体はほとんど前に傾かない。こちらだけが震えている。最後に、手首だけで刃をくるりと巻き、こちらの剣先を床へ落とすように払って突き放す。最後のひと振りは、そのあと一拍遅れて来る。','力でも位置でもなく「手首」。押し合いで格の差を見せる一枚。突き放されるまで、最後の合は来ない。',
- (B,J,t)=>{clash(B,t,CXP[0],CXP[1]);if(t>=6&&t<70&&t%4===0){star(B,CXP[0]+1,CXP[1]-1,2,'g')}if(t>=70&&t<78){const a=(t-70)/8*6.28;for(let r=3;r<6;r++)B.set(CXP[0]+Math.cos(a)*r,CXP[1]+Math.sin(a)*r,'#fff3b0',4)}});
+ '刃と刃がかみ合う。最初は彼の前足が半歩すべって押し返される（主人公の力は本物）。二人とも震えている。彼は押し返さず、さらに腰を沈め、体を低く前へ倒しながら、かみ合った刃の角度を少しずつ立てていく。角度が立ちきった瞬間、手首を返して刃を巻き、こちらの剣先を床へ払って突き放す。最後のひと振りは、そのあと一拍遅れて来る。','力では五分。勝つのは刃の角度と手首。押し合いで「技」の差を見せる一枚。突き放されるまで、最後の合は来ない。',
+ (B,J,t)=>{clash(B,t,CXP[0],CXP[1]);if(t>=6&&t<70&&t%4===0){star(B,CXP[0]+1,CXP[1]-1,2,'g')}if(t>=8&&t<22&&J.footF&&t%2===0)B.set(J.footF[0]+2+(t-8)*.2,Math.round(J.footF[1]),'#5a4048',4);if(t>=70&&t<78){const a=(t-70)/8*6.28;for(let r=3;r<6;r++)B.set(CXP[0]+Math.cos(a)*r,CXP[1]+Math.sin(a)*r,'#fff3b0',4)}},{pp:(P,t)=>{if(t>=6&&t<72)P.x+=Math.sin(t*1.3)*.5}});
 const crossCut=(B,t,h)=>{const d=t-h;if(d<0||d>16)return;const c=[HXX+10,FL-20],L=Math.min(30,(d+1)*12),f=d<8?1:(16-d)/8;for(let s=-L;s<=L;s++){if(f<.6&&(s+t)%2)continue;for(const[dx,dy]of[[1,0],[0,1]]){const x=c[0]+dx*s,y=c[1]+dy*s*.9;B.set(x,y,'#ffffff',4);B.set(x+dy,y+dx,'#ff9a7a',4);B.set(x-dy,y-dx,'#c8202c',4)}}};
-FINALE({f:'red2',id:'r2_q_last',n:'打ち合い：最後のひと振り「十文字」（赤）と打ち返し',bg:'red',I:ZONE(QSH),W:ZUP,H:ZP(Object.assign({},ZX2,{ua2:2.85,fa2:2.9,oh:0})),R:ZONE(Object.assign({},ZX2,{x:QX-8})),R2:ZSAL,cx:-18,
- cap:'突き放したあと、両手で柄を握り、上段にまっすぐ構えて完全に止まる。目が赤く光る。次の瞬間、縦と横の二本の斬撃が同時に見える、たった一太刀の「十文字」。弾いた瞬間、時が止まり、暗転、主人公の一閃。遅れて金の三日月。彼は倒れない。剣を顔の前にまっすぐ立てて、最初と同じ一礼をする。それが負けを認める作法。',
- why:'最後だけ赤。一太刀なのに二本見える＝剣の頂き。それでも当たりは一回、合図は一回。始まりと終わりの一礼で、打ち合いが「決闘」だったと分かる。',ex:(B,J,t)=>crossCut(B,t,40)});
-CRUSH({f:'red2',id:'r2_q_crush',n:'打ち合い：くずし斬り「巻き落とし」（赤）',bg:'red',A:ZONE(QF),B:ZONE(Object.assign({},QLK,{sw:1.4,fa:.4,lean:.25})),W:ZLV,H:ZONE(Object.assign({},QLASTH,{x:QX-12})),Z:ZRI,
- cap:'途中の合で弾けないと、彼は刃をこちらの剣に絡めて、手首だけでくるりと巻き落とす。こちらの剣先が床を打ち、画面が赤くにじむ。締まりがほどけ、彼は剣を下段に下ろして、片手のまま赤く光る。床すれすれから斜め上へ、逆袈裟の一閃。',why:'崩しは「巻き落とし」、斬るのは逆袈裟。赤い騎士（柄頭と袈裟）と同じ罰の場面で、技の格がちがう。合図から当たりまではいつもと同じ。',
+FINALE({f:'red2',id:'r2_q_last',n:'打ち合い：最後のひと振り「十文字」（赤）と打ち返し',bg:'red',I:ZDEEP(QSH),W:ZUP,H:ZLUNGE,R:ZKN,R2:ZSAL,cx:-18,
+ cap:'突き放したあと、両手の上段でいちど大きく息を吸い、止まる。目が赤く光る。左手を離し、体を一本の線に伸ばし切って、縦と横の二本の斬撃が同時に見える、たった一太刀の「十文字」。弾いた瞬間、時が止まり、暗転、主人公の一閃。遅れて金の三日月。彼は剣を床に突き立て、それにすがって片膝をつく。倒れはしない。剣を引き抜いて立ち、刃を顔の前に立てて、最初と同じ一礼をする。',
+ why:'最後だけ赤。一太刀なのに二本見える＝剣の頂き。それでも当たりは一回、合図は一回。片膝をつく＝全部を出しきった代償。それでも倒れずに礼で終える＝騎士の誇り。始まりと終わりの一礼で、打ち合いが「決闘」だったと分かる。',ex:(B,J,t)=>{crossCut(B,t,40);stomp(B,J,t,40)}});
+CRUSH({f:'red2',id:'r2_q_crush',n:'打ち合い：くずし斬り「巻き落とし」（赤）',bg:'red',A:ZDEEP(QF),B:ZDEEP(Object.assign({},QLK,{sw:1.4,fa:.4,fa2:.3,lean:.25})),W:ZLV,H:ZDEEP(Object.assign({},QLASTH,{x:QX-12})),Z:ZRI,
+ cap:'途中の合で弾けないと、彼は刃をこちらの剣に絡めて、手首だけでくるりと巻き落とす。こちらの剣先が床を打ち、画面が赤くにじむ。締まりがほどけ、彼は両手の剣を下段に下ろし、低く沈んで赤く光る。床すれすれから斜め上へ、体ごと伸び上がる逆袈裟の一閃。',why:'崩しは「巻き落とし」、斬るのは逆袈裟。赤い騎士（柄頭と袈裟）と同じ罰の場面で、技の格がちがう。合図から当たりまではいつもと同じ。',
  ex:(B,J,t)=>{if(t>=0&&t<10){const a=t/10*6.28;for(let r=3;r<7;r++)B.set(CXP[0]+Math.cos(a)*r,CXP[1]+4+Math.sin(a)*r,'#fff3b0',4)}}});
 /* ===== 突きのフェイント（打ち合いの中）：引いて紫の輪、突きかけて、切っ先が鍔の手前で止まる ===== */
 const tfe=(f,id,I,W0,Hf0,Hr,bg,cap,why,ex)=>{const W=Object.assign({},W0,{x:(W0.x||0)+12}),Hf={};for(const k in Hr)Hf[k]=typeof Hr[k]==='number'&&typeof W[k]==='number'?lerp(W[k],Hr[k],.3):Hr[k];return mv({f,id,n:'打ち合い：突きのフェイント',bg,len:130,heroP:t=>t>=78&&t<86?HRP:HRG,cap,why,
@@ -1432,16 +1445,10 @@ const half=(a,b)=>{const o={};for(const k in b)o[k]=typeof b[k]==='number'&&type
 tfe('lord','l_r_tfeint',LRI,LLO,half(LLO,LJAB),LJAB,'lord','鍵を腰に引き、鍵の歯が紫の輪に光る。突きかけて、鍵の先がこちらの鍔の手前、指一本のところでぴたりと止まる。引き戻して、間をおいて金の本物の突き。','突きにもフェイントがある。斬りのフェイント（振り下ろしかけて止まる）と同じく、紫の輪＝押さずに待つ。');
 tfe('lord2','l2_r_tfeint',L2X(LRI),L2X(LLO),L2X(half(LLO,LJAB)),L2X(LJAB),'lord','鍵の歯が紫の輪に光り、突きかけて止まる。止めた瞬間、背中の触手だけが前へのびかける。間をおいて金の本物。','突きのフェイント。触手につられて押さない。',(B,J,t)=>tentLash(B,J,t,26,40));
 for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?'f':'f2',S=QSTY[st];tfe(S.f,p+'_q_tfeint',QRI,QTSU,half(QTSU,QTSUH),QTSUH,S.bg,'剣を引き、切っ先が紫の輪に光る。突きかけて、切っ先がこちらの鍔の手前でぴたりと止まる。'+(S.dark?'止めた瞬間、触手だけが前へ出かける。':'')+'引き戻して、間をおいて金の本物の突き。','突きのフェイント。斬りのフェイントと同じく、紫の輪＝押さずに待つ。',S.dark?(B,J,t)=>T8(B,J,t,26,40):null)}
-tfe('red2','r2_q_tfeint',ZRI,ZRI,ZONE(half(QRI,ZX2)),ZX2,'red','構えのまま動かず、切っ先だけが紫の輪に光る。片手突きが走り、切っ先がこちらの鍔に触れる寸前、髪一本の距離で止まる。そのまま切っ先で鍔をコツンと叩いて引く。間をおいて金の本物。','突きのフェイント。本気は止める距離が「触れる寸前」。押せば、その距離からそのまま崩される。',(B,J,t)=>{if(t===40&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')});
-/* 本気の左手：背中の腰に軽く添える（oh=1 のキーだけ。oh は補間されるので、両手持ちとのあいだもなめらかに移る）。
-   剣の振りと逆に小さく動いて釣り合いをとるが、腕の値をそのまま写すと、剣が一瞬で振られたときに左手も跳ねる。
-   そこで少し前（2〜10F前）の腕の角度の平均に反応させ、遅れてなめらかに追わせる。息で揺れ、前へ踏みこむほど後ろへ開く */
-const offT=(M,t)=>{let s=0;for(const d of [2,4,6,8,10]){const Q=poseAt0(M,Math.max(0,t-d));s+=Q.ua!=null?Q.ua:2.3}const ua=s/5;
- return Math.max(-.2,Math.min(.3,-(ua-2.3)*.08))};
-const offhand=(M,P,t)=>{const w=Math.max(0,Math.min(1,P.oh||0));if(!w)return;const lean=Math.max(0,P.lean||0),
- tu=.25+offT(M,t)+lean*.5+Math.sin(t*.09)*.04,tf=1.9-lean*.7+Math.sin(t*.09+1)*.05,
- u0=P.ua2!=null?P.ua2:tu,f0=P.fa2!=null?P.fa2:tf;P.ua2=u0+(tu-u0)*w;P.fa2=f0+(tf-f0)*w};
-for(const M of MV)if(M.f==='red2'&&/_q_/.test(M.id)){const p0=M.pp;M.pp=(P,t)=>{if(p0)p0(P,t);offhand(M,P,t)}}
+tfe('red2','r2_q_tfeint',ZRI,ZRI,half(ZRI,ZTH),ZTH,'red','低い構えのまま動かず、切っ先だけが紫の輪に光る。両手突きが走り、切っ先がこちらの鍔に触れる寸前、髪一本の距離で止まる。そのまま切っ先で鍔をコツンと叩いて引く。間をおいて金の本物。','突きのフェイント。本気は全力の突きを「触れる寸前」で止められる。押せば、その距離からそのまま崩される。',(B,J,t)=>{if(t===40&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')});
+/* 本気の息：構えているあいだは、ゆっくり深く息をしている（体が上下にわずかに動く）。斬るときは吐く息と一緒に腰が沈む。
+   余裕のある者は息をしているように見えない。全部を出している者は、息が見える */
+for(const M of MV)if(M.f==='red2'&&/_q_/.test(M.id)){const p0=M.pp,hs=M.hits||[];M.pp=(P,t)=>{if(p0)p0(P,t);P.cr=(P.cr||0)+Math.sin(t*.075)*.3;for(const h of hs){const d=t-h;if(d>=0&&d<12)P.cr+=1.0*(1-d/12)}}}
 /* 拍の攻撃は、合図から当たりまでが拍のぶん長い（ゲームと同じ）。のしかかり38F、尾と炎36F */
 for(const id of ['d_slam','d_tail','d_breath','h_spit','h_crawl'])MV.find(m=>m.id===id).beat=true;
 

@@ -41,9 +41,14 @@ figcaption{padding:10px 12px 12px;font-size:13px;line-height:1.65}.row{display:f
 #spd{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:9;background:#1e1a24f2;border:1px solid var(--ln);border-radius:99px;padding:4px;display:flex;gap:2px;box-shadow:0 6px 20px #0008}
 #spd span{font-size:11px;color:var(--mu);padding:6px 8px 6px 10px}#spd button{border:0;background:transparent;color:var(--tx);font:inherit;font-size:13px;padding:6px 12px;border-radius:99px}#spd button.on{background:var(--ac);color:#000;font-weight:700}
 @media (max-width:700px){.ftop{grid-template-columns:1fr}.sgrid{grid-template-columns:1fr}.grid{grid-template-columns:1fr}body{font-size:14px}.old{width:76px}}
+#nav{flex-wrap:nowrap;gap:10px;align-items:center}.ng{display:flex;gap:2px;align-items:center;flex:none}.ng i{font-style:normal;font-size:10px;color:var(--mu);padding:0 4px 0 2px;white-space:nowrap}#nav a.on{background:var(--ac);color:#000;font-weight:700}
+.mtabs{position:sticky;top:44px;z-index:4;display:flex;gap:4px;flex-wrap:wrap;padding:8px 0;margin-bottom:6px;background:rgba(15,13,18,.94);backdrop-filter:blur(6px)}.mtabs button{border:1px solid var(--ln);background:var(--pa);color:var(--tx);font:inherit;font-size:13px;padding:6px 12px;border-radius:99px}.mtabs button small{color:var(--mu);margin-left:5px}.mtabs button.on{background:var(--ac);color:#000;font-weight:700;border-color:var(--ac)}.mtabs button.on small{color:#000}
+.tag.ct,.ct{font-size:10px;border-radius:4px;padding:1px 5px;margin-right:4px}.ct-enter{background:#1e3a2e;color:#9ee0b8}.ct-idle{background:#26303e;color:#a8c4e8}.ct-atk{background:#3a2222;color:#f0a8a0}.ct-hurt{background:#3a2e1a;color:#f0d090}.ct-down{background:#2e2238;color:#d0b0f0}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px}.tcard{display:block;background:var(--pa);border:1px solid var(--ln);border-radius:10px;padding:8px;text-decoration:none;color:var(--tx)}.tcard canvas{width:100%;image-rendering:pixelated;display:block}.tname{font-size:14px;margin-top:4px}.tcnt{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}.tcnt .ct{margin:0}
+.pnext{display:flex;justify-content:space-between;gap:10px;margin:28px 0 8px}.pnext a{color:var(--tx);text-decoration:none;background:var(--pa);border:1px solid var(--ln);border-radius:8px;padding:10px 14px;font-size:14px}
 </style></head><body>
-<header class="cover"><div class="kick">いまだ！ ・ 設定資料集 第2版</div><h1>門の系統と、赤の系統<br><span>鎖と、二つの世界線</span></h1>
-<p class="sub">決まった作風で描き直した第2版。主人公と、門の系統（門番・黒い門番・門のぬし・暗い門のぬし）、赤の系統（赤い騎士・本気・赤い門のぬし・第二形態）。くらやみに関わるボスには、新しい技と派生の立ち絵を足した。カードは動く。タップで一時停止。</p></header>
+<header class="cover"><div class="kick">いまだ！ ・ 設定資料集 第2版</div><h1>門の番人たちと、くらやみ<br><span>鎖と、二つの世界線</span></h1>
+<p class="sub">決まった作風で描き直した第2版。門の系統、赤の系統、竜たち、中ボスとモブ。キャラをえらぶと、その1体だけが出る。モーションは「出現・待機・攻撃・やられ・撃破」で絞りこめる。カードは動く。タップで一時停止。</p></header>
 <nav id="nav"></nav>
 <main id="book">
 <section id="rules"><h2>この資料集の約束</h2>
@@ -57,9 +62,9 @@ figcaption{padding:10px 12px 12px;font-size:13px;line-height:1.65}.row{display:f
 <div><b>合図から当たりまでの間は変えない</b>どの技も、合図の光から当たりまで28F（打ち合いは別）。新しい技も同じ。</div>
 </div></section>
 </main>
-<section id="next" style="max-width:1100px;margin:0 auto;padding:40px 16px 140px">
+<section id="next">
 <h2>この先</h2>
-<p>次は中ボスとモブ（組ごと）。そのあと、竜たちの専用ステージを含む、ステージの章。</p>
+<p>中ボスとモブを一組ずつ。済んだのは「暴れ大イノシシ・突進イノシシ」。次は「うそつきの影・影の剣士」。そのあと、竜たちの専用ステージを含む、ステージの章。</p>
 <h3>見てほしいところ</h3>
 <div class="q"><b>1.</b> 赤い騎士が「のまれなかったぬし」に見えるか（兜・封印・前垂れが同じで、角・ひび・鎖がない）。それでも「赤い騎士」として立っているか。</div>
 <div class="q"><b>2.</b> 赤い門のぬしの新しい技（ずれた斬撃）と、第二形態の新しい技（映り姿の居合）。</div>

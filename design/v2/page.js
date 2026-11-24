@@ -3,11 +3,11 @@ let SPD=1,ANIM=[];const BGC={};
 function bgData(kind,ctx){if(BGC[kind])return BGC[kind];bgFill(ctx,kind);return BGC[kind]=ctx.getImageData(0,0,CW,CH)}
 function paint(ctx,B,bg){const im=new ImageData(new Uint8ClampedArray(bg.data),bg.width,bg.height);for(let i=0;i<B.c.length;i++){const c=B.c[i];if(!c)continue;const[r,g,b]=rgb(c);im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b;im.data[i*4+3]=255}ctx.putImageData(im,0,0)}
 function el(t,cls,html){const e=document.createElement(t);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
-function moveCard(M){const c=el('figure','card');const cv=el('canvas');cv.width=CW;cv.height=CH;c.appendChild(cv);
- const kd=KINDOF(M.id);const tag=kd==='main'?`<span class="tag st">立ち絵</span>`:kd==='stand'?`<span class="tag st">派生の立ち絵</span>`:kd==='show'?`<span class="tag sh">演出</span>`:EXMV[M.id]?`<span class="tag ex">いまの技：${EXMV[M.id]}</span>`:`<span class="tag nw">新しい技（案）</span>`;
+function moveCard(M,cat){const c=el('figure','card');if(cat)c.dataset.cat=cat;const cv=el('canvas');cv.width=CW;cv.height=CH;c.appendChild(cv);
+ let kd=KINDOF(M.id);if(cat&&cat!=='atk'&&kd==='atk')kd=cat==='idle'?'stand':'show';const tag=kd==='main'?`<span class="tag st">立ち絵</span>`:kd==='stand'?`<span class="tag st">派生の立ち絵</span>`:kd==='show'?`<span class="tag sh">演出</span>`:EXMV[M.id]?`<span class="tag ex">いまの技：${EXMV[M.id]}</span>`:`<span class="tag nw">新しい技（案）</span>`;
  const lights=(M.cues||[]).map(c=>c.col).filter((v,i,a)=>a.indexOf(v)===i).map(c=>`<i class="lt ${c}"></i>`).join('');
  const gap=(M.cues&&M.hits&&M.cues.length&&M.hits.length)?`<span class="gap">合図→当たり ${M.hits[0]-M.cues[0].t}F</span>`:'';
- const meta=el('figcaption','',`<div class="row"><b>${M.n}</b>${tag}</div><p class="read"><span class="k">読み方</span>${M.cap}</p><p class="why"><span class="k">意味</span>${M.why||''}</p><div class="row foot">${lights}${gap}<span class="fr"></span></div>`);
+ const ctag=cat?`<span class="tag ct ct-${cat}">${(MCATS.find(c=>c[0]===cat)||[,''])[1]}</span>`:'';const meta=el('figcaption','',`<div class="row">${ctag}<b>${M.n}</b>${tag}</div><p class="read"><span class="k">読み方</span>${M.cap}</p><p class="why"><span class="k">意味</span>${M.why||''}</p><div class="row foot">${lights}${gap}<span class="fr"></span></div>`);
  c.appendChild(meta);const a={cv,ctx:cv.getContext('2d'),M,t:0,vis:false,pause:false,fr:meta.querySelector('.fr'),draw(){paint(this.ctx,frame(this.M,Math.floor(this.t)),bgData(this.M.bg||'def',this.ctx));this.fr.textContent=Math.floor(this.t)%this.M.len+'F'}};
  cv.onclick=()=>{a.pause=!a.pause;c.classList.toggle('paused',a.pause)};ANIM.push(a);a.draw();return c}
 function stageCard(s){const c=el('figure','card stage');const cv=el('canvas');cv.width=SW;cv.height=SH;c.appendChild(cv);
@@ -21,7 +21,7 @@ function ladder(keys,notes){const wrap=el('div','ladder');keys.forEach((k,i)=>{c
 function build(){const root=document.getElementById('book');
  root.appendChild(heroSec());root.appendChild(ladderSec());
  FORMS.forEach((F,i)=>{const sec=el('section','form');sec.id=F.key;
-  const head=el('div','fhead');head.appendChild(el('div','num',String(i+1).padStart(2,'0')));head.appendChild(el('div','',`<div class="en">${F.en}</div><h2>${F.ttl}</h2>`));sec.appendChild(head);
+  const head=el('div','fhead');head.appendChild(el('div','num',String(i+1).padStart(2,'0')));head.appendChild(el('div','',`<div class="en">${F.en}</div><h2>${F.ttl}</h2>`));sec.appendChild(head);sec.dataset.title=F.ttl;
   const top=el('div','ftop');const art=el('div','art');art.appendChild(standCanvas(F.key,110,120,F.sox||62));if(F.old)art.appendChild(el('div','old',`<img src="${OLDIMG[F.old]}" alt=""><span>いまのゲーム</span>`));top.appendChild(art);
   const txt=el('div','ftxt');txt.appendChild(el('p','lore',F.lore));
   const pl=el('div','pal');F.pal.forEach(p=>pl.appendChild(el('div','chip',`<i style="background:${p[0]}"></i><b>${p[1]}</b><span>${p[2]}</span>`)));txt.appendChild(pl);top.appendChild(txt);sec.appendChild(top);
@@ -31,15 +31,27 @@ function build(){const root=document.getElementById('book');
   if(F.pair){const Pp=F.pair;sec.appendChild(el('h3','',`モブ：${Pp.ttl} <small>同じ骨格・技が1つ少ない</small>`));const w=el('div','ladder');[[Pp.key,Pp.ttl],[F.key,F.ttl+'（中ボス）']].forEach(([k,n],i)=>{const col=el('div','step');col.appendChild(standCanvas(k,120,96,k===F.key?(F.sox||62):66));col.appendChild(el('div','lname',n));w.appendChild(col);if(!i)w.appendChild(el('div','arrow','→'))});sec.appendChild(w);
    const dt=el('table','parts');dt.innerHTML='<tr><th>くらべる所</th><th>モブと中ボス</th></tr>'+Pp.diff.map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td></tr>`).join('');sec.appendChild(dt)}
   const tb=el('table','parts');tb.innerHTML='<tr><th>部品</th><th>意味</th></tr>'+F.parts.map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td></tr>`).join('');sec.appendChild(tb);
-  sec.appendChild(el('h3','',`モーション <small>${MOVES_OF[F.key].length}</small>`));const g=el('div','grid');MOVES_OF[F.key].forEach(id=>g.appendChild(moveCard(MV.find(m=>m.id===id))));sec.appendChild(g);
-  if(F.pair){sec.appendChild(el('h3','',`モーション：${F.pair.ttl} <small>${F.pair.moves.length}</small>`));const g2=el('div','grid');F.pair.moves.forEach(id=>g2.appendChild(moveCard(MV.find(m=>m.id===id))));sec.appendChild(g2)}
+  const ids=movesFor(F.key);sec.appendChild(el('h3','',`モーション <small>${ids.length}</small>`));const tabs=el('div','mtabs'),g=el('div','grid');
+  MCATS.forEach(([c,n])=>{const k=c==='all'?ids.length:ids.filter(id=>catOf(F.key,id)===c).length;if(!k)return;const bt=el('button',c==='all'?'on':'',`${n}<small>${k}</small>`);bt.onclick=()=>{tabs.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===bt));g.querySelectorAll('.card').forEach(cd=>cd.style.display=(c==='all'||cd.dataset.cat===c)?'':'none')};tabs.appendChild(bt)});
+  sec.appendChild(tabs);ids.forEach(id=>g.appendChild(moveCard(MV.find(m=>m.id===id),catOf(F.key,id))));sec.appendChild(g);
   if(F.stage.length){sec.appendChild(el('h3','','専用ステージ'));const sg=el('div','sgrid');F.stage.forEach(id=>sg.appendChild(stageCard(STAGES.find(s=>s.id===id))));sec.appendChild(sg)}
   root.appendChild(sec)});
  root.appendChild(orderSec());
  const io=new IntersectionObserver(es=>es.forEach(e=>{const a=ANIM.find(a=>a.cv===e.target);if(a)a.vis=e.isIntersecting}),{rootMargin:'100px'});ANIM.forEach(a=>io.observe(a.cv));
  let last=0;const loop=ts=>{requestAnimationFrame(loop);if(ts-last<32)return;const dt=(ts-last)/16.67;last=ts;if(!SPD)return;for(const a of ANIM)if(a.vis&&!a.pause){a.t+=Math.min(4,dt)*SPD;a.draw()}};requestAnimationFrame(loop);
  document.querySelectorAll('#spd button').forEach(b=>b.onclick=()=>{SPD=+b.dataset.s;document.querySelectorAll('#spd button').forEach(x=>x.classList.toggle('on',x===b))});
- document.getElementById('nav').innerHTML='<a href="#hero">主人公</a><a href="#ladder">階段</a>'+FORMS.map((F,i)=>`<a href="#${F.key}">${F.ttl}</a>`).join('')+'<a href="#order">強さの順</a><a href="#next">この先</a>'}
+ router(root)}
+/* ===== 1体ずつ見る：目次と、上の帯と、ページの切りかえ ===== */
+const NAVG=[['はじめに',[['toc','目次'],['rules','約束'],['hero','主人公'],['ladder','階段'],['order','強さの順'],['next','この先']]],['門の系統',['gate','dgate','lord','lord2']],['赤の系統',['red','red2','fallen','fallen2']],['竜',['dragon','hydra']],['中ボスとモブ',['boarM','boar']]];
+const TTL=k=>(FORMS.find(F=>F.key===k)||{}).ttl||k;
+function tocSec(){const s=el('section','toc');s.id='toc';s.appendChild(el('h2','','目次'));s.appendChild(el('p','lead','見たいキャラをえらぶ。各ページのモーションは「出現・待機・攻撃・やられ・撃破」で絞りこめる。'));
+ NAVG.slice(1).forEach(([g,keys])=>{s.appendChild(el('h4','',g));const w=el('div','tgrid');keys.forEach(k=>{const F=FORMS.find(x=>x.key===k);if(!F)return;const a=el('a','tcard');a.href='#'+k;a.appendChild(standCanvas(k,110,100,F.sox||62));const ids=movesFor(k),cnt=MCATS.slice(1).map(([c,n])=>{const v=ids.filter(id=>catOf(k,id)===c).length;return v?`<span class="ct ct-${c}">${n} ${v}</span>`:''}).join('');a.appendChild(el('div','tname',`<b>${F.ttl}</b><div class="tcnt">${cnt}</div>`));w.appendChild(a)});s.appendChild(w)});return s}
+function router(root){const nx=document.getElementById('next');if(nx)root.appendChild(nx);root.insertBefore(tocSec(),root.firstChild);
+ const order=NAVG.flatMap(([g,ks])=>ks.map(k=>Array.isArray(k)?k[0]:k));
+ document.getElementById('nav').innerHTML=NAVG.map(([g,ks])=>`<span class="ng"><i>${g}</i>${ks.map(k=>Array.isArray(k)?`<a href="#${k[0]}" data-k="${k[0]}">${k[1]}</a>`:`<a href="#${k}" data-k="${k}">${TTL(k)}</a>`).join('')}</span>`).join('');
+ /* ページの下に、前後の移動 */order.forEach((k,i)=>{const sec=document.getElementById(k);if(!sec)return;const f=el('div','pnext');const pv=order[i-1],nv=order[i+1];f.innerHTML=(pv?`<a href="#${pv}">← ${TTL(pv)==='toc'?'目次':(NAVG[0][1].find(x=>x[0]===pv)||[0,TTL(pv)])[1]}</a>`:'<span></span>')+(nv?`<a href="#${nv}">${(NAVG[0][1].find(x=>x[0]===nv)||[0,TTL(nv)])[1]} →</a>`:'<span></span>');sec.appendChild(f)});
+ const show=()=>{let k=(location.hash||'#toc').slice(1);if(!document.getElementById(k)||!order.includes(k))k='toc';[...root.children].forEach(c=>{if(c.tagName==='SECTION')c.style.display=c.id===k?'':'none'});document.querySelectorAll('#nav a').forEach(a=>{const on=a.dataset.k===k;a.classList.toggle('on',on);if(on)a.scrollIntoView({block:'nearest',inline:'center'})});document.querySelector('header.cover').style.display=k==='toc'?'':'none';window.scrollTo(0,0)};
+ window.addEventListener('hashchange',show);show()}
 function heroSec(){const s=el('section','hero');s.id='hero';s.appendChild(el('div','fhead','<div class="num">00</div><div><div class="en">THE KNIGHT</div><h2>主人公</h2></div>'));
  s.appendChild(el('p','lead','名実ともに騎士。顔は見せない。だれもが自分を重ねられる。盾は顔の代わりで、キャラクターの中心。最初は何も描かれていない盾に、歩んだ道のりが刻まれていく。'));
  const g=el('div','hgrid');HVARS.forEach(v=>{const c=el('figure','card hv');const S=heroVar(v.o||{});const cv=standCanvas2(S,60,56,34);c.appendChild(cv);c.appendChild(el('figcaption','',`<div class="row"><b>${v.n}</b><span class="tag ex">${v.how}</span></div><p class="why">${v.why}</p>`));g.appendChild(c)});s.appendChild(g);return s}

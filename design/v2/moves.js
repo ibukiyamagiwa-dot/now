@@ -823,6 +823,29 @@ tfe('lord','l_r_tfeint',LRI,LLO,half(LLO,LJAB),LJAB,'lord','鍵を腰に引き�
 tfe('lord2','l2_r_tfeint',L2X(LRI),L2X(LLO),L2X(half(LLO,LJAB)),L2X(LJAB),'lord','鍵の歯が紫の輪に光り、突きかけて止まる。止めた瞬間、背中の触手だけが前へのびかける。間をおいて金の本物。','突きのフェイント。触手につられて押さない。',(B,J,t)=>tentLash(B,J,t,26,40));
 for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?'f':'f2',S=QSTY[st];tfe(S.f,p+'_q_tfeint',QRI,QTSU,half(QTSU,QTSUH),QTSUH,S.bg,'剣を引き、切っ先が紫の輪に光る。突きかけて、切っ先がこちらの鍔の手前でぴたりと止まる。'+(S.dark?'止めた瞬間、触手だけが前へ出かける。':'')+'引き戻して、間をおいて金の本物の突き。','突きのフェイント。斬りのフェイントと同じく、紫の輪＝押さずに待つ。',S.dark?(B,J,t)=>T8(B,J,t,26,40):null)}
 tfe('red2','r2_q_tfeint',ZRI,ZRI,half(ZRI,ZTH),ZTH,'red','低い構えのまま動かず、切っ先だけが紫の輪に光る。両手突きが走り、切っ先がこちらの鍔に触れる寸前、髪一本の距離で止まる。そのまま切っ先で鍔をコツンと叩いて引く。間をおいて金の本物。','突きのフェイント。本気は全力の突きを「触れる寸前」で止められる。押せば、その距離からそのまま崩される。',(B,J,t)=>{if(t===40&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')});
+/* ===== 連撃は「静と動」で組み直す =====
+   説明文どおりの向きで振る（打ち下ろし＝頭上から前下へ、すくい上げ＝前下から前上へ、突き＝まっすぐ前）。
+   一撃ごとに：当たったポーズで3F止まる（止め）→次の構えへ2〜4Fで素早く移る→構えで止まる（静）→最後の3Fで振る（動）。
+   二撃目・三撃目も、構えが一瞬止まって見えるので読める。最後の一撃は振り切ってから粘る。 */
+const CB_TWO=new Set(['red','red2','fallen','fallen2']);
+const CBP={down:{W:{ua:-1.9,fa:-1.6,sw:-.7,lean:-.15,cr:2.5,dx:4},S:{ua:2.5,fa:2.2,sw:2.65,lean:.32,cr:3.6,ff:-13,fb:9},F:{ua:2.2,fa:1.95,sw:2.4,lean:.36,cr:4,ff:-13,fb:9}},
+ up:{W:{ua:1.9,fa:1.4,sw:2.0,lean:.2,cr:4.2,dx:2},S:{ua:-2.75,fa:-2.9,sw:-2.3,lean:.05,cr:2.6,ff:-12,fb:9},F:{ua:-2.2,fa:-2.3,sw:-1.75,lean:-.05,cr:2.2,ff:-12,fb:9}},
+ thrust:{W:{ua:1.2,fa:3.0,sw:3.14,lean:-.14,cr:3.2,dx:10},S:{ua:3.1,fa:3.12,sw:3.14,lean:.3,cr:3.6,ff:-14,fb:10},F:{ua:3.1,fa:3.12,sw:3.14,lean:.34,cr:3.8,ff:-14,fb:10}}};
+const COMBO=(id,seq)=>{const M=MV.find(m=>m.id===id);if(!M)return;const I=M.keys[0].p,two=CB_TWO.has(M.f),hs=M.hits;const xs=hs.map(h=>{const k=M.keys.find(k=>k.t===h);return k&&k.p.x!=null?k.p.x:-30});
+ const mk=(o,x,extra)=>{const p=Object.assign({},o);delete p.dx;p.x=x;if(two){p.ua2=p.ua-.2;p.fa2=p.fa-.1}return Object.assign(p,extra||{})};
+ let last=null;const ks=[K(0,I)];const c0=(M.cues&&M.cues[0]?M.cues[0].t:14);
+ seq.forEach((T,i)=>{const h=hs[i],x=xs[i];let S,W;
+  if(T==='tent'){const base=last||mk(CBP.down.F,x);W=Object.assign({},base,{ua2:-.4,fa2:-.9,lean:(base.lean||0)-.08});S=Object.assign({},base,{ua2:3.0,fa2:3.1,lean:(base.lean||0)+.18,x:(base.x||0)-4})}
+  else{const P=CBP[T];W=mk(P.W,(i===0?0:(last&&last.x!=null?last.x:x))+P.W.dx);S=mk(P.S,x)}
+  if(i===0){ks.push(K(c0,W,'out'));ks.push(K(h-3,W))}
+  else{const hp=hs[i-1],gap=h-hp;ks.push(K(hp+3,last));const g=Math.max(2,Math.min(4,Math.floor((gap-6)/2)));ks.push(K(Math.min(h-4,hp+3+g),W,'out'));ks.push(K(h-3,W))}
+  ks.push(K(h,S,'in'));last=S});
+ const T=seq[seq.length-1],hl=hs[hs.length-1],F=T==='tent'?Object.assign({},last,{ua2:last.ua2,fa2:last.fa2}):mk(CBP[T].F,xs[xs.length-1]);
+ ks.push(K(hl+3,last));ks.push(K(hl+8,F,'out'));ks.push(K(Math.min(M.len-24,hl+30),F));ks.push(K(M.len-6,I,'io'));
+ M.keys=ks.sort((a,b)=>a.t-b.t);M.trails=hs.map((h,i)=>seq[i]==='tent'?null:[h-4,h+2,(M.hitCol==='r'&&i===hs.length-1)||(M.trails||[]).some(r=>r&&r[0]<=h&&r[1]>=h&&r[2]==='r')?'r':'w',0,seq[i]==='thrust'?'line':'arc']).filter(Boolean);M.combo=seq};
+COMBO('l_two',['down','up']);COMBO('l_rev',['up','down']);COMBO('l2_tri',['down','up','tent']);COMBO('f_sa',['down','up','tent']);
+COMBO('r_swap',['up','down']);COMBO('r_combo4',['down','up','down','thrust']);COMBO('f2_four',['down','up','tent','down']);
+COMBO('r2_tsubame',['down','up']);COMBO('r_three',['thrust','thrust','thrust']);COMBO('f2_tsubame',['down','up']);
 /* ===== 剣は腕で振る（桜井流モーションの見直しを含む） =====
    手首（剣の向き−前腕の向き。画面で時計回りを＋）は、握りこぶしで無理なく取れる範囲 +0.45〜+2.4 に収める。
    ＋側＝親指側へ立てる（剣が前腕より上・後ろへ立つ）は大きく取れる。−側＝手首を下へ折って剣を前腕の線より下げるのはだめ。
@@ -869,6 +892,8 @@ for(const M of MV){if(!KNIGHT_F.has(M.f)||!M.keys)continue;
    (c) 禍々しい者（黒い門番・暗い門のぬし・赤い門のぬし・第二形態）：合図の前にくらやみが武器へ吸い寄せられ、当たるとくらやみが裂けて噴き出し、その中で赤い目が一瞬開く。 */
 const SK_EX=/rally|_q_|_r_|l2_dark|f_dark|dg_sweep|iai|silent|reflect/;
 for(const M of MV){if(!KNIGHT_F.has(M.f)||!M.keys||!M.hits||SK_EX.test(M.id))continue;
+ /* (d) 連撃の止め：途中の一撃のあと、当たったポーズで3F止まってから次へ（静と動）。V字の二連撃（勢いで止まれない技）と、組み直した連撃は除く */
+ if(!M.combo&&M.id!=='r_two'&&M.hits.length>1)for(const h of M.hits.slice(0,-1)){const i=M.keys.findIndex(k=>k.t===h);if(i<0||i>=M.keys.length-1)continue;const H=M.keys[i],N=M.keys[i+1];if(N.t>h+4&&!same(N.p,H.p))M.keys.splice(i+1,0,K(h+3,H.p,'io'))}
  for(const h of M.hits){let hi=M.keys.findIndex(k=>k.t===h);if(hi<1)continue;const H=M.keys[hi],Pv=M.keys[hi-1];if(H.e==='snap')continue;
   if(h-Pv.t>6&&!same(Pv.p,H.p)){M.keys.splice(hi,0,K(h-4,Pv.p,'io'));hi++;M.keys[hi]=K(h,H.p,'in')}
   const S=Object.assign({},PDEF,(SPEC[M.f]||{}).pose||{}),A=Object.assign({},S,M.keys[hi-1].p),B=Object.assign({},S,H.p);

@@ -4,8 +4,9 @@
    主人公の剣の跡と火花は、合図の4色（白・赤・金・紫）と取り違えないよう、うすい青で描く。 */
 const HH1=27,HH2=39,HSTOP=4,HSL=['#dff2ff','#8ab8e0','#5a7ca8'];
 const TAU=Math.PI*2;
-/* 主人公の姿勢：角度は描く向き（0＝右、π＝左）。振りの向きが補間で逆回りしないよう、同じ角度を2πずらして書く */
-const HUP={ua:-1.9,fa:-2.3,sw:-1.2,lean:-.1,cr:1,ff:-8,fb:6},HDN={ua:-3.28,fa:-3.58,sw:-3.88,lean:.3,ff:-10,fb:6},HDN2={ua:-3.43,fa:-3.78,sw:-4.08,lean:.35,ff:-10,fb:6,cr:1},HUPS={ua:-2.6,fa:-2.4,sw:-2.0,lean:.15,ff:-10,fb:6},HREST={ua:2.7-TAU,fa:3.2-TAU,sw:-2.35};
+/* 主人公の姿勢：角度は描く向き（0＝右、π＝左）。振りの向きが補間で逆回りしないよう、同じ角度を2πずらして書く。
+   剣は腕で振る：刃は拳から前腕の続きで出し、手首を下へ折らない（手首の向き＝剣−前腕は＋0.5前後）。剣先を下げるときは腕ごと下げる */
+const HUP={ua:-1.9,fa:-2.3,sw:-1.2,lean:-.1,cr:1,ff:-8,fb:6},HDN={ua:-3.5,fa:-3.75,sw:-3.25,lean:.3,ff:-10,fb:6},HDN2={ua:-3.7,fa:-3.95,sw:-3.45,lean:.35,ff:-10,fb:6,cr:1},HUPS={ua:-2.5,fa:-2.2,sw:-1.7,lean:.15,ff:-10,fb:6},HREST={ua:2.7-TAU,fa:3.2-TAU,sw:-2.35};
 function heroAtk(X,L){const l=L||0,A=(x,o)=>Object.assign({x,lift:l},o);return{keys:[K(0,{lift:0}),K(10,{lift:0}),K(20,A(X*.88,HUP),'out'),K(24,A(X*.88,HUP)),K(HH1,A(X,HDN),'in'),K(HH1+HSTOP+2,A(X,HDN2)),K(HH2-3,A(X,HDN2)),K(HH2,A(X,HUPS),'in'),K(HH2+HSTOP+3,A(X,HUPS)),K(HH2+20,Object.assign({x:X*.15,lean:-.1,lift:0},HREST),'out'),K(HH2+28,Object.assign({lift:0},HREST)),K(400,Object.assign({lift:0},HREST))]}}
 /* 敵の当たり：白い光（2F）とヒットストップ */
 const kb=(a,dur)=>a<0?0:a<4?Math.sin(a/4*Math.PI/2):Math.exp(-(a-4)/dur);/* やられの姿勢へは約4Fかけて移る（止めきらない）＝「8つのヒットストップ仕様」 */

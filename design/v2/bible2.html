@@ -2572,18 +2572,25 @@ for(const k of['boar','boarM'])MCAT_HURT[k]=(MCAT_HURT[k]||[]).filter(id=>!/_wal
    - かかとから床に、細い影の尾がのびて、画面の外（持ち主が倒れた場所）へ続く。影は持ち主から離れられない。
    - 踏みこまない。斬るときは、影が床をすべるように「のびる」（体が前へ引きのばされる）。人の間合いでないことが、影であることの手がかり。
    うそつきの影（中ボス）は、主人公もまねる。ときどき輪郭が、丸い兜と羽根飾りとマント（主人公の形）に入れかわる。 */
-const SHP=['#08060e','#120d1c','#1c1529','#2a2040'],SHRIM='#56467a',SHBL=['#3a3250','#6a5e8a','#a89cc8'],SHTAIL='#0a0710';
+const SHBL=['#3a3250','#6a5e8a','#a89cc8'];
+/* 覚悟の段：拾われた影が、くらやみにのまれていく段階。剣（合図が出る場所）の色は変えない。のまれるほど、影にない「目」が開く（光らない） */
+const SHV={
+ n:{lbl:'覚悟1 ふつう',name:'影の剣士',body:['#08060e','#120d1c','#1c1529','#2a2040'],rim:'#56467a',tail:'#0a0710',rip:0,eyes:0,tailW:1},
+ r:{lbl:'覚悟2 赤い',name:'赤い影の剣士',body:['#0c0408','#1c0a12','#2c121c','#40202c'],rim:'#6a3a4e',tail:'#100608',rip:.35,eyes:0,tailW:1},
+ k:{lbl:'覚悟3 黒い',name:'黒い影の剣士',body:['#030205','#09070c','#110e16','#1c1824'],rim:'#46405a',tail:'#020103',rip:.35,eyes:1,tailW:2},
+ v:{lbl:'覚悟4 紫の',name:'紫の影の剣士',body:['#0a0414','#180a2a','#28143e','#3c2058'],rim:'#6a4a96',tail:'#0c0418',rip:.5,eyes:3,tailW:2}};
+const SHEYE='#7a2a4a';
 SPEC.shadeK={hk:1.2,lk:.9,name:'影の剣士',k:.86,pal:PAL.guard,helm:{type:'kettle'},cape:{len:11,col:'#3a4054',hi:'#6a7488',lo:'#1a1c24',tatter:3},
  w:Object.assign({},W_LONG,{len:21}),pose:{ua:1.85,fa:2.75,sw:3.7,ua2:1.45,fa2:1.85,ff:-6,fb:6,cr:1.5,lean:.1}};
 SPEC.shadeMK=Object.assign({},SPEC.shadeK,{k:1.075,name:'うそつきの影',cape:{len:16,col:'#3a4054',hi:'#6a7488',lo:'#1a1c24',tatter:6}});
 SPEC.shadeMimic=Object.assign({},SPEC.hero,{k:1.075,hk:1.45,w:Object.assign({},W_LONG,{len:21}),pose:SPEC.shadeK.pose});/* 主人公の形（丸い兜・羽根飾り・マント） */
 /* 影に描きかえる：ふつうの騎士として描いてから、明るさで3段の影色に置きかえる。剣（体を描いたときにない画素）だけ明るい灰紫。
    flat＝床へ倒れて平たくなる（0〜1、負なら背が伸びる）、stretch＝前へ引きのばす、rip＝輪郭のゆらぎ、cut＝斬られた筋（すき間）、mimic＝主人公の形 */
-function shadeDraw(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose,P0||{}),base=(P.mimic||0)>.5?SPEC.shadeMimic:S.base;
+function shadeDraw(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose,P0||{}),base=(P.mimic||0)>.5?SPEC.shadeMimic:S.base,V=SHV[P.tint]||SHV.n,SHP=V.body,SHRIM=V.rim,SHTAIL=V.tail;
  const W1=new Buf(B.w,B.h),J=knight(W1,ox,oy,base,P,T),W2=new Buf(B.w,B.h);knight(W2,ox,oy,base,Object.assign({},P,{sw:null,sw2:null}),T);
- const flat=P.flat||0,st=P.stretch||0,rip=P.rip||0,ax=J.footB?J.footB[0]:ox,cut=P.cut||0;
+ const flat=P.flat||0,st=P.stretch||0,rip=Math.max(P.rip||0,V.rip),ax=J.footB?J.footB[0]:ox,cut=P.cut||0;
  const X=(x,y)=>{let nx=x<ax?ax-(ax-x)*(1+st):x;if(rip)nx+=Math.round(Math.sin(y*.9+T*.6)*rip);return nx},Y=y=>oy-(oy-y)*(1-flat);
- /* 床の影の尾：かかとから画面の外へ */const tx=Math.round(X(ax,oy-1));for(let x=tx-2;x<B.w;x++){B.set(x,oy-1,SHTAIL,3);if(x<tx+18||(x+T)%5)B.set(x,oy,SHTAIL,3)}
+ /* 床の影の尾：かかとから画面の外へ */const tx=Math.round(X(ax,oy-1));for(let x=tx-2;x<B.w;x++){B.set(x,oy-1,SHTAIL,3);if(x<tx+18||(x+T)%5)B.set(x,oy,SHTAIL,3);if(V.tailW>1&&(x<tx+30||(x*3+T)%7))B.set(x,oy-2,SHTAIL,3)}
  const L=c=>{if(!c||c[0]!=='#')return .2;const n=parseInt(c.slice(1),16);return(((n>>16)&255)*.3+((n>>8)&255)*.59+(n&255)*.11)/255};
  /* まず影色に置きかえ（変形なし）、そのあと出力の画素から元の画素を引く（のばしても、すき間ができない） */
  const src=new Buf(B.w,B.h);let x0=B.w,x1=0,y0=B.h,y1=0;
@@ -2598,9 +2605,11 @@ function shadeDraw(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose,P0||{}),
  /* 背中側（上と右）の内側1画素を明るく。平たいときはつけない（床の影になっている） */
  if(flat<.6)for(let i=0;i<out.c.length;i++){if(out.t[i]!==1)continue;const x=i%B.w,y=(i/B.w)|0;if(!out.get(x,y-1)||!out.get(x+1,y))out.c[i]=SHRIM}
  for(let i=0;i<out.c.length;i++)if(out.c[i]){B.c[i]=out.c[i];B.t[i]=out.t[i]}
+ /* のまれるほど、影にない目が開く（黒い段で胸に一つ、紫の段で兜にも二つ）。光らない */
+ if(V.eyes&&flat<.5){const ey=[[J.sc,[0,1]],[J.head,[-2,0]],[J.head,[1,0]]].slice(0,V.eyes);for(const[p0,o]of ey){if(!p0)continue;const q=[Math.round(X(p0[0],p0[1])+o[0]),Math.round(Y(p0[1])+o[1])];if(B.get(q[0],q[1])&&(T+q[0]*7)%140>6)B.set(q[0],q[1],SHEYE,1)}}
  const tr=v=>Array.isArray(v)?(v.length===2&&typeof v[0]==='number'?[X(v[0],v[1]),Y(v[1])]:v.map(tr)):v;for(const k in J)if(k!=='P'&&k!=='k')J[k]=tr(J[k]);return J}
-SPEC.shade=Object.assign({},SPEC.shadeK,{draw:shadeDraw,knightLike:true,base:SPEC.shadeK});
-SPEC.shadeM=Object.assign({},SPEC.shadeMK,{draw:shadeDraw,knightLike:true,base:SPEC.shadeMK,mid:true});
+SPEC.shade=Object.assign({},SPEC.shadeK,{draw:shadeDraw,knightLike:true,base:SPEC.shadeK,tintable:true});
+SPEC.shadeM=Object.assign({},SPEC.shadeMK,{draw:shadeDraw,knightLike:true,base:SPEC.shadeMK,mid:true,tintable:true});
 Object.assign(PDEF,{flat:0,stretch:0,rip:0,cut:0,mimic:0});
 for(const k of['shade','shadeM'])SPEC[k+'@w']=flashSpec(k);
 
@@ -2617,7 +2626,7 @@ function shCards(f,pre,isM){const ox=isM?2:6,bg='gate',nm=isM?'うそつきの�
   keys:[K(0,{}),K(30,{}),K(44,{hd:-.35,lean:-.15,sw:3.2},'io'),K(96,{hd:-.35,lean:-.15,sw:3.2}),K(110,{},'io'),K(160,{})],pp:shIdlePP,
   cap:'構えたまま、首だけを後ろへ向けて、床の尾がのびていく先（画面の外）をしばらく見る。それから向き直る。光らない。',
   why:'影は、自分が誰の影だったかを覚えている。尾の先に、持ち主が倒れている。'});
- else mv({f,ox,id:pre+'_mimic',n:'ひまなとき：主人公をまねる',bg,len:180,
+ else mv({f,ox,id:pre+'_bored',n:'ひまなとき：主人公をまねる',bg,len:180,
   keys:[K(0,{}),K(40,{}),K(48,{ua:2.2,fa:2.0,sw:-2.3,lean:.05,cr:1},'io'),K(130,{ua:2.2,fa:2.0,sw:-2.3,lean:.05,cr:1}),K(140,{},'io'),K(180,{})],
   pp:(P,t)=>{P.mimic=t>=46&&t<132?1:0;if(t>=44&&t<50||t>=128&&t<134)P.rip=2},
   cap:'輪郭がゆらいで、丸い兜・羽根飾り・マントの形（主人公の形）に入れかわり、主人公と同じ構えで、同じ息をする。しばらくして、ゆらいでもとの剣士の影に戻る。',
@@ -2632,18 +2641,19 @@ function shCards(f,pre,isM){const ox=isM?2:6,bg='gate',nm=isM?'うそつきの�
   cues:[{t:16,col:'w'}],hits:[44],
   cap:'剣を振りかぶって止まり、剣先が白く光る（ときどき赤）。足は動かないまま、影が床をすべるように前へのびて斬る。ゆっくり縮んで戻る。合図から当たりまで、いつもの間。',
   why:'人なら踏みこむところを、影は「のびる」。間合いが人とちがうので、影だとわかる。読み方はほかの剣士と同じ（剣先の光）。'});
- mv({f,ox,id:pre+'_feint',n:'ふり→本物',bg,len:140,keys:[K(0,{}),K(14,SHW,'out'),K(38,SHW),K(42,SHF,'in'),K(50,Object.assign({},SHF,{stretch:0,rip:2})),K(56,SHW,'io'),K(80,SHW),K(84,SHS,'in'),K(92,SHS),K(110,{},'io'),K(140,{})],
-  cues:[{t:14,col:'p'},{t:56,col:'w'}],hits:[84],
+ mv({f,ox,id:pre+'_feint',n:'ふり→本物',bg,len:150,keys:[K(0,{}),K(14,SHW,'out'),K(38,SHW),K(42,SHF,'in'),K(50,Object.assign({},SHF,{stretch:0,rip:2})),K(58,SHW,'io'),K(88,SHW),K(92,SHS,'in'),K(100,SHS),K(118,{},'io'),K(150,{})],
+  cues:[{t:14,col:'p'},{t:64,col:'w'}],hits:[92],
   cap:'振りかぶって、紫の輪。のびかけるが、途中で止まり、輪郭がゆらいで縮む（ふり）。もう一度振りかぶって白く光り、今度は本当にのびて斬る。',
   why:'影はまねるだけ。剣士の動きをなぞるが、ふりには中身がない＝のびきらずに、ゆらいで崩れる。紫の輪はフェイントの合図（決まりどおり）。'});
  mv({f,ox,id:pre+'_two',n:'本物が2回続く',bg,len:130,keys:[K(0,{}),K(14,SHW,'out'),K(38,SHW),K(42,SHS,'in'),K(45,SHS),K(48,SHU,'out'),K(52,SHU),K(56,SHS2,'in'),K(64,SHS2),K(84,{},'io'),K(130,{})],
   cues:[{t:14,col:'w'},{t:28,col:'w'}],hits:[42,56],
   cap:'白く光って打ち下ろし（のびる）。縮みきらずに低く構え直して止まり、もう一度白く光ってすくい上げる。',
   why:'フェイントを覚えたところで、「本物が続く」もある。紫の輪がなければ全部本物。'});
- if(isM)mv({f,ox,id:pre+'_dfeint',n:'二重フェイント（中ボスだけ）',bg,len:170,keys:[K(0,{}),K(14,SHW,'out'),K(38,SHW),K(42,SHF,'in'),K(48,Object.assign({},SHF,{stretch:0,rip:2})),K(52,SHW,'io'),K(54,SHW),K(58,SHF,'in'),K(64,Object.assign({},SHF,{stretch:0,rip:2})),K(68,SHW,'io'),K(70,SHW),K(74,SHS,'in'),K(84,SHS),K(110,{},'io'),K(170,{})],
-  cues:[{t:14,col:'p'},{t:30,col:'p'},{t:46,col:'w'}],hits:[74],
-  cap:'紫の輪のふりが二回続き、三度目に白く光って本当にのびて斬る。ふりのたびに輪郭がゆらいで縮む。',
-  why:'中ボスだけの技（モブより1つ多い）。フェイントの決まりは同じで、数が増えるだけ。'});
+ if(isM)mv({f,ox,id:pre+'_dfeint',n:'二重フェイント（中ボスだけ）',bg,len:200,
+  keys:[K(0,{}),K(14,SHW,'out'),K(38,SHW),K(42,SHF,'in'),K(48,Object.assign({},SHF,{stretch:0,rip:2})),K(56,SHW,'io'),K(88,SHW),K(92,SHF,'in'),K(98,Object.assign({},SHF,{stretch:0,rip:2})),K(106,SHW,'io'),K(138,SHW),K(142,SHS,'in'),K(150,SHS),K(170,{},'io'),K(200,{})],
+  cues:[{t:14,col:'p'},{t:64,col:'p'},{t:114,col:'w'}],hits:[142],
+  cap:'振りかぶって止まり、紫の輪。のびかけて止まり、輪郭がゆらいで縮む（ふり）。構え直して止まってから、また紫の輪とふり。三度目に構えて止まったところで白く光り、本当にのびて斬る。',
+  why:'中ボスだけの技（モブより1つ多い）。合図は、構えて止まっているときにだけ出す（振っている最中には光らない）。ふりのあとは、必ず構えに戻って止まってから次の合図。'});
  /* パリィされ：影は弾かれると、輪郭がしぶきのようにゆらぎ、のびた体が縮む。大は床へ半分倒れて平たくなり、起き上がる */
  const SK=(kind,th,P,w)=>Object.assign(knightKit({})(kind,th,P,w),kind==='s'?{stretch:0,rip:2}:{stretch:-.1,flat:.45,rip:3,x:(P.x||0)+4});
  parriedCard({id:pre+'_pry',src:pre+'_two',n:'パリィされ：本物が2回（小→大）',kit:SK,rx:[{kind:'s'},{kind:'b'}],
@@ -2653,7 +2663,7 @@ function shCards(f,pre,isM){const ox=isM?2:6,bg='gate',nm=isM?'うそつきの�
  parriedCard({id:pre+'_brk',src:pre+'_strike',n:'ブレイク：床の影に戻りかける',len:200,kit:SK,rx:[{kind:'b'}],brk:{at:6,P:SBRK,star:J=>J.hip?[J.hip[0],FL-12]:null},
   cap:'四度目を弾かれると、立っていられず、床へ倒れて平たい影になる。剣士の形のまま床に伸び、ときどき輪郭がゆらぐ。頭の上（床の少し上）を、うすい青の星が回る。',
   why:'拾われて形をもらった影が、もとの「床の影」に戻りかけている。立っていないので、どこから見てもすき。'});
- recoverCard({id:pre+'_rec',f,ox,bg,n:'ブレイク：斬られて、立ち上がる',P:SBRK,idle:()=>({}),snap:5,star:J=>J.hip?[J.hip[0],FL-12]:null,
+ recoverCard({id:pre+'_rec',f,ox,bg,n:'ブレイク：斬られて、立ち上がる',P:SBRK,idle:()=>Object.assign({},SPEC[f].pose,{flat:0,rip:0,stretch:0,cut:0,x:0}),snap:5,star:J=>J.hip?[J.hip[0],FL-12]:null,
   react:(P,a,b)=>{const A=kb(a,6),Bk=kb(b,8);P.rip=Math.max(P.rip||0,3*A,3*Bk)},
   cap:'床に伸びたまま斬られると、輪郭が大きくゆらぐ。二太刀目のあと、一気に立ち上がる（背が少し伸びすぎてから収まる）。',
   why:'立ち上がりは出現と同じ動き。一瞬で、行き過ぎるくらい大きく。'});
@@ -2671,15 +2681,17 @@ shCards('shade','sh',false);shCards('shadeM','shM',true);
 
 /* 資料集に入れる */
 MOVES_OF.shade=['sh_idle','sh_bored','sh_strike','sh_feint','sh_two'];
-MOVES_OF.shadeM=['shM_idle','shM_mimic','shM_strike','shM_feint','shM_two','shM_dfeint'];
+MOVES_OF.shadeM=['shM_idle','shM_bored','shM_strike','shM_feint','shM_two','shM_dfeint'];
 Object.assign(MCAT_ENTER,{shade:['sh_enter'],shadeM:['shM_enter']});Object.assign(MCAT_DOWN,{shade:['sh_down'],shadeM:['shM_down']});Object.assign(MCAT_HURT,{shade:['sh_hurt'],shadeM:['shM_hurt']});
 Object.assign(MCAT_PARRY,{shade:['sh_pry'],shadeM:['shM_pry']});Object.assign(MCAT_BREAK,{shade:['sh_brk','sh_rec'],shadeM:['shM_brk','shM_rec']});
-FORMS.push({key:'shadeM',ttl:'うそつきの影',en:'THE SHADOWS THAT PRETEND · 中ボスとモブ',stage:[],sox:66,
+FORMS.push({key:'shadeM',ttl:'うそつきの影',en:'THE SHADOWS THAT PRETEND · 中ボスとモブ',stage:[],sox:66,vt:'SHV',vnote:'覚悟の段は、拾われた影がくらやみにのまれていく段階。体の影色が変わるだけでなく、輪郭がいつもゆらぎはじめ（赤い段から）、床の尾が太くなり（黒い段から）、影にはないはずの「目」が開く（黒い段で胸に一つ、紫の段で兜にも二つ。のまれるほど目が増える）。目は光らない。剣（合図が出る場所）の色はどの段でも変えない。',
+ variants:[['n','灰紫の影'],['r','赤い影。輪郭がいつもゆらぐ'],['k','真っ黒な影。床の尾が太く、胸に目が一つ'],['v','紫の影。兜にも目が開き、目が三つ']],
  lore:'倒れた剣士の「影」だけが、くらやみに拾われたもの。中身がないので、影はまねることしかできない。剣士の動きをなぞるが、ふりには中身がない（フェイント）。うそつきの影は、もっと腕の立つ剣士の影。目の前の主人公までまねはじめている。',
  parts:[['平たい影の体（3段の影色）','影なので陰影が少なく、光らない。目もない'],['剣（体よりも明るい灰紫）','合図が出る場所。攻略でいちばん見る場所なので、いちばん明るい'],['床の影の尾','かかとから画面の外へ。持ち主から離れられない。その先で持ち主が倒れている（撃破で、尾をたどって帰る）'],['のびる斬り','踏みこまず、影が床をすべるように前へのびる。人の間合いではない'],['ゆらぐ輪郭','ふり（フェイント）・弾かれ・斬られで、形が保てずにゆらぐ'],['主人公の形（うそつきの影）','ときどき丸い兜・羽根飾り・マントの形に入れかわる。まねがうまいほど、ふりもうまい']],
  pal:[['#1c1529','影の体','光らない'],['#6a5e8a','剣','合図が出る場所'],['#4a3c66','背中側のふち','暗い背景に溶けないため'],['#0a0710','床の尾','持ち主のところへ']],
  pair:{key:'shade',ttl:'影の剣士（モブ）',diff:[['同じ骨格','人型の剣士。うそつきの影は1.25倍で、マントの影が長い'],['技','モブは「のびる斬り」「ふり→本物」「本物が2回続く」。うそつきの影は＋「二重フェイント」。フェイントのルールは、うそつきの影で先に教わる'],['まね','モブは持ち主のほうをふり返る。うそつきの影は主人公の形をまねる']]}});
-FORMS.push({key:'shade',ttl:'影の剣士',en:'MOB · うそつきの影と同じ骨格',stage:[],sox:66,
+FORMS.push({key:'shade',ttl:'影の剣士',en:'MOB · うそつきの影と同じ骨格',stage:[],sox:66,vt:'SHV',vnote:'覚悟の段はうそつきの影と同じ（輪郭のゆらぎ、太い尾、開く目）。',
+ variants:[['n','灰紫の影'],['r','赤い影。輪郭がいつもゆらぐ'],['k','真っ黒な影。床の尾が太く、胸に目が一つ'],['v','紫の影。目が三つ']],
  lore:'倒れた剣士の影の一つ。技は「のびる斬り」「ふり→本物」「本物が2回続く」。フェイントのルールは、先にうそつきの影で教わっている。ひまなときは、床の尾がのびていく先（持ち主が倒れているほう）をふり返る。',
  parts:[['平たい影の体','光らない。目もない'],['剣（いちばん明るい）','合図が出る場所'],['床の影の尾','持ち主のところへ続く']],
  pal:[['#1c1529','影の体','光らない'],['#6a5e8a','剣','合図が出る場所'],['#0a0710','床の尾','持ち主のところへ']]});

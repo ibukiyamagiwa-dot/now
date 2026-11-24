@@ -164,7 +164,7 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   B.poly([R([-4.3*k,4.2*k]),R([4.3*k,4.2*k]),R([4.3*k,-4.2*k]),R([3.6*k,-4.8*k]),R([-3.6*k,-4.8*k]),R([-4.3*k,-4.2*k])],p.arm,p.armHi,p.armLo);
   const bd=hm.band||[p.trim,p.trimHi];for(let x=-4;x<=4;x+=.5)B.set(...R([x*k,-3.4*k]),bd[0],2);for(let x=-3.5;x<=3.5;x+=1.4)B.set(...R([x*k,-3.4*k]),bd[1],2);
   const ec=P.eyeOff?(P.eyeOff>=1?OUT:mix(hm.glow||OUT,OUT,P.eyeOff)):(hm.glow||OUT);
-  if(hm.slant){/* 赤い騎士：怒った眉の向き（鼻先へ下がる）の切れ込みを、目の色で塗りつぶす。上に黒いふち。縦の線は目の下から */const sl=hm.slant,Y=x=>-.3-(x+1.8)*sl;for(let x=-4.4;x<=.6;x+=.3){B.set(...R([x*k,Y(x)*k]),ec,2);B.set(...R([x*k,(Y(x)-.7)*k]),ec,2);B.set(...R([x*k,(Y(x)-1.4)*k]),OUT,2)}for(let y=1;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2)}
+  if(hm.slant){/* 赤い騎士：細い1画素の切れ込み。鼻先へわずかに下がる（困り眉の向きにしない）。上に線は足さない。縦の線は目の下から（目の上へ突き抜けると「へ」の字に見える） */const sl=hm.slant;for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,(-.4-(x+1.5)*sl)*k]),ec,2);for(let y=.6;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2)}
   else{for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,-.4*k]),ec,2);for(let y=-2;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2)}
   if(!hm.slant)for(let i=0;i<3;i++)for(let j=0;j<2;j++)B.set(...R([(1.2+j*1.2)*k,(1.6+i*.9)*k]),OUT,2);
   for(const d of (hm.dents||[]))for(let i=0;i<3;i++)B.set(...R([(d[0]+i*.4)*k,(d[1]+(i===1?.4:0))*k]),p.armLo,2);
@@ -287,9 +287,9 @@ function heroShield(B,J,V){const k=J.k*1.55,c=add(J.hdB,[V.front?-.5*k:2.6*k,V.f
  if(V.notch)for(let i=0;i<V.notch;i++){const x=c[0]-3*k+i*1.5*k;B.set(x,c[1]-4.4*k,'#e8eaf0',2);B.set(x,c[1]-3.9*k,fl,2)}
  /* 描きこみは盾の形で切り抜く（はみ出さない） */if(V.marks&&V.marks.length){const T2=new Buf(B.w,B.h);for(const m of V.marks)m(T2,c,k,V,B);const M=B.mask(P0);for(const key of M){const x=(key%4096)-1024,y=Math.floor(key/4096)-1024;if(x<0||y<0||x>=B.w||y>=B.h)continue;const i=y*B.w+x;if(T2.c[i]){B.c[i]=T2.c[i];B.t[i]=2}}}}
 const HV={};/* 差分。体つき・兜の形・剣の長さ・マントの位置は変えない */
-SPEC.hero={k:.72,hk:1.45,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:20,wide:1.5,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:28,w:1.25}),
+SPEC.hero={k:.72,hk:1.45,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:20,wide:1.5,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:28,w:1.25,col:'#c0c6d6',hi:'#c0c6d6',lo:'#7c84a0'}),/* 刃は手元の銀を土台に一色（先だけ白くならない） */
  mid:(B,J,T,P)=>{heroShield(B,J,Object.assign({front:P.shieldFront},P.V||{}))},
- pose:{ua:2.7,fa:3.2,sw:-2.35,ua2:1.75,fa2:1.95,ff:-5,fb:5}};/* 手を胸の高さまで上げて前へ。刃は拳から前上がり約45度（手首の向き＋0.73） */
+ pose:{ua:1.95,fa:2.85,sw:-2.6,ua2:1.75,fa2:1.95,ff:-5,fb:5}};/* 肘を曲げて前腕を前へ。剣は手首から立てる（手首の向き＋0.8） */
 /* 鞘：赤い騎士の腰。ふだんは空のまま。本気になると剣が納まる */
 function sheathDraw(B,J,T,P){const k=J.k,h=J.hip,a=add(h,[-1*k,1*k]),b=add(h,[13*k,-5*k]);B.thick(a,b,1.2*k,'#2a1a22','#4a3038','#120810');B.line(...add(a,[0,0]),...add(a,[1*k,0]),'#c8a050');
  if(P.sheath){const g=add(a,[-4*k,2*k]);B.thick(a,g,1*k,'#2a1a22','#4a3038','#120810');B.thick(add(g,[-.5*k,-2*k]),add(g,[.5*k,2*k]),.8*k,'#6a4a50','#8a6a70','#120810')}}
@@ -405,7 +405,7 @@ SPEC.fallen2={hk:1.1,lk:.9,tk:.95,name:'赤い門のぬし 第二形態',k:1.35,
  pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.2,fa2:1.8,ff:-9,fb:7,cr:2,lean:.05}};
 const ORDER=['gate','dgate','lord','lord2','red','red2','fallen','fallen2'];
 /* 赤い騎士の目：切れ込みを鼻先へ下げて、力んだ怒りの目に（本気は水平のまま＝冷静） */
-SPEC.red.helm=Object.assign({},SPEC.red.helm,{slant:.32,glowHi:'#fff0b0'});
+SPEC.red.helm=Object.assign({},SPEC.red.helm,{slant:.12});
 
 /* 主人公の差分：クリアチェッカーのごほうびで変わる部分。体つき・兜の形・剣の長さ・マントの位置は変えない */
 const OPENGATE=(col)=>(B,R,k)=>{/* 開いた門：門を越えた者の印 */B.poly([R([-2.2*k,1*k]),R([-.5*k,1*k]),R([-.5*k,6*k]),R([-2.2*k,6*k])],col,null,null);B.poly([R([.5*k,1*k]),R([2.2*k,1*k]),R([2.2*k,6*k]),R([.5*k,6*k])],col,null,null)};
@@ -1992,7 +1992,7 @@ const HH1=27,HH2=39,HSTOP=4,HSL=['#dff2ff','#8ab8e0','#5a7ca8'];
 const TAU=Math.PI*2;
 /* 主人公の姿勢：角度は描く向き（0＝右、π＝左）。振りの向きが補間で逆回りしないよう、同じ角度を2πずらして書く。
    剣は腕で振る：刃は拳から前腕の続きで出し、手首を下へ折らない（手首の向き＝剣−前腕は＋0.5前後）。剣先を下げるときは腕ごと下げる */
-const HUP={ua:-1.9,fa:-2.3,sw:-1.2,lean:-.1,cr:1,ff:-8,fb:6},HDN={ua:-3.5,fa:-3.75,sw:-3.25,lean:.3,ff:-10,fb:6},HDN2={ua:-3.7,fa:-3.95,sw:-3.45,lean:.35,ff:-10,fb:6,cr:1},HUPS={ua:-2.5,fa:-2.2,sw:-1.7,lean:.15,ff:-10,fb:6},HREST={ua:2.7-TAU,fa:3.2-TAU,sw:-2.35};
+const HUP={ua:-1.9,fa:-2.3,sw:-1.2,lean:-.1,cr:1,ff:-8,fb:6},HDN={ua:-3.5,fa:-3.75,sw:-3.25,lean:.3,ff:-10,fb:6},HDN2={ua:-3.7,fa:-3.95,sw:-3.45,lean:.35,ff:-10,fb:6,cr:1},HUPS={ua:-2.5,fa:-2.2,sw:-1.7,lean:.15,ff:-10,fb:6},HREST={ua:1.95-TAU,fa:2.85-TAU,sw:-2.6};
 function heroAtk(X,L){const l=L||0,A=(x,o)=>Object.assign({x,lift:l},o);return{keys:[K(0,{lift:0}),K(10,{lift:0}),K(20,A(X*.88,HUP),'out'),K(24,A(X*.88,HUP)),K(HH1,A(X,HDN),'in'),K(HH1+HSTOP+2,A(X,HDN2)),K(HH2-3,A(X,HDN2)),K(HH2,A(X,HUPS),'in'),K(HH2+HSTOP+3,A(X,HUPS)),K(HH2+20,Object.assign({x:X*.15,lean:-.1,lift:0},HREST),'out'),K(HH2+28,Object.assign({lift:0},HREST)),K(400,Object.assign({lift:0},HREST))]}}
 /* 敵の当たり：白い光（2F）とヒットストップ */
 const kb=(a,dur)=>a<0?0:a<4?Math.sin(a/4*Math.PI/2):Math.exp(-(a-4)/dur);/* やられの姿勢へは約4Fかけて移る（止めきらない）＝「8つのヒットストップ仕様」 */

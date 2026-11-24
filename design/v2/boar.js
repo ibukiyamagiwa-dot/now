@@ -3,13 +3,15 @@
    攻めるのは怒りではなく、おびえ。だから白目をむき、背の毛が逆立つ。
    攻略でいちばん大事なのは「牙」（合図はいつも牙に出る）と「間合い」（遠いほど遅く着く）。牙を体でいちばん明るくする。
    中ボスは同じ骨格を大きくし、群れを守ってきた年寄りの印を足す：折れた牙、割れた額、長いたてがみ、割れたひづめ（地をかく癖＝溜め突進）。 */
+const BMUD=['#07060a','#110d17','#1d1728'];/* 下の階の泥：黒に、ほんの少しの紫 */
 const BV={
- n:{lbl:'覚悟1 ふつう',name:'突進イノシシ',coat:['#140c0a','#2e1c14','#4c3020','#6a4630','#8a6244'],mane:['#0c0706','#1e120e','#342018'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:['#0a0710','#181222','#2a2038'],eye:'#ffb070',sclera:'#d8d0c4',mudH:.35,smoke:0,third:0,vein:0},
- r:{lbl:'覚悟2 赤い',name:'赤い突進イノシシ',coat:['#160808','#341414','#52201c','#72322a','#94483c'],mane:['#0e0505','#220c0a','#3a1612'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:['#0a0610','#1a1024','#2e1c40'],eye:'#ff5a3c',sclera:'#e8c8c0',mudH:.75,smoke:0,third:0,vein:1},
- k:{lbl:'覚悟3 黒い',name:'黒い突進イノシシ',coat:['#08070a','#1a171e','#2c2832','#423c48','#5c5464'],mane:['#050406','#121016','#221e28'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:['#06040a','#140e1e','#261a36'],eye:'#ff4040',sclera:'#c8c0c8',mudH:1.3,smoke:1,third:0,vein:1},
- v:{lbl:'覚悟4 紫の',name:'紫の突進イノシシ',coat:['#0c0614','#22122e','#3a2050','#56347a','#7650a0'],mane:['#08040e','#180c24','#2a163c'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:['#0a0418','#1c0a32','#32164e'],eye:'#ff6ad8',sclera:'#e0d0f0',mudH:1.7,smoke:1,third:1,vein:2}};
+ n:{lbl:'覚悟1 ふつう',name:'突進イノシシ',coat:['#140c0a','#2e1c14','#4c3020','#6a4630','#8a6244'],mane:['#0c0706','#1e120e','#342018'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ffb070',sclera:'#d8d0c4',mudH:.35,smoke:0,third:0,vein:0},
+ r:{lbl:'覚悟2 赤い',name:'赤い突進イノシシ',coat:['#160808','#341414','#52201c','#72322a','#94483c'],mane:['#0e0505','#220c0a','#3a1612'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff5a3c',sclera:'#e8c8c0',mudH:.75,smoke:0,third:0,vein:1},
+ k:{lbl:'覚悟3 黒い',name:'黒い突進イノシシ',coat:['#08070a','#1a171e','#2c2832','#423c48','#5c5464'],mane:['#050406','#121016','#221e28'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff4040',sclera:'#c8c0c8',mudH:1.3,smoke:1,third:0,vein:1},
+ v:{lbl:'覚悟4 紫の',name:'紫の突進イノシシ',coat:['#0c0614','#22122e','#3a2050','#56347a','#7650a0'],mane:['#08040e','#180c24','#2a163c'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff6ad8',sclera:'#e0d0f0',mudH:1.7,smoke:1,third:1,vein:2}};
 const BPDEF={seep:0,trem:0,look:0,x:0,y:0,cr:0,hd:0,run:0,runA:0,gal:0,paw:0,pawL:0,brs:0,roll:0,dead:0,blink:0,snort:0,dust:0,lean:0,daze:0,jaw:0};
 function drawBoar(B,ox,oy,S,P0,T){const P=Object.assign({},BPDEF,S.pose||{});for(const[a,v]of Object.entries(P0||{}))if(v!==undefined&&!(typeof v==='number'&&!isFinite(v)))P[a]=v;
+ if(P.hide)return{k:S.k||1,D:BV[P.tint||'n'],hoofs:[],gone:true};
  const k=S.k||1,D=BV[P.tint||S.tint||'n'],M=!!S.mid,dd=Math.max(0,Math.min(1,P.dead)),fd=c=>dd>0?mix(c,'#0a0608',.35*dd):c;
  const C=D.coat.map(fd),MA=D.mane.map(fd),TU=D.tusk,MU=D.mud.map(fd),FAR=a=>a.map(c=>mix(c,'#000000',.45));
  /* 体の回転（壁に激突・たおれる）：腰のあたりを中心に回す */

@@ -15,7 +15,7 @@ function stageCard(s){const c=el('figure','card stage');const cv=el('canvas');cv
  const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){stageFrame(s,Math.floor(this.t)).toCanvas(this.ctx)}};cv.onclick=()=>{a.pause=!a.pause;c.classList.toggle('paused',a.pause)};ANIM.push(a);a.draw();return c}
 /* 立ち絵：大きく、地面だけ */
 function standCanvas(key,w,h,ox,sc,ext){const cv=el('canvas','stand');cv.width=w;cv.height=h;const S=SPEC[key];const idle=MV.find(m=>m.f===key&&/idle/.test(m.id));
- const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);const P=idle?poseAt0(idle,tt%idle.len,Object.assign({},PDEF,S.pose)):{};if(idle&&idle.pp)idle.pp(P,tt%idle.len);if(ext)Object.assign(P,ext);P.chainL=P.chainL||22;
+ const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);const P=idle?poseAt0(idle,tt%idle.len,Object.assign({},PDEF,S.pose)):{};if(idle&&idle.pp)idle.pp(P,tt%idle.len);if(KTINT&&S.tintable)P.tint=KTINT;if(ext)Object.assign(P,ext);P.chainL=P.chainL||22;
    (S.draw||knight)(B,ox,h-6,S,P,tt);if(key==='lord'||key==='lord2')pool(B,joints(ox,h-6,S,Object.assign({},PDEF,S.pose)),tt,key==='lord'?16:24);B.outline();if(S.aura)(S.aura.smoke?auraSmoke(B,S.aura,tt,1):aura(B,S.aura,tt));const ctx=this.ctx;ctx.clearRect(0,0,w,h);B.toCanvas(ctx)}};ANIM.push(a);a.draw();return cv}
 function ladder(keys,notes){const wrap=el('div','ladder');keys.forEach((k,i)=>{const col=el('div','step');const S=SPEC[k];col.appendChild(standCanvas(k,80,104,44));col.appendChild(el('div','lname',S.name));col.appendChild(el('div','ladd',notes[i]));wrap.appendChild(col);if(i<keys.length-1)wrap.appendChild(el('div','arrow','→'))});return wrap}
 function build(){const root=document.getElementById('book');
@@ -39,12 +39,13 @@ function build(){const root=document.getElementById('book');
  root.appendChild(orderSec());
  const io=new IntersectionObserver(es=>es.forEach(e=>{const a=ANIM.find(a=>a.cv===e.target);if(a)a.vis=e.isIntersecting}),{rootMargin:'100px'});ANIM.forEach(a=>io.observe(a.cv));
  let last=0;const loop=ts=>{requestAnimationFrame(loop);if(ts-last<32)return;const dt=(ts-last)/16.67;last=ts;if(!SPD)return;for(const a of ANIM)if(a.vis&&!a.pause){a.t+=Math.min(4,dt)*SPD;a.draw()}};requestAnimationFrame(loop);
- document.querySelectorAll('#spd button').forEach(b=>b.onclick=()=>{SPD=+b.dataset.s;document.querySelectorAll('#spd button').forEach(x=>x.classList.toggle('on',x===b))});
+ document.querySelectorAll('#spd button[data-s]').forEach(b=>b.onclick=()=>{SPD=+b.dataset.s;document.querySelectorAll('#spd button[data-s]').forEach(x=>x.classList.toggle('on',x===b))});
+ document.querySelectorAll('#spd button[data-k]').forEach(b=>b.onclick=()=>{KTINT=b.dataset.k==='n'?null:b.dataset.k;document.querySelectorAll('#spd button[data-k]').forEach(x=>x.classList.toggle('on',x===b));for(const a of ANIM)a.draw()});
  router(root)}
 /* ===== 1体ずつ見る：目次と、上の帯と、ページの切りかえ ===== */
 const NAVG=[['はじめに',[['toc','目次'],['rules','約束'],['hero','主人公'],['ladder','階段'],['order','強さの順'],['next','この先']]],['門の系統',['gate','dgate','lord','lord2']],['赤の系統',['red','red2','fallen','fallen2']],['竜',['dragon','hydra']],['中ボスとモブ',['boarM','boar']]];
 const TTL=k=>(FORMS.find(F=>F.key===k)||{}).ttl||k;
-function tocSec(){const s=el('section','toc');s.id='toc';s.appendChild(el('h2','','目次'));s.appendChild(el('p','lead','見たいキャラをえらぶ。各ページのモーションは「出現・待機・攻撃・やられ・撃破」で絞りこめる。'));
+function tocSec(){const s=el('section','toc');s.id='toc';s.appendChild(el('h2','','目次'));s.appendChild(el('p','lead','見たいキャラをえらぶ。各ページのモーションは「出現・待機・攻撃・やられ・撃破」で絞りこめる。下の帯の「覚悟」で、段ごとの姿（色と、のまれた分だけ増える部品）に切りかわる。段を描いてあるのは、くらやみの竜・三つ首の竜（亡骸）・イノシシ。門の番人たちと赤の系統は、どの覚悟でも同じ姿。'));
  NAVG.slice(1).forEach(([g,keys])=>{s.appendChild(el('h4','',g));const w=el('div','tgrid');keys.forEach(k=>{const F=FORMS.find(x=>x.key===k);if(!F)return;const a=el('a','tcard');a.href='#'+k;a.appendChild(standCanvas(k,110,100,F.sox||62));const ids=movesFor(k),cnt=MCATS.slice(1).map(([c,n])=>{const v=ids.filter(id=>catOf(k,id)===c).length;return v?`<span class="ct ct-${c}">${n} ${v}</span>`:''}).join('');a.appendChild(el('div','tname',`<b>${F.ttl}</b><div class="tcnt">${cnt}</div>`));w.appendChild(a)});s.appendChild(w)});return s}
 function router(root){const nx=document.getElementById('next');if(nx)root.appendChild(nx);root.insertBefore(tocSec(),root.firstChild);
  const order=NAVG.flatMap(([g,ks])=>ks.map(k=>Array.isArray(k)?k[0]:k));

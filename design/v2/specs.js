@@ -36,13 +36,13 @@ function heroShield(B,J,V){const k=J.k*1.55,c=add(J.hdB,[V.front?-.5*k:2.6*k,V.f
  /* 盾：木の板を鉄のふちで締めた、紋章のない盾。この騎士の顔の代わり */
  const P0=[[c[0]-4*k,c[1]-5*k],[c[0]-1.5*k,c[1]-5.6*k],[c[0]+1.5*k,c[1]-5.6*k],[c[0]+4*k,c[1]-5*k],[c[0]+3.8*k,c[1]+.5*k],[c[0]+2*k,c[1]+4*k],[c[0],c[1]+5.6*k],[c[0]-2*k,c[1]+4*k],[c[0]-3.8*k,c[1]+.5*k]];
  B.poly(P0,rim,'#e8eaf0','#565a6c');B.poly(P0.map(p=>[c[0]+(p[0]-c[0])*.8,c[1]+(p[1]-c[1])*.82]),face,fh,fl);
- B.disc(c[0],c[1]-.5*k,1.3*k,rim,'#ffffff','#565a6c');/* 中央の鉄の突起 */
+ const plain=!(V.marks&&V.marks.length)&&!V.face;if(plain)B.disc(c[0],c[1]-.5*k,1.3*k,rim,'#ffffff','#565a6c');/* 中央の鉄の突起：はじまりの盾だけ。差分では外して、描きこみの場所を空ける */
  if(V.notch)for(let i=0;i<V.notch;i++){const x=c[0]-3*k+i*1.5*k;B.set(x,c[1]-4.4*k,'#e8eaf0',2);B.set(x,c[1]-3.9*k,fl,2)}
- for(const m of (V.marks||[]))m(B,c,k,V)}
+ /* 描きこみは盾の形で切り抜く（はみ出さない） */if(V.marks&&V.marks.length){const T2=new Buf(B.w,B.h);for(const m of V.marks)m(T2,c,k,V,B);const M=B.mask(P0);for(const key of M){const x=(key%4096)-1024,y=Math.floor(key/4096)-1024;if(x<0||y<0||x>=B.w||y>=B.h)continue;const i=y*B.w+x;if(T2.c[i]){B.c[i]=T2.c[i];B.t[i]=2}}}}
 const HV={};/* 差分。体つき・兜の形・剣の長さ・マントの位置は変えない */
-SPEC.hero={k:.72,hk:1.45,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:20,wide:1.5,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:24,w:1.25}),
+SPEC.hero={k:.72,hk:1.45,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:20,wide:1.5,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:28,w:1.25}),
  mid:(B,J,T,P)=>{heroShield(B,J,Object.assign({front:P.shieldFront},P.V||{}))},
- pose:{ua:2.4,fa:2.2,sw:-2.5,ua2:1.75,fa2:1.95,ff:-5,fb:5}};
+ pose:{ua:1.95,fa:2.85,sw:-2.6,ua2:1.75,fa2:1.95,ff:-5,fb:5}};/* 肘を曲げて前腕を前へ。剣は手首から立てる（手首の向き＋0.8） */
 /* 鞘：赤い騎士の腰。ふだんは空のまま。本気になると剣が納まる */
 function sheathDraw(B,J,T,P){const k=J.k,h=J.hip,a=add(h,[-1*k,1*k]),b=add(h,[13*k,-5*k]);B.thick(a,b,1.2*k,'#2a1a22','#4a3038','#120810');B.line(...add(a,[0,0]),...add(a,[1*k,0]),'#c8a050');
  if(P.sheath){const g=add(a,[-4*k,2*k]);B.thick(a,g,1*k,'#2a1a22','#4a3038','#120810');B.thick(add(g,[-.5*k,-2*k]),add(g,[.5*k,2*k]),.8*k,'#6a4a50','#8a6a70','#120810')}}
@@ -157,3 +157,5 @@ SPEC.fallen2={hk:1.1,lk:.9,tk:.95,name:'赤い門のぬし 第二形態',k:1.35,
  aura:{r:4,c1:'#46205e',c2:'#2a1238',rim:'#ff4a8a'},
  pose:{ua:1.95,fa:2.7,sw:3.5,ua2:1.2,fa2:1.8,ff:-9,fb:7,cr:2,lean:.05}};
 const ORDER=['gate','dgate','lord','lord2','red','red2','fallen','fallen2'];
+/* 赤い騎士の目：切れ込みを鼻先へ下げて、力んだ怒りの目に（本気は水平のまま＝冷静） */
+SPEC.red.helm=Object.assign({},SPEC.red.helm,{slant:.32,glowHi:'#fff0b0'});

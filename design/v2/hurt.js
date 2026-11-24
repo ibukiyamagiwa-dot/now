@@ -5,11 +5,11 @@
 const HH1=27,HH2=39,HSTOP=4,HSL=['#dff2ff','#8ab8e0','#5a7ca8'];
 const TAU=Math.PI*2;
 /* 主人公の姿勢：角度は描く向き（0＝右、π＝左）。振りの向きが補間で逆回りしないよう、同じ角度を2πずらして書く */
-const HUP={ua:-1.9,fa:-2.3,sw:-1.2,lean:-.1,cr:1,ff:-8,fb:6},HDN={ua:-3.28,fa:-3.58,sw:-3.88,lean:.3,ff:-10,fb:6},HDN2={ua:-3.43,fa:-3.78,sw:-4.08,lean:.35,ff:-10,fb:6,cr:1},HUPS={ua:-2.6,fa:-2.4,sw:-2.0,lean:.15,ff:-10,fb:6},HREST={ua:1.95-TAU,fa:2.75-TAU,sw:3.4-TAU};
+const HUP={ua:-1.9,fa:-2.3,sw:-1.2,lean:-.1,cr:1,ff:-8,fb:6},HDN={ua:-3.28,fa:-3.58,sw:-3.88,lean:.3,ff:-10,fb:6},HDN2={ua:-3.43,fa:-3.78,sw:-4.08,lean:.35,ff:-10,fb:6,cr:1},HUPS={ua:-2.6,fa:-2.4,sw:-2.0,lean:.15,ff:-10,fb:6},HREST={ua:1.95-TAU,fa:2.85-TAU,sw:-2.6};
 function heroAtk(X,L){const l=L||0,A=(x,o)=>Object.assign({x,lift:l},o);return{keys:[K(0,{lift:0}),K(10,{lift:0}),K(20,A(X*.88,HUP),'out'),K(24,A(X*.88,HUP)),K(HH1,A(X,HDN),'in'),K(HH1+HSTOP+2,A(X,HDN2)),K(HH2-3,A(X,HDN2)),K(HH2,A(X,HUPS),'in'),K(HH2+HSTOP+3,A(X,HUPS)),K(HH2+20,Object.assign({x:X*.15,lean:-.1,lift:0},HREST),'out'),K(HH2+28,Object.assign({lift:0},HREST)),K(400,Object.assign({lift:0},HREST))]}}
 /* 敵の当たり：白い光（2F）とヒットストップ */
-const kb=(a,dur)=>a<0?0:a<2?a/2:Math.exp(-(a-2)/dur);
-function hitT(t,h){return t<h?-1:t<h+HSTOP?0:t-h-HSTOP}
+const kb=(a,dur)=>a<0?0:a<4?Math.sin(a/4*Math.PI/2):Math.exp(-(a-4)/dur);/* やられの姿勢へは約4Fかけて移る（止めきらない）＝「8つのヒットストップ仕様」 */
+function hitT(t,h){return t<h?-1:t-h}/* 斬られた側は止めない。止めるのは主人公の剣だけ */
 const FLASH={};function flashSpec(key){if(FLASH[key])return FLASH[key];const S=SPEC[key],dr=S.draw||knight;
  return FLASH[key]=Object.assign({},S,{draw:(B,ox,oy,S2,P,T)=>{const T2=new Buf(B.w,B.h);const J=dr(T2,ox,oy,S,P,T);if(key==='hydra')for(let i=0;i<T2.c.length;i++)if(T2.c[i]){B.c[i]=T2.c[i];B.t[i]=T2.t[i]}const only=key==='hydra'?new Set([...HSK,...HNAIL,...HPAD]):null;for(let i=0;i<T2.c.length;i++)if(T2.c[i]&&(!only||only.has(T2.c[i]))){B.c[i]=T2.t[i]===1?'#fbf8ff':T2.c[i];B.t[i]=T2.t[i]}return J}})}
 /* 敵の前のはし（主人公が届く場所）をはかる */
@@ -27,7 +27,7 @@ function hurtMove(key,id,o){const I=MV.find(m=>m.f===key&&/_idle$/.test(m.id)),b
  return mv({f:key,ox:I.ox,id,n:o.n||'やられ：主人公の斬りかかり',bg:I.bg,len:o.len||130,noHero:true,keys:[K(0,{})],cap:o.cap,why:o.why,
   fAt:t=>(t>=HH1&&t<HH1+2)||(t>=HH2&&t<HH2+2)?key+'@w':key,
   pp:(P,t)=>{const tt=t%I.len;Object.assign(P,poseAt0(I,tt,base));if(I.pp)I.pp(P,tt);const a=hitT(t,HH1),b=hitT(t,HH2);
-   if((a===0&&t<HH1+HSTOP)||(b===0&&t>=HH2&&t<HH2+HSTOP))P.x=(P.x||0)+((t&1)?.6:-.6);/* 止まっているあいだの、こまかい震え */
+   for(const h of[HH1,HH2])if(t>=h&&t<h+HSTOP+2)P.x=(P.x||0)+((t&1)?1:-1)*1.6*(1-(t-h)/(HSTOP+2));/* ヒットストップの震え：斬られた側を大きく、横にだけ、だんだん小さく */
    o.react(P,a,b,t)},
   pre:I.pre,
   fx:(B,J,t,S,M)=>{if(I.fx)I.fx(B,J,t%I.len,S,M);if(o.fx)o.fx(B,J,t,hitT(t,HH1),hitT(t,HH2),hp)},
@@ -57,11 +57,11 @@ hurtMove('lord2','l2_hurt',{react:(P,a,b,t)=>{const A=kb(a,6),Bk=kb(b,9);ADD(P,{
 /* ---------- 赤の系統 ---------- */
 hurtMove('red','r_hurt',{len:140,react:(P,a,b,t)=>{const A=kb(a,6),Bk=kb(b,8);ADD(P,{x:5*A+9*Bk,lean:-.28*A-.38*Bk,hd:-.3*A-.35*Bk});
   if(b>14&&b<60){/* 怒りで前へ：踏みこんで肩をいからせ、肩で速く息をする */const u=Math.min(1,(b-14)/5)*Math.max(0,1-(b-40)/20);ADD(P,{lean:.22*u,cr:2*u+Math.sin(b*.6)*.8*u,x:-2*u})}},
- fx:(B,J,t,a,b)=>{if(b>16&&b<64&&J.head)for(const s of[0,9,18,27,36])puff(B,add(J.head,[-4,1]),b-16-s,'#9a8c90');const d=b-16;if(d>=0&&d<8)for(let i=0;i<5;i++)B.set((J.ank?J.ank[0]:EXX)-4+i*2,FL-(i%2),'#5a4448',5)},
+ fx:(B,J,t,a,b)=>{if(b>16&&b<70&&J.head)for(const s of[0,17,34])breath(B,add(J.head,[-4,2]),b-16-s);/* 肩で速く息をする（約35Fで一往復の半分ずつ） */const d=b-16;if(d>=0&&d<8)for(let i=0;i<5;i++)B.set((J.ank?J.ank[0]:EXX)-4+i*2,FL-(i%2),'#5a4448',5)},
  cap:'大きくのけぞり、二太刀目で後ろへよろめく。すぐに前の足で床を踏みしめ、肩をいからせて前へ乗り出し、肩で速く息をする。斬られるほど、力みが強くなる。',
  why:'彼から見れば、主人公は「決して開けてはならない門」を開けた侵略者。痛みより、倒さねばという気持ちが先に出る＝力み。'});
 hurtMove('red2','r2_hurt',{len:140,react:(P,a,b)=>{const A=kb(a,4),Bk=kb(b,5);ADD(P,{x:1.2*A+2.2*Bk,lean:-.05*A-.07*Bk});if(b>10&&b<34){const u=Math.sin((b-10)/24*Math.PI);ADD(P,{cr:2*u})}},
- fx:(B,J,t,a,b)=>{if(J.head)puff(B,add(J.head,[-4,1]),b-10,'#b8b0b4')},
+ fx:(B,J,t,a,b)=>{if(J.head)breath(B,add(J.head,[-4,2]),b-12,true)},
  cap:'半歩も下がらない。切っ先はこちらの目に向いたまま、構えはくずれない。二太刀目のあと、腰を一度だけ深く沈めて、息をひとつ吐く。それだけ。',
  why:'本気は「削ぎ落とし」。痛みも怒りも、動きの無駄として捨てている。斬られたことを、息ひとつで飲みこむ。'});
 hurtMove('fallen','f_hurt',{react:(P,a,b,t)=>{const A=kb(a,6),Bk=kb(b,8);ADD(P,{x:3*A+5*Bk,lean:-.15*A-.2*Bk});for(const d of[a,b])if(d>=0&&d<10)P.x+=(d%2?5:-4)*(1-d/10)},

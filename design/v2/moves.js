@@ -144,7 +144,7 @@ mv({f:'red',id:'r_rage',n:'本気を出す：マントを斬る',bg:'red',len:19
  keys:[K(0,RI),K(20,{ua:-1.0,fa:-.4,sw:.3}),K(30,{ua:2.4,fa:1.2,sw:.2,capeOff:0},'in'),K(60,{ua:2.4,fa:1.2,sw:.2,capeOff:1}),K(78,{ua:1.6,fa:1.7,sw:2.15,ua2:1.4,fa2:1.8,cr:1,lean:-.08,hd:-.1},'io'),K(96,{ua:1.6,fa:1.7,sw:2.15,ua2:1.4,fa2:1.8,cr:3,lean:.1,hd:.15},'io'),K(118,{ua:1.6,fa:1.7,sw:2.15,ua2:1.4,fa2:1.8,cr:3,lean:.1,hd:.15}),K(146,R2G,'io'),K(190,R2G)],
  pp:(P,t)=>{if(t>=30)P.capeOff=1},
  pre:(B,t)=>{if(t>=30){/* 斬り落とされたマントが床に落ちる */const u=Math.min(1,(t-30)/26),x=EXX+10,y=lerp(FL-24,FL-2,u*u);B.poly([[x,y],[x+12,y-6+u*6],[x+16,y+2],[x+3,y+3]],'#5a0e1c','#8a2030','#2a0610')}},
- fx:(B,J,t)=>{if(t>=28&&t<36)for(let i=0;i<14;i++)B.set(J.sc[0]+2+i,J.sc[1]-4+i,'#ffffff',4);if(t>=80&&t<100&&J.head&&t%3===0){/* 吐く息 */const d=(t-80)/3;B.set(J.head[0]-4-d,J.head[1]+2-d*.3,'#8a8098',4)}}});
+ fx:(B,J,t)=>{if(t>=28&&t<36)for(let i=0;i<14;i++)B.set(J.sc[0]+2+i,J.sc[1]-4+i,'#ffffff',4);if(J.head){/* 吐く息 */breath(B,add(J.head,[-4,2]),t-80,true)}}});
 
 /* ---------- 本気の赤い騎士 ---------- */
 const R2N={ua:1.7,fa:2.2,sw:null,sheath:1,ua2:1.4,fa2:2.6,ff:-12,fb:8,cr:4.5,lean:.18,hd:.1};
@@ -249,12 +249,19 @@ const XG=Object.assign({},X);
 mv({f:'gate',id:'g_enter',n:'登場：剣を交差させる',bg:'gate',len:130,noHero:false,cap:'歩み出て、二本の剣を目の前で打ち合わせ、交差させる。',why:'最初に「通行止め」の構えを見せる。この先のボスはみな、この構えの意味を受けつぐ。',
  keys:[K(0,{x:30,ua:1.6,fa:1.8,sw:1.3,ua2:1.4,fa2:1.6,sw2:1.6}),K(40,{x:10,ua:1.6,fa:1.8,sw:1.3,ua2:1.4,fa2:1.6,sw2:1.6,cr:1}),K(60,{x:0,ua:-1.6,fa:-1.2,sw:-1.5,ua2:-1.3,fa2:-1.6,sw2:-1.4,cr:0}),K(72,XG,'in'),K(130,XG)],
  fx:(B,J,t)=>{if(t>=72&&t<80)star(B,Math.round(J.hdF[0]),Math.round(J.hdF[1]-10),[3,5,5,4,3,2,1,1][t-72],'w')}});
-mv({f:'dgate',id:'dg_turn',n:'のまれかけ：門番が黒い門番になる',bg:'gate',len:180,noHero:true,cap:'門番の背中から、くらやみが這い上がる。兜の目が一つずつ開き、鎖が黒く長くのびる。',why:'覚悟3で門番がこの姿になる理由を、一枚で見せる。門に背を向けて立っていた番人だから、背中から。',
- fAt:t=>t<110?'gate':'dgate',
- keys:[K(0,XG),K(60,Object.assign({},XG,{lean:.25,cr:2,hd:.3})),K(108,Object.assign({},XG,{lean:.3,cr:3,hd:.4})),K(110,Object.assign({},XG,{lean:.3,cr:3,hd:.4,eyes:0})),K(140,Object.assign({},XG,{lean:.08,eyes:3})),K(180,Object.assign({},XG,{lean:.08,eyes:3}))],
- pp:(P,t)=>{if(t>=110)P.eyes=t<120?0:t<128?1:t<136?2:3},
- post:(B,J,t)=>{if(t>20&&t<110){const u=(t-20)/90;for(let i=0;i<B.c.length;i++){const x=i%CW,y=i/CW|0;if(B.t[i]!==1)continue;const dx=x-(J.hip[0]+4),dy=FL-y;if(dx>0&&dy<u*60&&((x*5+y*3)%7)/7<u*1.4)B.c[i]=(x+y)%3?INK.col:INK.hi}}
-  if(t>=108&&t<112)for(let i=0;i<B.c.length;i++)if(B.c[i]&&B.t[i]===1)B.c[i]='#ffffff'}});
+mv({f:'dgate',id:'dg_turn',n:'のまれかけ：門番が黒い門番になる',bg:'gate',len:210,noHero:true,cap:'門番の背中の下から、くらやみがじわじわ這い上がる。前線の先を細い黒い筋が走り、のまれたところは色が抜けて黒紫の筋が浮く。はじめはゆっくり、だんだん速く、背中から胸、腕、兜まで広がる。門番は前かがみに震えながら、交差の構えだけはほどかない。全身がのまれると、粒が入れかわるように黒い門番の姿に溶けかわり、兜の目が一つずつ開く。',why:'覚悟3で門番がこの姿になる理由を、一枚で見せる。門に背を向けて立っていた番人だから、背中から。最後まで交差をほどかないのは、のまれても門番の仕事だけは体に残っているから。',
+ fAt:t=>t<150?'gate':'dgate',
+ keys:[K(0,XG),K(30,XG),K(90,Object.assign({},XG,{lean:.18,cr:1.5,hd:.25})),K(140,Object.assign({},XG,{lean:.32,cr:3,hd:.45})),K(150,Object.assign({},XG,{lean:.3,cr:3,hd:.4})),K(172,Object.assign({},XG,{lean:.08,cr:0,hd:0}),'out'),K(210,Object.assign({},XG,{lean:.08}))],
+ pp:(P,t)=>{P.eyes=t<174?0:t<182?1:t<190?2:3;if(t>40&&t<150){const a=Math.min(1,(t-40)/80);P.x=(P.x||0)+((t%4<2)?.5:-.5)*a}},
+ post:(B,J,t)=>{/* 侵食の前線：背中の下（門のある側）から距離で広がる。進み方ははじめ遅く、だんだん速い */
+  const o=[J.hip[0]+7*J.k,FL-2],prog=t<24?0:Math.min(1.25,Math.pow((t-24)/112,1.7)*1.25),G=['#4a4458','#262234','#6e6880'];/* のまれた色＝黒い門番の鋼の色（入れかわりで明るさが跳ねないように） */
+  if(t<150&&prog>0)for(let i=0;i<B.c.length;i++){if((B.t[i]!==1&&B.t[i]!==2)||!B.c[i])continue;const x=i%CW,y=i/CW|0,f=Math.hypot((x-o[0])*1.25,y-o[1])/64+hsh(x>>1,y>>1)*.12;
+   if(f<prog-.07){const L=rgb(B.c[i]).reduce((a,b)=>a+b,0)/765;const q=rgb(B.c[i]),tr=q[0]>150&&q[1]>110&&q[2]<120,bl=q[2]>q[0]+45&&q[2]>q[1]+30;B.c[i]=bl?mix(B.c[i],'#120c1c',.45):hsh(x,y)>.93||((x+y*2+Math.floor(f*30))%17===0)?INK.col:tr?(L>.5?'#7a50a0':'#4a3058'):L>.55?G[2]:L>.3?G[0]:G[1]}
+   else if(f<prog){B.c[i]=(x+y)&1?'#5a2a78':INK.hi}
+   else if(f<prog+.14&&((x*3+y*2+Math.floor(f*40))%13===0))B.c[i]=INK.col}
+  /* 足元から、くらやみが染み出す */if(t>=20&&t<160){const r=Math.min(14,(t-20)*.2);for(let x=-r;x<=r;x++){const xx=Math.round(o[0]+x);if((xx+t>>2)%3)B.set(xx,FL+1,INK.col,6)}}
+  /* 入れかわり：のまれた門番から、粒ごとに黒い門番の絵へ溶けかわる（白く光らせない） */
+  if(t>=138&&t<150){const u=(t-138)/12,Bd=new Buf(CW,CH);knight(Bd,EXX,FL,SPEC.dgate,J.P,t);for(let i=0;i<B.c.length;i++){const x=i%CW,y=i/CW|0;if(hsh(x+7,y+3)<u){if(Bd.c[i]){B.c[i]=Bd.c[i];B.t[i]=Bd.t[i]}else if(B.t[i]===1){B.c[i]=0;B.t[i]=0}}}}}});
 mv({f:'dgate',id:'dg_state',n:'派生の立ち絵：目の数',bg:'gate',len:180,noHero:true,cap:'目が1つ、2つ、3つ。開いている目の数で、のまれ具合がわかる。',why:'「目＝上位の存在の視線、のまれたものほど目が増える」というモチーフを、一体の中で見せる。',
  keys:[K(0,{}),K(180,{})],pp:(P,t)=>{P.eyes=t<60?1:t<120?2:3}});
 mv({f:'dgate',id:'dg_chain',n:'鎖の打ち払い',bg:'gate',len:120,cap:'手首の黒い鎖を後ろへ引いて、白く光る。鞭のように横に払う。',why:'門番の短い鎖が、のまれて長く黒くなった。仕えるための鎖が、武器になってしまった。',

@@ -1,7 +1,7 @@
 /* ===== 中ボスとモブ：一組ずつ =====
    モブと中ボスは同じ骨格。中ボスはモブより技が1つ多い。新しいタイミングのルールは中ボスで先に出す。 */
-SPEC.boar={name:'突進イノシシ',k:1,draw:drawBoar,pose:{}};
-SPEC.boarM={name:'暴れ大イノシシ',k:1.25,mid:true,draw:drawBoar,pose:{}};
+SPEC.boar={name:'突進イノシシ',k:1,draw:drawBoar,pose:{},tintable:true};
+SPEC.boarM={name:'暴れ大イノシシ',k:1.25,mid:true,draw:drawBoar,pose:{},tintable:true};
 
 /* ---------- 突進イノシシ・暴れ大イノシシ ----------
    突進の時間はゲームと同じ：合図（走り出し）から着くまで、近い28F・中くらい35F・遠い41F（大イノシシは42F）。
@@ -74,12 +74,27 @@ mv({f:'boarM',ox:BOAR.boarM.ox,id:'bM_look',n:'下をかいで、おびえる',b
  cap:'ひまなとき。鼻を床につけて何かをかぐ。床の割れ目から、ほんの少しくらやみがにじむ。びくっと頭を上げ、たてがみを逆立てて、後ずさって震える。光らない＝攻撃ではない。',
  why:'イノシシが上へ逃げてきた理由を、一度だけ見せる。主人公はこれから、このイノシシがおびえて逃げてきた方へ降りていく。'});
 
-/* たおれる：くらやみに拾われる */
-for(const key of['boar','boarM'])mv({f:key,ox:BOAR[key].ox,id:key==='boar'?'b_down':'bM_down',n:'たおれる',bg:'def',len:190,noHero:true,keys:[K(0,{})],
- pp:(P,t)=>{if(t<8){P.hd=-.5;P.brs=1.4;P.x=2;P.jaw=1}
-  else if(t<40){/* 前足が折れて、鼻から崩れる */const u=Math.min(1,(t-8)/20);P.dead=u*.8;P.cr=3*u;P.hd=1.1*u;P.y=6*u;P.roll=-.14*u;P.brs=1.4*(1-u)}
-  else{const d=t-40;P.dead=Math.min(1,.8+d/40);P.cr=3;P.hd=1.1;P.y=6;P.roll=-.14;P.blink=1;
-   if(d<30){P.run=d/4;P.runA=.3*(1-d/30)}/* 後ろ足が二度だけ宙をかく */
-   P.seep=Math.max(0,(d-50)/80)*2.2}/* 倒れたものは、くらやみに拾われる：足元から黒い泥がのぼってくる */},
- cap:'頭をはね上げて鳴き、前足が折れて鼻から崩れる。後ろ足が二度だけ宙をかいて止まる。しばらくすると、足元から黒い泥がゆっくりのぼってくる。',
- why:'柱の法則「倒れたものは、くらやみに拾われる」。生きたまま逃げてきた獣も、倒れればくらやみの材料になる。勝つほど、くらやみに材料を渡している。'});
+/* たおれる（撃破）：泥に覆われて、爆散する。ザコは何度も倒すので短く、気持ちよく（「遅さは罪」「閃光、爆発、残煙」）
+   【泥が覆う時間】○、【閃光】○、【かけらの数】○、【残煙】○ は、ゲームでは調整できる値にする */
+const BDOWN={boar:{cover:[6,30],flash:36,n:18,len:96},boarM:{cover:[6,36],flash:42,n:28,len:110}};
+function boarBurst(B,c,d,n,k,mid){/* 閃光：中心は白、まわりに黒を混ぜる（明るい背景でも暗い背景でも見える） */
+ if(d>=-1&&d<6){/* 体より大きく、短く。はじめは白に黒のふち、すぐに黒紫の暗い衝撃の輪になって広がり消える（明るい紫の輪は使わない＝フェイントの合図と紛れる） */const r=(d<0?15:21+d*2.6)*k;for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const q=Math.hypot(x,y);if(q>r)continue;const ring=q>r-2.2,hole=d>=2&&q<r-2.2-(d-1)*5;if(hole)continue;B.set(c[0]+x,c[1]+y*.75,d<=1?(ring?((x+y)&1?'#000000':'#ffffff'):'#ffffff'):ring?((x+y)&1?'#000000':'#3e2e54'):d<3?'#d8d0e0':((x+y)&1?'#1d1728':'#2c2238'),4)}}
+ /* かけら：泥の塊が飛び、落ちて床にしみこむ */
+ for(let i=0;i<n;i++){const a=-Math.PI*(.08+.84*hsh(i,1)),v=(1.4+hsh(i,2)*2.6)*k,s=hsh(i,3)>.45?3:2,tl=d-1;if(tl<0)continue;let x=c[0]+Math.cos(a)*v*tl,y=c[1]+Math.sin(a)*v*tl+.11*tl*tl;const land=y>=FL;if(land){y=FL;x=c[0]+Math.cos(a)*v*Math.min(tl,(Math.sqrt(Math.max(0,(Math.sin(a)*v)**2+.44*(FL-c[1])))-Math.sin(a)*v)/.22)}
+  const life=34+hsh(i,4)*14;if(d<1)continue;if(tl>life)continue;const fade=land?Math.max(0,1-(tl-life*.55)/(life*.45)):1;if(fade<=0||(land&&hsh(i,tl)>fade))continue;
+  for(let yy=0;yy<s;yy++)for(let xx=0;xx<s+(land?1:0);xx++)B.set(x+xx,y-yy,(yy===s-1||xx===0)&&!land?'#7a4aa8':land?BMUD[1]:(i+xx)%2?'#2c2238':'#1d1728',4)}
+ /* 残煙：黒紫の煙が上へ。点が抜けて消える */
+ if(d>=4&&d<44)for(let i=0;i<(mid?7:5);i++){const u=(d-4)/40,x=c[0]+(hsh(i,5)-.5)*16*k+Math.sin(d*.15+i)*2,y=c[1]-u*18*k-hsh(i,6)*4,r=(1.5+u*3)*k;for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++){if(xx*xx+yy*yy>r*r)continue;if(hsh(Math.round(x+xx),Math.round(y+yy)+d)<.5-u*.45)B.set(x+xx,y+yy,(xx+yy)&1?'#2c2238':'#43365a',5)}}}
+for(const key of['boar','boarM']){const D_=BDOWN[key],M_=key==='boarM';mv({f:key,ox:BOAR[key].ox,id:M_?'bM_down':'b_down',n:'撃破：泥にのまれて、爆散',bg:'def',len:D_.len,noHero:true,keys:[K(0,{})],
+ pp:(P,t)=>{if(t<6){P.hd=-.5;P.brs=1.4;P.x=2;P.jaw=1}
+  else if(t<=D_.flash){const u=Math.min(1,(t-6)/16);P.dead=u*.7;P.cr=3*u;P.hd=1.1*u;P.y=4*u;P.brs=1.4*(1-u);P.x=2;if(t>D_.flash-8){P.trem=2;P.y-=.5}}
+  else P.hide=1},
+ fx:(B,J,t)=>{const c=[EXX+BOAR[key].ox-6*BOAR[key].k,FL-9*BOAR[key].k];
+  if(!J.gone){/* 泥が足元から全身をのぼる。のぼりきると、体は泥の塊になってふくらむ */const u=Math.max(0,Math.min(1,(t-D_.cover[0])/(D_.cover[1]-D_.cover[0]))),Hh=30*BOAR[key].k,top=FL-u*u*(3-2*u)*Hh;
+   for(let i=0;i<B.c.length;i++){if(B.t[i]!==1||!B.c[i])continue;const x=i%CW,y=i/CW|0;if(x<40)continue;const edge=top+(hsh(x,3)-.5)*3;if(y>=edge){const L=rgb(B.c[i]).reduce((a,b)=>a+b,0)/765;const top1=B.t[i-CW]!==1;B.c[i]=y<edge+1.5||top1?'#3e2e54':L>.35?BMUD[2]:L>.18?BMUD[1]:BMUD[0]}}
+   /* のぼる泥の先：ところどころ紫がかったふちと、したたり */if(u>0&&u<1)for(let x=c[0]-26;x<c[0]+30;x+=3)if(B.tag(x,Math.round(top))===1&&hsh(x,Math.floor(t/3))>.5)B.set(x,top-1,'#4e2c70',4)}
+  boarBurst(B,c,t-D_.flash,D_.n,BOAR[key].k,M_)},
+ cap:'最後の一撃で鳴いて、前足が折れる。足元から黒紫の泥が一気に全身をのぼり、体が泥の塊になって震え、ふくらむ。閃光とともに泥のかけらが飛び散り、黒紫の煙が上がる。かけらは床に落ちて、しみこんで消える。何も残らない。',
+ why:'柱の法則「倒れたものは、くらやみに拾われる」を、ザコの気持ちいい爆散のまま見せる。飛び散るのは血ではなく、くらやみの泥。しみこんで消えるのは、くらやみが材料を持ち帰ったから。何度も見る撃破なので、のぼる泥から消えるまでを約1.5秒（大イノシシは約1.8秒）に詰めた。'})}
+
+SPEC.dragon.tintable=true;SPEC.hydra.tintable=true;

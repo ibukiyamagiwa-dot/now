@@ -7,10 +7,9 @@ const SCR=(B,a,b,hi,lo)=>{B.line(a[0],a[1],b[0],b[1],hi,2);B.line(a[0]+1,a[1]+1,
 /* 盾への描きこみ：差分の中心は盾。盾を見れば「どこまで来た騎士か」が読める */
 const HSH={
  scar:(B,c,k)=>{/* 大きな斜めの切り傷と、ふちの刻み：番人たちと渡り合った跡 */SCR(B,[c[0]-3*k,c[1]-3.5*k],[c[0]+2.5*k,c[1]+3*k],'#e8dcc0','#1a120c');SCR(B,[c[0]+1.5*k,c[1]-4*k],[c[0]+3*k,c[1]-1*k],'#e8dcc0','#1a120c');for(let i=0;i<5;i++){const x=c[0]-3*k+i*1.5*k;B.set(x,c[1]-5.4*k,0,0);B.set(x,c[1]-4.9*k,'#1a120c',2)}},
- gate:(B,c,k)=>{/* 開いた門の紋章：アーチの枠と、外へ開いた二枚の扉。真ん中は空いている */const G='#e0c070',x=c[0],y=c[1];
-  for(const s of[-1,1]){for(let yy=-1.5;yy<=3.2;yy+=.5)B.set(x+s*1.8*k,y+yy*k,G,2);for(let t=0;t<=1;t+=.1){B.set(x+s*(1.8+t*1.3)*k,y+(-1.2+t*.6)*k,G,2);B.set(x+s*(1.8+t*1.3)*k,y+(3.2-t*.6)*k,G,2)}for(let yy=-.6;yy<=2.6;yy+=.5)B.set(x+s*3.1*k,y+yy*k,G,2)}
-  for(let a=0;a<=3.14;a+=.2)B.set(x-Math.cos(a)*1.8*k,y-1.5*k-Math.sin(a)*1.4*k,G,2)},
- plume:(B,c,k)=>{/* 盾の角から垂れる白い羽根 */for(let i=0;i<6;i++)B.disc(c[0]+(3.8+i*.25)*k,c[1]-(4.5-i*1.4)*k,(1.3-i*.12)*k,'#e8e0d0','#ffffff','#9a9080')},
+ gate:(B,c,k)=>{/* 開いた門：金の門枠と、内側へ開いた二枚の扉（暗い金）。まん中は門の向こうの暗がり（閉じた門の紋は、まん中に扉の合わせ目の線がある）。小さいので1画素ずつ置く */const G='#f0c850',D='#140e1a',x0=Math.round(c[0])-3,y0=Math.round(c[1]-4*k);
+  const g='#9a7224',bm=['.GGGGG.','GGDDDGG','GgDDDgG','GgDDDgG','GgDDDgG','GgDDDgG','GgDDDgG','GG...GG'];bm.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.')B.set(x0+x,y0+y,ch==='G'?G:ch==='g'?g:D,2)}))},
+ plume:(B,c,k)=>{/* 盾の面に、斜めの白い大羽根（赤い騎士の羽根）。はみ出さない */for(let i=0;i<8;i++){const t=i/7,x=c[0]+lerp(-2.6,2.4,t)*k,y=c[1]+lerp(3.2,-3.6,t)*k;B.set(x,y,i>5?'#ffffff':'#e8e0d0',2);if(i>0&&i<7){B.set(x-1,y-1+(i%2),'#c8c0b0',2);B.set(x+1,y+1,'#9a9080',2)}}},
  ink:(B,c,k)=>{/* ふちからにじむくらやみ */for(let i=0;i<10;i++){const a=-2.6+i*.55,x=c[0]+Math.cos(a)*3.6*k,y=c[1]+Math.sin(a)*4.6*k;B.set(x,y,INK.col,2);B.set(x,y+1,INK.hi,2);if(i%3===0)B.set(x,y+2,INK.col,2)}},
 };
 function heroVar(o){const H=Object.assign({},SPEC.hero);H.pal=Object.assign({},SPEC.hero.pal,o.pal||{});H.helm=Object.assign({},SPEC.hero.helm,o.helm||{});H.cape=Object.assign({},SPEC.hero.cape,o.cape||{});

@@ -1,3 +1,5 @@
+/* 覚悟の段（ページ全体で切りかえる）：n ふつう／r 赤い／k 黒い／v 紫の。段を描いてある敵（tintable）だけ変わる */
+let KTINT=null;
 /* ===== カードの描画：一枚に「主人公」と「敵」と「床」 ===== */
 const CW=136,CH=118,FL=94,HXX_=26,FL_=94,EXX=92,HXX=26;
 const SKY={def:['#1c1824','#241e2e'],gate:['#1e2230','#262c3c'],lord:['#140c18','#1e1424'],red:['#1e1418','#2a1c20'],hole:['#08060c','#100c18']};
@@ -9,7 +11,7 @@ function floor(B,kind){const y=FL;const c=kind==='hole'?['#0c0a14','#1a1428']:ki
 function bgFill(ctx,kind){const g=SKY[kind]||SKY.def;ctx.fillStyle=g[0];ctx.fillRect(0,0,CW,CH);ctx.fillStyle=g[1];for(let y=0;y<FL;y+=4)ctx.fillRect(0,y,CW,1)}
 /* 1コマ描く */
 function frame(M,t){const tt=t%M.len,S=SPEC[M.fAt?M.fAt(tt):M.f],B=new Buf(CW,CH),base=Object.assign({},PDEF,S.pose);floor(B,M.bg||'def');
- const P=poseAt0(M,tt,base);if(M.pp)M.pp(P,tt);
+ const P=poseAt0(M,tt,base);if(M.pp)M.pp(P,tt);if(KTINT&&S.tintable&&!P.tintFix)P.tint=KTINT;
  const ox=EXX+(M.ox||0),oy=FL;
  const hit=M.hits&&M.hits.some(h=>tt>=h&&tt<h+8);if(!M.noHero)drawHeroSmall(B,tt,hit,M.heroP?M.heroP(tt):null);
  if(M.pre)M.pre(B,tt,S,P);
@@ -35,3 +37,6 @@ function arcTrail(B,S,M,t,ox,oy,n,col,which){/* 弧：太い三日月。外側�
   if(prev){for(const s of[.55,.65,.75,.85,.95,1.05]){B.line(lerp(prev[1][0],prev[0][0],s),lerp(prev[1][1],prev[0][1],s),lerp(hd[0],tp[0],s),lerp(hd[1],tp[1],s),s>.9?c[1]:s>.7?c[0]:mix(c[0],'#000000',.4),4)}}prev=[tp,hd]}}
 function lineTrail(B,S,M,t,ox,oy,n,col,which){/* 直線：切っ先の通り道に細い一本線と、平行な速さの線 */const c=FXC[col]||FXC.w;const T=tipsOf(S,M,t,ox,oy,n,which);if(T.length<2)return;const a=T[0],b=T[T.length-1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
   B.line(a[0],a[1],b[0],b[1],c[1],4);B.line(a[0]+nx,a[1]+ny,b[0]+nx,b[1]+ny,c[0],4);for(const o of[-3,3,5]){const s=.3+Math.abs(o)*.06;B.line(lerp(a[0],b[0],s)+nx*o,lerp(a[1],b[1],s)+ny*o,b[0]+nx*o-dx*.1,b[1]+ny*o-dy*.1,c[0],4)}}
+
+/* 吐く息：見えにくいくらいの、うすい湯気。口元から前へ細く出て、ゆるく上へ広がりながら、点が抜けて消える（18F） */
+function breath(B,p,d,big){if(d<0||d>=18)return;const u=d/18,L=Math.round(2+d*.45*(big?1.4:1));for(let i=0;i<L;i++)for(let j=0;j<=(i>2?1:0);j++){const x=p[0]-1-i-d*.35,y=p[1]-d*.22-i*.18+(j?-1:0)+Math.sin(i*.8+d*.35)*.5;if(hsh(i*7+j,d)>.35+u*.6&&((i+j+d)&1))B.set(x,y,u<.4?'#7c7480':'#5e5864',5)}}

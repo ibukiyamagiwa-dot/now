@@ -98,3 +98,5 @@ for(const key of['boar','boarM']){const D_=BDOWN[key],M_=key==='boarM';mv({f:key
  why:'柱の法則「倒れたものは、くらやみに拾われる」を、ザコの気持ちいい爆散のまま見せる。飛び散るのは血ではなく、くらやみの泥。しみこんで消えるのは、くらやみが材料を持ち帰ったから。何度も見る撃破なので、のぼる泥から消えるまでを約1.5秒（大イノシシは約1.8秒）に詰めた。'})}
 
 SPEC.dragon.tintable=true;SPEC.hydra.tintable=true;
+/* 三つ首の竜：亡骸の頭を前へ垂らし、角を親指の先から逃がす（親指と角が重なってシルエットが読めなかった） */
+SPEC.hydra.pose=Object.assign({},SPEC.hydra.pose||{},{droopC:.6});

@@ -44,11 +44,11 @@ function breath(B,p,d,big){if(d<0||d>=18)return;const u=d/18,L=Math.round(2+d*.4
 /* 剣先を床に刺さないようにする（騎士の姿の敵すべて）。刺さるぶんだけ、手首を折らずに腕ごと持ち上げる（剣は腕で振る）。
    例外：剣や鍵を床に突き立てる姿と、水の下から出てくる姿（鞘に納めているあいだは剣先がない） */
 const PLANT=new Set(['g_kneel','l_kneel','l2_down','f_kneel','f_swallow','f2_end','l_plant','f_rise']);
-function liftTip(S,M,P,ox){if(!S||S.draw||PLANT.has(M.id)||M.plant)return;const two=CB_TWO.has(M.f);
+function liftTip(S,M,P,ox){if(!S||(S.draw&&!S.knightLike)||PLANT.has(M.id)||M.plant)return;const two=CB_TWO.has(M.f);
  for(const w of[1,2]){const k=w===2?'sw2':'sw';if(P[k]==null||(w===2&&!S.w2))continue;
   for(let n=0;n<70;n++){const tp=tipOf(S,P,ox,FL,w);if(!tp||tp[1]<=FL)break;const s=Math.cos(P[k])<0?.04:-.04;
    if(w===1){P.ua+=s;P.fa+=s;P.sw+=s;if(two&&P.ua2!=null){P.ua2+=s;P.fa2+=s}}else{P.ua2+=s;P.fa2+=s;P.sw2+=s}}}}
 
 /* 踏みこんでも、主人公に体を重ねない（手前で止める）。剣は届いてよい。すれちがって後ろへ抜ける居合だけは例外 */
 const PASS=new Set(['r2_iai','r2_iai2','r2_silent','f_silent','f_iai']),NEAR=HXX+8;
-function fixPose(S,M,P,ox){if(!S||S.draw)return;if(!M.noHero&&!PASS.has(M.id)){const J=joints(ox,FL,S,Object.assign({},PDEF,S.pose,P)),f=Math.min(J.hip[0],J.sc[0],J.head[0],J.footF[0],J.kneeF[0],J.shF[0]);if(f<NEAR)P.x=(P.x||0)+(NEAR-f)}liftTip(S,M,P,ox)}
+function fixPose(S,M,P,ox){if(!S||(S.draw&&!S.knightLike))return;if(!M.noHero&&!PASS.has(M.id)){const J=joints(ox,FL,S,Object.assign({},PDEF,S.pose,P)),f=Math.min(J.hip[0],J.sc[0],J.head[0],J.footF[0],J.kneeF[0],J.shF[0]);if(f<NEAR)P.x=(P.x||0)+(NEAR-f)}liftTip(S,M,P,ox)}

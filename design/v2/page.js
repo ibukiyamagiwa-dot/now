@@ -43,7 +43,7 @@ function build(){const root=document.getElementById('book');
  document.querySelectorAll('#spd button[data-k]').forEach(b=>b.onclick=()=>{KTINT=b.dataset.k==='n'?null:b.dataset.k;document.querySelectorAll('#spd button[data-k]').forEach(x=>x.classList.toggle('on',x===b));for(const a of ANIM)a.draw()});
  router(root)}
 /* ===== 1体ずつ見る：目次と、上の帯と、ページの切りかえ ===== */
-const NAVG=[['はじめに',[['toc','目次'],['rules','約束'],['hero','主人公'],['ladder','階段'],['order','強さの順'],['next','この先']]],['門の系統',['gate','dgate','lord','lord2']],['赤の系統',['red','red2','fallen','fallen2']],['竜',['dragon','hydra']],['中ボスとモブ',['boarM','boar']]];
+const NAVG=[['はじめに',[['toc','目次'],['rules','約束'],['hero','主人公'],['ladder','階段'],['order','強さの順'],['next','この先']]],['門の系統',['gate','dgate','lord','lord2']],['赤の系統',['red','red2','fallen','fallen2']],['竜',['dragon','hydra']],['中ボスとモブ',['boarM','boar','shadeM','shade']]];
 const TTL=k=>(FORMS.find(F=>F.key===k)||{}).ttl||k;
 function tocSec(){const s=el('section','toc');s.id='toc';s.appendChild(el('h2','','目次'));s.appendChild(el('p','lead','見たいキャラをえらぶ。各ページのモーションは「出現・待機・攻撃・やられ・撃破」で絞りこめる。下の帯の「覚悟」で、段ごとの姿（色と、のまれた分だけ増える部品）に切りかわる。段を描いてあるのは、くらやみの竜・三つ首の竜（亡骸）・イノシシ。門の番人たちと赤の系統は、どの覚悟でも同じ姿。'));
  NAVG.slice(1).forEach(([g,keys])=>{s.appendChild(el('h4','',g));const w=el('div','tgrid');keys.forEach(k=>{const F=FORMS.find(x=>x.key===k);if(!F)return;const a=el('a','tcard');a.href='#'+k;a.appendChild(standCanvas(k,110,100,F.sox||62));const ids=movesFor(k),cnt=MCATS.slice(1).map(([c,n])=>{const v=ids.filter(id=>catOf(k,id)===c).length;return v?`<span class="ct ct-${c}">${n} ${v}</span>`:''}).join('');a.appendChild(el('div','tname',`<b>${F.ttl}</b><div class="tcnt">${cnt}</div>`));w.appendChild(a)});s.appendChild(w)});return s}

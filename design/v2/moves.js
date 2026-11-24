@@ -637,9 +637,9 @@ mv({f:'hydra',id:'h_pool',n:'足元の溜まり（光らない・拍）',bg:'hol
  pre:(B,t)=>{const u=Math.min(1,t/20);for(let x=Math.round(lerp(EXX-10,HXX-6,u));x<EXX;x++)B.set(x,FL,INK.hi,6)},
  fx:(B,J,t)=>{for(const b of[28,46])if(t>=b&&t<b+8){for(let q=0;q<2;q++){const r=2+(t-b)*.8+q*2;for(let a=0;a<6.28;a+=.5)B.set(HXX+4+Math.cos(a)*r,FL-2+Math.sin(a)*r*.4,'#a8a0b0',4)}}
   if(t>=60&&t<84){const u=t<64?(t-60)/4:1-(t-64)/20;for(let i=0;i<3;i++){const x=HXX+i*4;B.tube([x,FL],[x+(i-1)*2,FL-10*u],[x+(i-1)*3,FL-24*u],2,.5,INK.col,INK.hi,INK.lo,1)}}}});
-mv({f:'hydra',id:'h_fake',n:'鳴いたのに来ない首',bg:'hole',len:170,cap:'三本が順に関節を鳴らす。そのうち一本だけ、光が紫の輪になる。その首は噛みつかない（ふり）。来るのは白く光った首だけ。',why:'「鳴いた数＝攻撃の数」に、フェイントの色のルールを重ねた。数えるのは白い光だけ。フェイントは、うそつきの影で先に教わっている。',
- keys:[K(0,HI),K(80,HI),K(84,Object.assign({},HI,{f2:1,j2:.8}),'in'),K(88,Object.assign({},HI,{f2:1,j2:.8})),K(96,HI,'io'),K(106,Object.assign({},HI,{f0:.25}),'out'),K(112,Object.assign({},HI,{f0:.25})),K(116,HI,'io'),K(124,Object.assign({},HI,{f1:1,j1:.8}),'in'),K(132,Object.assign({},HI,{f1:1,j1:.8})),K(150,HI,'io'),K(170,HI)],
- pp:(P,t)=>{P.lit=[0,t>=56&&t<128?1:0,t>=24&&t<88?1:0];for(const[b,i]of[[24,2],[40,0],[56,1]])P['snap'+i]=t>=b&&t<b+6?1:0},
+mv({f:'hydra',id:'h_fake',n:'鳴いたのに来ない首',bg:'hole',len:170,cap:'三本が順に関節を鳴らす。鳴った首が光る。そのうち一本だけ、光が紫の輪になる。その首は、噛みつく間になっても前に出ず、その場で口を開けて鎌首をもたげるだけ（ふり）。来るのは白く光った首だけ。',why:'「鳴いた数＝攻撃の数」に、フェイントの色のルールを重ねた。数えるのは白い光だけ。フェイントは、うそつきの影で先に教わっている。',
+ keys:[K(0,HI),K(80,HI),K(84,Object.assign({},HI,{f2:1,j2:.8}),'in'),K(88,Object.assign({},HI,{f2:1,j2:.8})),K(96,HI,'io'),K(100,Object.assign({},HI,{j0:1,curl:.15}),'out'),K(112,Object.assign({},HI,{j0:1,curl:.15})),K(118,HI,'io'),K(124,Object.assign({},HI,{f1:1,j1:.8}),'in'),K(132,Object.assign({},HI,{f1:1,j1:.8})),K(150,HI,'io'),K(170,HI)],
+ pp:(P,t)=>{P.lit=[0,t>=96&&t<128?1:0,t>=56&&t<88?1:0];for(const[b,i]of[[56,2],[76,0],[96,1]])P['snap'+i]=t>=b&&t<b+6?1:0},
  cues:[{t:56,col:'w',at:J=>J.fingers[2]},{t:76,col:'p',at:J=>J.fingers[0]},{t:96,col:'w',at:J=>J.fingers[1]}],hits:[84,124]});
 mv({f:'hydra',id:'h_rift',n:'裂け目のふちの触手',bg:'hole',len:130,cap:'裂け目が大きく開き、ふちの肉から太い触手が一本ずるりと出て、とぐろを巻きながら先を白く光らせる。弧を描いて、横からたたきつける。',why:'首だけでなく、裂け目そのものも向こう側の一部。首とちがい、横から弧で来る。',
  keys:[K(0,HI),K(14,Object.assign({},HI,{rift:1.4})),K(60,Object.assign({},HI,{rift:1.4})),K(90,HI)],cues:[{t:14,col:'w',at:J=>J.ttip||J.rift}],hits:[42],

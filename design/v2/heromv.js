@@ -3,8 +3,10 @@
    主人公の剣の光・跡・火花は、敵の合図の4色と取り違えないよう、うすい青で描く（まほうの色だけは、ゲームの ほのお・かみなり・ひかり の色）。
    剣は腕で振る：刃は拳から前腕の続きで出し、手首を下へ折らない。 */
 const HP_={
- guard:{ua:2.5,fa:-2.6,sw:-2.05,cr:1.5,lean:-.05},            /* ガード：刃を前へ傾けて受ける */
+ guard:{ua:1.25,fa:-.2,sw:-1.3,ua2:2.95,fa2:3.05,cr:2,lean:-.08},  /* ガード：盾を前へ突き出して受ける（剣は盾の後ろで立てたまま） */
  parry:{ua:2.9,fa:-2.6,sw:-2.2,lean:.15,x:-2},                /* パリィ：当たる直前に、前へ弾く */
+ parryFT:{ua:-2.75,fa:-2.2,sw:-1.75,lean:.22,x:-4},            /* パリィの振り切り：止まりが解けたら、刃を頭上まで払い上げて粘る */
+ parryHFT:{ua:-2.8,fa:-2.25,sw:-1.8,cr:2,lean:.15,x:2,ff:-9,fb:8},
  parryH:{ua:2.7,fa:-2.4,sw:-2.0,cr:3,lean:.1,x:3,ff:-9,fb:8},  /* 赤をパリィ：腰を落として踏んばる */
  dodge:{x:12,lean:-.35,cr:3,ff:-3,fb:8,ua:1.6,fa:1.9,sw:2.6},  /* ジャスト回避：低く後ろへすり抜ける */
  hurt:{x:6,lean:-.3,hd:-.3,ua:1.2,fa:1.0,sw:2.4,cr:1},         /* やられ */
@@ -22,6 +24,15 @@ function heroCard(o){const HM={keys:o.hero};const I=MV.find(m=>m.id==='g_idle'),
 const GSTRIKE=after=>[K(0,{}),K(8,{}),K(HC,GW,'out'),K(HIT-4,GW),K(HIT,GS,'in')].concat(after);
 const ghit=(B,x,y,d,col,big)=>{if(d<0||d>=(big?12:8))return;const c=col||HSL;for(let i=0;i<(big?14:8);i++){const a=i/(big?14:8)*TAU+.4,r=2+d*(big?2:1.3);B.set(x+Math.cos(a)*r,y+Math.sin(a)*r*.8,i%2?c[1]:c[0],4)}if(d<(big?5:3)){const r=(big?7:4)-d;for(let i=-r;i<=r;i++){B.set(x+i,y,c[0],4);B.set(x,y+i,c[0],4)}}};
 const CPX=HXX+16,CPY=FL-20;/* 刃と刃がぶつかる場所 */
+/* 刃の手元と剣先（画面の向き） */
+function heroBlade(t,keys){const P=poseAt0({keys},t,hbase()),J=joints(CW-HXX,FL,SPEC.hero,Object.assign({},hbase(),P)),h=J.hdF,tp=add(h,dir(P.sw,SPEC.hero.w.len*SPEC.hero.k));return[[CW-1-h[0],h[1]],[CW-1-tp[0],tp[1]],[CW-1-J.hdB[0],J.hdB[1]]]}
+/* 刃そのものを光らせる（u＝つばから剣先へ、どこまで光ったか） */
+function bladeGlow(B,h,tp,u,col,t){const dx=tp[0]-h[0],dy=tp[1]-h[1],L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L,n=Math.ceil(L);
+ for(let i=3;i<=n;i++){const q=i/n;if(q>u)break;const x=h[0]+dx*q,y=h[1]+dy*q,edge=q>u-.12;
+  B.set(x+nx,y+ny,col[0],4);B.set(x-nx,y-ny,col[0],4);if(((i+t)&1))B.set(x+nx*2,y+ny*2,col[0],4);else B.set(x-nx*2,y-ny*2,col[0],4);
+  B.set(x,y,edge?'#ffffff':col[1],5)}}
+/* 刃の振りの跡（太い三日月）：t0〜t1 の剣先を手元から扇で塗る */
+function bladeArc(B,keys,t0,t1,cols){for(let s=t0;s<t1;s+=.25){const[h,tp]=heroBlade(s,keys);const k=(s-t0)/(t1-t0);for(let q=.45;q<=1.02;q+=.03){const x=lerp(h[0],tp[0],q),y=lerp(h[1],tp[1],q);B.set(x,y,q>.85||k>.7?cols[0]:cols[1],4)}}}
 function afterimage(B,t,P,dx,col){const H=new Buf(CW,CH);knight(H,CW-HXX,FL,SPEC.hero,P,t);const F=new Buf(CW,CH);F.blit(H,true);for(let i=0;i<F.c.length;i++){const x=i%CW,y=(i/CW)|0;if(F.c[i]&&!B.c[i]&&((x+y+t)&1)){if(x+dx>=0&&x+dx<CW)B.set(x+dx,y,col,5)}}}
 
 /* ---------- 出現・待機 ---------- */
@@ -49,18 +60,28 @@ heroAtkCard('hh_chase','追撃：二の太刀','chase','剣先が光ってから
 heroAtkCard('hh_heavy','重い一撃','heavy','当たるちょうどその瞬間（3F）に押すと、重い一撃になる。当たった瞬間、相手が白く光り、画面が長く止まって揺れる。','いちばん狭い受付に、いちばん大きなごほうび。手応え（止まり・光・揺れ）を最大にして、狙いたくなるようにした。');
 
 /* ---------- まもる（ガード・パリィ・ジャスト回避・早押し） ---------- */
-heroCard({id:'hh_guard',cat:'def',n:'ガード（30F）',len:110,cues:[{t:HC,col:'w'}],gate:GSTRIKE([K(56,GS),K(80,{},'io'),K(110,{})]),
- hero:[K(0,{}),K(HIT-12,{}),K(HIT-6,HP_.guard,'out'),K(HIT,HP_.guard),K(HIT+3,Object.assign({},HP_.guard,{x:4,lean:-.15})),K(HIT+14,Object.assign({},HP_.guard,{x:3})),K(HIT+30,{},'io'),K(110,{})],
- fx:(B,J,t)=>ghit(B,CPX,CPY,t-HIT,['#c8ccd8','#7c84a0']),
- cap:'当たる30F前までに押すと、刃を前へ傾けて受ける。受けた勢いで少し押し下がる。火花は小さく、灰色。ダメージは減るが、少し受ける。','why':'いちばん広い受付。とりあえず身を守れる。火花を灰色に小さくして、パリィとの差を見た目にも出す。'});
+const GUARDK=[K(0,{}),K(HIT-12,{}),K(HIT-6,HP_.guard,'out'),K(HIT,HP_.guard),K(HIT+3,Object.assign({},HP_.guard,{x:4,lean:-.15})),K(HIT+14,Object.assign({},HP_.guard,{x:3})),K(HIT+30,{},'io'),K(110,{})];
+heroCard({id:'hh_guard',cat:'def',n:'ガード（30F・盾）',len:110,cues:[{t:HC,col:'w'}],gate:GSTRIKE([K(56,GS),K(80,{},'io'),K(110,{})]),
+ hero:GUARDK,
+ fx:(B,J,t)=>{const d=t-HIT;if(d<0||d>=10)return;const sh=heroBlade(t,GUARDK)[2],x=sh[0]+5,y=sh[1];ghit(B,x,y,d,['#c8ccd8','#7c84a0']);
+  /* 受けた重さ：盾の後ろへ、押された線が3本 */if(d<6)for(let i=0;i<3;i++)for(let j=0;j<4-d/2;j++)B.set(sh[0]-6-j-d,y-4+i*4,'#7c84a0',4)},
+ cap:'当たる30F前までに押すと、盾を前へ突き出して受ける。剣は盾の後ろで立てたまま。受けた勢いで少し押し下がる。火花は小さく、灰色。ダメージは減るが、少し受ける。','why':'いちばん広い受付。とりあえず身を守れる。盾で「耐える」、剣で「弾く」と道具を分けて、ガードとパリィの差を一目でわかるようにした（まほうの縦の剣とも形が別になる）。せっかく持っている盾を、ここで使う。'});
+const PARRYK=[K(0,{}),K(HIT-3,{}),K(HIT,HP_.parry,'in'),K(HIT+12,HP_.parry),K(HIT+15,HP_.parryFT,'out'),K(HIT+34,HP_.parryFT),K(HIT+50,{},'io'),K(120,{})];
+const PARRYHK=[K(0,{}),K(HIT-3,{}),K(HIT,HP_.parryH,'in'),K(HIT+18,HP_.parryH),K(HIT+21,HP_.parryHFT,'out'),K(HIT+40,HP_.parryHFT),K(HIT+56,{},'io'),K(130,{})];
+function parryFx(B,t,keys,stop){const d=t-HIT,c=['#ffffff','#bfe8ff'];
+ if(d>=0&&d<2)for(let i=0;i<B.c.length;i++)if(B.t[i]===1&&(i%CW)<HXX+9&&((i/CW)|0)>FL-40)B.c[i]=((i%CW+((i/CW)|0))&1)?'#ffffff':'#d8f2ff';/* 弾いた瞬間、主人公が白く光る */
+ ghit(B,CPX,CPY,d,c,true);
+ if(d>=0&&d<stop){/* 止まりのあいだ、弾いた点から集中線 */for(let i=0;i<16;i++){const a=i/16*TAU+.2,r0=9+(i%3)*2,r1=r0+5+((i*7)%5)-d*.3;if(r1<=r0)continue;for(let r=r0;r<r1;r++)B.set(CPX+Math.cos(a)*r,CPY+Math.sin(a)*r*.75,i%2?c[1]:c[0],5)}}
+ if(d>=-3&&d<2)bladeArc(B,keys,HIT-3,Math.min(t,HIT)+.01,['#ffffff','#7cc8f0']);
+ const e=t-(HIT+stop);if(e>=0&&e<8)bladeArc(B,keys,HIT+stop+Math.max(0,e-4),Math.min(t,HIT+stop+3)+.01,e<3?['#ffffff','#7cc8f0']:['#bfe8ff','#3a6a90'])}
 heroCard({id:'hh_parry',cat:'def',n:'パリィ（6F）',len:120,cues:[{t:HC,col:'w'}],gate:GSTRIKE([K(HIT+12,GS),K(HIT+16,GREC,'out'),K(HIT+40,GREC),K(110,{},'io')]),
- hero:[K(0,{}),K(HIT-3,{}),K(HIT,HP_.parry,'in'),K(HIT+12,HP_.parry),K(HIT+16,Object.assign({},HP_.parry,{x:-4,lean:.25})),K(HIT+40,{},'io'),K(120,{})],
- fx:(B,J,t)=>{const d=t-HIT;ghit(B,CPX,CPY,d,['#ffffff','#bfe8ff'],true);if(d>=0&&d<12)for(let i=0;i<6;i++)B.set(CPX+3+i*2,CPY-4-i,'#ffffff',4)},
- cap:'当たる直前（6F）に押すと、刃で前へ弾く。弾いた瞬間に二人とも12F止まり、大きな火花が散る。止まりが解けると、門番の剣がはね上がり、体ごとのけぞって下がる。','why':'遊びの核。いちばん気持ちよく：止まり（ヒットストップ）・大きな火花・相手が大きくのけぞる、の三つで手応えを出す。'});
+ hero:PARRYK,
+ fx:(B,J,t)=>parryFx(B,t,PARRYK,12),
+ cap:'当たる直前（6F）に押すと、刃で前へ弾く。弾いた瞬間に2F白く光り、刃のまわりに青白い集中線が走って、二人とも12F止まる。止まりが解けると、刃は太い三日月の跡を引いて頭上まで払い上がり、そこで粘る。門番の剣ははね上がり、体ごとのけぞって下がる。','why':'遊びの核で、成功の型。ジャスト回避（残像＝逃げた跡）より一段上に見せるため、パリィだけが「打ち勝った跡」（太い三日月）と、止まりの間の集中線を持つ。振り切りで粘るのは 2023-02-22「フォロースルーで印象が決まる」。'});
 heroCard({id:'hh_parryH',cat:'def',n:'赤い光をパリィ',len:130,cues:[{t:HC,col:'r'}],gate:GSTRIKE([K(HIT+18,GS),K(HIT+22,Object.assign({},GREC,{x:-10,lean:-.45}),'out'),K(HIT+50,GREC),K(120,{},'io')]),
- hero:[K(0,{}),K(HIT-3,{}),K(HIT,HP_.parryH,'in'),K(HIT+18,HP_.parryH),K(HIT+24,Object.assign({},HP_.parryH,{x:6})),K(HIT+50,{},'io'),K(130,{})],
- fx:(B,J,t)=>{const d=t-HIT;ghit(B,CPX,CPY,d,['#ffffff','#bfe8ff'],true);if(d>=0&&d<26)for(let i=0;i<10;i++){const x=HXX+4-d*.5-i*1.5,y=FL-((i*3+d)%3);if(hsh(i,d)>.3)B.set(x,y,i%2?'#8a7a66':'#5a4a3e',5)}},
- cap:'赤い光（重い）でも、6Fで押せば弾ける。腰を落として踏んばり、足が床を削って土ぼこりが立つ。止まりは18F（ふつうより6F長い）。','why':'重い一撃を弾いた手応えは、ふつうのパリィより重く長く。足元の土ぼこりで「押しこまれたのを止めた」と見せる。'});
+ hero:PARRYHK,
+ fx:(B,J,t)=>{const d=t-HIT;parryFx(B,t,PARRYHK,18);if(d>=0&&d<26)for(let i=0;i<10;i++){const x=HXX+4-d*.5-i*1.5,y=FL-((i*3+d)%3);if(hsh(i,d)>.3)B.set(x,y,i%2?'#8a7a66':'#5a4a3e',5)}},
+ cap:'赤い光（重い）でも、6Fで押せば弾ける。腰を落として踏んばり、足が床を削って土ぼこりが立つ。止まりは18F（ふつうより6F長い）。止まりが解けると、踏んばったまま刃を頭上まで払い上げる。','why':'重い一撃を弾いた手応えは、ふつうのパリィより重く長く。足元の土ぼこりで「押しこまれたのを止めた」と見せる。'});
 heroCard({id:'hh_just',cat:'def',n:'ジャスト回避（12F）',len:120,cues:[{t:HC,col:'w'}],gate:GSTRIKE([K(HIT+10,GS),K(90,{},'io'),K(120,{})]),
  hero:[K(0,{}),K(HIT-4,{}),K(HIT,HP_.dodge,'out'),K(HIT+18,HP_.dodge),K(HIT+40,{},'io'),K(120,{})],
  fx:(B,J,t)=>{const d=t-HIT;if(d>=0&&d<14){afterimage(B,t,{},0,d<6?'#9dffc4':'#5a9a7a')}if(d>=0&&d<10)for(let i=0;i<6;i++){const a=i*1.05+d*.3;B.set(HXX+Math.cos(a)*(4+d),FL-16+Math.sin(a)*(4+d),'#9dffc4',4)}},
@@ -84,7 +105,10 @@ function magicCard(lv,id,n,cap,why){const T=[0,12,16,30][lv],c0=24,cast=c0+18,hi
   gate:[K(0,{}),K(hit,{}),K(hit+3,{x:5,lean:-.3,hd:-.3},'out'),K(hit+12,{x:4,lean:-.2}),K(hit+40,{},'io'),K(hit+60,{})],
   hero:[K(0,{}),K(10,{}),K(c0,HP_.magic,'out'),K(cast-2,HP_.magic),K(cast+2,fin,'in'),K(hit+8,fin),K(hit+40,{},'io'),K(hit+60,{})],
   fx:(B,J,t)=>{const tp=heroTip(t,{keys:[K(0,{}),K(10,{}),K(c0,HP_.magic,'out'),K(cast-2,HP_.magic),K(cast+2,fin,'in'),K(hit+8,fin),K(hit+40,{},'io'),K(hit+60,{})]});
-   if(t>=c0&&t<cast){/* 見切りの光が、つばから剣先へのぼる */const u=(t-c0)/18;for(let i=0;i<7;i++){const y=tp[1]+12-i*2*u;if(i<u*7)B.set(tp[0]+((i+t)&1),y,col[i%2],4)}}
+   const MK=[K(0,{}),K(10,{}),K(c0,HP_.magic,'out'),K(cast-2,HP_.magic),K(cast+2,fin,'in'),K(hit+8,fin),K(hit+40,{},'io'),K(hit+60,{})];
+   if(t>=c0&&t<cast+6){/* 見切りの光：つばから剣先へ、刃そのものが光で満ちていく。満ちたら剣先が星のように光り、放つと消える */const[h,bt]=heroBlade(t,MK),u=Math.min(1,(t-c0)/14);
+    if(t<cast||((t-cast)&1)===0)bladeGlow(B,h,bt,t<cast?u:1-(t-cast)/6,col,t);
+    const f=t-(c0+14);if(f>=0&&f<cast-c0-14){const r=f<2?6:3+((t>>1)&1);for(let i=-r;i<=r;i++){B.set(bt[0]+i,bt[1],Math.abs(i)<2?'#ffffff':col[1],5);B.set(bt[0],bt[1]+i,Math.abs(i)<2?'#ffffff':col[1],5)}}}
    const ex=EXX-6,ey=FL-20;
    /* 共通：唱えているあいだ、主人公の足元に魔法陣（段が上がるほど大きい）。光の粒がまわる */if(t>=c0&&t<hit+4){const k=Math.min(1,(t-c0)/6),rx=(10+lv*3)*k,ry=2+lv;for(let a=0;a<64;a++){const th=a/64*TAU;B.set(HXX+Math.cos(th)*rx,FL+1+Math.sin(th)*ry,col[0],4)}for(let i=0;i<4+lv*2;i++){const th=t*.1+i*TAU/(4+lv*2);B.set(HXX+Math.cos(th)*rx,FL+1+Math.sin(th)*ry,'#ffffff',4)}}
    if(lv===1&&t>=cast&&t<hit){/* ほのお：黒いふちの火の玉が弧を描いて飛び、火の粉を引く */const k=(t-cast)/T,x=lerp(HXX+14,ex,k),y=lerp(FL-26,ey,k)-Math.sin(k*Math.PI)*12;for(let i=1;i<8;i++){const q=[x-i*2.2,y+Math.sin(i*1.3+t)*1.2+i*.3];if((i+t)%2)B.set(q[0],q[1],i<3?col[1]:col[0],4)}B.disc(x,y,4.2,'#5a1a08',null,null,4);B.disc(x,y,3.2,col[0],null,null,4);B.disc(x,y,1.6,'#fff3b0',null,null,4)}
@@ -98,7 +122,7 @@ function magicCard(lv,id,n,cap,why){const T=[0,12,16,30][lv],c0=24,cast=c0+18,hi
     if(t>=hit-3&&t<hit+20){const w=t<hit?2:Math.min(28,6+(t-hit)*4),fade=t>hit+12?1-(t-hit-12)/8:1;for(let y=0;y<=FL+1;y++)for(let x=Math.round(ex-w/2-3);x<=ex+w/2+3;x++){const core=Math.abs(x-ex)<=w/2,keep=fade>=1||hsh(x,y+t)<fade;if(!keep)continue;B.set(x,y,core?((y+t)%7?'#ffffff':'#e8fbff'):((x+y)&1?col[0]:'#3a8aa8'),4)}}}
    const d=t-hit;if(d>=0&&d<12){ghit(B,ex,ey,d,col,true)}},
   cap,why})}
-magicCard(1,'hh_fire','まほう：ほのお','剣を顔の前にまっすぐ立て、足元に魔法陣が回り、見切りの光がつばから剣先へのぼる（ゲージ1本）。剣を前へ振ると、黒いふちの火の玉が火の粉を引いて弧を描き、門番に当たって爆ぜる。','まほうの構えは、剣を顔の前に縦に立てる（本気の赤い騎士の最期の構えと同じ形＝二人は同じ剣の型を知っている）。');
+magicCard(1,'hh_fire','まほう：ほのお','剣を顔の前にまっすぐ立て、足元に魔法陣が回り、見切りの光がつばから剣先へのぼって刃が光で満ち、剣先が星のように光る（ゲージ1本）。剣を前へ振ると、黒いふちの火の玉が火の粉を引いて弧を描き、門番に当たって爆ぜる。','まほうの構えは、剣を顔の前に縦に立てる（本気の赤い騎士の最期の構えと同じ形＝二人は同じ剣の型を知っている）。');
 magicCard(2,'hh_thunder','まほう：かみなり','構えから剣を頭上へ掲げると、剣に小さな雷が集まり、画面の上から三本の雷が少しずつずれて門番に落ちる（まん中は白）。落ちた瞬間、画面がうすく光る（ゲージ2本）。','掲げた剣が避雷針になる。ほのおより少し遅く、強い。');
 magicCard(3,'hh_light','まほう：ひかり','構えから剣を床に突き立て、片ひざを落とす。画面が暗くなり、門番の足元に二重の魔法陣が広がって、光の粒がのぼる。天井から床まで、白い芯と水色のふちの太い光の柱が開く（ゲージ3本）。いちばん長く、いちばん強い。','剣を床に突く＝地の底へ祈る形。光の柱は、くらやみの底から立ちのぼる「別の世界線の光」とも読める。どのまほうも、相手の構えを崩す。');
 

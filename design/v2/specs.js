@@ -42,7 +42,7 @@ function heroShield(B,J,V){const k=J.k*1.55,c=add(J.hdB,[V.front?-.5*k:2.6*k,V.f
 const HV={};/* 差分。体つき・兜の形・剣の長さ・マントの位置は変えない */
 SPEC.hero={k:.72,hk:1.45,pal:PAL.hero,helm:{type:'round',plume:'#a83a3e',plumeHi:'#d06060',plumeLo:'#6a2028'},cape:{len:20,wide:1.5,col:'#8a2a30',hi:'#b84448',lo:'#4a1420'},w:Object.assign({},W_HERO,{len:28,w:1.25}),
  mid:(B,J,T,P)=>{heroShield(B,J,Object.assign({front:P.shieldFront},P.V||{}))},
- pose:{ua:1.95,fa:2.85,sw:-2.6,ua2:1.75,fa2:1.95,ff:-5,fb:5}};/* 肘を曲げて前腕を前へ。剣は手首から立てる（手首の向き＋0.8） */
+ pose:{ua:2.7,fa:3.2,sw:-2.35,ua2:1.75,fa2:1.95,ff:-5,fb:5}};/* 手を胸の高さまで上げて前へ。刃は拳から前上がり約45度（手首の向き＋0.73） */
 /* 鞘：赤い騎士の腰。ふだんは空のまま。本気になると剣が納まる */
 function sheathDraw(B,J,T,P){const k=J.k,h=J.hip,a=add(h,[-1*k,1*k]),b=add(h,[13*k,-5*k]);B.thick(a,b,1.2*k,'#2a1a22','#4a3038','#120810');B.line(...add(a,[0,0]),...add(a,[1*k,0]),'#c8a050');
  if(P.sheath){const g=add(a,[-4*k,2*k]);B.thick(a,g,1*k,'#2a1a22','#4a3038','#120810');B.thick(add(g,[-.5*k,-2*k]),add(g,[.5*k,2*k]),.8*k,'#6a4a50','#8a6a70','#120810')}}

@@ -53,7 +53,7 @@ function drawHead(B,S,J,P,T){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R
   B.poly([R([-4.3*k,4.2*k]),R([4.3*k,4.2*k]),R([4.3*k,-4.2*k]),R([3.6*k,-4.8*k]),R([-3.6*k,-4.8*k]),R([-4.3*k,-4.2*k])],p.arm,p.armHi,p.armLo);
   const bd=hm.band||[p.trim,p.trimHi];for(let x=-4;x<=4;x+=.5)B.set(...R([x*k,-3.4*k]),bd[0],2);for(let x=-3.5;x<=3.5;x+=1.4)B.set(...R([x*k,-3.4*k]),bd[1],2);
   const ec=P.eyeOff?(P.eyeOff>=1?OUT:mix(hm.glow||OUT,OUT,P.eyeOff)):(hm.glow||OUT);
-  if(hm.slant){/* 赤い騎士：太く黒い切れ込みが鼻先へ下がる（怒った眉の向き＝力み）。その奥に金の目が一つだけ光る。縦の線は目の下から */const sl=hm.slant,Y=x=>-.3-(x+1.8)*sl;for(let x=-4.4;x<=.8;x+=.3){B.set(...R([x*k,Y(x)*k]),OUT,2);B.set(...R([x*k,(Y(x)-.7)*k]),OUT,2)}for(let x=-3.7;x<=-2.3;x+=.3)B.set(...R([x*k,Y(x)*k]),x>-3.3&&x<-2.7?(hm.glowHi||ec):ec,2);for(let y=1;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2)}
+  if(hm.slant){/* 赤い騎士：怒った眉の向き（鼻先へ下がる）の切れ込みを、目の色で塗りつぶす。上に黒いふち。縦の線は目の下から */const sl=hm.slant,Y=x=>-.3-(x+1.8)*sl;for(let x=-4.4;x<=.6;x+=.3){B.set(...R([x*k,Y(x)*k]),ec,2);B.set(...R([x*k,(Y(x)-.7)*k]),ec,2);B.set(...R([x*k,(Y(x)-1.4)*k]),OUT,2)}for(let y=1;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2)}
   else{for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,-.4*k]),ec,2);for(let y=-2;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2)}
   if(!hm.slant)for(let i=0;i<3;i++)for(let j=0;j<2;j++)B.set(...R([(1.2+j*1.2)*k,(1.6+i*.9)*k]),OUT,2);
   for(const d of (hm.dents||[]))for(let i=0;i<3;i++)B.set(...R([(d[0]+i*.4)*k,(d[1]+(i===1?.4:0))*k]),p.armLo,2);

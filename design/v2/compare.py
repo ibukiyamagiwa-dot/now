@@ -10,6 +10,8 @@ HERE=os.path.dirname(os.path.abspath(__file__));REPO='/home/claude/now';OUT='/ho
 shutil.rmtree(TMP,ignore_errors=True)
 for v in('old','new'):
   os.makedirs(f'{TMP}/{v}');[shutil.copy(f'{HERE}/{f}',f'{TMP}/{v}/') for f in os.listdir(HERE) if f.endswith('.js') or f=='t3.html']
+for v in('old','new'):  # t3.html に文字コードの指定がないと、説明文が文字化けする
+  t=open(f'{TMP}/{v}/t3.html',encoding='utf-8').read();open(f'{TMP}/{v}/t3.html','w',encoding='utf-8').write(t.replace('<html>','<html><head><meta charset="utf-8"></head>',1))
 for f in os.listdir(f'{TMP}/old'):
   if f.endswith('.js'):
     r=subprocess.run(['git','-C',REPO,'show',f'{REV}:design/v2/{f}'],capture_output=True)
@@ -32,5 +34,5 @@ for id in IDS:
     fs.append(W.convert('P',palette=Image.ADAPTIVE,colors=128))
   fs[0].save(f'{OUT}/{id}.gif',save_all=True,append_images=fs[1:],duration=40,loop=0,optimize=True)
   secs.append(f'<section><h2>{html.escape(n["n"])}</h2><p class="n">{html.escape(n["cap"])}</p><img src="{id}.gif" alt="{html.escape(n["n"])}の比較"></section>')
-open(f'{OUT}/index.html','w').write('<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>修正前と修正後</title><style>body{margin:0;background:#111;color:#e8e8e8;font-family:"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.6}main{max-width:860px;margin:0 auto;padding:20px 14px 60px}h1{font-size:20px;margin:0 0 6px}p.lead{color:#aaa;font-size:14px;margin:0 0 22px}section{margin:0 0 30px}h2{font-size:16px;margin:0 0 4px}p.n{color:#bbb;font-size:13px;margin:0 0 8px}img{width:100%;height:auto;image-rendering:pixelated;border-radius:6px;display:block}</style></head><body><main><h1>修正前と修正後</h1><p class="lead">左が修正前、右が修正後。同じフレームを並べ、約2/5の速さでくり返し再生。右上はフレーム、「当」は当たりの瞬間。説明文は修正後のもの。</p>'+''.join(secs)+'</main></body></html>')
+open(f'{OUT}/index.html','w',encoding='utf-8').write('<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>修正前と修正後</title><style>body{margin:0;background:#111;color:#e8e8e8;font-family:"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.6}main{max-width:860px;margin:0 auto;padding:20px 14px 60px}h1{font-size:20px;margin:0 0 6px}p.lead{color:#aaa;font-size:14px;margin:0 0 22px}section{margin:0 0 30px}h2{font-size:16px;margin:0 0 4px}p.n{color:#bbb;font-size:13px;margin:0 0 8px}img{width:100%;height:auto;image-rendering:pixelated;border-radius:6px;display:block}</style></head><body><main><h1>修正前と修正後</h1><p class="lead">左が修正前、右が修正後。同じフレームを並べ、約2/5の速さでくり返し再生。右上はフレーム、「当」は当たりの瞬間。説明文は修正後のもの。</p>'+''.join(secs)+'</main></body></html>')
 print('\n'.join(sorted(os.listdir(OUT))))

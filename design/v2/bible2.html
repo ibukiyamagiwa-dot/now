@@ -2894,62 +2894,227 @@ FORMS.push({key:'samurai',ttl:'居合の剣士',en:'MOB · 居合のおかしら
    - おかしらだけの技「大きな岩」（赤い光、重い）は、封印の石を頭の上へ持ち上げる構え。ふだんから背中側の床に置いてある。
    - 弾いた石は足元に落ちる（次のこうげきで投げ返せる）。大きな岩は弾くと三つに割れる。 */
 const IMV={
- n:{lbl:'覚悟1 ふつう',name:'石なげ小鬼',skin:['#5e7a3a','#7e9a52','#34461e'],vein:0,eyes:0},
- r:{lbl:'覚悟2 赤い',name:'赤い石なげ小鬼',skin:['#8a4a3a','#aa6a52','#4a2420'],vein:1,eyes:0},
- k:{lbl:'覚悟3 黒い',name:'黒い石なげ小鬼',skin:['#3a3c36','#56584e','#1c1e1a'],vein:2,eyes:1},
- v:{lbl:'覚悟4 紫の',name:'紫の石なげ小鬼',skin:['#4e3a64','#6a5084','#2a1c3a'],vein:2,eyes:2}};
-const IMEYE='#a85a3a',IMEYE2='#7a2a4a',IMTOOTH='#cfc6a6',ROCK=['#7a6e66','#a0948a','#463e3a'],SEAL=['#5e5a66','#807a8a','#33303a'],SEALG='#8a7030';
-/* 頭：大きな頭、後ろへのびた耳、かぎ鼻、にやけた口。ear＝耳（1で後ろへ寝る、-1で立つ）、grin＝口を開けて笑う */
-function impHead(B,R,k,T,P){const V=IMV[P.tint]||IMV.n,sk=V.skin,ear=P.ear||0,g=P.grin||0;
- B.poly([R([3*k,-2.2*k]),R([(8.5-ear*1.5)*k,(-5.5+ear*3.5)*k]),R([(9-ear)*k,(-4.6+ear*3.5)*k]),R([4*k,.2*k])],sk[0],sk[1],sk[2]);/* 耳 */
- B.disc(...R([0,-1.5*k]),4.4*k,sk[0],sk[1],sk[2]);/* 頭 */
- B.poly([R([-4*k,-.5*k]),R([3.4*k,0]),R([2.6*k,3.6*k]),R([-3.6*k,3.2*k])],sk[0],sk[1],sk[2]);/* あご */
- B.poly([R([-3.6*k,-1.6*k]),R([-7.4*k,.6*k]),R([-6.6*k,1.2*k]),R([-3.4*k,.6*k])],sk[0],sk[1],sk[2]);/* かぎ鼻 */
- const my=(1.9+g*.6)*k;B.thick(R([-4.2*k,my]),R([-.2*k,my-.4*k]),(.5+g*.6)*k,OUT,OUT,OUT);for(const x of[-3.4,-2.2,-1])B.set(...R([x*k,my-.5*k]),IMTOOTH,2);/* にやけた口と歯 */
- B.set(...R([-2.6*k,-1.8*k]),IMEYE,2);B.set(...R([-1.4*k,-1.8*k]),IMEYE,2);B.line(...R([-3.4*k,-2.7*k]),...R([-1*k,-2.4*k]),sk[2]);/* 目（光らない）とまゆ */
- if(V.eyes>=1)B.set(...R([-2*k,-4*k]),IMEYE2,2);if(V.eyes>=2){B.set(...R([1*k,-3.4*k]),IMEYE2,2);B.set(...R([-.6*k,1*k]),IMEYE2,2)}/* のまれるほど目が増える（光らない） */
- if(V.vein>=1)for(let i=0;i<4;i++)B.set(...R([(1.5+i*.5)*k,(-3+i*.9)*k]),'#1a1220',2)}
-/* 石と、石の袋。rF/rB＝前・後ろの手に石、jug/jn＝お手玉（数）、bigUp＝大岩を頭の上へ */
-function rock(B,x,y,r,c){B.disc(x,y,r,(c||ROCK)[0],(c||ROCK)[1],(c||ROCK)[2])}
-function sealRock(B,x,y,r){rock(B,x,y,r,SEAL);/* 閉じた門の紋章（くすんだ金）：アーチと、まん中の合わせ目 */for(let a=Math.PI;a<=Math.PI*2.01;a+=.35)B.set(x+Math.cos(a)*r*.45,y+Math.sin(a)*r*.45+r*.1,SEALG,2);B.line(x-r*.45,y+r*.12,x-r*.45,y+r*.42,SEALG);B.line(x+r*.45,y+r*.12,x+r*.45,y+r*.42,SEALG);B.line(x,y-r*.3,x,y+r*.42,SEALG);
- B.line(x+r*.3,y-r*.7,x+r*.6,y-r*.1,SEAL[2])/* 欠け */}
+ n:{lbl:'覚悟1 ふつう',name:'石なげ小鬼',skin:['#34461e','#5e7a3a','#7e9a52','#9cb46a'],vein:0,eyes:0},
+ r:{lbl:'覚悟2 赤い',name:'赤い石なげ小鬼',skin:['#4a2420','#8a4a3a','#aa6a52','#c4846a'],vein:1,eyes:0},
+ k:{lbl:'覚悟3 黒い',name:'黒い石なげ小鬼',skin:['#1c1e1a','#3e4038','#5a5c52','#74766a'],vein:2,eyes:1},
+ v:{lbl:'覚悟4 紫の',name:'紫の石なげ小鬼',skin:['#2a1c3a','#4e3a64','#6a5084','#8468a0'],vein:2,eyes:2}};
+const IMEYE='#cabe84',IMEYE2='#8a3a4a',IMTOOTH='#cfc6a6',IMMOUTH='#3a141a',IMTONGUE='#8a3a40',IMHAIR='#c8c4b8',IMSCAR='#a87a68',IMNAIL='#d8d0b4',
+ ROCK=['#7a6e66','#a0948a','#463e3a'],ROCKHI='#cec4b6',SEAL=['#5e5a66','#807a8a','#33303a'],SEALG='#8a7030',
+ IMRAG=['#5a4430','#7a6044','#2a1e14'],IMROPE='#9a8a64',IMNAVY=['#2e3a5e','#404e7a','#181e34'],IMNAVYG='#8a7030';
+/* ===== 頭：1画素ずつ手で打ったドット絵（左を向く） =====
+   記号：x 黒の線／1 肌の影／2 肌／3 肌の明るい面／4 いちばん明るい面／e 白目（にごった黄。光らない）／p 黒目／m 口の中／t 歯／n 耳の内側／o 舌／w 白い毛／s 古傷／k いぼ
+   まゆの骨が目の上に張り出し、その下でぎょろ目が主人公を見る。鼻は鉤のように垂れて口にかぶさる。口は耳のほうへ切れ上がり、歯は欠けて不ぞろい。耳は長く、後ろへのびる。 */
+const IMHEAD={
+ imp:{piv:[11,14],ctr:[8,7],
+  face:[
+"......xxxxx......",
+"....xx443332x....",
+"...x4433322221x..",
+"...x433221222221x",
+"..x4332212222221x",
+".x443333222222221x",
+".xx1111xx22222221x",
+"..x1pee1122222221x",
+"..xx1ee1122222221x",
+".x3x1122222222221x",
+"x43x2222222222221x",
+"x321x1xxxxx222221x",
+".x21xtmtmtx22221x.",
+"..xx.xmmmtm1221x..",
+"......x222221xx...",
+".......xxxxxx....."],
+  ear:{at:[12,0],rows:[
+"........xx",
+".......x4x",
+"......x44x",
+".....x4n2x",
+"....x4nn1x",
+"...x3nn21x",
+"..x3nn21x.",
+".x3nn21x..",
+"x3nn21x...",
+"x2221x....",
+"xxxx......"]},
+  earFlat:{at:[13,4],rows:[
+"...xxxxx...",
+"xxx44443xx.",
+"x33nnnn21xx",
+"x2211111x..",
+"xxxxxxx...."]},
+  mouth:{y:11,laugh:[
+"x321xtmtmtx22221x",
+".x21xmmmmmx2221x.",
+"..xx.xmoomt1221x.",
+"......xt22221xx.."],
+   o:[
+"x321x1xxx1222221x",
+".x21xmmmx122221x.",
+"..xx.xmmx11221x..",
+"......x222221xx.."]},
+  eye:[[4,7],[5,7],[6,7],[5,8],[6,8]],
+  eyes:{wide:'epeee',shut:'xx1x2',daze:'xexxe'},
+  vein:[[9,2],[10,3],[10,4],[11,5],[12,6]],third:[[7,3],[8,3]],more:[[[12,9],[13,9]],[[11,2],[12,2]]]},
+ impM:{piv:[14,19],ctr:[11,9],
+  face:[
+"........xxxxxx........",
+"......xx4443332x......",
+".....x44433322221x....",
+"....x4433221111221x...",
+"...x443322222222221x..",
+"...x4332211111122221x.",
+"..x43322222222222221x.",
+".x44444433222222222221x",
+"xww1111111x22222222221x",
+".xx1peesx112222222221x.",
+"..xx1eeesx12222222221x.",
+"..x3x111xs22222222221x.",
+".x43x11222222222221x...",
+"x443x22222222222221x...",
+"x3k2x1222222222221x....",
+"x3221x1xxxxxxx221x.....",
+".x221xtmtmmtmx221x.....",
+"..x1xxmmmmmmtm121x.....",
+"...x..x1222222211x.....",
+"......xx2222221xx......",
+"........xxxxxxx........"],
+  ear:{at:[15,0],rows:[
+"...........ww",
+"..........xwx",
+".........x4nx",
+"........x4n.x",
+".......x4nn1x",
+"......x4nnn1x",
+".....x3nnn21x",
+"....x3nnn21x.",
+"...x3nnn21x..",
+"..x3nn221x...",
+".x32n21x.....",
+"x22221x......",
+"xxxxx........"]},
+  earFlat:{at:[16,6],rows:[
+"...xxxxxxx....",
+"xxx4444443xxww",
+"x33nnnn.n21xx.",
+"x22111111x....",
+"xxxxxxxxx....."]},
+  mouth:{y:15,laugh:[
+"x3221xtmtmtmx21x",
+".x221xmmmmmmx21x",
+"..x1xxmoommt121x",
+"...x..xt2222211x"],
+   o:[
+"x3221x1xxxx1221x",
+".x221xmmmmx1221x",
+"..x1xxmmmx11121x",
+"...x..x1222222211x"]},
+  eye:[[4,9],[5,9],[6,9],[5,10],[6,10]],
+  eyes:{wide:'epeee',shut:'xx1x2',daze:'xexxe'},
+  vein:[[12,2],[13,3],[14,4],[15,5],[16,6],[17,7]],third:[[9,4],[10,4]],more:[[[16,11],[17,11]],[[14,1],[15,1]]]}};
+function imGrid(H,P){const g=H.face.map(r=>r.split(''));const put=(ox,oy,rows)=>rows.forEach((r,y)=>[...r].forEach((c,x)=>{if(c==='.')return;const Y=oy+y,X=ox+x;while(g.length<=Y)g.push([]);while(g[Y].length<=X)g[Y].push('.');g[Y][X]=c}));
+ const ear=P.ear>=.5?H.earFlat:H.ear;put(ear.at[0],ear.at[1],ear.rows);
+ const g2=P.grin||0;if(P.ear>=.5)put(0,H.mouth.y,H.mouth.o);else if(g2>=.6)put(0,H.mouth.y,H.mouth.laugh);
+ const es=P.daze?'daze':P.ear>=.5?'wide':g2>=.9?'shut':null;if(es)H.eye.forEach(([x,y],i)=>{g[y][x]=H.eyes[es][i]});
+ /* 外まわりの黒は描かない（体全体の輪郭線が引く）。内側の線だけ残す */
+ const W=Math.max(...g.map(r=>r.length)),at=(x,y)=>(g[y]&&g[y][x])||'.';const o=g.map((r,y)=>r.map((c,x)=>c==='x'&&[[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>at(x+a,y+b)==='.')?'.':c));return o}
+function imStamp(B,H,P,at,a,V){const g=imGrid(H,P),sk=V.skin,col={'1':sk[0],'2':sk[1],'3':sk[2],'4':sk[3],x:OUT,p:OUT,e:IMEYE,m:IMMOUTH,t:IMTOOTH,n:mix(sk[0],'#9a4a4a',.45),o:IMTONGUE,w:IMHAIR,s:IMSCAR,k:sk[0]};
+ const ax=Math.round(at[0]),ay=Math.round(at[1]),[px,py]=H.piv,c=Math.cos(a),s=Math.sin(a),h=g.length,w=Math.max(...g.map(r=>r.length));
+ const L2D=(lx,ly)=>{const dx=lx+.5-px,dy=ly+.5-py;return[ax+dx*c-dy*s,ay+dx*s+dy*c]};
+ if(a===0){g.forEach((r,y)=>r.forEach((ch,x)=>{if(ch!=='.')B.set(ax+x-px,ay+y-py,col[ch],1)}))}
+ else{const R=Math.hypot(w,h)+2;for(let Y=Math.floor(ay-R);Y<=ay+R;Y++)for(let X=Math.floor(ax-R);X<=ax+R;X++){const dx=X+.5-ax,dy=Y+.5-ay,lx=Math.floor(dx*c+dy*s+px),ly=Math.floor(-dx*s+dy*c+py);const ch=g[ly]&&g[ly][lx];if(ch&&ch!=='.')B.set(X,Y,col[ch],1)}}
+ const put=(x,y,cc)=>{const d=L2D(x,y);B.set(Math.floor(d[0]),Math.floor(d[1]),cc,1)};
+ /* 覚悟の段：頭に黒い筋、光らない目が増える */
+ if(V.vein>=1)H.vein.forEach(([x,y])=>put(x,y,'#1a1220'));
+ if(V.eyes>=1){put(H.third[0][0],H.third[0][1],IMEYE2);put(H.third[1][0],H.third[1][1],OUT)}
+ if(V.eyes>=2)for(const e of H.more){put(e[0][0],e[0][1],IMEYE2);put(e[1][0],e[1][1],OUT)}
+ return L2D(H.ctr[0],H.ctr[1])}
+/* 石と、石の袋。rF/rB＝前・後ろの手に石、jug/jn＝お手玉（数）、bigUp＝大岩を頭の上へ。石は攻略でいちばん大事な情報なので、光らせずに、ふちの明るい一点で数えやすくする */
+function rock(B,x,y,r,c){B.disc(x,y,r,(c||ROCK)[0],(c||ROCK)[1],(c||ROCK)[2]);if(!c&&r>=1.5)B.set(x-r*.45,y-r*.45,ROCKHI,1)}
+const BIGR=7.4;
+function sealRock(B,x,y,r){rock(B,x,y,r,SEAL);/* 閉じた門の紋章（くすんだ金）：アーチと、まん中の合わせ目。削られて欠けている */for(let a=Math.PI;a<=Math.PI*2.01;a+=.3)B.set(x+Math.cos(a)*r*.5,y+Math.sin(a)*r*.5+r*.1,SEALG,2);B.line(x-r*.5,y+r*.12,x-r*.5,y+r*.5,SEALG);B.line(x+r*.5,y+r*.12,x+r*.5,y+r*.5,SEALG);B.line(x,y-r*.35,x,y+r*.5,SEALG);
+ B.line(x+r*.35,y-r*.8,x+r*.75,y-r*.15,SEAL[2]);B.line(x+r*.42,y-r*.7,x+r*.8,y-r*.1,SEAL[2]);/* 爪で削った欠け */for(const[dx,dy]of[[-.3,-.6],[.6,.3],[-.7,.0]])B.set(x+r*dx,y+r*dy,SEAL[2],2)}
 const impRockR=k=>2.2*k/.7;
-function impBehind(B,J,T,P,S){if(S.big&&!P.bigUp&&!P.bigGone){const k=J.k,r=6.5*k/1.075;sealRock(B,J.hip[0]+(14*k)+(P.bigX||0),FL-r+.5,r)}}
+function impBehind(B,J,T,P,S){if(S.big&&!P.bigUp&&!P.bigGone)sealRock(B,J.hip[0]+(14*J.k)+3+(P.bigX||0),FL-BIGR+.5,BIGR)}
 function impFront(B,J,T,P,S){const k=J.k,rr=impRockR(k);
- /* 腰の石の袋 */const pc=add(J.hip,[3*k,2*k]);B.disc(pc[0],pc[1],2.4*k,'#5a4430','#7a6044','#2a1e14');B.set(pc[0]-1,pc[1]-2*k,'#2a1e14',2);
- if(P.rF)rock(B,J.hdF[0]-1,J.hdF[1]-rr*.6,rr);if(P.rB)rock(B,J.hdB[0],J.hdB[1]-rr*.6,rr);
- if(P.jug>0&&P.jn>0){const c=add(J.sc,[-10*k,-8*k]);for(let i=0;i<P.jn;i++){const a=(T/39+i/3)*Math.PI*2;rock(B,c[0]+Math.cos(a)*4*k,c[1]+Math.sin(a)*7*k,rr)}}
- if(P.bigUp){const c=add(J.head,[0,-14*k]);sealRock(B,c[0],c[1],6.5*k/1.075)}
- const V=IMV[P.tint]||IMV.n;if(V.vein>=2){for(const[a,b]of[[J.shF,J.elF],[J.elF,J.hdF]])for(let i=0;i<4;i++)B.set(lerp(a[0],b[0],i/4)+(i%2),lerp(a[1],b[1],i/4),'#1a1220',2)}}
+ if(P.rF)rock(B,J.hdF[0]-1,J.hdF[1]-rr*.7,rr);if(P.rB)rock(B,J.hdB[0],J.hdB[1]-rr*.7,rr);
+ if(P.jug>0&&P.jn>0){const c=J.jc||[J.head[0]-13*k/.7,J.head[1]+1];for(let i=0;i<P.jn;i++){const a=(T/39+i/3)*Math.PI*2;rock(B,c[0]+Math.cos(a)*4*k,c[1]+Math.sin(a)*7*k,rr)}}
+ if(P.bigUp&&J.big)sealRock(B,J.big[0],J.big[1],BIGR)}
 const lerpP=(a,b,u)=>[lerp(a[0],b[0],u),lerp(a[1],b[1],u)];
-function impDraw(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose,P0||{}),V=IMV[P.tint]||IMV.n,sk=V.skin;
- const S2=Object.assign({},S,{pal:Object.assign({},S.pal,{arm:sk[0],armHi:sk[1],armLo:sk[2],chest:sk[0],under:sk[0],underHi:sk[1],underLo:sk[2],foot:sk[0],footHi:sk[1],glove:sk[0]})});
- return knight(B,ox,oy,S2,P,T)}
-const IMBASE={hk:2.05,lk:.78,tk:.78,pal:Object.assign({},PAL.guard,{trim:'#5a4430',trimHi:'#7a6044',trimLo:'#2a1e14'}),helm:{type:'imp',extra:impHead},cape:null,
- tabard:{len:5,col:'#5a4430',hi:'#7a6044',lo:'#2a1e14'},behind:(B,J,T,P)=>impBehind(B,J,T,P,SPEC[P._who]||{}),front:(B,J,T,P)=>impFront(B,J,T,P,SPEC[P._who]||{})};
-Object.assign(PDEF,{ear:0,grin:0,rF:0,rB:0,jug:0,jn:0,bigUp:0,bigGone:0,bigX:0,parried:0});
+/* ===== 体：騎士の部品を使わない、小鬼だけの体 =====
+   約2頭身。猫背で、腹が出て、脚は短く、腕は長い（手が地面に届きそう）。大きな手に爪。手が大きいのは、石を持つ手がいちばん大事だから。
+   モブ：門番の前垂れとは関係のない、ただの麻のぼろ布の腰巻と縄の帯。腰に石の袋。
+   おかしら：拾った門番の紺の前垂れ（金のふちがすり切れている）を、首に結んでマントにしている。首には、削り取った封印のかけらの首飾り。年寄りで、まゆと耳の先に白い毛、目をまたぐ古傷、鼻にいぼ、欠けた歯。 */
+function imArm(B,sh,el,hd,k,sk,front){const b=front?sk[1]:sk[0],h=front?sk[2]:sk[1],l=sk[0];
+ B.thick(sh,el,1.05*k,b,h,l);B.thick(lerpP(el,hd,.1),lerpP(el,hd,.8),1.35*k,b,h,l);B.disc(el[0],el[1],1.25*k,b,h,l);
+ const u=[hd[0]-el[0],hd[1]-el[1]],L=Math.hypot(u[0],u[1])||1,d=[u[0]/L,u[1]/L],n=[-d[1],d[0]];B.disc(hd[0],hd[1],1.75*k,b,h,l);
+ for(const s of[-1,0,1]){const p=[hd[0]+d[0]*2.2*k+n[0]*s*1.3*k,hd[1]+d[1]*2.2*k+n[1]*s*1.3*k];B.set(p[0],p[1],front?b:l,1);B.set(p[0]+d[0]*1.1,p[1]+d[1]*1.1,IMNAIL,1)}}
+function imLeg(B,hp,kn,ft,k,sk,front){const b=front?sk[1]:sk[0],h=front?sk[2]:sk[1],l=sk[0];
+ B.thick(hp,kn,1.55*k,b,h,l);const an=[ft[0]+.5*k,ft[1]-1.6*k];B.thick(kn,an,1.05*k,b,h,l);B.disc(kn[0],kn[1],1.3*k,b,h,l);
+ B.poly([[ft[0]-5.5*k,ft[1]],[ft[0]+2.2*k,ft[1]],[ft[0]+1.8*k,ft[1]-2.4*k],[ft[0]-1.6*k,ft[1]-2.2*k],[ft[0]-4.5*k,ft[1]-1.2*k]],b,h,l);
+ for(const i of[0,1.6])B.set(ft[0]-5.8*k+i*k,ft[1]-.6,IMNAIL,1)}
+function impFig(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{});P.cr=(P.cr||0)*.62;
+ const J=joints(ox,oy,S,P);J.P=P;P.T=T;const k=S.k,V=IMV[P.tint]||IMV.n,sk=V.skin,L=-J.lean,h=J.hip,R=v=>add(h,rot(v,L)),isM=!!S.big;
+ if(S.behind)S.behind(B,J,T,P);
+ /* おかしらのマント（門番の紺の前垂れの切れ端）：背中側に垂れる。すそはぼろぼろ */
+ if(isM){const w=Math.sin(T*.06)*1.2,top=[R([-1.5*k,-11.5*k]),R([3*k,-12*k]),R([7*k,-9*k]),R([(10.5+w*.5)*k,-2*k])],hem=[],n=6,x0=h[0]+(11+w)*k,x1=h[0]+.5*k;
+  for(let i=0;i<=n;i++){const t2=i/n;hem.push([lerp(x0,x1,t2),FL-2-((i%2)?3.5*k:0)-t2*3*k])}B.poly([...top,...hem,R([0,-2*k])],IMNAVY[0],IMNAVY[1],IMNAVY[2]);
+  /* すり切れた金のふち（門番の前垂れと同じ金）。ところどころ切れている */for(let i=0;i<=24;i++){const u=i/24;if(hsh(i,7)<.3)continue;const p=u<.5?lerpP(top[2],top[3],u*2):lerpP(top[3],hem[0],(u-.5)*2);B.set(p[0],p[1],IMNAVYG,2)}
+  /* 閉じた門の紋章の名残：アーチの半分だけ */const m=R([7*k,-5*k]);for(let a2=Math.PI;a2<=Math.PI*1.55;a2+=.3)B.set(m[0]+Math.cos(a2)*2,m[1]+Math.sin(a2)*2,IMNAVYG,2);B.line(m[0]-2,m[1],m[0]-2,m[1]+2,IMNAVYG,2)}
+ const hb=R([-1.8*k,-10.5*k]),HD=IMHEAD[isM?'impM':'imp'];let a=-P.lean*.35-P.hd;if(Math.abs(a)<.12)a=0;
+ {const dx=HD.ctr[0]+.5-HD.piv[0],dy=HD.ctr[1]+.5-HD.piv[1];J.head=[Math.round(hb[0])+dx*Math.cos(a)-dy*Math.sin(a),Math.round(hb[1])+dx*Math.sin(a)+dy*Math.cos(a)]}
+ /* 大きな岩：頭の上にのせ、両手をのばして両わきを支える（腕は届くところまでのびる） */
+ if(P.bigUp){const top=J.head[1]-HD.ctr[1]-1,c=[J.head[0]+1,top-BIGR+3];J.big=c;for(const[s,sh,ky]of[[-1,J.shF,'F'],[1,J.shB,'B']]){const hd=[c[0]+s*(BIGR-1),c[1]+2],d=Math.hypot(hd[0]-sh[0],hd[1]-sh[1]),L=Math.max(7*k,d/2+.6);J['hd'+ky]=hd;J['el'+ky]=ik(sh,hd,L,L,s<0?1:-1)}}
+ /* お手玉：石の輪は顔の前。両手は輪の下で受ける（手が拍ごとに上下する） */
+ if(P.jug>0&&P.jn>0){const kk=k/.7,c=[J.head[0]-13*kk,J.head[1]+1];J.jc=c;const bob=Math.sin(T/39*Math.PI*6)*1;for(const[s,sh,ky,bd]of[[-1,J.shF,'F',1],[1,J.shB,'B',1]]){const hd=[c[0]+s*3*k,c[1]+7*k+(s<0?bob:-bob)],d=Math.hypot(hd[0]-sh[0],hd[1]-sh[1]),L=Math.max(7*k,d/2+.6);J['hd'+ky]=hd;J['el'+ky]=ik(sh,hd,L,L,bd)}}
+ imArm(B,J.shB,J.elB,J.hdB,k,sk,false);
+ imLeg(B,J.hpB,J.kneeB,J.footB,k,sk,false);
+ /* 胴：猫背の背中のこぶと、前へ出た腹 */
+ B.poly([R([-2.5*k,-9.5*k]),R([2.5*k,-10.5*k]),R([5*k,-6.5*k]),R([3.5*k,.5*k]),R([-2.5*k,.5*k]),R([-4.5*k,-4*k])],sk[1],sk[2],sk[0]);
+ B.disc(...R([2.4*k,-8*k]),3.2*k,sk[1],sk[2],sk[0]);/* 背中のこぶ */
+ const bc=R([-2.2*k,-3.6*k]);B.disc(bc[0],bc[1],5.3*k,sk[1],sk[3],sk[0]);/* 腹 */
+ B.set(bc[0]-1,bc[1]+1,sk[0],1);/* へそ */for(let i=0;i<3;i++)B.set(...R([(-1+i*.9)*k,(-6.8+i*.2)*k]),sk[0],1);/* あばら */
+ for(let i=0;i<3;i++)B.set(...R([(4.6-i*.3)*k,(-7-i*1.6)*k]),sk[3],1);/* 背骨のでっぱり */
+ /* 腰巻と縄の帯 */
+ const rg=[R([-4.6*k,-.8*k]),R([4*k,-1*k]),R([4.6*k,2.6*k]),R([3*k,1.8*k]),R([2*k,3.4*k]),R([.4*k,2.2*k]),R([-1*k,3.8*k]),R([-2.6*k,2.4*k]),R([-4.2*k,3*k])];
+ B.poly(rg,IMRAG[0],IMRAG[1],IMRAG[2]);
+ for(let i=0;i<=8;i++){const p=R([lerp(-4.6,4.2,i/8)*k,(-.9-(i%2)*.3)*k]);B.set(p[0],p[1],i%2?IMROPE:mix(IMROPE,'#000000',.4),1)}
+ /* 腰の石の袋：口から石がのぞく */const pc=R([3.6*k,1.8*k]);B.disc(pc[0],pc[1],2.5*k,IMRAG[0],IMRAG[1],IMRAG[2]);B.line(pc[0]-1,pc[1]-2.2*k,pc[0]+1,pc[1]-2.2*k,IMROPE);B.set(pc[0]-1,pc[1]-2.6*k,ROCK[1],1);B.set(pc[0]+1,pc[1]-2.8*k,ROCK[0],1);
+ imLeg(B,J.hpF,J.kneeF,J.footF,k,sk,true);
+ /* 首と頭：頭は肩より前に出る（猫背）。体がかたむいても、頭はあまりかたむかない */
+ if(P.bigUp)imArm(B,J.shF,J.elF,J.hdF,k,sk,true);/* 岩を持ち上げるときは、腕は大きな頭のうしろを通る */
+ B.thick(R([-.5*k,-9*k]),hb,1.6*k,sk[1],sk[2],sk[0]);
+ J.head=imStamp(B,HD,P,hb,a,V);
+ /* おかしらの首飾り：削り取った封印のかけら（くすんだ金の紋のかけら） */
+ if(isM){/* 首飾り：削り取った封印のかけらを縄に通している。かけらに金の紋がのこる */const A=R([-4.2*k,-9.5*k]),C=R([1.8*k,-10.2*k]);for(let i=0;i<=10;i++){const u=i/10,p=lerpP(A,C,u);B.set(p[0],p[1]+Math.sin(u*Math.PI)*3.2*k,IMROPE,1)}
+  for(let i=0;i<4;i++){const u=.15+i*.23,p=lerpP(A,C,u),y=p[1]+Math.sin(u*Math.PI)*3.2*k+1;B.set(p[0],y,SEAL[1],1);B.set(p[0]+1,y,SEAL[0],1);B.set(p[0],y+1,i%2?SEAL[2]:SEALG,1)}}
+ if(!P.bigUp)imArm(B,J.shF,J.elF,J.hdF,k,sk,true);
+ if(V.vein>=2){for(const[a2,b2]of[[J.shF,J.elF],[J.elF,J.hdF]])for(let i=0;i<4;i++)B.set(lerp(a2[0],b2[0],i/4)+(i%2),lerp(a2[1],b2[1],i/4),'#1a1220',2)}
+ if(S.front)S.front(B,J,T,P);
+ return J}
+const IMBASE={hk:2.05,lk:.5,tk:.66,pal:Object.assign({},PAL.guard),
+ behind:(B,J,T,P)=>impBehind(B,J,T,P,SPEC[P._who]||{}),front:(B,J,T,P)=>impFront(B,J,T,P,SPEC[P._who]||{})};
+Object.assign(PDEF,{ear:0,grin:0,rF:0,rB:0,jug:0,jn:0,bigUp:0,bigGone:0,bigX:0,parried:0,daze:0});
 const IMPOSE={ua:2.0,fa:2.4,sw:null,ua2:1.5,fa2:2.0,ff:-6,fb:6,cr:2.4,lean:.16,hd:-.05};
-SPEC.imp=Object.assign({},IMBASE,{name:'石なげ小鬼',k:.7,draw:(B,ox,oy,S,P,T)=>impDraw(B,ox,oy,S,Object.assign({},P,{_who:'imp'}),T),knightLike:true,tintable:true,pose:IMPOSE});
-SPEC.impM=Object.assign({},IMBASE,{name:'小鬼のおかしら',k:.875,big:true,draw:(B,ox,oy,S,P,T)=>impDraw(B,ox,oy,S,Object.assign({},P,{_who:'impM'}),T),knightLike:true,tintable:true,pose:IMPOSE});
+SPEC.imp=Object.assign({},IMBASE,{name:'石なげ小鬼',k:.7,draw:(B,ox,oy,S,P,T)=>impFig(B,ox,oy,S,Object.assign({},P,{_who:'imp'}),T),knightLike:true,tintable:true,pose:IMPOSE});
+SPEC.impM=Object.assign({},IMBASE,{name:'小鬼のおかしら',k:.875,big:true,draw:(B,ox,oy,S,P,T)=>impFig(B,ox,oy,S,Object.assign({},P,{_who:'impM'}),T),knightLike:true,tintable:true,pose:IMPOSE});
 for(const k of['imp','impM'])SPEC[k+'@w']=flashSpec(k);
 
 /* 石の飛び方：投げた手から、主人公の頭へ、高い山なり。13Fごとに「ヒュ」（音の輪）、足元の影が一段ずつ濃く大きくなり、4拍目（52F）で落ちる */
 const LOB=52,BEAT=13,HEADP=[HXX+4,FL-15];
 function soundArc(B,c,d){if(d<0||d>=8)return;const r=2+d*.9;for(let a=-.8;a<=.8;a+=.2){B.set(c[0]-Math.cos(a)*r,c[1]+Math.sin(a)*r,d<4?'#a8a0b0':'#6a6278',4);B.set(c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r,d<4?'#a8a0b0':'#6a6278',4)}}
-function lobFx(B,t,t0,from,P,big){const d=t-t0;if(d<0)return;const r=big?6.5:impRockR(.7);
+function lobFx(B,t,t0,from,P,big){const d=t-t0;if(d<0)return;const r=big?BIGR:impRockR(.7);
  if(d<=LOB){const u=d/LOB,x=lerp(from[0],HEADP[0],u),y=lerp(from[1],HEADP[1],u)-58*4*u*(1-u);(big?sealRock:rock)(B,x,y,r);
   const st=Math.min(3,Math.floor(d/BEAT)),w=3+st*3;for(let dx=-w;dx<=w;dx++)if((dx+st)%(4-st)===0||st===3)B.set(HXX+5+dx,FL+1,st>=2?'#000000':'#1a1620',5);/* 足元の影 */
   for(const b of[BEAT,BEAT*2,BEAT*3])soundArc(B,[x,y],d-b)}
  else if(!P.parried){const e=d-LOB;if(e<18){const x=HEADP[0]-e*1.1,y=HEADP[1]-e*2.2+e*e*.22;if(y<FL-1)rock(B,x,y,r);else rock(B,x,FL-r,r)}}}
 /* 大きな岩：持ち上げた頭の上から、短い山なりで投げる */
-function bigFx(B,t,t0,t1,from,P){if(t<t0)return;if(t<=t1){const u=(t-t0)/(t1-t0);sealRock(B,lerp(from[0],HEADP[0]+4,u),lerp(from[1],HEADP[1]-2,u)-14*4*u*(1-u),6.5)}
- else if(!P.parried){const e=t-t1;if(e<26){sealRock(B,HEADP[0]+4-e*.4,Math.min(FL-6,HEADP[1]-2+e*e*.3),6.5);if(e>8&&e<20)for(let i=0;i<5;i++)B.set(HEADP[0]+i*3-6,FL-1-(i%2),ROCK[0],5)}}}
+function bigFx(B,t,t0,t1,from,P){if(t<t0)return;if(t<=t1){const u=(t-t0)/(t1-t0);sealRock(B,lerp(from[0],HEADP[0]+4,u),lerp(from[1],HEADP[1]-2,u)-14*4*u*(1-u),BIGR)}
+ else if(!P.parried){const e=t-t1;if(e<26){sealRock(B,HEADP[0]+4-e*.4,Math.min(FL-BIGR,HEADP[1]-2+e*e*.3),BIGR);if(e>8&&e<20)for(let i=0;i<5;i++)B.set(HEADP[0]+i*3-6,FL-1-(i%2),ROCK[0],5)}}}
 const rocksAtFeet=(B,n)=>{for(let i=0;i<n;i++)rock(B,HXX+14+i*6,FL-2-(i%2),impRockR(.7))};
 
 /* 構え */
 const IMW1={ua:-2.5,fa:-2.0,rF:1},IMR1={ua:-1.0,fa:-.55,rF:0,lean:.24},IMW2={ua2:-2.3,fa2:-1.9,rB:1},IMR2={ua2:-1.0,fa2:-.6,rB:0,lean:.24};
 const IM2={ua:1.6,fa:-.4,ua2:1.3,fa2:-.7,rF:1,rB:1,cr:3.2,lean:.12,grin:.6};/* 二つ投げ：両手に石を一つずつ持ち、ひざで拍をとる */
-const IMJ={ua:2.2,fa:-1.2,ua2:1.9,fa2:-1.4,jug:1,jn:3,cr:2.6,lean:.02,hd:-.25,grin:.8};/* 三つ投げ：三つでお手玉 */
+const IMJ={ua:2.6,fa:-2.3,ua2:2.4,fa2:-2.0,jug:1,jn:3,cr:2.6,lean:.02,hd:-.25,grin:.8};/* 三つ投げ：三つでお手玉 */
 const IMB={ua:-1.85,fa:-1.6,ua2:-1.4,fa2:-1.75,bigUp:1,cr:4.2,lean:-.04,ff:-8,fb:8,hd:-.1,grin:.2};/* 大きな岩：封印の石を頭の上へ */
 const IMBT={ua:2.5,fa:2.8,ua2:2.3,fa2:2.7,bigUp:0,cr:3,lean:.42,ff:-9,fb:7,grin:1};
 const impIdlePP=(P,t)=>{P.cr=(P.cr||0)+Math.abs(Math.sin(t*Math.PI/48))*.5};
@@ -2957,7 +3122,7 @@ const handF=J=>add(J.hip,[-5*J.k,-20*J.k]);
 
 function imCards(f,pre,isM){const ox=isM?4:10,bg='def',S=SPEC[f],k=S.k;
  mv({f,ox,id:pre+'_idle',n:'立ち絵',bg,len:96,keys:[K(0,{}),K(96,{})],pp:impIdlePP,
-  cap:isM?'石なげ小鬼より大きく、背中側の床に、門の紋章が彫られた大きな石（封印の石）を置いている。':'大きな頭に、後ろへのびた耳、かぎ鼻、にやけた口。腰に石の袋。目はにぶい色で光らない。',
+  cap:isM?'年寄りの小鬼。拾った門番の紺の前垂れをマントにし、削り取った封印のかけらを首飾りにしている。まゆと耳の先に白い毛、目をまたぐ古傷、鼻のいぼ、欠けた歯。背中側の床に、門の紋章が彫られた大きな石（封印の石）。':'約2頭身。張り出したまゆの骨の下で、にごった黄色のぎょろ目が主人公を見る。鉤のように垂れた鼻、耳のほうへ切れ上がった口と不ぞろいの歯、後ろへのびた長い耳。猫背で腹が出て、脚は短く、腕は長い。大きな手に白い爪。麻のぼろ布の腰巻と縄の帯、腰に石の袋。',
   why:'子どもが遊ぶように、石を投げに来る。悪意より遊び。だから顔はいつもにやけている。'});
  if(!isM)mv({f,ox,id:pre+'_bored',n:'ひまなとき：小石を拾う',bg,len:150,
   keys:[K(0,{}),K(16,{}),K(28,{ua:2.6,fa:2.2,lean:.45,cr:4,hd:.3},'io'),K(44,{ua:2.6,fa:2.2,lean:.45,cr:4,hd:.3}),K(56,{ua:-2.6,fa:-2.6,rF:1,lean:.05,hd:-.2},'io'),K(84,{ua:-2.6,fa:-2.6,rF:1,lean:.05,hd:-.2}),K(92,{ua:-1.2,fa:-.4,rF:0,lean:-.12,hd:-.35,grin:1},'out'),K(120,{grin:1},'io'),K(150,{})],
@@ -3015,7 +3180,7 @@ function imCards(f,pre,isM){const ox=isM?4:10,bg='def',S=SPEC[f],k=S.k;
    cap:'大きな岩を弾くと、三つに割れて足元に落ちる。おかしらは両手を振り上げて地団駄を踏む。割れた三つは、次のこうげきで投げ返せる。',
    why:'重い一撃を弾いたごほうびが、投げ返し三つぶん。封印の石は、主人公の手でさらに割られる（勝つほど、くらやみに材料を渡している）。'})}
  /* ブレイク：しりもちをついて目を回す。袋から石がこぼれる */
- const BRK=t=>({cr:7.5,lean:-.32+Math.sin(t*.1)*.04,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.32+Math.sin(t*.13)*.12,ear:1,grin:0,x:2});
+ const BRK=t=>({cr:7.5,lean:-.32+Math.sin(t*.1)*.04,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.32+Math.sin(t*.13)*.12,ear:1,grin:0,x:2,daze:1});
  parriedCard({id:pre+'_brk',src:isM?pre+'_big':pre+'_two',n:'ブレイク：しりもちをついて目を回す',len:isM?230:250,kit,rx:isM?[{kind:'b'}]:[{kind:'s'},{kind:'b'}],pp:stamp,brk:{at:6,P:BRK,star:J=>add(J.head,[0,-12])},
   fx:(B,J,t,Hc)=>{rocksAtFeet(B,isM?3:Hc.filter(H=>t>=H).length);const T0=Hc[Hc.length-1]+20;if(t>T0)for(let i=0;i<3;i++)rock(B,J.hip[0]+8+i*4,FL-2,impRockR(J.k)*.8)},
   cap:'四度目を弾くと、しりもちをついて、袋から石がこぼれる。後ろ手をついたまま、頭をふらふらさせて目を回す。頭の上をうすい青の星が回る。',
@@ -3029,7 +3194,7 @@ function imCards(f,pre,isM){const ox=isM?4:10,bg='def',S=SPEC[f],k=S.k;
   why:'痛がるが、こりない。遊びはやめない。'});
  /* 撃破：ひっくり返り、石がころがり、体が足元の暗がりへ沈む。石だけが残る */
  mv({f,ox,id:pre+'_down',n:'撃破：暗がりへ沈む',bg,len:140,noHero:true,
-  keys:[K(0,{}),K(6,{lift:6,ear:1,lean:-.3},'out'),K(16,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.3,ear:1},'in'),K(40,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.4,ear:1}),K(100,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.4,ear:1,lift:-62},'in'),K(140,{lift:-62})],
+  keys:[K(0,{}),K(6,{lift:6,ear:1,lean:-.3},'out'),K(16,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.3,ear:1,daze:1},'in'),K(40,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.4,ear:1,daze:1}),K(100,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.4,ear:1,daze:1,lift:-62},'in'),K(140,{lift:-62})],
   post:(B,J,t)=>{for(let i=0;i<B.c.length;i++){const y=i/CW|0;if(y>FL&&(B.t[i]===1||B.t[i]===2||B.t[i]===3)){B.c[i]=0;B.t[i]=0}}
    if(t>=40){const u=Math.min(1,(t-40)/60),x0=J.hip[0];for(let dx=-14;dx<=14;dx++){if(Math.abs(dx)<14*Math.min(1,u*1.5)+2&&hsh(dx,t>>3)<.8)B.set(x0+dx,FL+1,'#0c0910',5)}}
    if(t>=16){const n=isM?3:2;for(let i=0;i<n;i++){const d=Math.min(1,(t-16)/20);rock(B,J.hip[0]-6+i*7+d*(i-1)*6,FL-2,impRockR(J.k)*.9)}}},
@@ -3046,9 +3211,9 @@ Object.assign(MCAT_PARRY,{imp:['im_pry'],impM:['imM_pry','imM_prybig']});Object.
 FORMS.push({key:'impM',ttl:'小鬼のおかしら',en:'THE STONE-TOSSING IMPS · 中ボスとモブ',stage:[],sox:62,vt:'IMV',vnote:'覚悟の段は、生きたまま浸食されていく段階。肌の色が変わるだけでなく、赤い段から頭に黒い筋、黒い段から腕にも筋が走って額に光らない目が一つ開き、紫の段では目が三つになる。石（攻撃の道具）の色はどの段でも変えない。',
  variants:[['n','緑の肌'],['r','赤い肌。頭に黒い筋'],['k','黒い肌。腕にも筋、額に目'],['v','紫の肌。目が三つ']],
  lore:'迷宮に住みつく小鬼たち。拍に合わせて石を投げるのは、遊び歌のようなもの。悪意より遊び。おかしらがいつも持ち歩く大きな石には、門の紋章が彫られている。封印の石を、遊びで削り、投げ、壊している。',
- parts:[['大きな頭とにやけた口','いつも遊んでいる顔。斬られても、こりずにまたにやける'],['手の石・お手玉','持っている石の数＝投げる数。お手玉の拍＝落ちる拍（いちばん大事な原則）'],['腰の石の袋','ブレイクでこぼれる。石がない＝投げられない＝すき'],['封印の石（おかしら）','門の紋章（閉じた門）が彫られた石。遊びで削られ、欠けている。大きな岩の技で投げる'],['光らない石','攻撃は音（ポイ・ヒュ・ヒュ・ヒュ）と足元の影で読む。大きな岩だけが赤く光る']],
- pal:[['#5e7a3a','緑の肌','光らない'],['#7a6e66','石','投げる石。弾くと足元に落ちる'],['#5e5a66','封印の石','門の紋章（くすんだ金）'],['#a85a3a','にぶい目','光らない']],
- pair:{key:'imp',ttl:'石なげ小鬼（モブ）',diff:[['同じ骨格','人型（小さい）。おかしらは1.25倍で、封印の石を持ち歩く'],['技','モブは「二つ投げ」。おかしらは「三つ投げ」＋「大きな岩（赤）」。拍で来る攻撃と投げ返しは、おかしらで先に教わる'],['構え','両手に一つずつ＝二つ。お手玉＝三つ。石を頭の上へ＝大きな岩']]}});
+ parts:[['張り出したまゆと、ぎょろ目','目はにぶい黄色で光らない。笑うと細くなり、斬られると見開き、ブレイクで回る'],['鉤鼻と切れ上がった口','いつも遊んでいる顔。斬られても、こりずにまたにやける。おかしらは歯が欠けている'],['大きな手と白い爪','石を持つ手。手の石の数＝投げる数なので、手を大きく描く'],['紺のマント（おかしら）','倒れた門番から拾った前垂れ。すり切れた金のふちと、閉じた門の紋章の名残。小鬼も、倒れたものを拾って使う'],['封印のかけらの首飾り（おかしら）','背中の封印の石から削り取ったかけら。封印を壊して遊んでいる証拠'],['手の石・お手玉','持っている石の数＝投げる数。お手玉の拍＝落ちる拍（いちばん大事な原則）'],['腰の石の袋','ブレイクでこぼれる。石がない＝投げられない＝すき'],['封印の石（おかしら）','門の紋章（閉じた門）が彫られた石。遊びで削られ、欠けている。大きな岩の技で投げる'],['光らない石','攻撃は音（ポイ・ヒュ・ヒュ・ヒュ）と足元の影で読む。大きな岩だけが赤く光る']],
+ pal:[['#5e7a3a','緑の肌','光らない'],['#7a6e66','石','投げる石。ふちの明るい一点で数えやすく（光らない）'],['#5e5a66','封印の石','門の紋章（くすんだ金）'],['#cabe84','にごった黄色の目','光らない。合図の白・金と取り違えないよう、にごらせる'],['#2e3a5e','紺のマント','門番の前垂れと同じ紺']],
+ pair:{key:'imp',ttl:'石なげ小鬼（モブ）',diff:[['同じ骨格','人型（小さい）。おかしらは1.25倍で、封印の石を持ち歩く'],['技','モブは「二つ投げ」。おかしらは「三つ投げ」＋「大きな岩（赤）」。拍で来る攻撃と投げ返しは、おかしらで先に教わる'],['構え','両手に一つずつ＝二つ。お手玉＝三つ。石を頭の上へ＝大きな岩'],['身なり','モブは麻のぼろ布だけ。おかしらは拾った門番の紺のマントと、封印のかけらの首飾り。年寄りで、白い毛と古傷']]}});
 FORMS.push({key:'imp',ttl:'石なげ小鬼',en:'MOB · 小鬼のおかしらと同じ骨格',stage:[],sox:62,vt:'IMV',vnote:'覚悟の段は小鬼のおかしらと同じ（黒い筋、額の目、目が三つ）。',
  variants:[['n','緑の肌'],['r','赤い肌'],['k','黒い肌。額に目'],['v','紫の肌。目が三つ']],
  lore:'迷宮に住みつく小鬼。上の暗がりから降ってきて、石を二つ投げる。ひまなときは床の小石を拾っては放って遊ぶ。',

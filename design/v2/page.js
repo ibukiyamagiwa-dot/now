@@ -4,10 +4,10 @@ function bgData(kind,ctx){if(BGC[kind])return BGC[kind];bgFill(ctx,kind);return 
 function paint(ctx,B,bg){const im=new ImageData(new Uint8ClampedArray(bg.data),bg.width,bg.height);for(let i=0;i<B.c.length;i++){const c=B.c[i];if(!c)continue;const[r,g,b]=rgb(c);im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b;im.data[i*4+3]=255}ctx.putImageData(im,0,0)}
 function el(t,cls,html){const e=document.createElement(t);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
 function moveCard(M,cat){const c=el('figure','card');if(cat)c.dataset.cat=cat;const cv=el('canvas');cv.width=CW;cv.height=CH;c.appendChild(cv);
- let kd=KINDOF(M.id);if(cat&&cat!=='atk'&&kd==='atk')kd=cat==='idle'?'stand':'show';const tag=kd==='main'?`<span class="tag st">立ち絵</span>`:kd==='stand'?`<span class="tag st">派生の立ち絵</span>`:kd==='show'?`<span class="tag sh">演出</span>`:EXMV[M.id]?`<span class="tag ex">いまの技：${EXMV[M.id]}</span>`:`<span class="tag nw">新しい技（案）</span>`;
+ let kd=KINDOF(M.id);if(cat&&cat!=='atk'&&kd==='atk')kd=cat==='idle'?'stand':'show';if(M.hero)kd='hero';const tag=kd==='hero'?`<span class="tag ex">主人公</span>`:kd==='main'?`<span class="tag st">立ち絵</span>`:kd==='stand'?`<span class="tag st">派生の立ち絵</span>`:kd==='show'?`<span class="tag sh">演出</span>`:EXMV[M.id]?`<span class="tag ex">いまの技：${EXMV[M.id]}</span>`:`<span class="tag nw">新しい技（案）</span>`;
  const lights=(M.cues||[]).map(c=>c.col).filter((v,i,a)=>a.indexOf(v)===i).map(c=>`<i class="lt ${c}"></i>`).join('');
  const gap=(M.cues&&M.hits&&M.cues.length&&M.hits.length)?`<span class="gap">合図→当たり ${M.hits[0]-M.cues[0].t}F</span>`:'';
- const ctag=cat?`<span class="tag ct ct-${cat}">${(MCATS.find(c=>c[0]===cat)||[,''])[1]}</span>`:'';const meta=el('figcaption','',`<div class="row">${ctag}<b>${M.n}</b>${tag}</div><p class="read"><span class="k">読み方</span>${M.cap}</p><p class="why"><span class="k">意味</span>${M.why||''}</p><div class="row foot">${lights}${gap}<span class="fr"></span></div>`);
+ const ctag=cat?`<span class="tag ct ct-${cat}">${(MCATS.concat(HCATS).find(c=>c[0]===cat)||[,''])[1]}</span>`:'';const meta=el('figcaption','',`<div class="row">${ctag}<b>${M.n}</b>${tag}</div><p class="read"><span class="k">読み方</span>${M.cap}</p><p class="why"><span class="k">意味</span>${M.why||''}</p><div class="row foot">${lights}${gap}<span class="fr"></span></div>`);
  c.appendChild(meta);const a={cv,ctx:cv.getContext('2d'),M,t:0,vis:false,pause:false,fr:meta.querySelector('.fr'),draw(){paint(this.ctx,frame(this.M,Math.floor(this.t)),bgData(this.M.bg||'def',this.ctx));this.fr.textContent=Math.floor(this.t)%this.M.len+'F'}};
  cv.onclick=()=>{a.pause=!a.pause;c.classList.toggle('paused',a.pause)};ANIM.push(a);a.draw();return c}
 function stageCard(s){const c=el('figure','card stage');const cv=el('canvas');cv.width=SW;cv.height=SH;c.appendChild(cv);
@@ -55,6 +55,10 @@ function router(root){const nx=document.getElementById('next');if(nx)root.append
  window.addEventListener('hashchange',show);show()}
 function heroSec(){const s=el('section','hero');s.id='hero';s.appendChild(el('div','fhead','<div class="num">00</div><div><div class="en">THE KNIGHT</div><h2>主人公</h2></div>'));
  s.appendChild(el('p','lead','名実ともに騎士。顔は見せない。だれもが自分を重ねられる。盾は顔の代わりで、キャラクターの中心。最初は何も描かれていない盾に、歩んだ道のりが刻まれていく。'));
+ {const ids=HMV_IDS,tabs=el('div','mtabs'),g=el('div','grid');s.appendChild(el('h3','',`モーション <small>${ids.length}</small>`));
+  HCATS.forEach(([c,n])=>{const k=c==='all'?ids.length:ids.filter(id=>MV.find(m=>m.id===id).cat===c).length;if(!k)return;const bt=el('button',c==='all'?'on':'',`${n}<small>${k}</small>`);bt.onclick=()=>{tabs.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===bt));g.querySelectorAll('.card').forEach(cd=>cd.style.display=(c==='all'||cd.dataset.cat===c)?'':'none')};tabs.appendChild(bt)});
+  s.appendChild(tabs);ids.forEach(id=>{const M=MV.find(m=>m.id===id);g.appendChild(moveCard(M,M.cat))});s.appendChild(g)}
+ s.appendChild(el('h3','','クリアチェッカーの差分'));
  const g=el('div','hgrid');HVARS.forEach(v=>{const c=el('figure','card hv');const S=heroVar(v.o||{});const cv=standCanvas2(S,60,56,34);c.appendChild(cv);c.appendChild(el('figcaption','',`<div class="row"><b>${v.n}</b><span class="tag ex">${v.how}</span></div><p class="why">${v.why}</p>`));g.appendChild(c)});s.appendChild(g);return s}
 function standCanvas2(S,w,h,ox){const cv=el('canvas','stand');cv.width=w;cv.height=h;const a={cv,ctx:cv.getContext('2d'),t:0,vis:false,pause:false,draw(){const B=new Buf(w,h),tt=Math.floor(this.t);knight(B,ox,h-4,S,{V:S.V},tt);B.outline();const F=new Buf(w,h);F.blit(B,true);this.ctx.clearRect(0,0,w,h);F.toCanvas(this.ctx)}};ANIM.push(a);a.draw();return cv}
 function ladderSec(){const s=el('section','lad');s.id='ladder';

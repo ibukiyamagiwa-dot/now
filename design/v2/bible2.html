@@ -1050,7 +1050,7 @@ mv({f:'red2',id:'r2_moon',n:'満月（弧）',bg:'red',len:140,cap:'正眼から
   K(80,{ua:1.75,fa:2.45,sw:2.6,ua2:1.6,fa2:2.35,x:-38,lean:.24,ff:-14,fb:10,cr:5.2,sheath:0}),K(108,R2D,'io'),K(130,R2G,'io')],
  cues:[{t:14,col:'w'}],hits:[42],trails:[[34,58,'w',0,'arc']]});
 mv({f:'red2',id:'r2_tsubame',n:'つばめ返し（弧が二つ）',bg:'red',len:150,cap:'白く光ったら、上からの円弧、続けて下からの円弧。2撃の間はふつう（タン・タン）。見るのは剣先。',why:'円の技を二つ、向きを逆にしてつなぐ。二撃目の光は、一撃目の終わりに出る。',
- keys:[K(0,R2G),K(10,R2D),K(14,R8),K(42,Object.assign({},RCUT,{x:-46}),'in'),K(46,Object.assign({},RCUT,{x:-46,ua:2.4,fa:2.0,sw:1.6})),K(56,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2}),'in'),K(84,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2})),K(140,R2G)],
+ keys:[K(0,R2G),K(10,R2D),K(14,R8),K(42,Object.assign({},RCUT,{x:-46}),'in'),K(46,Object.assign({},RCUT,{x:-46,ua:2.4,fa:2.0,sw:1.95})),K(56,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2}),'in'),K(84,Object.assign({},RCUT,{x:-46,ua:2.2,fa:-2.6,sw:-2.2})),K(140,R2G)],
  cues:[{t:14,col:'w'},{t:28,col:'w'}],hits:[42,56],trails:[[36,44,'w',0,'arc'],[49,58,'w',0,'arc']]});
 mv({f:'red2',id:'r2_juji',n:'十文字（タタン・重い）',bg:'red',len:150,cap:'正眼から剣を脇に引き、目が赤く光る。横一文字に薙いで、間を置かずに真上から唐竹割り。赤い角ばった軌跡が十字に残る。2撃とも重く、間が短い（タタン）。',why:'赤い角ばった軌跡は「重い一撃」の印。横と縦、二本の赤い線が交わって十字になる。弾き切れば、二度大きく返せる。',
  keys:[K(0,R2G),K(10,Object.assign({},RW,{sheath:0,cr:4})),K(38,Object.assign({},RW,{sheath:0,cr:4.5,x:4})),K(42,{ua:3.0,fa:3.0,sw:3.0,ua2:2.6,fa2:2.8,x:-44,lean:.25,ff:-13,fb:9,cr:4,sheath:0},'in'),K(44,{ua:-2.2,fa:-1.7,sw:-1.3,x:-44,lean:-.05,cr:3,sheath:0}),K(50,{ua:2.8,fa:2.5,sw:2.0,x:-48,lean:.35,ff:-13,fb:9,cr:5,sheath:0},'in'),K(84,{ua:2.8,fa:2.5,sw:2.0,x:-48,lean:.35,ff:-13,fb:9,cr:5,sheath:0}),K(144,R2G)],
@@ -1460,24 +1460,44 @@ tfe('lord','l_r_tfeint',LRI,LLO,half(LLO,LJAB),LJAB,'lord','鍵を腰に引き�
 tfe('lord2','l2_r_tfeint',L2X(LRI),L2X(LLO),L2X(half(LLO,LJAB)),L2X(LJAB),'lord','鍵の歯が紫の輪に光り、突きかけて止まる。止めた瞬間、背中の触手だけが前へのびかける。間をおいて金の本物。','突きのフェイント。触手につられて押さない。',(B,J,t)=>tentLash(B,J,t,26,40));
 for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?'f':'f2',S=QSTY[st];tfe(S.f,p+'_q_tfeint',QRI,QTSU,half(QTSU,QTSUH),QTSUH,S.bg,'剣を引き、切っ先が紫の輪に光る。突きかけて、切っ先がこちらの鍔の手前でぴたりと止まる。'+(S.dark?'止めた瞬間、触手だけが前へ出かける。':'')+'引き戻して、間をおいて金の本物の突き。','突きのフェイント。斬りのフェイントと同じく、紫の輪＝押さずに待つ。',S.dark?(B,J,t)=>T8(B,J,t,26,40):null)}
 tfe('red2','r2_q_tfeint',ZRI,ZRI,half(ZRI,ZTH),ZTH,'red','低い構えのまま動かず、切っ先だけが紫の輪に光る。両手突きが走り、切っ先がこちらの鍔に触れる寸前、髪一本の距離で止まる。そのまま切っ先で鍔をコツンと叩いて引く。間をおいて金の本物。','突きのフェイント。本気は全力の突きを「触れる寸前」で止められる。押せば、その距離からそのまま崩される。',(B,J,t)=>{if(t===40&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')});
-/* ===== 剣は腕で振る =====
-   手首だけで剣を回すと、剣としておかしい（腕は止まったまま、刃だけがくるりと回る）。
-   (1) 手首の曲がり（剣の向き−前腕の向き）は ±1.1 まで。超えるキーは、腕ごと（両手なら左腕も）剣の向きへ回して、手首を戻す。
-       こうすると、振りかぶりでは腕が頭上へ上がり、振り下ろしでは腕ごと弧を描く。
-   (2) 振り抜く技は、当たりのあと5Fで、腕と剣がさらに振った向きへ進んで止まる（振り切り）。
-       当たりの位置で止めるのは、刃と刃が当たって止まる打ち合いと、意図して止める技（居合の一閃・参段・突き）だけ。 */
+/* ===== 剣は腕で振る（桜井流モーションの見直しを含む） =====
+   手首（剣の向き−前腕の向き。画面で時計回りを＋）は、握りこぶしで無理なく取れる範囲 +0.45〜+2.4 に収める。
+   ＋側＝親指側へ立てる（剣が前腕より上・後ろへ立つ）は大きく取れる。−側＝手首を下へ折って剣を前腕の線より下げるのはだめ。
+   剣先を下げるときは、手首を折らずに、肘を曲げ、腕ごとそこまで振り下ろす（前腕を下げ、上腕も前腕より 0.3 以上下へ）。
+   手首を立てすぎたキー（＋2.4 超）は、腕ごと剣の向きへ回す。両手持ちなら左腕も同じだけ動かす。
+   例外（意図して剣と前腕を一直線にするもの）：突き（剣も前腕もほぼ真横前）と、居合の一閃（一瞬で描く）。 */
 const KNIGHT_F=new Set(['gate','dgate','lord','lord2','red','red2','fallen','fallen2']),WR=a=>{while(a>Math.PI)a-=6.2832;while(a<-Math.PI)a+=6.2832;return a};
-const wristFix=(f,p)=>{if(!p||typeof p.sw!=='number')return p;const S=Object.assign({},PDEF,(SPEC[f]&&SPEC[f].pose)||{});const ua=p.ua!=null?p.ua:S.ua,fa=p.fa!=null?p.fa:S.fa;const w=WR(p.sw-fa),L=1.1;if(Math.abs(w)<=L)return p;
- const r=w-Math.sign(w)*L,q=Object.assign({},p,{ua:ua+r,fa:fa+r});const ua2=p.ua2!=null?p.ua2:S.ua2,fa2=p.fa2!=null?p.fa2:S.fa2;if(Math.abs(WR(ua2-ua))<.6&&Math.abs(WR(fa2-fa))<.6){q.ua2=ua2+r;q.fa2=fa2+r}return q};
-const NOSWING=/iai|silent|three|reflect|_q_|_r_|rally|thrust|pierce|delay|tsuki|jab|lunge/;
+const WLO=.45,WHI=2.4;
+const wristFix=(f,p)=>{if(!p||typeof p.sw!=='number')return p;const S=Object.assign({},PDEF,(SPEC[f]&&SPEC[f].pose)||{});let ua=p.ua!=null?p.ua:S.ua,fa=p.fa!=null?p.fa:S.fa;
+ if(Math.abs(WR(p.sw-Math.PI))<.2&&Math.abs(WR(fa-Math.PI))<.25)return p;/* 突き */if(p.kn>0)return p;/* 剣を床に突き立てて膝をつく */
+ const w=WR(p.sw-fa);let dF=0,dU=0;
+ if(w<WLO){dF=WR(w-WLO);const nf=fa+dF;const e=WR(nf-ua);if(e<.3)dU=e-.3}
+ else if(w>WHI){dF=w-WHI;dU=dF}
+ if(!dF&&!dU)return p;const ua2=p.ua2!=null?p.ua2:S.ua2,fa2=p.fa2!=null?p.fa2:S.fa2,two=Math.abs(WR(ua2-ua))<.6&&Math.abs(WR(fa2-fa))<.6;
+ /* 腕を下げた結果、剣先が床に深く刺さるなら、刺さらないところまで戻す（床の奥行きのぶん 8 までは許す） */
+ const Sp=SPEC[f];for(const s of[1,.75,.5,.25]){const q=Object.assign({},p,{ua:ua+dU*s,fa:fa+dF*s});if(two){q.ua2=ua2+dU*s;q.fa2=fa2+dF*s}
+  if(!Sp||!Sp.w)return q;const P=Object.assign({},S,q);let J;try{J=joints(0,FL,Sp,P)}catch(e){return q}const ty=J.hdF[1]+Math.sin(P.sw)*Sp.w.len*Sp.k;if(ty<=FL+8)return q}
+ return p};
+const NOSWING=/iai|silent|three|reflect|_q_|_r_|rally|thrust|pierce|delay|tsuki|jab|lunge|moon/;
+/* 振り切りの剣先は、真下（床に突き立てる向き）まで行かせない。前下がり 2.05 で止める */
+const swRot=(p,d,s)=>{const F=Object.assign({},p);for(const[q,a]of[['ua',.45],['fa',.65],['sw',.8],['ua2',.45],['fa2',.65]])if(typeof F[q]==='number')F[q]+=d*a*s;
+ if(typeof F.sw==='number'){const w0=WR(p.sw),w1=WR(F.sw);if(w0>=2.05&&w1<2.05&&w1>0){const back=2.05-w1;F.sw+=back;for(const q of['ua','fa','ua2','fa2'])if(typeof F[q]==='number')F[q]+=back*.8}}return F};
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 for(const M of MV){if(!KNIGHT_F.has(M.f)||!M.keys)continue;
  M.keys=M.keys.map(k=>k.e==='snap'||k.p===IAI?k:K(k.t,wristFix(M.f,k.p),k.e));
  if(NOSWING.test(M.id)||!M.hits)continue;
  for(const h of M.hits){const i=M.keys.findIndex(k=>k.t===h);if(i<1||i>=M.keys.length-1)continue;const H=M.keys[i],Pv=M.keys[i-1],N=M.keys[i+1];
   if(typeof H.p.sw!=='number'||typeof Pv.p.sw!=='number'||H.e==='snap')continue;const ds=WR(H.p.sw-Pv.p.sw);if(Math.abs(ds)<1.0)continue;
-  if(N.t-h<10||JSON.stringify(N.p)!==JSON.stringify(H.p))continue;/* すぐ次の振りへつながる連撃は、次の振りが振り切りを兼ねる */
-  const d=Math.sign(ds),F=Object.assign({},H.p);for(const[q,a]of[['ua',.45],['fa',.65],['sw',.8],['ua2',.45],['fa2',.65]])if(typeof F[q]==='number')F[q]+=d*a;
-  F.lean=(F.lean||0)+.06;const nk=[];for(let j=0;j<M.keys.length;j++){const k=M.keys[j];if(j>i&&JSON.stringify(k.p)===JSON.stringify(H.p)&&k.t<=N.t)nk.push(K(k.t,F,k.e));else nk.push(k);if(j===i)nk.push(K(h+5,F,'out'))}
+  if(N.t-h<10||!same(N.p,H.p))continue;/* すぐ次の振りへつながる連撃は、次の振りが振り切りを兼ねる */
+  const d=Math.sign(ds);
+  /* 桜井流(1) 当たりの瞬間は「少し振り抜いた」ポーズで決める（振り抜いていないところで当てると手ごたえに欠ける） */
+  const H2=wristFix(M.f,swRot(H.p,d,.3));
+  /* 桜井流(2) 振り切り：当たりのあと5Fで、さらに振った向きへ進んで止まり、残る時間いっぱい粘る */
+  const F=wristFix(M.f,Object.assign(swRot(H.p,d,1),{lean:(H.p.lean||0)+.06}));
+  const holdEnd=M.keys.filter((k,j)=>j>i&&same(k.p,H.p)).map(k=>k.t).pop()||N.t;
+  const nk=[];for(let j=0;j<M.keys.length;j++){const k=M.keys[j];if(j===i){nk.push(K(k.t,H2,k.e));nk.push(K(h+5,F,'out'));continue}if(j>i&&same(k.p,H.p))nk.push(K(k.t,F,k.e));else nk.push(k)}
+  /* 桜井流(3) 戻りは、来た道をなぞらない：戻りの途中で剣先をいったん上へ逃がしてから構えに収まる */
+  const r=nk.findIndex(k=>k.t>holdEnd);if(r>0){const A=nk[r-1],B=nk[r];if(B.t-A.t>=10&&typeof B.p.sw==='number'){const mid=Object.assign({},B.p);mid.sw=(typeof mid.sw==='number'?mid.sw:0)-.7*d;mid.cr=(mid.cr||0)+.6;nk.splice(r,0,K(Math.round(A.t+(B.t-A.t)*.55),wristFix(M.f,mid),'io'))}}
   M.keys=nk.sort((a,b)=>a.t-b.t)}}
 /* 赤い騎士と本気の角度は、いつも近い回り道で補間する。角度の差が半周をこえると、腕や剣が体の後ろを大回りして、
    振ってもいない「ひと振り」が一瞬見えてしまう（構えを移すだけの場面で、剣を振ったように見えた）。 */

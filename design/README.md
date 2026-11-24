@@ -23,6 +23,7 @@
 - `hurt.js`（v2）：全員の「やられ」、足りなかった出現、モーションの種類（出現・待機・攻撃・やられ・撃破）の分け方
 - `boar.js` `mobs.js` `shade.js` `iai.js`（v2）：中ボスとモブ。`boar.js` は四つ足の骨格、`mobs.js` は中ボスとモブの設計とモーション、`shade.js` は影の剣士、`iai.js` は居合の剣士
 - `content.js` `page.js` `shell.html`：資料集ページの文章とつくり
+- `audit_stance.py`（v2）：いちばん大事な原則の点検。同じ敵の技で、一度に来る数や間がちがうのに、予兆の瞬間の絵がほぼ同じ組を出す（`python3 audit_stance.py`）
 
 ## 公開した資料
 - 初版の資料集（claude.ai のアーティファクト）：c55e734f-3a97-4f5b-9a54-0f68b0d20639

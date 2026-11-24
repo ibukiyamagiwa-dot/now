@@ -71,6 +71,8 @@ function syncOut(){
 }
 const dbg={bar:false,slow:false,god:false,fix:false,all:false};
 let CFG={guide:false,vol:7,bgm:5,shake:100,flash:100,dev:false,vib:true};
+/* ?new：資料集の骨組みの描き方（js/24r-rig.js）で描く。いまは門番だけ。保存はしない */
+const NEWDRAW=/[?&]new(?:[&=]|$)/.test(location.search);
 const MOB=matchMedia('(hover:none) and (pointer:coarse)').matches||/[?&]mob/.test(location.search);
 let PORTV=false,UIS=1;
 function layout(){PORTV=MOB&&innerHeight>innerWidth;UIS=PORTV?1.9:MOB?1.3:1;document.body.classList.toggle('mob',MOB);document.body.classList.toggle('port',PORTV)}

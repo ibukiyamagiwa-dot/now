@@ -10,7 +10,7 @@ function eName(e){if(e.kind==='lord'||e.key==='gateK')return lordFrame(e);if(e.k
 function tailStrike(){if(G.state!=='enemy'||!G.en||G.en.kind!=='dragon')return null;return G.strikes.find(s=>!s.cx&&s.mv==='tail'&&G.et>=s.cue-1&&G.et<=s.impact+14)||null}
 function dragonFrame(){const f2=(G.anim>>3)%2;if(G.state==='roar'&&G.t>=6&&G.t<66)return'dragonR'+f2;if(G.state==='blown'&&G.t>=12&&G.t<70)return'dragonR'+f2;if(tailStrike())return'dragonT'+f2;if(G.state==='enemy'){const s=G.strikes.find(s=>!s.done&&G.et>=s.cue-2)||G.strikes.find(s=>s.done&&!s.cx&&G.et<s.impact+8&&G.et>=s.impact);if(s){if(s.red)return'dragonR'+f2;if(s.mv==='stab'||s.mv==='breath')return'dragonM'+f2}}return'dragon'+((G.anim>>(G.en&&G.en.rage?2:3))%8)}
 function glowLv(e){return e.kind==='dragon'&&e.rage&&e.lit?(G.anim>>3)%4:-1}
-function eSpr(e,v){const nm=eName(e);if(NSPR[nm])return nspr(nm,v,e.tint);return spr(nm,nm+v+e.col+glowLv(e),enemyPal(e,v))
+function eSpr(e,v){if(RIG.on(e))return RIG.img(e,v);const nm=eName(e);if(NSPR[nm])return nspr(nm,v,e.tint);return spr(nm,nm+v+e.col+glowLv(e),enemyPal(e,v))
 }
 const CACHE={};
 function spr(name,key,pal){
@@ -217,6 +217,7 @@ function drawEnemy(){
  else if(e.kind==='knight'){const ns=G.state==='enemy'&&G.strikes.find(s=>!s.done),k=ns&&G.et>=ns.start?Math.max(0,1-Math.abs(G.et-ns.cue)/10):0,LN=[6, 9, 7, 3],ct=nCol('#4a2260',v,e.tint),cT=nCol('#9a62b4',v,e.tint);
   if(!G.ko)for(let j=0;j<4;j++){const R=an('knT',x,y,j),L=LN[j];for(let i=0;i<L;i++){const f=i/L,sw=Math.sin(G.anim*.06+j*1.9+i*.45)*f*1.6,cu=-k*f*f*(5+j),yy=R.y+Math.round(i*(1-.3*k));px(Math.round(R.x+sw+cu),yy,i===L-1?cT:ct)}}
   tip=an('knH',x,y,ns?G.strikes.filter(s=>s.done).length%2:0)}
+ else if(RIG.on(e)){tip=RIG.tip(e,x,y-idle)}
  else if(e.kind==='lord'){tip=drawLordFx(e,x,y-idle,v)}
  else if(e.kind==='boar'){tip=an('boarT',x,y)}
  else if(e.kind==='doll'){tip=an('dollT',x,y)}
@@ -225,7 +226,8 @@ function drawEnemy(){
  else if(e.kind==='hydra'){const hs=G.state==='enemy'&&G.strikes.find(s=>!s.done),ps=poolStrike();if(ps){tip={x:Math.round(poolX(ps,G.et)),y:FLOOR-4}}else if(hs&&hs.heads){const hp=hydraHeadPos(hs.heads[hs.heads.length>1?1:0],x,y);tip={x:Math.round(hp[0])-6,y:Math.round(hp[1])+2}}else tip={x:x-14,y:y-26-Math.round((p.rise||0)*9)}}
  else{tip={x:x-19,y:y-18-idle}}
  if(e.kind==='dragon')drawFire(x,y);
- if(e.broken){for(let i=0;i<3;i++){const an=G.anim*.08+i*2.1;pxStar(x+Math.cos(an)*11,y-h-5+Math.sin(an)*2,2,'#e8c46a')}}
+ if(e.broken&&RIG.on(e))RIG.brkStars(e,x,y-idle);
+ else if(e.broken){for(let i=0;i<3;i++){const an=G.anim*.08+i*2.1;pxStar(x+Math.cos(an)*11,y-h-5+Math.sin(an)*2,2,'#e8c46a')}}
  if(tip){const SR=PORTV?LW-42:LW-10,SL=PORTV?42:10;tip={x:Math.max(SL,Math.min(SR,tip.x)),y:Math.max(14,tip.y)}}
  if(p.cue>=0&&p.cue<12){if(p.fake)pxArc(tip.x,tip.y,2+Math.round(p.cue/2),0,Math.PI*2,'#c9a8ff');else{pxStar(tip.x,tip.y,3+Math.round(6*(1-p.cue/12)),p.red?'#ff4a5a':p.gold?'#ffd27a':'#ffffff');if(p.gold)pxArc(tip.x,tip.y,3+p.cue,0,Math.PI*2,'#ffd27a')}}
  else if(p.pulse){pxStar(tip.x,tip.y,4,p.red?'#ff4a5a':'#ffffff')}

@@ -4,7 +4,8 @@
   出力: /home/claude/cmp/（index.html と技ごとのGIF）。中身は毎回入れかえる。"""
 import asyncio,base64,io,os,shutil,subprocess,sys,html
 from playwright.async_api import async_playwright
-from PIL import Image,ImageDraw,ImageFont
+from PIL import Image,ImageDraw,ImageFont,ImageChops
+import warnings;warnings.filterwarnings('ignore')
 REV,IDS=sys.argv[1],sys.argv[2:]
 HERE=os.path.dirname(os.path.abspath(__file__));REPO='/home/claude/now';OUT='/home/claude/cmp';TMP='/tmp/cmpsrc'
 shutil.rmtree(TMP,ignore_errors=True)
@@ -28,11 +29,13 @@ for id in IDS:
   def img(d,i):i=min(i,len(d['fr'])-1);return Image.open(io.BytesIO(base64.b64decode(d['fr'][i].split(',')[1]))).convert('RGB').resize((136*S,118*S),Image.NEAREST)
   fs=[]
   for i in range(max(len(o['fr']),len(n['fr']))):
-    W=Image.new('RGB',(136*S*2+12,118*S+40),(17,17,17));W.paste(img(o,i),(0,34));W.paste(img(n,i),(136*S+12,34));d=ImageDraw.Draw(W)
+    A,Bm=img(o,i),img(n,i);diff=sum(1 for q in ImageChops.difference(A,Bm).getdata() if sum(q)>30)>200
+    W=Image.new('RGB',(136*S*2+12,118*S+40),(17,17,17));W.paste(A,(0,34));W.paste(Bm,(136*S+12,34));d=ImageDraw.Draw(W)
+    if diff:d.rectangle([136*S+8,30,136*S*2+11,118*S+37],outline=(255,210,80),width=3);d.text((136*S+120,4),'ちがう',fill=(255,210,80),font=F)
     d.text((8,4),'修正前',fill=(200,120,120),font=F);d.text((136*S+20,4),'修正後',fill=(140,210,150),font=F);t=n['t0']+i;d.text((136*S*2-120,4),f'{t}F',fill=(150,150,150),font=F)
     if any(h<=t<h+3 for h in n['hits']):d.text((136*S*2-60,4),'当',fill=(255,220,120),font=F)
     fs.append(W.convert('P',palette=Image.ADAPTIVE,colors=128))
   fs[0].save(f'{OUT}/{id}.gif',save_all=True,append_images=fs[1:],duration=40,loop=0,optimize=True)
   secs.append(f'<section><h2>{html.escape(n["n"])}</h2><p class="n">{html.escape(n["cap"])}</p><img src="{id}.gif" alt="{html.escape(n["n"])}の比較"></section>')
-open(f'{OUT}/index.html','w',encoding='utf-8').write('<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>修正前と修正後</title><style>body{margin:0;background:#111;color:#e8e8e8;font-family:"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.6}main{max-width:860px;margin:0 auto;padding:20px 14px 60px}h1{font-size:20px;margin:0 0 6px}p.lead{color:#aaa;font-size:14px;margin:0 0 22px}section{margin:0 0 30px}h2{font-size:16px;margin:0 0 4px}p.n{color:#bbb;font-size:13px;margin:0 0 8px}img{width:100%;height:auto;image-rendering:pixelated;border-radius:6px;display:block}</style></head><body><main><h1>修正前と修正後</h1><p class="lead">左が修正前、右が修正後。同じフレームを並べ、約2/5の速さでくり返し再生。右上はフレーム、「当」は当たりの瞬間。説明文は修正後のもの。</p>'+''.join(secs)+'</main></body></html>')
+open(f'{OUT}/index.html','w',encoding='utf-8').write('<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>修正前と修正後</title><style>body{margin:0;background:#111;color:#e8e8e8;font-family:"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.6}main{max-width:860px;margin:0 auto;padding:20px 14px 60px}h1{font-size:20px;margin:0 0 6px}p.lead{color:#aaa;font-size:14px;margin:0 0 22px}section{margin:0 0 30px}h2{font-size:16px;margin:0 0 4px}p.n{color:#bbb;font-size:13px;margin:0 0 8px}img{width:100%;height:auto;image-rendering:pixelated;border-radius:6px;display:block}</style></head><body><main><h1>修正前と修正後</h1><p class="lead">左が修正前、右が修正後。同じフレームを並べ、約2/5の速さでくり返し再生。右上はフレーム、「当」は当たりの瞬間。修正前と絵がちがうコマは、右の絵を黄色の枠で囲み「ちがう」と出す。説明文は修正後のもの。</p>'+''.join(secs)+'</main></body></html>')
 print('\n'.join(sorted(os.listdir(OUT))))

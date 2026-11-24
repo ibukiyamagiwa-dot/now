@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "out=$(git -C \"$CLAUDE_PROJECT_DIR\" pull --ff-only 2>&1) && echo \"git pull（main）: $out\" || echo \"git pull に失敗した（手元の変更とぶつかっている可能性）。作業の前に確かめること: $out\"",
+            "timeout": 60,
+            "statusMessage": "main を pull しています"
+          }
+        ]
+      }
+    ]
+  }
+}

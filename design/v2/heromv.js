@@ -85,15 +85,22 @@ function magicCard(lv,id,n,cap,why){const T=[0,12,16,30][lv],c0=24,cast=c0+18,hi
   hero:[K(0,{}),K(10,{}),K(c0,HP_.magic,'out'),K(cast-2,HP_.magic),K(cast+2,fin,'in'),K(hit+8,fin),K(hit+40,{},'io'),K(hit+60,{})],
   fx:(B,J,t)=>{const tp=heroTip(t,{keys:[K(0,{}),K(10,{}),K(c0,HP_.magic,'out'),K(cast-2,HP_.magic),K(cast+2,fin,'in'),K(hit+8,fin),K(hit+40,{},'io'),K(hit+60,{})]});
    if(t>=c0&&t<cast){/* 見切りの光が、つばから剣先へのぼる */const u=(t-c0)/18;for(let i=0;i<7;i++){const y=tp[1]+12-i*2*u;if(i<u*7)B.set(tp[0]+((i+t)&1),y,col[i%2],4)}}
-   const ex=EXX-8,ey=FL-20;
-   if(lv===1&&t>=cast&&t<hit){/* ほのお：放物線で飛ぶ */const k=(t-cast)/T,x=lerp(HXX+14,ex,k),y=lerp(FL-24,ey,k)-Math.sin(k*Math.PI)*12;for(let i=0;i<5;i++)B.set(x-i*1.5,y+Math.sin(i+t)*.8,i<2?col[1]:col[0],4);B.disc(x,y,2,col[1],null,null,4)}
-   if(lv===2&&t>=cast&&t<=hit+2){/* かみなり：剣に雷が集まり、門番の頭上から落ちる */if(t<hit)for(let i=0;i<4;i++)B.set(tp[0]+(hsh(i,t)-.5)*8,tp[1]+(hsh(t,i)-.5)*8,col[i%2],4);else{let x=ex,y=10;for(let i=0;i<14;i++){const nx=x+(hsh(i,7)-.5)*8,ny=y+(ey-10)/14;B.line(x,y,nx,ny,col[1],4);B.line(x+1,y,nx+1,ny,col[0],4);x=nx;y=ny}}}
-   if(lv===3&&t>=cast&&t<hit+6){/* ひかり：剣を床に突き、門番の足元から光の柱が次々に立つ */for(let i=0;i<5;i++){const s=cast+i*5;if(t<s)continue;const x=ex-14+i*7,h=Math.min(40,(t-s)*5);for(let y=FL;y>FL-h;y--)if((y+t+i)%3)B.set(x,y,(y%4)?col[0]:col[1],4)}}
+   const ex=EXX-6,ey=FL-20;
+   /* 共通：唱えているあいだ、主人公の足元に魔法陣（段が上がるほど大きい）。光の粒がまわる */if(t>=c0&&t<hit+4){const k=Math.min(1,(t-c0)/6),rx=(10+lv*3)*k,ry=2+lv;for(let a=0;a<64;a++){const th=a/64*TAU;B.set(HXX+Math.cos(th)*rx,FL+1+Math.sin(th)*ry,col[0],4)}for(let i=0;i<4+lv*2;i++){const th=t*.1+i*TAU/(4+lv*2);B.set(HXX+Math.cos(th)*rx,FL+1+Math.sin(th)*ry,'#ffffff',4)}}
+   if(lv===1&&t>=cast&&t<hit){/* ほのお：黒いふちの火の玉が弧を描いて飛び、火の粉を引く */const k=(t-cast)/T,x=lerp(HXX+14,ex,k),y=lerp(FL-26,ey,k)-Math.sin(k*Math.PI)*12;for(let i=1;i<8;i++){const q=[x-i*2.2,y+Math.sin(i*1.3+t)*1.2+i*.3];if((i+t)%2)B.set(q[0],q[1],i<3?col[1]:col[0],4)}B.disc(x,y,4.2,'#5a1a08',null,null,4);B.disc(x,y,3.2,col[0],null,null,4);B.disc(x,y,1.6,'#fff3b0',null,null,4)}
+   if(lv===1){const d=t-hit;if(d>=0&&d<14){/* 爆ぜる：閃光→火の輪→黒い煙 */const r=3+d*1.6;for(let a=0;a<48;a++){const th=a/48*TAU;B.set(ex+Math.cos(th)*r,ey+Math.sin(th)*r*.8,d<4?'#ffffff':d<9?col[0]:'#3a2a28',4)}if(d<4)B.disc(ex,ey,6-d,'#fff3b0',null,null,4)}}
+   if(lv===2&&t>=cast&&t<hit){/* かみなり：掲げた剣に雷が集まる */if((t>>1)%2)for(let i=0;i<5;i++)B.set(tp[0]+(hsh(i,t)-.5)*9,tp[1]+(hsh(t,i)-.5)*9,col[i%2],4)}
+   if(lv===2&&t>=hit&&t<hit+12){/* 画面の上から、三本の雷が少しずつずれて落ちる（まん中は白） */for(let b=0;b<3;b++){if(t-hit<b*3)continue;let x=ex+(b-1)*10,y=0;const x1=ex+(b-1)*3,sd=b*97+(t>>1)%3*13;for(let i=1;i<=9;i++){const nx=lerp(ex+(b-1)*10,x1,i/9)+(i<9?(hsh(i,sd)-.5)*14:0),ny=ey*i/9+4;B.line(x,y,nx,ny,b===1?'#ffffff':col[0],4);B.line(x+1,y,nx+1,ny,b===1?col[1]:'#a88a20',4);x=nx;y=ny}}if(t-hit<3)for(let i=0;i<B.c.length;i++)if(!B.c[i]&&((i%CW+((i/CW)|0))&1))B.set(i%CW,(i/CW)|0,'#4a4420',5)}
+   if(lv===3){/* ひかり：剣を床に突くと、画面が暗くなり、相手の足元に二重の魔法陣が広がる。天井から床まで、太い光の柱が開く */
+    if(t>=cast&&t<hit+20){const dim=t<hit+12?1:1-(t-hit-12)/8;for(let i=0;i<B.c.length;i++)if(!B.c[i]&&((i%CW+((i/CW)|0)+(dim<.5?t:0))&1)&&dim>.3)B.set(i%CW,(i/CW)|0,'#06030f',6)}
+    if(t>=cast&&t<hit+10){const k=Math.min(1,(t-cast)/(T*.7));for(const[rx,ry,c]of[[26*k,6*k,col[0]],[18*k,4*k,'#e8c46a']])for(let a=0;a<72;a++){const th=a/72*TAU;B.set(ex+Math.cos(th)*rx,FL+1+Math.sin(th)*ry,c,4)}for(let i=0;i<8;i++){const th=-t*.06+i*TAU/8;B.set(ex+Math.cos(th)*22*k,FL+1+Math.sin(th)*5*k,'#ffffff',4)}
+     for(let i=0;i<6;i++){const u=((t-cast)*.9+i*7)%22;if(u<20)B.set(ex-18+i*7,FL-u,col[(i+t)%2],5)}}
+    if(t>=hit-3&&t<hit+20){const w=t<hit?2:Math.min(28,6+(t-hit)*4),fade=t>hit+12?1-(t-hit-12)/8:1;for(let y=0;y<=FL+1;y++)for(let x=Math.round(ex-w/2-3);x<=ex+w/2+3;x++){const core=Math.abs(x-ex)<=w/2,keep=fade>=1||hsh(x,y+t)<fade;if(!keep)continue;B.set(x,y,core?((y+t)%7?'#ffffff':'#e8fbff'):((x+y)&1?col[0]:'#3a8aa8'),4)}}}
    const d=t-hit;if(d>=0&&d<12){ghit(B,ex,ey,d,col,true)}},
   cap,why})}
-magicCard(1,'hh_fire','まほう：ほのお','剣を顔の前にまっすぐ立て、見切りの光がつばから剣先へのぼる（ゲージ1本）。剣を前へ振ると、火の玉が弧を描いて飛ぶ。','まほうの構えは、剣を顔の前に縦に立てる（本気の赤い騎士の最期の構えと同じ形＝二人は同じ剣の型を知っている）。');
-magicCard(2,'hh_thunder','まほう：かみなり','構えから剣を頭上へ掲げると、剣に小さな雷が集まり、門番の頭上から雷が落ちる（ゲージ2本）。','掲げた剣が避雷針になる。ほのおより少し遅く、強い。');
-magicCard(3,'hh_light','まほう：ひかり','構えから剣を床に突き立て、片ひざを落とす。門番の足元から光の柱が手前から奥へ次々に立つ（ゲージ3本）。いちばん長く、いちばん強い。','剣を床に突く＝地の底へ祈る形。光の柱は、くらやみの底から立ちのぼる「別の世界線の光」とも読める。どのまほうも、相手の構えを崩す。');
+magicCard(1,'hh_fire','まほう：ほのお','剣を顔の前にまっすぐ立て、足元に魔法陣が回り、見切りの光がつばから剣先へのぼる（ゲージ1本）。剣を前へ振ると、黒いふちの火の玉が火の粉を引いて弧を描き、門番に当たって爆ぜる。','まほうの構えは、剣を顔の前に縦に立てる（本気の赤い騎士の最期の構えと同じ形＝二人は同じ剣の型を知っている）。');
+magicCard(2,'hh_thunder','まほう：かみなり','構えから剣を頭上へ掲げると、剣に小さな雷が集まり、画面の上から三本の雷が少しずつずれて門番に落ちる（まん中は白）。落ちた瞬間、画面がうすく光る（ゲージ2本）。','掲げた剣が避雷針になる。ほのおより少し遅く、強い。');
+magicCard(3,'hh_light','まほう：ひかり','構えから剣を床に突き立て、片ひざを落とす。画面が暗くなり、門番の足元に二重の魔法陣が広がって、光の粒がのぼる。天井から床まで、白い芯と水色のふちの太い光の柱が開く（ゲージ3本）。いちばん長く、いちばん強い。','剣を床に突く＝地の底へ祈る形。光の柱は、くらやみの底から立ちのぼる「別の世界線の光」とも読める。どのまほうも、相手の構えを崩す。');
 
 /* ---------- やられ・撃破 ---------- */
 heroCard({id:'hh_hurt',cat:'hurt',n:'やられ：斬られる',len:110,cues:[{t:HC,col:'w'}],gate:GSTRIKE([K(56,GS),K(80,{},'io'),K(110,{})]),

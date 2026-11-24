@@ -1404,7 +1404,7 @@ const Z0={sheath:0},ZP=p=>Object.assign({},p,Z0),ZSAL=ZP({ua:2.0,fa:.3,sw:-1.57,
  ZRI=ZP(Object.assign({},QRI,{ua2:-.6,fa2:-1.4})),ZONE=p=>ZP(Object.assign({},p,{ua2:-.6,fa2:-1.4})),ZX2=ZP({ua:3.05,fa:3.0,sw:3.14,ua2:-.6,fa2:-1.4,x:QX-14,lean:.35,ff:-14,fb:10,cr:3}),ZLV=ZP({ua:1.3,fa:1.9,sw:2.0,ua2:-.6,fa2:-1.4,x:QX+10,cr:3.5,lean:-.1});
 const ghostArc=(B,J,t,h)=>{for(let g=1;g<=3;g++)rsl(B,J,t-g,h,'g',4.4,2.4)};
 QR('red2','r2_q_open','打ち合い：一礼と誘いのひと振り（金）',150,[K(0,R2S),K(6,ZSAL,'out'),K(16,ZSAL),K(20,ZP(QOPEN),'out'),K(40,ZP(QOPEN)),K(42,ZP(QOPENH),'in'),K(52,ZP(QOPENH)),K(64,ZRI,'out'),K(150,ZRI)],[{t:14,col:'g'}],[42],'g',t=>t>=42&&t<52?HRP:t>=52?HRG:null,
- '剣を抜き、刃を顔の前にまっすぐ立てて一礼する。そのまま八相に移し、刃が金に光る。袈裟の一振り。弾けば踏みこみ、画面が締まる。踏みこんだあと、左手は背中に回したまま。','本気の打ち合いは一礼で始まる。片手で足りる、という宣言。赤い騎士と同じ型なのに、格の差が姿勢で分かる。',(B,J,t)=>{clash(B,t-42,CXP[0],CXP[1]);if(t>=8&&t<16&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')},{bars:t=>t<44?0:Math.min(10,(t-44)*.6)});
+ '剣を抜き、刃を顔の前にまっすぐ立てて一礼する。そのまま八相に移し、刃が金に光る。袈裟の一振り。弾けば踏みこみ、画面が締まる。踏みこんだあと、左手は背中の腰に軽く添える。','本気の打ち合いは一礼で始まる。片手で足りる、という宣言。赤い騎士と同じ型なのに、格の差が姿勢で分かる。',(B,J,t)=>{clash(B,t-42,CXP[0],CXP[1]);if(t>=8&&t<16&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')},{bars:t=>t<44?0:Math.min(10,(t-44)*.6)});
 QR('red2','r2_q_tame','打ち合い：溜めの合（上段の静止・弧）',120,[K(0,ZRI),K(8,ZUP,'out'),K(46,ZUP),K(48,ZONE(QTAMEH),'in'),K(60,ZONE(QTAMEH)),K(84,ZRI),K(120,ZRI)],[{t:20,col:'g'}],[48],'g',t=>t>=48&&t<56?HRP:HRG,
  '剣を頭上にまっすぐ立てた上段で、完全に止まる。剣先も肩も、ふるえ一つない（赤い騎士は溜めで引きしぼってふるえる）。金に光ってから、頭上を越える大きな弧。刃のあとに、三本の残像が重なる。','溜めは弧。本気は「ふるえない」。止まっている時間そのものが溜め。',(B,J,t)=>{clash(B,t,CXP[0],CXP[1]);clash(B,t-48,CXP[0],CXP[1]-6);ghostArc(B,J,t,48)},{trails:[[44,50,'g',0,'arc']]});
 QR('red2','r2_q_tsume','打ち合い：詰めの合（予備動作なしの突き）',80,[K(0,ZRI),K(33,ZRI),K(34,ZX2,'snap'),K(44,ZX2),K(58,ZRI),K(80,ZRI)],[{t:6,col:'g'}],[34],'g',t=>t>=34&&t<42?HRP:HRG,
@@ -1412,10 +1412,10 @@ QR('red2','r2_q_tsume','打ち合い：詰めの合（予備動作なしの突�
 QR('red2','r2_q_feint','打ち合い：フェイント（刃を寝かせる）',140,[K(0,ZRI),K(8,ZONE(QF),'out'),K(14,ZONE(QF)),K(22,ZONE(QFM),'in'),K(30,ZONE(Object.assign({},QFM,{sw:2.4,fa:1.4}))),K(38,ZONE(Object.assign({},QFM,{sw:2.4,fa:1.4}))),K(46,ZONE(QF),'io'),K(76,ZONE(QF)),K(78,ZONE(QCUT),'in'),K(92,ZONE(QCUT)),K(118,ZRI),K(140,ZRI)],[{t:12,col:'p'},{t:50,col:'g'}],[78],'g',t=>t>=78&&t<86?HRP:HRG,
  '振り下ろしかけて、刃がこちらの剣に触れた瞬間に止め、手首を返して刃を寝かせ、こちらの剣の上にそっと乗せる。そのまま滑らせて離す。斬る気がないのに、斬れる位置にいた、と分からせる。間をおいて、金の本物。','フェイントの紫の輪は同じ。本気は「止める」だけでなく「乗せる」。押せば、乗せた刃でそのまま崩される。',(B,J,t)=>{clash(B,t-78,CXP[0],CXP[1]);if(t>=30&&t<38&&J.tip)B.set(J.tip[0],J.tip[1],'#ffffff',4)},{trails:[[74,80,'g',0,'arc']]});
 QR('red2','r2_q_heavy','打ち合い：重い合（片手の赤い突き）',110,[K(0,ZRI),K(10,ZONE(QHV),'out'),K(38,ZONE(QHV)),K(40,ZONE(Object.assign({},QHVH,{x:QX-16,lean:.45,ff:-16})),'in'),K(56,ZONE(Object.assign({},QHVH,{x:QX-16,lean:.45,ff:-16}))),K(90,ZRI),K(110,ZRI)],[{t:12,col:'r'}],[40],'r',t=>t>=40&&t<50?HRP:HRG,
- '左手を背中に回したまま、片手で剣を体の後ろまで引き、低く沈んで赤く光る。片手のまま、体を一本の線にして突く。赤い騎士の両手の突きより半歩遠くから届く。','重い合は赤。構えは「深く引いて止まる」。本気は片手で、間合いが半歩遠い。',(B,J,t)=>clash(B,t-40,CXP[0]-2,CXP[1]+2),{trails:[[36,42,'r',0,'line']]});
+ '左手を腰の後ろに添えたまま、片手で剣を体の後ろまで引き、低く沈んで赤く光る。片手のまま、体を一本の線にして突く。赤い騎士の両手の突きより半歩遠くから届く。','重い合は赤。構えは「深く引いて止まる」。本気は片手で、間合いが半歩遠い。',(B,J,t)=>clash(B,t-40,CXP[0]-2,CXP[1]+2),{trails:[[36,42,'r',0,'line']]});
 QR('red2','r2_q_lock','打ち合い：鍔迫り合い（片手で受ける）',110,[K(0,ZONE(QCUT)),K(6,ZONE(Object.assign({},QLK,{lean:.15,cr:3})),'out'),K(70,ZONE(Object.assign({},QLK,{lean:.15,cr:3}))),K(74,ZONE(Object.assign({},QLK,{sw:1.6,fa:.6,lean:.2})),'in'),K(80,ZONE(QSH),'out'),K(110,ZONE(QSH))],[],[],'g',
  t=>t<4?HRP:t<74?Object.assign({},HRL,{x:HRL.x+Math.sin(t*1.3)*.6}):t<80?Object.assign({},HRL,{sw:.4,fa:.6,lean:.1}):t<88?Object.assign({},HRG,{x:-2,lean:-.2}):HRG,
- 'こちらが両手で押しこむ刃を、彼は片手で受け止める。左手は背中のまま、体はほとんど前に傾かない。こちらだけが震えている。最後に、手首だけで刃をくるりと巻き、こちらの剣先を床へ落とすように払って突き放す。最後のひと振りは、そのあと一拍遅れて来る。','力でも位置でもなく「手首」。押し合いで格の差を見せる一枚。突き放されるまで、最後の合は来ない。',
+ 'こちらが両手で押しこむ刃を、彼は片手で受け止める。左手は腰の後ろに添えたまま、体はほとんど前に傾かない。こちらだけが震えている。最後に、手首だけで刃をくるりと巻き、こちらの剣先を床へ落とすように払って突き放す。最後のひと振りは、そのあと一拍遅れて来る。','力でも位置でもなく「手首」。押し合いで格の差を見せる一枚。突き放されるまで、最後の合は来ない。',
  (B,J,t)=>{clash(B,t,CXP[0],CXP[1]);if(t>=6&&t<70&&t%4===0){star(B,CXP[0]+1,CXP[1]-1,2,'g')}if(t>=70&&t<78){const a=(t-70)/8*6.28;for(let r=3;r<6;r++)B.set(CXP[0]+Math.cos(a)*r,CXP[1]+Math.sin(a)*r,'#fff3b0',4)}});
 const crossCut=(B,t,h)=>{const d=t-h;if(d<0||d>16)return;const c=[HXX+10,FL-20],L=Math.min(30,(d+1)*12),f=d<8?1:(16-d)/8;for(let s=-L;s<=L;s++){if(f<.6&&(s+t)%2)continue;for(const[dx,dy]of[[1,0],[0,1]]){const x=c[0]+dx*s,y=c[1]+dy*s*.9;B.set(x,y,'#ffffff',4);B.set(x+dy,y+dx,'#ff9a7a',4);B.set(x-dy,y-dx,'#c8202c',4)}}};
 FINALE({f:'red2',id:'r2_q_last',n:'打ち合い：最後のひと振り「十文字」（赤）と打ち返し',bg:'red',I:ZONE(QSH),W:ZUP,H:ZX2,R:ZONE(Object.assign({},ZX2,{x:QX-8})),R2:ZSAL,cx:-18,
@@ -1433,6 +1433,9 @@ tfe('lord','l_r_tfeint',LRI,LLO,half(LLO,LJAB),LJAB,'lord','鍵を腰に引き�
 tfe('lord2','l2_r_tfeint',L2X(LRI),L2X(LLO),L2X(half(LLO,LJAB)),L2X(LJAB),'lord','鍵の歯が紫の輪に光り、突きかけて止まる。止めた瞬間、背中の触手だけが前へのびかける。間をおいて金の本物。','突きのフェイント。触手につられて押さない。',(B,J,t)=>tentLash(B,J,t,26,40));
 for(const st of['red','fallen','fallen2']){const p=st==='red'?'r':st==='fallen'?'f':'f2',S=QSTY[st];tfe(S.f,p+'_q_tfeint',QRI,QTSU,half(QTSU,QTSUH),QTSUH,S.bg,'剣を引き、切っ先が紫の輪に光る。突きかけて、切っ先がこちらの鍔の手前でぴたりと止まる。'+(S.dark?'止めた瞬間、触手だけが前へ出かける。':'')+'引き戻して、間をおいて金の本物の突き。','突きのフェイント。斬りのフェイントと同じく、紫の輪＝押さずに待つ。',S.dark?(B,J,t)=>T8(B,J,t,26,40):null)}
 tfe('red2','r2_q_tfeint',ZRI,ZRI,ZONE(half(QRI,ZX2)),ZX2,'red','構えのまま動かず、切っ先だけが紫の輪に光る。片手突きが走り、切っ先がこちらの鍔に触れる寸前、髪一本の距離で止まる。そのまま切っ先で鍔をコツンと叩いて引く。間をおいて金の本物。','突きのフェイント。本気は止める距離が「触れる寸前」。押せば、その距離からそのまま崩される。',(B,J,t)=>{if(t===40&&J.tip)star(B,J.tip[0],J.tip[1],2,'w')});
+/* 本気の左手：背中の腰に軽く添える。剣の振りと逆に小さく動いて釣り合いをとり、息にあわせてわずかに揺れる。前へ踏みこむほど、後ろへ開く */
+const offhand=(P,t)=>{if(P.ua2==null||Math.abs(P.ua2+.6)>.3)return;const lean=Math.max(0,P.lean||0),sw=Math.max(-.35,Math.min(.5,-((P.ua||2.3)-2.3)*.14));P.ua2=.25+sw+lean*.7+Math.sin(t*.09)*.04;P.fa2=1.9-lean*.9+Math.sin(t*.09+1)*.05};
+for(const M of MV)if(M.f==='red2'&&/_q_/.test(M.id)){const p0=M.pp;M.pp=(P,t)=>{if(p0)p0(P,t);offhand(P,t)}}
 /* 拍の攻撃は、合図から当たりまでが拍のぶん長い（ゲームと同じ）。のしかかり38F、尾と炎36F */
 for(const id of ['d_slam','d_tail','d_breath','h_spit','h_crawl'])MV.find(m=>m.id===id).beat=true;
 

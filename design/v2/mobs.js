@@ -100,3 +100,11 @@ for(const key of['boar','boarM']){const D_=BDOWN[key],M_=key==='boarM';mv({f:key
 SPEC.dragon.tintable=true;SPEC.hydra.tintable=true;
 /* 三つ首の竜：亡骸の頭を前へ垂らし、角を親指の先から逃がす（親指と角が重なってシルエットが読めなかった） */
 SPEC.hydra.pose=Object.assign({},SPEC.hydra.pose||{},{droopC:.6});
+
+/* ひっくり返って背中で寝ているとき（壁に激突・ブレイク）：体の一番下（背中）が、床にちょうどつくように上下を合わせる。床に沈めず、浮かせもしない */
+function drawBoarG(B,ox,oy,S,P0,T){const ro=(P0&&P0.roll)||0;if(Math.cos(ro)>-.6||(P0&&P0.air))return drawBoar(B,ox,oy,S,P0,T);
+ /* 跳ねる高さ（y）は残す：y=-2 を「寝ている高さ」として床に合わせ、そこからの差だけ持ち上げる */
+ const W=new Buf(B.w,B.h),J=drawBoar(W,ox,oy,S,Object.assign({},P0,{y:-2}),T);let my=-1;for(let i=0;i<W.c.length;i++)if(W.c[i]&&W.t[i]<=3)my=Math.max(my,(i/W.w)|0);if(my<0)return J;
+ const dy=Math.round(oy-1-my+((P0.y==null?0:P0.y)+2)*(S.k||1));for(let i=0;i<W.c.length;i++)if(W.c[i]){const y=((i/W.w)|0)+dy;if(y>=0&&y<B.h){const j=y*B.w+i%W.w;B.c[j]=W.c[i];B.t[j]=W.t[i]}}
+ const sh=v=>Array.isArray(v)?(v.length===2&&typeof v[0]==='number'?[v[0],v[1]+dy]:v.map(sh)):v;for(const k in J)J[k]=sh(J[k]);return J}
+SPEC.boar.draw=drawBoarG;SPEC.boarM.draw=drawBoarG;

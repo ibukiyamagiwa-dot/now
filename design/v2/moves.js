@@ -277,12 +277,18 @@ mv({f:'lord2',id:'l2_extf',n:'伸びる刃（ふり）',bg:'lord',len:120,cap:'�
 mv({f:'lord2',id:'l2_whip',n:'ちぎれた鎖の鞭',bg:'lord',len:120,cap:'手首からちぎれた鎖を、触手が拾って振り回す。白く光ったら、上から叩きつける。',why:'門と自分をつないでいた鎖が、もう鞭でしかない。つながりが切れたことを技で見せる。',
  keys:[K(0,L2I),K(16,Object.assign({},L2I,{ua2:-1.2,fa2:-1.6,lean:-.15})),K(30,Object.assign({},L2I,{ua2:-1.2,fa2:-1.6,lean:-.15})),K(44,Object.assign({},L2I,{ua2:2.6,fa2:2.9,lean:.25}),'in'),K(70,Object.assign({},L2I,{ua2:2.6,fa2:2.9,lean:.25})),K(110,L2I)],cues:[{t:16,col:'w',at:J=>J.hdB}],hits:[44],
  fx:(B,J,t)=>{const h=J.hdB;let tip;if(t<44){const a=-1.4-Math.min(1,t/16)*.8;tip=add(h,dir(a,20))}else{const u=Math.min(1,(t-44)/4);tip=[lerp(h[0]-6,HXX+8,u),lerp(h[1]-20,FL-12,u)]}if(t>=44&&t>70)return;for(let i=0;i<20;i++){const s=i/20,x=lerp(h[0],tip[0],s),y=lerp(h[1],tip[1],s)-Math.sin(s*3.14)*6;B.set(x,y,i%2?'#5e566e':'#b8902a',1)}}});
-mv({f:'lord2',id:'l2_gate',n:'門の向こうの指',bg:'lord',len:160,cap:'背後の大門のすき間が開き、中から三本の指が出てくる。光った指の順に来る。',why:'三つ首の竜と同じもの（上位の存在の指先）。門の向こうにいるのが何か、一度だけのぞかせる。',
- keys:[K(0,L2I),K(20,Object.assign({},L2I,{door:1.4,lean:-.2})),K(150,Object.assign({},L2I,{door:1.4,lean:-.2}))],
- cues:[0,1,2].map(i=>({t:30+i*10,col:'w',at:J=>[CW-8-i*6,20+i*14]})),hits:[58,68,78],
- pre:(B,t)=>{/* 背後の門のすき間 */const o=Math.min(1,t/20)*3;for(let y=6;y<FL;y++)for(let x=CW-24;x<CW;x++){const cx=CW-12;const g=Math.abs(x-cx)<o+(y%7?0:1);B.set(x,y,g?(((x+y+(t/4|0))%5)?'#3a1a5a':'#c070ff'):((x-CW)%9===0||y%12===0?'#1a1420':'#2a2232'),6)}},
- fx:(B,J,t)=>{for(let i=0;i<3;i++){const imp=58+i*10,d=t-imp,base=[CW-12,20+i*14];if(t<28)continue;let u=d<-10?.15:d<0?.15+(d+10)/10*.85:d<10?1:Math.max(.15,1-(d-10)/20);const tip=[lerp(base[0],HXX+8,u),lerp(base[1],FL-12-i*2,u)];
-   /* 指：3つの節としわ。先は白い爪 */for(let s=0;s<=1;s+=.02){const x=lerp(base[0],tip[0],s),y=lerp(base[1],tip[1],s)-Math.sin(s*3.14)*8*u,r=2.4-s*1.2;for(let yy=-r;yy<=r;yy++)B.set(x,y+yy,(Math.abs(s-.33)<.02||Math.abs(s-.66)<.02)?'#2a2030':yy<-r+1?'#b0a8b8':yy>r-1?'#4a4050':'#7a7088',1)}B.set(tip[0],tip[1],'#e8e0d0',2);B.set(tip[0]+1,tip[1],'#e8e0d0',2)}}});
+/* 門の向こうの指の動き：縁にかかって指先がのぞく→合図で目が光り、いったん引く（構え）→3Fで突き出る→当たって口が裂け、伸びたまま粘る→もがきながら戻る */
+const GFU=(t,cue,hit,i)=>t<cue?.1+.05*Math.sin(t*.31+i*2):t<hit-3?Math.max(.02,.1-(t-cue)*.02):t<hit?lerp(.02,1,(t-(hit-3))/3):t<hit+8?1:Math.max(.1,1-(t-hit-8)/22)+.04*Math.sin(t*.5+i);
+const GFT=[[HXX+6,FL-30],[HXX+12,FL-17],[HXX+6,FL-5]];
+const gfTip=(t,root,i,cue,hit)=>{const S=new Buf(CW,CH);return gateFinger(S,root,GFT[i],i,{k:1,T:t,u:GFU(t,cue,hit,i)}).ch[3]};
+const gfDraw=(B,t,roots,cues,hits,k)=>{for(const i of[2,0,1]){if(t<12)continue;const cue=cues[i],hit=hits[i],u=GFU(t,cue,hit,i),em=Math.min(1,(t-12)/10);
+ const r=gateFinger(B,roots[i],GFT[i],i,{k,T:t,u:u*em,lit:t>=cue&&t<cue+10,eye:t>=cue+10,mouth:t>=hit-1&&t<hit+14?1-Math.max(0,t-hit)/14:0,crack:t>=hit-3&&t<hit+2});
+ if(t>=hit&&t<hit+10){const d=t-hit;for(let q=0;q<7;q++){const a=-2.6+q*.8+hsh(q,i)*.4,rr=2+d*1.6;B.set(r.tip[0]+Math.cos(a)*rr,r.tip[1]+Math.sin(a)*rr*.8+d*d*.06,q%2?INK.hi:INK.col,4)}}}};
+mv({f:'lord2',id:'l2_gate',n:'門の向こうの指',bg:'lord',len:170,cap:'背後の大門のすき間が開く。すき間の縁に、内側から三本の指がかかる。灰紫の皮、節ごとの横じわ、白い平たい爪。上の指は爪がはがれ、下の指には古い金の指輪。指先の目が光った順に、いったん奥へ引いてから一気に突き出る。当たる瞬間、指先の腹が縦に裂けて口になる。動くたびに節が鳴る。',why:'三つ首の竜と同じ手の指（はがれた爪、金の指輪で同じと分かる）。門の向こうにいるのが何か、ここで一度だけのぞかせる。合図は指先の目の光、引いてから突き出る＝構えと攻撃がはっきり分かれる。',
+ keys:[K(0,L2I),K(20,Object.assign({},L2I,{door:1.4,lean:-.2})),K(160,Object.assign({},L2I,{door:1.4,lean:-.2}))],
+ cues:[0,1,2].map(i=>({t:30+i*10,col:'w',at:J=>gfTip(30+i*10,[CW-12,22+i*14],i,30+i*10,58+i*10)})),hits:[58,68,78],
+ pre:(B,t)=>{/* 背後の門のすき間 */const o=Math.min(1,t/20)*4;for(let y=6;y<FL;y++)for(let x=CW-26;x<CW;x++){const cx=CW-12;const g=Math.abs(x-cx)<o+(y%7?0:1);B.set(x,y,g?(((x+y+(t/4|0))%5)?'#1a0a2a':'#c070ff'):((x-CW)%9===0||y%12===0?'#1a1420':'#2a2232'),6)}
+  gfDraw(B,t,[0,1,2].map(i=>[CW-12,22+i*14]),[30,40,50],[58,68,78],1)}});
 
 /* ===== 追加の新しい技 ===== */
 mv({f:'dgate',id:'dg_beat',n:'鎖の拍',bg:'gate',len:150,cap:'黒い鎖で床を3回打つ（ガン・ガン・ガン）。その次の拍で、鎖が横から来る。',why:'拍で読む攻撃は、小鬼のおかしらで先に教わっている。「3」は門の数字。門番の誓いの鎖が、拍を刻む道具になった。',
@@ -498,11 +504,10 @@ FWR('f_zanpunish','r_zanpunish',{n:'残心に手を出す',cap:'残心の最中�
 mv({f:'fallen2',id:'f2_mirror',n:'水面の先読み',bg:'hole',len:130,cap:'水面の映り姿が、本体より先に動く。合図の白い光は、水の中の剣先に出る。見るのは本体ではなく水面。',why:'映り姿は、のまれる前の赤い騎士。剣の型は、映り姿のほうが先に知っている。',
  keys:[K(0,F2I),K(14,R8),K(38,R8),K(42,RCUT,'in'),K(70,RCUT),K(124,F2I)],cues:[{t:14,col:'w',at:J=>[EXX-6,FL+16]}],hits:[42],trails:[[39,44,'w']],
  post:(B,J,t)=>{water(B,t);const M=MV.find(m=>m.id==='f2_mirror'),base=Object.assign({},PDEF,SPEC.red.pose);reflection(B,t,'red',poseAt0(M,Math.min(t+10,129),base),EXX)}});
-mv({f:'fallen2',id:'f2_fingers',n:'アーチの奥の指',bg:'hole',len:150,cap:'門のアーチの内側から、三本の指が出てくる。光った指の順に来て、最後に銀の剣。4撃。',why:'暗い門のぬしの「門の向こうの指」と同じもの。彼の背中の門も、同じ向こう側につながっている。',
+mv({f:'fallen2',id:'f2_fingers',n:'アーチの奥の指',bg:'hole',len:150,cap:'背中の門のアーチの内側から、三本の指が這い出る。三つ首の竜と同じ指（上の指ははがれた爪、下の指には金の指輪）。指先の目が光った順に、いったん引いてから突き出て、当たる瞬間に指先が裂けて口になる。最後に、本体の銀の剣。4撃。',why:'暗い門のぬしの「門の向こうの指」と同じ手。彼の背中の門も、同じ向こう側につながっている。剣（騎士の名残）と指（向こうの者）が一つの技に混ざる。',
  keys:[K(0,F2I),K(50,F2I),K(56,R8),K(84,R8),K(88,RCUT,'in'),K(110,RCUT),K(144,F2I)],
- cues:[0,1,2].map(i=>({t:14+i*10,col:'w',at:J=>{const c=add(J.sc,[4*J.k,-4*J.k]);return add(c,dir(Math.PI*(1.15+i*.35),12*J.k))}})).concat([{t:60,col:'w'}]),hits:[42,52,62,88],trails:[[85,90,'w']],
- fx:(B,J,t)=>{for(let i=0;i<3;i++){const imp=42+i*10,d=t-imp,c=add(J.sc,[4*J.k,-4*J.k]),base=add(c,dir(Math.PI*(1.15+i*.35),12*J.k));if(t<10||d>20)continue;const u=d<-8?.1:d<0?.1+(d+8)/8*.9:Math.max(.1,1-d/20);const tip=[lerp(base[0],HXX+8,u),lerp(base[1],FL-12-i*2,u)];
-   for(let s=0;s<=1;s+=.03){const x=lerp(base[0],tip[0],s),y=lerp(base[1],tip[1],s)-Math.sin(s*3.14)*6*u,r=2-s;for(let yy=-r;yy<=r;yy++)B.set(x,y+yy,(Math.abs(s-.33)<.03||Math.abs(s-.66)<.03)?'#2a2030':yy<-r+1?'#b0a8b8':'#7a7088',1)}B.set(tip[0],tip[1],'#e8e0d0',2)}},
+ cues:[0,1,2].map(i=>({t:14+i*10,col:'w',at:J=>{const c=add(J.sc,[4*J.k,-4*J.k]);return gfTip(14+i*10,add(c,dir(Math.PI*(1.15+i*.35),12*J.k)),i,14+i*10,42+i*10)}})).concat([{t:60,col:'w'}]),hits:[42,52,62,88],trails:[[85,90,'w']],
+ fx:(B,J,t)=>{const c=add(J.sc,[4*J.k,-4*J.k]);gfDraw(B,t,[0,1,2].map(i=>add(c,dir(Math.PI*(1.15+i*.35),12*J.k))),[14,24,34],[42,52,62],1)},
  post:(B,J,t)=>{water(B,t);reflection(B,t,'red',J.P||{},EXX)}});
 mv({f:'fallen2',id:'f2_silent',n:'光らない核の拍',bg:'hole',len:150,cap:'胸の核が3回、光らずに脈打つ（ドクン・ドクン・ドクン）。音の輪だけが広がる。その次の拍で、銀の剣。',why:'「光らない」と「拍」の二つの読み方を重ねた。どちらも先に教わっているが、同時に来るのはここだけ。',
  keys:[K(0,F2I),K(14,R8),K(52,R8),K(56,RCUT,'in'),K(90,RCUT),K(140,F2I)],hits:[56],trails:[[53,58,'w']],
@@ -529,10 +534,10 @@ mv({f:'fallen2',id:'f2_dfeint',n:'水面の二重フェイント',bg:'hole',len:
 /* 強さの順を整える（3）：数でも後の者が上になるように */
 const IAIS=(y)=>({ua:3.1,fa:3.0+y*.15,sw:3.14+y*.2,ua2:2.9,fa2:2.85+y*.15,sheath:0,x:-4,lean:.28,cr:5,ff:-12,fb:9});
 const KAS={ua:-2.3,fa:-2.85,sw:3.1,ua2:-2.45,fa2:-2.95,x:10,cr:3.6,lean:.06,ff:-12,fb:9,sheath:0},KASb=Object.assign({},KAS,{ua:-2.0,fa:-2.6,ua2:-2.15,fa2:-2.7,lean:-.04,x:13});
-mv({f:'red2',id:'r2_three',n:'参段（霞・上中下・タン・タタン）',bg:'red',len:170,cap:'【構え】正眼から両手を額の高さまで上げ、刃を水平に寝かせて切っ先をこちらの目に向ける「霞」の構え。本気の中で、ただ一つ手が高い構え。そこから一歩も動かずに、腕ごと三度振り抜く。一度目は額の高さを横一文字、二度目と三度目は胸の高さから膝の高さへ、ひと続きに斬り下ろす。振るたびに刃が飛ぶ斬撃になり、上・中・下の高さで飛んでくる（タン・タタン）。最後は低く沈んだ残心。',why:'弐の居合は「納刀して、すれちがって、後ろから」。参段は「抜き身のまま、霞から、その場で飛ぶ斬撃が三つ」。手の高さ（霞は額、ほかは腰）で、ひと目で見分けられる。一撃で来る溜めは、手が低いまま深く沈む。',
- keys:[K(0,R2G),K(12,KAS,'io'),K(27,KAS),K(28,KASb,'out'),K(30,{ua:-3.0,fa:-3.05,sw:3.0,ua2:-3.1,fa2:-3.1,x:4,lean:.26,cr:4,ff:-13,fb:10,sheath:0},'in'),K(35,{ua:2.8,fa:2.6,sw:2.35,ua2:2.6,fa2:2.5,x:4,lean:.3,cr:4.4,ff:-13,fb:10,sheath:0},'out'),
-  K(48,KAS,'io'),K(57,KAS),K(58,KASb,'out'),K(60,{ua:3.0,fa:3.05,sw:3.12,ua2:2.85,fa2:2.95,x:2,lean:.3,cr:4.6,ff:-14,fb:10,sheath:0},'in'),K(66,{ua:2.55,fa:2.7,sw:2.75,ua2:2.4,fa2:2.6,x:0,lean:.38,cr:5.6,ff:-15,fb:11,sheath:0},'in'),
-  K(72,{ua:2.3,fa:2.45,sw:2.3,ua2:2.15,fa2:2.35,x:0,lean:.36,cr:5.8,ff:-15,fb:11,sheath:0},'out'),K(112,{ua:2.3,fa:2.45,sw:2.3,ua2:2.15,fa2:2.35,x:0,lean:.34,cr:5.8,ff:-15,fb:11,sheath:0}),K(134,R2G,'io'),K(170,R2G)],
+mv({f:'red2',id:'r2_three',n:'参段（霞・上中下・タン・タタン）',bg:'red',len:170,cap:'【構え】正眼から両手を額の高さまで上げ、刃を水平に寝かせて切っ先をこちらの目に向ける「霞」の構え。本気の中で、ただ一つ手が高い構え。そこから一歩も動かずに、腕ごと三度振り抜く。一度目は額の高さを横一文字、二度目と三度目は胸の高さから膝の高さへ、ひと続きに斬り下ろす。振るたびに刃が飛ぶ斬撃になり、上・中・下の高さで飛んでくる（タン・タタン）。最後は低く沈んだ残心から、刃を一度鋭く振って血を払う（血振り）。構えは一瞬で取り（少し行き過ぎて戻る）、一振りごとに剣先をいったん頭上へ逃がしてから霞に戻る（来た道をなぞらない）。',why:'弐の居合は「納刀して、すれちがって、後ろから」。参段は「抜き身のまま、霞から、その場で飛ぶ斬撃が三つ」。手の高さ（霞は額、ほかは腰）で、ひと目で見分けられる。一撃で来る溜めは、手が低いまま深く沈む。',
+ keys:[K(0,R2G),K(4,Object.assign({},KAS,{ua:-2.05,fa:-2.6,ua2:-2.2,fa2:-2.7,lean:-.08,cr:3.2}),'out'),K(10,KAS,'io'),K(27,KAS),K(28,KASb,'out'),K(30,{ua:-3.0,fa:-3.05,sw:3.0,ua2:-3.1,fa2:-3.1,x:4,lean:.26,cr:4,ff:-13,fb:10,sheath:0},'in'),K(35,{ua:2.8,fa:2.6,sw:2.35,ua2:2.6,fa2:2.5,x:4,lean:.3,cr:4.4,ff:-13,fb:10,sheath:0},'out'),
+  K(42,{ua:-1.7,fa:-1.9,sw:-1.75,ua2:-1.85,fa2:-2.0,x:10,lean:-.05,cr:3.4,ff:-12,fb:9,sheath:0},'io'),K(50,KAS,'io'),K(57,KAS),K(58,KASb,'out'),K(60,{ua:3.0,fa:3.05,sw:3.12,ua2:2.85,fa2:2.95,x:2,lean:.3,cr:4.6,ff:-14,fb:10,sheath:0},'in'),K(66,{ua:2.55,fa:2.7,sw:2.75,ua2:2.4,fa2:2.6,x:0,lean:.38,cr:5.6,ff:-15,fb:11,sheath:0},'in'),
+  K(72,{ua:2.3,fa:2.45,sw:2.3,ua2:2.15,fa2:2.35,x:0,lean:.36,cr:5.8,ff:-15,fb:11,sheath:0},'out'),K(102,{ua:2.3,fa:2.45,sw:2.3,ua2:2.15,fa2:2.35,x:0,lean:.34,cr:5.8,ff:-15,fb:11,sheath:0}),K(105,{ua:2.55,fa:2.75,sw:2.95,ua2:2.4,fa2:2.65,x:0,lean:.3,cr:5.6,ff:-15,fb:11,sheath:0},'in'),K(108,{ua:2.2,fa:2.35,sw:2.15,ua2:2.05,fa2:2.25,x:0,lean:.32,cr:5.8,ff:-15,fb:11,sheath:0},'out'),K(124,{ua:2.2,fa:2.35,sw:2.15,ua2:2.05,fa2:2.25,x:4,lean:.2,cr:5,ff:-14,fb:10,sheath:0}),K(144,R2G,'io'),K(170,R2G)],
  cues:[{t:14,col:'w',at:J=>add(J.head,[-3,0])},{t:42,col:'w',at:J=>add(J.head,[-3,0])},{t:50,col:'w',at:J=>add(J.head,[-3,0])}],hits:[42,70,78],
  trails:[[29,35,'w',0,'arc'],[59,63,'w',0,'arc'],[63,70,'w',0,'arc']],
  fx:(B,J,t)=>{for(const s of[30,60,66])stomp(B,J,t,s);/* 飛ぶ斬撃：振った瞬間に出て、当たる瞬間にこちらへ届く三日月 */[[30,42,FL-26],[60,70,FL-15],[66,78,FL-5]].forEach(([s,h,y])=>{if(t>=s&&t<h+3){const u=Math.min(1,(t-s)/(h-s)),x=lerp(EXX-6,HXX+6,u);for(let a=-1.2;a<=1.2;a+=.08){const c=Math.cos(a),sn=Math.sin(a);for(let r=0;r<3;r++){const px=x+c*(9-r)-7,py=y+sn*(10-r*.8);B.set(px,py,r===0?'#ffffff':r===1?'#bfe8ff':'#6a7090',4)}}for(let k=1;k<6;k++){if((k+t)%2)continue;B.set(x+k*3,y-3,'#8a90a8',4);B.set(x+k*3+1,y+3,'#8a90a8',4)}}})}});
@@ -857,6 +862,23 @@ for(const M of MV){if(!KNIGHT_F.has(M.f)||!M.keys)continue;
   /* 桜井流(3) 戻りは、来た道をなぞらない：戻りの途中で剣先をいったん上へ逃がしてから構えに収まる */
   const r=nk.findIndex(k=>k.t>holdEnd);if(r>0){const A=nk[r-1],B=nk[r];if(B.t-A.t>=10&&typeof B.p.sw==='number'){const mid=Object.assign({},B.p);mid.sw=(typeof mid.sw==='number'?mid.sw:0)-.7*d;mid.cr=(mid.cr||0)+.6;nk.splice(r,0,K(Math.round(A.t+(B.t-A.t)*.55),wristFix(M.f,mid),'io'))}}
   M.keys=nk.sort((a,b)=>a.t-b.t)}}
+/* ===== 桜井流の監査（番人系統：門番・黒い門番・門のぬし・暗い門のぬし・赤い騎士・本気・赤い門のぬし・第二形態）=====
+   (a) 中割りでぬるくしない：構えから当たりまで 6F を超える振りは、構えのまま止めて、最後の 4F で一気に振る（構えが長く読める・振りは鋭い）。
+       光らない技（ささやき）と、払いそのものを長く見せる技（マントの触手払い）は除く。
+   (b) 体ごと：当たりの瞬間に体（前傾・踏みこみ・沈み）がほとんど動かない振りは、前傾+0.12、半歩（4）踏みこませる。
+   (c) 禍々しい者（黒い門番・暗い門のぬし・赤い門のぬし・第二形態）：合図の前にくらやみが武器へ吸い寄せられ、当たるとくらやみが裂けて噴き出し、その中で赤い目が一瞬開く。 */
+const SK_EX=/rally|_q_|_r_|l2_dark|f_dark|dg_sweep|iai|silent|reflect/;
+for(const M of MV){if(!KNIGHT_F.has(M.f)||!M.keys||!M.hits||SK_EX.test(M.id))continue;
+ for(const h of M.hits){let hi=M.keys.findIndex(k=>k.t===h);if(hi<1)continue;const H=M.keys[hi],Pv=M.keys[hi-1];if(H.e==='snap')continue;
+  if(h-Pv.t>6&&!same(Pv.p,H.p)){M.keys.splice(hi,0,K(h-4,Pv.p,'io'));hi++;M.keys[hi]=K(h,H.p,'in')}
+  const S=Object.assign({},PDEF,(SPEC[M.f]||{}).pose||{}),A=Object.assign({},S,M.keys[hi-1].p),B=Object.assign({},S,H.p);
+  const body=Math.abs((B.lean||0)-(A.lean||0))+Math.abs((B.x||0)-(A.x||0))/20+Math.abs((B.cr||0)-(A.cr||0))/5;
+  if(body<.12){const old=H.p,np=Object.assign({},old,{lean:(old.lean!=null?old.lean:S.lean||0)+.12,x:(old.x!=null?old.x:0)-4});M.keys=M.keys.map(k=>k.t>=h&&k.p===old?K(k.t,np,k.e):k)}}}
+const DARK_F=new Set(['dgate','lord2','fallen','fallen2']);
+const darkGather=(B,J,t,c)=>{const d=c-t;if(d<=0||d>14)return;const tg=J.tip||J.hdF||J.sc;if(!tg)return;for(let q=0;q<12;q++){const a=q*.52+c*.7,r=3+d*1.8+hsh(q,c)*3,x=tg[0]+Math.cos(a)*r,y=tg[1]+Math.sin(a)*r*.8;/* 吸い寄せられる黒いすじ：芯は黒、ふちは紫 */const x2=x-Math.cos(a)*3,y2=y-Math.sin(a)*2.4;B.line(x,y,x2,y2,INK.lo,4);B.set(x,y,q%3?INK.eye:INK.hi,4)}};
+const darkBurst=(B,t,h,seed)=>{const d=t-h;if(d<0||d>18)return;const c=[HXX+5,FL-12];for(let q=0;q<7;q++){const a=-3.0+q*.55+hsh(q,seed)*.3,L=Math.min(1,(d+1)/3)*(12+hsh(seed,q)*10)*(d<11?1:1-(d-11)/7),bend=Math.sin(d*.4+q)*.6;let p=c;for(let s=0;s<L;s+=1){const aa=a+bend*s/L,np=[p[0]+Math.cos(aa),p[1]+Math.sin(aa)*.85],th=s<L*.5?2:1;for(let o=0;o<th;o++)B.set(np[0],np[1]+o,INK.lo,4);B.set(np[0],np[1]-1,INK.hi,4);if(s>L-2)B.set(np[0],np[1],INK.eye,4);p=np}}
+ if(d>=3&&d<11){/* くらやみの裂け目の中で、赤い目が一瞬開く */const e=[c[0]+5+(seed%3),c[1]-8-(seed%4)];for(let xx=-1;xx<=3;xx++){B.set(e[0]+xx,e[1],INK.lo,4);B.set(e[0]+xx,e[1]-1,INK.lo,4);B.set(e[0]+xx,e[1]+1,INK.lo,4)}B.set(e[0]+1,e[1],INK.eye2,4);B.set(e[0]+2,e[1],'#ff9aa8',4)}};
+for(const M of MV){if(!DARK_F.has(M.f)||!M.hits||/rally|_q_|_r_/.test(M.id))continue;const fx0=M.fx;M.fx=(B,J,t,S,Mm)=>{if(fx0)fx0(B,J,t,S,Mm);for(const c of(M.cues||[]))if(!c.at)darkGather(B,J,t,c.t);M.hits.forEach((h,i)=>darkBurst(B,t,h,i*7+h))}}
 /* 赤い騎士と本気の角度は、いつも近い回り道で補間する。角度の差が半周をこえると、腕や剣が体の後ろを大回りして、
    振ってもいない「ひと振り」が一瞬見えてしまう（構えを移すだけの場面で、剣を振ったように見えた）。 */
 for(const M of MV)if(KNIGHT_F.has(M.f)){M.keys=M.keys.map(k=>Object.assign({},k,{p:Object.assign({},k.p)}));for(let i=1;i<M.keys.length;i++){const a=M.keys[i-1].p,b=M.keys[i].p;for(const q of['ua','fa','sw','ua2','fa2']){const A=a[q]!=null?a[q]:PDEF[q];if(typeof b[q]!=='number'||typeof A!=='number')continue;while(b[q]-A>Math.PI)b[q]-=6.2832;while(b[q]-A<-Math.PI)b[q]+=6.2832}}}

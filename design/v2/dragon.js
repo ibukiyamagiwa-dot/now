@@ -172,4 +172,24 @@ function drawHydra(B,ox,oy,S,P0,T){const P=Object.assign({},DPDEF,{f0:0,f1:0,f2:
  J.fingers=fin;J.heads=fin;return J}
 Object.assign(PDEF,DPDEF,{fist:0,snap0:0,snap1:0,snap2:0,f0:0,f1:0,f2:0,j0:0,j1:0,j2:0,curl:0,fist:0,snap0:0,snap1:0,snap2:0,rift:1,emerge:1,grip:0,heads:1,press:0,stump:0,swap:0,spread:0,grab:0,tx0:0,ty0:0,tx1:0,ty1:0,tx2:0,ty2:0,cjaw:0});
 SPEC.dragon={name:'くらやみの竜',k:1,draw:drawDragon,pose:{},aura:{r:2,c1:'#22142e',c2:'#1a1024',rim:'#6a3a90'}};
+/* ===== 門の向こうの指（三つ首の竜と同じ手の指）=====
+   暗い門のぬし・第二形態の「門から指」の技で使う。三つ首の竜の指と同じ作り：灰紫の皮、三つの節と節ごとの横じわ、内側の肉色の腹、白い平たい爪。
+   上の指は爪がはがれて赤黒い爪の床がむき出し、下の指には太い古い金の指輪。指先には目が一つ（光ると合図）。当たる瞬間、指先の腹が縦に裂けて口になる。
+   動かすたびに節が鳴る（白い小さな破片＝関節の音）。 */
+function gateFinger(B,root,tgt,i,o){const k=o.k||1,T=o.T||0,u=o.u||0,L=[[12,11,9],[14,13,11],[11,10,8]][i].map(v=>v*k),Ls=L[0]+L[1]+L[2];
+ const dx=tgt[0]-root[0],dy=tgt[1]-root[1],D=Math.hypot(dx,dy)||1,ux=dx/D,uy=dy/D,nx=-uy,ny=ux,reach=Math.min(D,lerp(Ls*.3,Math.max(D,Ls),u));/* 届かなければ、節が不気味に伸びる */
+ /* 節の曲がり：伸びきるほどまっすぐ。のびる前は鉤のように曲がる */const bend=(1-u)*.9+.18,ch=[root];let a=Math.atan2(uy,ux)-bend*1.2;const sc=reach/Ls;
+ for(let j=0;j<3;j++){const p=ch[j];ch.push([p[0]+Math.cos(a)*L[j]*sc*1.08,p[1]+Math.sin(a)*L[j]*sc*1.08]);a+=bend}
+ const m=new Set(),segR=[[3.6,3],[3,2.6],[2.6,1.8]];for(let j=0;j<3;j++){dCurve(m,t=>LP(ch[j],ch[j+1],t),segR[j][0]*k,segR[j][1]*k,10,.02,i*3+j);dDisc(m,ch[j][0],ch[j][1],(segR[j][0]+.5)*k,.05,i+j)}
+ dShade(B,m,HSK,mix(HSK[4],'#d8cce0',.3),null,true);
+ {const has=(x,y)=>m.has(MK(x,y));for(const key of m){const[x,y]=UK(key);if(B.tag(x,y)!==1)continue;let dd=0;while(dd<3&&has(x+1,y+dd+1))dd++;if(dd<2&&has(x,y-2)&&B.get(x,y)!==HSK[0])B.set(x,y,dd===0?HPAD[0]:HPAD[1],1)}}
+ for(let j=1;j<3;j++){const p=ch[j],q=ch[j+1],aa=Math.atan2(q[1]-p[1],q[0]-p[0])+1.57;for(let w=-1;w<=1;w++){const of=[Math.cos(aa-1.57)*w*1.2,Math.sin(aa-1.57)*w*1.2];for(let s2=-2.6;s2<=1.4;s2+=.5){const x=p[0]+of[0]+Math.cos(aa)*s2*k,y=p[1]+of[1]+Math.sin(aa)*s2*k;if(B.tag(Math.round(x),Math.round(y))===1)B.set(x,y,HSK[1],1)}}}
+ if(i===2){const p0=ch[1],p1=ch[2],aa=Math.atan2(p1[1]-p0[1],p1[0]-p0[0]),c2=LP(p0,p1,.45),G=['#4a3010','#9a7424','#e0b848','#fff4c0'],r=3.4*k;for(let w=-1.6;w<=1.6;w+=.4)for(let s2=-r;s2<=r;s2+=.4){const x=c2[0]+Math.cos(aa)*w+Math.cos(aa+1.57)*s2,y=c2[1]+Math.sin(aa)*w+Math.sin(aa+1.57)*s2;B.set(x,y,Math.abs(w)>1.2?G[0]:s2<-r*.4?G[2]:s2>r*.5?G[0]:G[1],1)}B.set(c2[0]+Math.cos(aa+1.57)*-1.8,c2[1]+Math.sin(aa+1.57)*-1.8,G[3],2)}
+ const tp=ch[3],bp=ch[2],aa=Math.atan2(tp[1]-bp[1],tp[0]-bp[0]),Rh=v=>add(tp,rot([v[0]*k,v[1]*k],aa));
+ const nail=[Rh([-5.5,-2.4]),Rh([-1,-3.6]),Rh([2.6,-3]),Rh([3.4,-1.6]),Rh([-5,-1.2])];
+ if(i===0){B.poly(nail,'#5a1a2c','#9a4a5c','#2a0812');B.line(...Rh([-5,-1.6]),...Rh([2.6,-2.2]),'#2a0812',1);B.set(...Rh([-1,-2.6]),'#c87a86',1)}else{B.poly(nail,HNAIL[1],HNAIL[3],HNAIL[0]);B.line(...Rh([-5,-1.4]),...Rh([2.8,-1.8]),HNAIL[0],1);B.set(...Rh([0,-3]),HNAIL[3],1)}
+ const mo=o.mouth||0;if(mo>.1){B.poly([Rh([3,.2]),Rh([-5,0]),Rh([-5,.4+mo*3]),Rh([3,.8+mo*4.5])],'#2a0612','#3e0c1c','#14040a');for(let q=0;q<4;q++){B.set(...Rh([2-q*2,.6]),HNAIL[2],1);B.set(...Rh([1.6-q*2,.4+mo*3.6]),HNAIL[2],1)}}
+ if(o.lit){const g=Rh([-1,-.5]);glow(B,Math.round(g[0]),Math.round(g[1]),4,'#ffffff');B.set(...Rh([-1.8,-.6]),'#ffffff',2);B.set(...Rh([-3.4,-.2]),'#ffffff',2)}else if(o.eye){B.set(...Rh([-1.8,-.6]),'#ff3050',2);B.set(...Rh([-3.4,-.2]),'#ff3050',2)}else B.line(...Rh([-3.6,-.4]),...Rh([-1.4,-.7]),HSK[0],1);
+ if(o.crack){/* 節が鳴る：関節から白い小さな破片 */for(let j=1;j<3;j++){const p=ch[j];B.set(p[0]-1,p[1]-3,'#ece6da',4);B.set(p[0]+2,p[1]-4,'#ece6da',4);B.set(p[0]-3,p[1]-2,'#c8c0b4',4)}}
+ return {tip:Rh([3.6,.6]),ch}}
 SPEC.hydra={name:'三つ首の竜',k:1,draw:drawHydra,pose:{},aura:{r:3,c1:'#2a1840',c2:'#1e1230',rim:'#c070ff'}};

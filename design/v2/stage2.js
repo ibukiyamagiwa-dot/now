@@ -104,7 +104,7 @@ function figBuf(key,x,tint,t,o){o=o||{};const S=SPEC[key],idle=MV.find(m=>m.f===
  const ox=x+((idle&&idle.ox)||0);(S.draw||knight)(B,ox,SFL,S,P,t);if(key==='lord'||key==='lord2')pool(B,joints(ox,SFL,S,Object.assign({},PDEF,S.pose)),t,key==='lord'?16:24);B.outline();if(S.aura)(S.aura.smoke?auraSmoke(B,S.aura,t,1):aura(B,S.aura,t));return B}
 function heroBuf(t){const H=new Buf(SW,SH);knight(H,SW-HXS,SFL,SPEC.hero,{},t);H.outline();const F=new Buf(SW,SH);F.blit(H,true);return F}
 const TINTK=['n','n','r','k','v'];
-function stageBg(s,t,K){const B=new Buf(SW,SH);if(s.k2)STG[s.st](B,t,K,s);else STG[s.st](B,t,s.open||s.rage||s.deep);return B}
+function stageBg(s,t,K){const B=new Buf(SW,SH);if(s.k2)STG[s.st](B,t,K,s,s.lw);else STG[s.st](B,t,s.open||s.rage||s.deep);return B}
 function stageK(s){return s.fixK!=null?s.fixK:Math.max(s.kmin||0,Math.min(s.kmax==null?4:s.kmax,KSTG))}
 function stageFrameK(s,t){if(s.custom)return s.custom(t);const K=stageK(s),B=stageBg(s,t,K);
  if(!s.noHero)B.blit(heroBuf(t));
@@ -115,7 +115,8 @@ function stageFrameK(s,t){if(s.custom)return s.custom(t);const K=stageK(s),B=sta
 /* ---- 白黒で確かめる（2024-05-07「色が薄れた世界」：背景を白黒にして、目立つ所と目立たない所を確かめる） ----
    数で点検する：①輪郭の差＝敵のふちの画素と、すぐ外の背景の明るさの差（L*、平均）／②芯の差＝敵の体の明るさと、まわりの背景の明るさの差／③合図の余白＝合図の4色のうち一番暗い色と、真ん中の背景の一番明るい所との差 */
 const ROSTER=[['boar','boarM'],['boar','shade','shadeM','samurai','samuraiM'],['boar','imp','impM','doll','dollM','shade','samurai'],['imp','boar','doll','shade','samurai'],['imp','impM','doll','dollM','shade','samurai']];
-const AUD={edge:14,core:10,cue:14,ex:{'大門の間':9,'大門の間（開きかけ）':9}};/* ex：輪郭の差の例外。大門の間は重さを優先して扉を暗くし、ぬしはくらやみのオーラと金の縁で立たせる（惟吹さんの判断、2026-11-25） *//* 合格の目安（L*の差）。edge＝輪郭、core＝芯、cue＝合図の余白 */
+const AUD={edge:14,core:10,cue:14,ex:{'大門の間':9,'大門の間（開きかけ）':9}};/* 主人公は白い鎧で体が明るく、暗い輪郭線が暗い背景に接するので「輪郭の差」は低く出る（1〜10）が、目でははっきり読める。主人公だけは芯の差（体とまわりの明るさの差）が AUD.edge 以上で合格にする（2026-11-26、惟吹さんの確認待ち） */
+function stageOk(r){const q=v=>Math.round(v*10)/10;/* 表に出す小数1桁の値で判定する（見えている数と合否をそろえる） */return (r.w==='hero'?q(r.core)>=AUD.edge:q(r.edge)>=(AUD.ex[r.st]||AUD.edge))&&q(r.cue)>=AUD.cue}/* ex：輪郭の差の例外。大門の間は重さを優先して扉を暗くし、ぬしはくらやみのオーラと金の縁で立たせる（惟吹さんの判断、2026-11-25） *//* 合格の目安（L*の差）。edge＝輪郭、core＝芯、cue＝合図の余白 */
 function audit1(bg,F){let ne=0,se=0,nc=0,sc=0,nr=0,sr=0;const W=SW,H=SH,isF=i=>F.c[i]&&F.t[i]!==0;
  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){const i=y*W+x;if(!isF(i)){continue}
   const nb=[i-1,i+1,i-W,i+W].filter(j=>!isF(j));if(nb.length){for(const j of nb){if(!bg.c[j])continue;ne++;se+=Math.abs(lstar(F.c[i])-lstar(bg.c[j]))}}
@@ -124,9 +125,17 @@ function audit1(bg,F){let ne=0,se=0,nc=0,sc=0,nr=0,sr=0;const W=SW,H=SH,isF=i=>F
  return{edge:ne?se/ne:0,core:nc&&nr?Math.abs(sc/nc-sr/nr):0,fig:nc?sc/nc:0,ring:nr?sr/nr:0}}
 function zoneMax(bg){let m=0;for(let y=12;y<SFL;y++)for(let x=70;x<216;x++){const c=bg.c[y*SW+x];if(c)m=Math.max(m,lstar(c))}return m}
 const CUEL=Math.min(...['#ffffff','#ff4040','#ffd040','#b060ff'].map(lstar));
+/* 点検する組の表（資料集のページと audit_stage.py が同じものを使う）。主人公はどのステージにも立つので、全部の組に入れる。
+   誓いの間（赤い騎士のあと）は、部屋ごと暗くなる前（redEnd の t=90、天窓の光の幅 5.5）で、主人公が読めるかを見る。そのあと闇に沈むのは演出 */
+function stageAuditList(){const L=[],S=id=>STAGES.find(x=>x.id===id);for(let K=0;K<5;K++)L.push({K,s:{st:'maze',k2:1,n:'迷宮の階'},who:ROSTER[K]});
+ L.push({K:0,s:S('s_gate'),who:['gate']},{K:3,s:S('s_gate_k'),who:['dgate']},{K:4,s:S('s_gate_k'),who:['dgate']});
+ for(let K=1;K<5;K++)L.push({K,s:S('s_mon'),who:['dragon']});for(let K=2;K<4;K++)L.push({K,s:S('s_monh'),who:['hydra']});/* 三つ首は覚悟2・3だけ */
+ for(const id of ['s_lord','s_lord2','s_red','s_red2','s_hole','s_hole2']){const st=S(id);L.push({K:4,s:st,who:st.who.map(w=>w[0])})}
+ L.push({K:4,s:{st:'red',k2:1,rage:1,lw:12*(1-70/130),n:'誓いの間（赤い騎士のあと）'},who:[]});
+ for(const it of L)it.who=[...it.who,'hero'];return L}
 function stageAudit(list){const rows=[];for(const it of list){const K=it.K,bg=stageBg(it.s,40,K),zm=zoneMax(bg);
-  for(const w of it.who){const tn=it.tint||TINTK[K];let e=0,c=0,f=0,r=0;const T=[0,24,48,72];for(const t of T){const a=audit1(bg,figBuf(w,EXS,tn,t));e+=a.edge;c+=a.core;f+=a.fig;r+=a.ring}
-   rows.push({K,st:it.s.n||it.s.st,w,ttl:(FORMS.find(F=>F.key===w)||{}).ttl||w,edge:e/T.length,core:c/T.length,fig:f/T.length,ring:r/T.length,zm,cue:CUEL-zm})}}return rows}
+  for(const w of it.who){const tn=it.tint||TINTK[K];let e=0,c=0,f=0,r=0;const T=[0,24,48,72];for(const t of T){const a=audit1(bg,w==='hero'?heroBuf(t):figBuf(w,EXS,tn,t));e+=a.edge;c+=a.core;f+=a.fig;r+=a.ring}
+   rows.push({K,st:it.s.n||it.s.st,w,ttl:w==='hero'?'主人公':(FORMS.find(F=>F.key===w)||{}).ttl||w,edge:e/T.length,core:c/T.length,fig:f/T.length,ring:r/T.length,zm,cue:CUEL-zm})}}return rows}
 /* ===== 関所：門番の持ち場。迷宮の「奥への通路」を、格子戸で閉じた所（通路と同じ形・同じ光） =====
    覚悟0は門番。覚悟3・4は黒い門番：格子戸は内側から押し曲げられ、旗はくらやみに食われている */
 function grate(B,L,t,K,broken){/* 落とし格子：壁の厚みの中ほど（0.93）に収める。黒い鉄のかたまりとして、向こうの光の前に立てる。
@@ -248,13 +257,9 @@ function stageSec(){const s=el('section','stagech');s.id='stage';
  s.appendChild(el('h3','','誓いの間だけは、覚悟の光の外にある'));
  s.appendChild(el('p','note','誓いの間は、門が開かなかった別の世界線の部屋なので、くらやみがない。ならくの紫の中で、ここだけ暖かい石の色に戻る。その差が「ここは別の世界だ」という印になる。赤い騎士が倒れると部屋ごと暗くなり、次の穴の底で、同じ柱の並びが紫に沈んでいる。'));
  s.appendChild(el('h3','','点検の表'));
- s.appendChild(el('p','note',`輪郭の差＝敵のふちの画素と、すぐ外の背景との明るさの差（L*、待機の4コマの平均）。${AUD.edge}以上で合格。芯の差＝敵の体と、まわりの背景の明るさの差（参考）。合図の余白＝合図の4色の一番暗い色（L* ${CUEL.toFixed(0)}）と、画面の真ん中の背景の一番明るい所との差。${AUD.cue}以上で合格。`));
+ s.appendChild(el('p','note',`輪郭の差＝敵のふちの画素と、すぐ外の背景との明るさの差（L*、待機の4コマの平均）。${AUD.edge}以上で合格。芯の差＝敵の体と、まわりの背景の明るさの差（参考）。合図の余白＝合図の4色の一番暗い色（L* ${CUEL.toFixed(0)}）と、画面の真ん中の背景の一番明るい所との差。${AUD.cue}以上で合格。主人公は体が明るく、暗い輪郭線が暗い背景に接するので、芯の差が${AUD.edge}以上で合格にする。`));
  const tb=el('div','sttable','<p class="note">点検中…</p>');s.appendChild(tb);
- setTimeout(()=>{const L=[];for(let K=0;K<5;K++)L.push({K,s:{st:'maze',k2:1,n:'迷宮の階'},who:ROSTER[K]});
-  L.push({K:0,s:STAGES.find(x=>x.id==='s_gate'),who:['gate']},{K:3,s:STAGES.find(x=>x.id==='s_gate_k'),who:['dgate']},{K:4,s:STAGES.find(x=>x.id==='s_gate_k'),who:['dgate']});
-  for(let K=1;K<5;K++)L.push({K,s:STAGES.find(x=>x.id==='s_mon'),who:['dragon']});for(let K=2;K<4;K++)L.push({K,s:STAGES.find(x=>x.id==='s_monh'),who:['hydra']});/* 三つ首は覚悟2・3だけ */
-  for(const id of ['s_lord','s_lord2','s_red','s_red2','s_hole','s_hole2']){const st=STAGES.find(x=>x.id===id);L.push({K:4,s:st,who:st.who.map(w=>w[0])})}
-  const R=stageAudit(L),ok=r=>r.edge>=(AUD.ex[r.st]||AUD.edge)&&r.cue>=AUD.cue,ng=R.filter(r=>!ok(r)).length;
-  tb.innerHTML=`<p class="note"><b>${R.length}組のうち、合格 ${R.length-ng}・不合格 ${ng}</b></p><table><tr><th>覚悟</th><th>ステージ</th><th>敵</th><th>輪郭の差</th><th>芯の差</th><th>合図の余白</th><th></th></tr>${R.map(r=>`<tr class="${ok(r)?'':'bad'}"><td>${r.K}</td><td>${r.st}</td><td>${r.ttl}</td><td>${r.edge.toFixed(1)}</td><td>${r.core.toFixed(1)}</td><td>${r.cue.toFixed(1)}</td><td>${ok(r)?(AUD.ex[r.st]&&r.edge<AUD.edge?'例外':'○'):'×'}</td></tr>`).join('')}</table>`},400);
+ setTimeout(()=>{const R=stageAudit(stageAuditList()),ok=stageOk,ng=R.filter(r=>!ok(r)).length;
+  tb.innerHTML=`<p class="note"><b>${R.length}組のうち、合格 ${R.length-ng}・不合格 ${ng}</b></p><table><tr><th>覚悟</th><th>ステージ</th><th>敵</th><th>輪郭の差</th><th>芯の差</th><th>合図の余白</th><th></th></tr>${R.map(r=>`<tr class="${ok(r)?'':'bad'}"><td>${r.K}</td><td>${r.st}</td><td>${r.ttl}</td><td>${r.edge.toFixed(1)}</td><td>${r.core.toFixed(1)}</td><td>${r.cue.toFixed(1)}</td><td>${ok(r)?(r.w==='hero'?'○（芯）':AUD.ex[r.st]&&r.edge<AUD.edge?'例外':'○'):'×'}</td></tr>`).join('')}</table>`},400);
  return s}
 FORMS.forEach(F=>{if(['boarM','boar','shadeM','shade','samuraiM','samurai','impM','imp','dollM','doll'].includes(F.key)&&!(F.stage||[]).length)F.stage=['s_maze_'+F.key]});

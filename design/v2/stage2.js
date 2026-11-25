@@ -115,7 +115,7 @@ function stageFrameK(s,t){if(s.custom)return s.custom(t);const K=stageK(s),B=sta
 /* ---- 白黒で確かめる（2024-05-07「色が薄れた世界」：背景を白黒にして、目立つ所と目立たない所を確かめる） ----
    数で点検する：①輪郭の差＝敵のふちの画素と、すぐ外の背景の明るさの差（L*、平均）／②芯の差＝敵の体の明るさと、まわりの背景の明るさの差／③合図の余白＝合図の4色のうち一番暗い色と、真ん中の背景の一番明るい所との差 */
 const ROSTER=[['boar','boarM'],['boar','shade','shadeM','samurai','samuraiM'],['boar','imp','impM','doll','dollM','shade','samurai'],['imp','boar','doll','shade','samurai'],['imp','impM','doll','dollM','shade','samurai']];
-const AUD={edge:14,core:10,cue:14,ex:{'大門の間':9,'大門の間（開きかけ）':9}};/* 主人公は白い鎧で体が明るく、暗い輪郭線が暗い背景に接するので「輪郭の差」は低く出る（1〜10）が、目でははっきり読める。主人公だけは芯の差（体とまわりの明るさの差）が AUD.edge 以上で合格にする（2026-11-26、惟吹さんの確認待ち） */
+const AUD={edge:14,core:10,cue:14,ex:{'大門の間':9,'大門の間（開きかけ）':9}};/* 主人公は白い鎧で体が明るく、暗い輪郭線が暗い背景に接するので「輪郭の差」は低く出る（1〜10）が、目でははっきり読める。主人公だけは芯の差（体とまわりの明るさの差）が AUD.edge 以上で合格にする（2026-11-26 惟吹さん。stages.md） */
 function stageOk(r){const q=v=>Math.round(v*10)/10;/* 表に出す小数1桁の値で判定する（見えている数と合否をそろえる） */return (r.w==='hero'?q(r.core)>=AUD.edge:q(r.edge)>=(AUD.ex[r.st]||AUD.edge))&&q(r.cue)>=AUD.cue}/* ex：輪郭の差の例外。大門の間は重さを優先して扉を暗くし、ぬしはくらやみのオーラと金の縁で立たせる（惟吹さんの判断、2026-11-25） *//* 合格の目安（L*の差）。edge＝輪郭、core＝芯、cue＝合図の余白 */
 function audit1(bg,F){let ne=0,se=0,nc=0,sc=0,nr=0,sr=0;const W=SW,H=SH,isF=i=>F.c[i]&&F.t[i]!==0;
  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){const i=y*W+x;if(!isF(i)){continue}

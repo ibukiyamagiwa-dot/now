@@ -463,11 +463,12 @@ let KTINT=null;
 /* いちばん大事な原則（2026-11-25）：合図は一回の攻撃ごとに、どの覚悟でも出す。連撃も一撃ごとに当たりの28F前に置く。
    意図して間の速い連撃（前の当たりから28Fより短い撃、「タタン」）は二回当たる一回の攻撃で、続きの撃の合図は覚悟「みならい」（MINARAI）だけ出す（ゲームの【速い連撃の二撃目以降の合図】＝0）。
    速くても残す合図：フェイントの紫の輪、別の「見る場所」に順に灯る合図（目・首・輪・触手など、at のあるもの）、残心に手を出したときの一撃。
-   同じ場所にもう一度出る合図は、at があっても速い続きなら隠す（CUE_HIDE）。 */
+   同じ場所にもう一度出る合図は、at があっても速い続きなら隠す（CUE_HIDE）。
+   予告の連撃（yokoku。2026-11-26）は、予告で順とリズムを先に見せ、予兆は一撃目だけ。続きの撃の合図は、間に関係なくみならいだけ出す。 */
 let MINARAI=false;
 const CUE_KEEP=new Set(['r_zanpunish','r2_zanpunish','f_zanpunish','f2_zanpunish']),CUE_HIDE=new Set([]);
 function cueHidden(M,c){const id=M.cueOf||M.id,src=M.cueOf?MV.find(m=>m.id===M.cueOf):M,c0=c._src||c;if(!src||CUE_KEEP.has(id)||c0.col==='p')return false;
- const hs=(src.hits||[]).slice().sort((a,b)=>a-b);if(hs.length<2)return false;const i=hs.findIndex(h=>Math.abs(h-(c0.t+28))<=3);if(i<1||hs[i]-hs[i-1]>=28)return false;/* 前の当たりから28F以上あれば、ふつうの一撃 */
+ const hs=(src.hits||[]).slice().sort((a,b)=>a-b);if(hs.length<2)return false;const i=hs.findIndex(h=>Math.abs(h-(c0.t+28))<=3);if(src.yokoku)return i>=1;/* 予告の連撃：予兆は一撃目だけ。続きは予告で聞いたリズム */if(i<1||hs[i]-hs[i-1]>=28)return false;/* 前の当たりから28F以上あれば、ふつうの一撃 */
  return CUE_HIDE.has(id)||!c0.at}
 /* ===== カードの描画：一枚に「主人公」と「敵」と「床」 ===== */
 const CW=136,CH=118,FL=94,HXX_=26,FL_=94,EXX=92,HXX=26;
@@ -852,12 +853,22 @@ mv({f:'gate',id:'g_kneel',n:'膝をつく',bg:'gate',len:110,cap:'片膝をつ�
  keys:[K(0,X),K(10,Object.assign({},X,{lean:-.2,x:3})),K(34,Object.assign({},KNEEL,{sw2:1.2,ua2:1.7,fa2:1.4}),'out'),K(100,Object.assign({},KNEEL,{sw2:1.2,ua2:1.7,fa2:1.4}))],noHero:true});
 
 /* ---------- 黒い門番 ---------- */
+/* 予告の連撃（2026-11-26 作者）：攻撃する部位がいくつもある技は「予告 → 全部が引いて止まる → 予兆1回 → 予告どおりの攻撃」。
+   予告は本番と同じ順・同じ間で、攻撃する部位の先が小さく光る（予兆の星より小さい、解錠のカチと同じ「見せる光」）。テンポは28Fを基準に技ごとに決める。
+   予兆は一撃目にだけ出し、続きの撃の合図はみならいだけ（cards.js の cueHidden が yokoku を見る） */
+const preStar=(B,p,t,s0)=>{if(p&&t>=s0&&t<s0+8)star(B,Math.round(p[0]),Math.round(p[1]),[2,3,3,2,2,1,1,1][t-s0],'w')};
+const DGE={pre:[10,38,66],back:78,cue:88,hits:[116,144,172]};/* 兜の目→触手：28・28 */
 mv({f:'dgate',id:'dg_idle',n:'立ち絵：にじむ',bg:'gate',len:90,cap:'門番と同じ構え。でも小さく震え、背中からくらやみがにじむ。',why:'シルエットは人のまま。のまれかけ＝まだ「門番」。ぬしより禍々しくしないための線引き。',
  keys:sway({cr:0,lean:.08},{cr:1,lean:.1},90,2),pp:(P,t)=>{if(t%23<2)P.x=(t%2?1:-1)}});
-mv({f:'dgate',id:'dg_eyes',n:'兜の目 → 触手',bg:'gate',len:120,cap:'兜の目が一つずつ開く。開くたびに、マントのすそから触手が一本のぞいて止まり、その先が白く光る。光った順に触手が来る。目の数＝回数。',why:'「目が開いた数だけ来る」というルールを見た目に埋め込む。数えれば読める。光るのは攻撃する触手の先（合図は攻撃するものに出す）。',
- keys:[K(0,{eyes:0}),K(10,{eyes:1}),K(24,{eyes:2}),K(38,{eyes:3}),K(124,{eyes:3})],pp:(P,t)=>{P.eyes=t<10?0:t<24?1:t<38?2:3},
- fx:(B,J,t)=>{const k=J.k;for(let i=0;i<3;i++){const c=10+i*14,imp=c+28;if(t>=c&&t<imp+6){/* 目が開いたら触手がすそからのぞいて止まり（静）、当たる8F前から伸びる（動） */const r=[J.hip[0]+6*k,J.hip[1]+(2+i*5)*k],u=t<imp-8?0:Math.min(1,(t-imp+8)/8);tentacle(B,r,[lerp(r[0],HXX+20,u*.6),r[1]-8],[lerp(r[0]+6,HXX+8,u),lerp(r[1],FL-14,u)],2*k,.5*k,true)}}},
- cues:[0,1,2].map(i=>({t:10+i*14,col:'w',at:J=>[J.hip[0]+6*J.k+6*J.k,J.hip[1]+(2+i*5)*J.k]})),hits:[38,52,66]});
+mv({f:'dgate',id:'dg_eyes',gifStart:0,n:'兜の目 → 触手',bg:'gate',len:200,yokoku:true,cap:'兜の目が一つ開くたびに、マントのすそから触手が一本のぞき、その先が小さく光る（予告。タン・タン・タン）。三本そろうと、全部がうしろへ引いて止まり、一本目の先が白く光る（予兆）。そこから予告と同じ順・同じ間で来る。目の数＝回数。',why:'「目が開いた数だけ来る」というルールを見た目に埋め込む。予告で数とリズムを先に聞かせ、予兆から一撃目までは28F。続きは聞いたリズムで弾けるので、反射神経に頼らない（2026-11-26 作者）。光るのは攻撃する触手の先。',
+ keys:[K(0,{eyes:0}),K(10,{eyes:1}),K(38,{eyes:2}),K(66,{eyes:3}),K(200,{eyes:3})],pp:(P,t)=>{P.eyes=t<10?0:t<38?1:t<66?2:3},
+ fx:(B,J,t)=>{const k=J.k;for(let i=0;i<3;i++){const e=DGE.pre[i],h=DGE.hits[i];if(t<e||t>=h+16)continue;
+  /* のぞく（4Fで出て止まる・予告の光）→ 全部そろって引いて止まる（構え）→ 待つ（静）→ 当たる6F前から突く（動）→ 4F粘り、すそへ引っこむ */
+  const r=[J.hip[0]+6*k,J.hip[1]+(2+i*5)*k],pk=Math.min(1,(t-e)/4),bk=t<DGE.back?0:Math.min(1,(t-DGE.back)/8),u=t<h-6?0:t<h+4?Math.min(1,(t-h+6)/6):Math.max(0,1-(t-h-4)/8);
+  const tip0=[r[0]+6*k*pk,r[1]],tipB=[r[0]+11*k,r[1]-7*k],tw=t>=h+4?[lerp(tip0[0],tipB[0],u),lerp(tip0[1],tipB[1],u)]:[lerp(tip0[0],tipB[0],bk),lerp(tip0[1],tipB[1],bk)];
+  const tip=[lerp(tw[0],HXX+8,u),lerp(tw[1],FL-14,u)],mid=[lerp(lerp(r[0]+2*k,r[0]+4*k,bk),HXX+20,u*.6),lerp(lerp(r[1]-4*k,r[1]-10*k,bk),r[1]-8,u)];
+  tentacle(B,r,mid,tip,2*k,.5*k,true);preStar(B,tip0,t,e+4)}},
+ cues:[0,1,2].map(i=>({t:DGE.hits[i]-28,col:'w',at:J=>[J.hip[0]+17*J.k,J.hip[1]+(2+i*5)*J.k-7*J.k]})),hits:DGE.hits});
 mv({f:'dgate',id:'dg_sweep',n:'マントの触手払い',bg:'gate',len:100,cap:'体を沈めたら、低い払い。マントの裾が先に開く。ときどき赤い光（重い）。',why:'人の剣では届かない「低さ」で、のまれていることを伝える。',
  keys:[K(0,X),K(16,Object.assign({},X,{cr:4,lean:-.1})),K(44,Object.assign({},X,{cr:4,lean:.2,x:-6}),'in'),K(90,X)],cues:[{t:16,col:'w',at:J=>add(J.hip,[8,10])}],hits:[44],
  fx:(B,J,t)=>{if(t>=36&&t<56){const u=Math.min(1,(t-36)/8),k=J.k,r=add(J.hip,[6*k,8*k]);tentacle(B,r,[lerp(r[0]+10,60,u),FL-2],[lerp(r[0],HXX+6,u),FL-6],2.4*k,.6*k,true)}}});
@@ -909,9 +920,12 @@ mv({f:'lord2',id:'l2_open',n:'本気：胸の扉が開く',bg:'lord',len:150,noH
   if(t>=78&&t<86)ring(B,Math.round(J.sc[0]),Math.round(J.sc[1]+12),(t-78)*3,'p')}});
 mv({f:'lord2',id:'l2_idle',n:'立ち絵',bg:'lord',len:120,keys:sway({cr:1.5,door:1},{cr:3,door:.8},120,2),
  cap:'胸の口が呼吸し、背中の触手三本が門のように広がる。',why:'ぬし（第一形態）より部品が多い＝情報量が多いほど強い、を体で見せる。'});
-mv({f:'lord2',id:'l2_back',n:'背中の触手 ×3：目の順に',bg:'lord',len:130,cap:'背中の触手の先の目が、白く光った順に来る。光った数＝回数。',why:'黒い門番の「目の数＝回数」と同じルール。前に覚えたことがここで効く。',
- keys:[K(0,L2I),K(120,L2I)],pp:(P,t)=>{const on=[0,1,2].map(i=>t>=12+i*14&&t<12+i*14+40);P.eyeOn=on;P.ten=[0,1,2].map(i=>{const imp=40+i*14,d=t-imp;return d<-8?0:d<0?(d+8)/8:d<10?1:Math.max(0,1-(d-10)/12)})},
- cues:[0,1,2].map(i=>({t:12+i*14,col:'w',at:J=>{const k=J.k,r=add(J.sc,[4*k,(-4+i*3)*k]);return[r[0]+(10+i*3)*k,r[1]-(16-i*7)*k]}})),hits:[40,54,68]});
+const L2B={pre:[12,40,68],back:78,hits:[118,146,174]};/* 背中の触手：28・28 */
+const l2bTip=(J,i,ex)=>{const k=J.k,r=add(J.sc,[4*k,(-4+i*3)*k]),rest=[r[0]+(10+i*3)*k,r[1]-(16-i*7)*k];return ex>=0?rest:[lerp(rest[0],r[0]+3*k,-ex),lerp(rest[1],r[1],-ex)]};
+mv({f:'lord2',id:'l2_back',gifStart:0,n:'背中の触手 ×3：目の順に',bg:'lord',len:200,yokoku:true,cap:'背中の触手の先の目が、一つずつ小さく光る（予告。タン・タン・タン）。三つ光ると、三本とも根元へ引いて止まり、一本目の目が白く光る（予兆）。そこから予告と同じ順・同じ間で来る。光った数＝回数。',why:'黒い門番の「目の数＝回数」と、予告→予兆→予告どおり、が同じルール。前に覚えたことがここで効く。',
+ keys:[K(0,L2I),K(200,L2I)],pp:(P,t)=>{P.eyeOn=[0,1,2].map(i=>t>=L2B.pre[i]&&t<L2B.hits[i]+10);P.ten=[0,1,2].map(i=>{const d=t-L2B.hits[i],bk=t<L2B.back?0:-.45*Math.min(1,(t-L2B.back)/8);return d<-6?bk:d<0?lerp(bk,1,(d+6)/6):d<10?1:Math.max(0,1-(d-10)/12)})},
+ fx:(B,J,t)=>{for(let i=0;i<3;i++)preStar(B,l2bTip(J,i,0),t,L2B.pre[i])},
+ cues:[0,1,2].map(i=>({t:L2B.hits[i]-28,col:'w',at:J=>l2bTip(J,i,-.45)})),hits:L2B.hits});
 mv({f:'lord2',id:'l2_arm',n:'腕の触手：のびる',bg:'lord',len:110,cap:'左腕だった触手が後ろへしなる。白く光ったら、のびてくる。',why:'人の腕の長さを超えて届く。「この距離なら安全」が通じない怖さ。',
  keys:[K(0,L2I),K(16,{ua2:-.4,fa2:-.9}),K(30,{ua2:-.4,fa2:-.9}),K(44,{ua2:3.0,fa2:3.1},'in'),K(60,{ua2:3.0,fa2:3.1}),K(100,L2I)],cues:[{t:16,col:'w',at:J=>J.hdB}],hits:[44],
  fx:(B,J,t)=>{if(t>=40&&t<64){const u=t<44?(t-40)/4:t<52?1:1-(t-52)/12;tentacle(B,J.hdB,add(J.hdB,[-16*u,-6]),[lerp(J.hdB[0],HXX+10,u),lerp(J.hdB[1],FL-12,u)],1.8*J.k,.5*J.k,true)}}});
@@ -1122,12 +1136,19 @@ const gfTip=(t,root,i,cue,hit)=>{const S=new Buf(CW,CH);return gateFinger(S,root
 const gfDraw=(B,t,roots,cues,hits,k)=>{for(const i of[2,0,1]){if(t<12)continue;const cue=cues[i],hit=hits[i],u=GFU(t,cue,hit,i),em=Math.min(1,(t-12)/10);
  const r=gateFinger(B,roots[i],GFT[i],i,{k,T:t,u:u*em,lit:t>=cue&&t<cue+10,eye:t>=cue+10,mouth:t>=hit-1&&t<hit+14?1-Math.max(0,t-hit)/14:0,crack:t>=hit-3&&t<hit+2});
  if(t>=hit&&t<hit+10){const d=t-hit;for(let q=0;q<7;q++){const a=-2.6+q*.8+hsh(q,i)*.4,rr=2+d*1.6;B.set(r.tip[0]+Math.cos(a)*rr,r.tip[1]+Math.sin(a)*rr*.8+d*d*.06,q%2?INK.hi:INK.col,4)}}}};
-mv({f:'lord2',id:'l2_gate',n:'門の向こうの指',bg:'lord',len:170,cap:'背後の大門のすき間が開く。すき間の縁に、内側から三本の指がかかる。灰紫の皮、節ごとの横じわ、白い平たい爪。上の指は爪がはがれ、下の指には古い金の指輪。指先の目が光った順に、いったん奥へ引いてから一気に突き出る。当たる瞬間、指先の腹が縦に裂けて口になる。動くたびに節が鳴る。',why:'三つ首の竜と同じ手の指（はがれた爪、金の指輪で同じと分かる）。門の向こうにいるのが何か、ここで一度だけのぞかせる。合図は指先の目の光、引いてから突き出る＝構えと攻撃がはっきり分かれる。',
- keys:[K(0,L2I),K(20,Object.assign({},L2I,{door:1.4,lean:-.2})),K(160,Object.assign({},L2I,{door:1.4,lean:-.2}))],
- cues:[0,1,2].map(i=>({t:30+i*14,col:'w',at:J=>gfTip(30+i*14,[CW-12,22+i*14],i,30+i*14,58+i*14)})),hits:[58,72,86],
- pre:(B,t)=>{/* 背後の門のすき間 */const o=Math.min(1,t/20)*4;for(let y=6;y<FL;y++)for(let x=CW-26;x<CW;x++){const cx=CW-12;const g=Math.abs(x-cx)<o+(y%7?0:1);B.set(x,y,g?(((x+y+(t/4|0))%5)?'#1a0a2a':'#c070ff'):((x-CW)%9===0||y%12===0?'#1a1420':'#2a2232'),6)}
-  gfDraw(B,t,[0,1,2].map(i=>[CW-12,22+i*14]),[30,44,58],[58,72,86],1)}});
-
+/* 門の向こうの指：予告（指先の目が小さく光る。タン・タタ＝28・14、同じぬしの解錠と同じリズム）→ 三本とも奥へ引いて止まる → 一本目の目が白く光る（予兆）→ 予告どおりに3Fで突き出る */
+const L2G={pre:[30,58,72],back:82,hits:[120,148,162]};
+const GFU2=(t,i)=>{const h=L2G.hits[i];return t<L2G.back?.1+.05*Math.sin(t*.31+i*2):t<h-3?Math.max(.02,.1-(t-L2G.back)*.0135):t<h?lerp(.02,1,(t-(h-3))/3):t<h+8?1:Math.max(.1,1-(t-h-8)/22)+.04*Math.sin(t*.5+i)};
+const gfTip2=(t,root,i)=>{const S=new Buf(CW,CH);return gateFinger(S,root,GFT[i],i,{k:1,T:t,u:GFU2(t,i)}).ch[3]};
+const gfDraw2=(B,t,roots,k)=>{for(const i of[2,0,1]){if(t<12)continue;const p0=L2G.pre[i],hit=L2G.hits[i],u=GFU2(t,i),em=Math.min(1,(t-12)/10);
+ const r=gateFinger(B,roots[i],GFT[i],i,{k,T:t,u:u*em,lit:t>=p0&&t<p0+8,eye:t>=L2G.hits[i]-18,mouth:t>=hit-1&&t<hit+14?1-Math.max(0,t-hit)/14:0,crack:t>=hit-3&&t<hit+2});
+ if(t>=p0&&t<p0+8)preStar(B,r.tip,t,p0);
+ if(t>=hit&&t<hit+10){const d=t-hit;for(let q=0;q<7;q++){const a=-2.6+q*.8+hsh(q,i)*.4,rr=2+d*1.6;B.set(r.tip[0]+Math.cos(a)*rr,r.tip[1]+Math.sin(a)*rr*.8+d*d*.06,q%2?INK.hi:INK.col,4)}}}};
+mv({f:'lord2',id:'l2_gate',gifStart:0,n:'門の向こうの指',bg:'lord',len:200,yokoku:true,cap:'背後の大門のすき間が開く。すき間の縁に、内側から三本の指がかかる。灰紫の皮、節ごとの横じわ、白い平たい爪。上の指は爪がはがれ、下の指には古い金の指輪。指先の目が一つずつ小さく光る（予告。タン・タタ）。三本とも奥へ引いて止まり、一本目の目が白く光る（予兆）。予告どおりのリズムで一本ずつ突き出る。当たる瞬間、指先の腹が縦に裂けて口になる。動くたびに節が鳴る。',why:'三つ首の竜と同じ手の指（はがれた爪、金の指輪で同じと分かる）。門の向こうにいるのが何か、ここで一度だけのぞかせる。リズムは同じぬしの解錠（タン・タタ）と同じで、予告で先に聞かせる。引いてから突き出る＝構えと攻撃がはっきり分かれる。',
+ keys:[K(0,L2I),K(20,Object.assign({},L2I,{door:1.4,lean:-.2})),K(200,Object.assign({},L2I,{door:1.4,lean:-.2}))],
+ cues:[0,1,2].map(i=>({t:L2G.hits[i]-28,col:'w',at:J=>gfTip2(L2G.hits[i]-28,[CW-12,22+i*14],i)})),hits:L2G.hits,
+ pre:(B,t)=>{/* 背後の門のすき間 */const o=Math.min(1,t/20)*4;for(let y=6;y<FL;y++)for(let x=CW-26;x<CW;x++){const cx=CW-12;const g=Math.abs(x-cx)<o+(y%7?0:1);B.set(x,y,g?(((x+y+(t/4|0))%5)?'#1a0a2a':'#c070ff'):((x-CW)%9===0||y%12===0?'#1a1420':'#2a2232'),6)}},
+ /* 指はぬしより手前に描く（この技の主役は指。ぬしが指に隠れてよい。2026-11-26 作者） */fx:(B,J,t)=>gfDraw2(B,t,[0,1,2].map(i=>[CW-12,22+i*14]),1)});
 /* ===== 追加の新しい技 ===== */
 mv({f:'dgate',id:'dg_beat',n:'鎖の拍',bg:'gate',len:150,cap:'黒い鎖で床を3回打つ（ガン・ガン・ガン）。その次の拍で、鎖が横から来る。',why:'拍で読む攻撃は、小鬼のおかしらで先に教わっている。「3」は門の数字。門番の誓いの鎖が、拍を刻む道具になった。',
  keys:[K(0,X),K(14,Object.assign({},X,{ua2:.6,fa2:1.4})),K(130,Object.assign({},X,{ua2:.6,fa2:1.4})),K(146,X)],cues:[{t:20,col:'w',at:J=>[J.hdB[0]+10,FL-2]}],hits:[48],
@@ -1962,7 +1983,7 @@ const FORMS=[
  pal:[['#3a3446','古い黒鉄','長い年月'],['#b8902a','くすんだ金','昔の誇り'],['#222842','色あせた紺','門番たちと同じ色'],['#ff3050','封印の奥の赤','赤い騎士の名残']]},
 {key:'lord2',ttl:'暗い門のぬし',en:'THE OPENED GATE',old:null,stage:['s_lord2'],
  lore:'膝をついて封印がほどけた、ぬしの第二形態。くらやみが内側から体を押し開け、門を守っていた者は、門そのものになった。くらやみに悪意はない。ただ、そうなっただけ。',
- parts:[['左右に開く胸の扉','体＝門。扉の奥の口と目が「門の向こう」。ここからの攻撃はいちばん重い'],['割れた兜の一つ目','人の顔（兜）が割れ、中の目が一つ'],['ちぎれた鎖','門とのつながりが切れた。手首から垂れた鎖は、触手が拾って鞭にする'],['背中の三本の触手と、先の目','黒い門番の「目の数＝回数」と同じルール'],['左腕の触手','人の腕の長さを超えて届く'],['破れた前垂れ','紺も紋章も、ほとんど残っていない'],['背後の門のすき間','ぬしが崩れたせいで、門が内側から押し開かれはじめた。のぞく指は、三つ首の竜と同じもの']],
+ parts:[['左右に開く胸の扉','体＝門。扉の奥の口と目が「門の向こう」。ここからの攻撃はいちばん重い'],['割れた兜の一つ目','人の顔（兜）が割れ、中の目が一つ'],['ちぎれた鎖','門とのつながりが切れた。手首から垂れたまま'],['背中の三本の触手と、先の目','黒い門番の「目の数＝回数」と同じルール'],['左腕の触手','人の腕の長さを超えて届く'],['破れた前垂れ','紺も紋章も、ほとんど残っていない'],['背後の門のすき間','ぬしが崩れたせいで、門が内側から押し開かれはじめた。のぞく指は、三つ首の竜と同じもの']],
  pal:[['#140e1a','もっと深い黒','封印がほどけた'],['#ff3050','胸の口の赤','いちばん重い場所'],['#22142e','くらやみの触手','門の向こうのもの']]},
 {key:'red',ttl:'赤い騎士',en:'THE RED KNIGHT',old:'red',stage:['s_red'],
  lore:'門のぬしが、くらやみに飲まれなかった場合の、あり得た別の姿。同じ人の、もう一つの世界線。ぬしがきれいに倒れた瞬間、門が一度だけ揺らぎ、向こうの世界線から歩み出てくる。彼の世界では、門は決して開けてはならないもの。主人公は、たった今その門を開けた者だ。',
@@ -3585,7 +3606,7 @@ function stageFrameK(s,t){if(s.custom)return s.custom(t);const K=stageK(s),B=sta
 /* ---- 白黒で確かめる（2024-05-07「色が薄れた世界」：背景を白黒にして、目立つ所と目立たない所を確かめる） ----
    数で点検する：①輪郭の差＝敵のふちの画素と、すぐ外の背景の明るさの差（L*、平均）／②芯の差＝敵の体の明るさと、まわりの背景の明るさの差／③合図の余白＝合図の4色のうち一番暗い色と、真ん中の背景の一番明るい所との差 */
 const ROSTER=[['boar','boarM'],['boar','shade','shadeM','samurai','samuraiM'],['boar','imp','impM','doll','dollM','shade','samurai'],['imp','boar','doll','shade','samurai'],['imp','impM','doll','dollM','shade','samurai']];
-const AUD={edge:14,core:10,cue:14,ex:{'大門の間':9,'大門の間（開きかけ）':9}};/* 主人公は白い鎧で体が明るく、暗い輪郭線が暗い背景に接するので「輪郭の差」は低く出る（1〜10）が、目でははっきり読める。主人公だけは芯の差（体とまわりの明るさの差）が AUD.edge 以上で合格にする（2026-11-26、惟吹さんの確認待ち） */
+const AUD={edge:14,core:10,cue:14,ex:{'大門の間':9,'大門の間（開きかけ）':9}};/* 主人公は白い鎧で体が明るく、暗い輪郭線が暗い背景に接するので「輪郭の差」は低く出る（1〜10）が、目でははっきり読める。主人公だけは芯の差（体とまわりの明るさの差）が AUD.edge 以上で合格にする（2026-11-26 惟吹さん。stages.md） */
 function stageOk(r){const q=v=>Math.round(v*10)/10;/* 表に出す小数1桁の値で判定する（見えている数と合否をそろえる） */return (r.w==='hero'?q(r.core)>=AUD.edge:q(r.edge)>=(AUD.ex[r.st]||AUD.edge))&&q(r.cue)>=AUD.cue}/* ex：輪郭の差の例外。大門の間は重さを優先して扉を暗くし、ぬしはくらやみのオーラと金の縁で立たせる（惟吹さんの判断、2026-11-25） *//* 合格の目安（L*の差）。edge＝輪郭、core＝芯、cue＝合図の余白 */
 function audit1(bg,F){let ne=0,se=0,nc=0,sc=0,nr=0,sr=0;const W=SW,H=SH,isF=i=>F.c[i]&&F.t[i]!==0;
  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){const i=y*W+x;if(!isF(i)){continue}

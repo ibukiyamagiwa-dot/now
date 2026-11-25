@@ -3,10 +3,10 @@
 // 使い方: node tools/ichimai.mjs 出力.png [ページ=/] [場面を作るJS]
 //   例: node tools/ichimai.mjs nippo/2026-11-25_game.png / "startPractice('samuraiB');G.card=null;for(let i=0;i<90;i++)tick()"
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
-import { execSync } from 'node:child_process';
+import { execSync } from 'node:child_process'; import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 let pw; try { pw = require('playwright'); } catch { pw = require(path.join(execSync('npm root -g').toString().trim(), 'playwright')); }
-const dir = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');   // Windows でも正しい道すじにする
 const [out, pg = '/', js = ''] = process.argv.slice(2);
 if (!out) { console.log('使い方: node tools/ichimai.mjs 出力.png [ページ=/] [場面を作るJS]'); process.exit(1); }
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.woff2': 'font/woff2', '.png': 'image/png' };

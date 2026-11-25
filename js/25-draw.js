@@ -292,7 +292,7 @@ function drawEnemy(){
  }
  const AI=e.uhp&&e.kind!=='hydra'?aliveIdx():null,bigF=AI&&e.ubig[AI[0]],xs=AI?x-(AI.length-1)*9:x;
  if(AI){for(let k=AI.length-1;k>=1;k--){const u=AI[k],bob=Math.round(Math.abs(Math.sin(G.anim*.15+k*1.7))*3);if(e.ubig[u])l.drawImage(img,xs-(w>>1)+k*14+2,y-h*2-bob,w*2,h*2);else l.drawImage(img,xs-(w>>1)+k*14,y-h-bob)}}
- const bs=e.kind==='boar'&&boarStrike(),bd=bs&&bs.res==='parry'?G.et-bs.impact:-1;if(bd>=0&&bd<12){l.save();l.translate(x,y-h/2-Math.round(Math.sin(bd/12*Math.PI)*16));l.rotate(Math.PI/2*Math.floor(bd/3));l.drawImage(img,-(w>>1),-(h>>1));l.restore()}
+ const bs=e.kind==='boar'&&boarStrike(),bd=bs&&bs.res==='parry'?G.et-bs.impact:-1;if(bd>=0&&bd<12){l.save();const qr=Math.floor(bd/3);l.translate(x,y-(qr%2?w:h)/2-Math.round(Math.sin(bd/12*Math.PI)*16));l.rotate(Math.PI/2*qr);l.drawImage(img,-(w>>1),-(h>>1));l.restore()}
  const GA=e.kind==='ghost'?ghostAlpha():null;let gx=xs;if(GA){l.globalAlpha=GA.a;gx=GA.x??xs}
  if(!G.ko)G.ex=GA&&GA.x!=null?GA.x:xs;
  if(bd>=0&&bd<12){}else if(AN){const W2=(bigF?w*2:w)*AN.sx,H2=(bigF?h*2:h)*AN.sy;l.drawImage(img,Math.round(gx-W2/2),Math.round(y-H2-idle),Math.round(W2),Math.round(H2))}
@@ -444,7 +444,7 @@ function ghostAlpha(){const e=G.en;if(G.state==='ko'||G.state==='win'||G.state==
  return{a:e.hurt?P.ghostHurtA:P.ghostIdleA+P.ghostIdleSwayA*Math.sin(G.anim*.1)}}
 /* 三つ首：首の位置（待機のゆらぎ・光る予告・噛みつき） */
 function hydraHeadPos(i,x,y){const base=[[x-48,y-42],[x-30,y-58],[x-6,y-64]][i],sw=Math.sin(G.anim*.07+i*2.1)*2;let hx=base[0],hy=base[1]+sw;
- if(G.state==='enemy'){const s=G.strikes.find(s=>!s.cx&&s.heads&&s.heads.includes(i)&&s.res!=='cut'&&G.et>=s.cue-2&&G.et<=s.impact+8);if(s){const d=G.et-s.impact,T=s.heads.length>1?[HX+24+(i-1)*4,FLOOR-14+(i-1)*6]:[HX+24,FLOOR-14];
+ if(G.state==='enemy'){const s=G.strikes.find(s=>!s.cx&&s.heads&&s.heads.includes(i)&&s.res!=='cut'&&G.et>=s.cue-2&&G.et<=s.impact+8);if(s){const d=G.et-s.impact,T=s.heads.length>1?[HX+24+(i-1)*4,FLOOR-14+(i-1)*3]:[HX+24,FLOOR-14];
   if(d<-6){const k=Math.min(1,(G.et-s.cue+2)/8);hx+=8*k;hy-=6*k}else if(d<=0){const k=(d+6)/6;hx=hx+8+(T[0]-hx-8)*k;hy=hy-6+(T[1]-hy+6)*k}else{const k=1-d/8;hx=hx+(T[0]-hx)*k;hy=hy+(T[1]-hy)*k}}}
  return[hx,hy]}
 function drawHydra(x,y,v,pal){const e=G.en,t=e.tint,cN=nCol('#241e34',v,t),cH=nCol('#3a3050',v,t),cR=nCol('#6a5a48',v,t),HA=ANC.hydraHead[0];
@@ -604,6 +604,13 @@ function drawIai(){const I=G.iai;if(!I)return;const t=I.t++;if(t>34){G.iai=null;
 /* 見え方（開発者ページ。2024-05-17「透過機能」：動きを見やすくするため、要素ごとに半透明・非表示にできる）。
    fn が中で不透明度を自分で切りかえても効くよう、描く前と後の画面を混ぜる */
 function seeThru(on,fn){if(!on)return fn();const b=l.getImageData(0,0,LW,LH);fn();const a=l.getImageData(0,0,LW,LH),A=a.data,B=b.data;for(let i=0;i<A.length;i+=4)for(let j=0;j<3;j++)A[i+j]=Math.round(B[i+j]+(A[i+j]-B[i+j])*.35);l.putImageData(a,0,0)}
+/* 床で切る（design/GAME_REQUESTS.md「床と間合い」）：敵の絵は床の線（FLOOR）より下を描かない。沈んだ部分は床で切れて見える。
+   床に落ちる影・床をすべるたまり・合図の光は切らない。描いた時の向きと濃さを覚えておき、切ったあとで描く */
+function floorClip(fn){const keep={shadowPx,drawHPool,cueStar,drawCue,pxStar},q=[];
+ for(const k in keep)globalThis[k]=(...a)=>{q.push([keep[k],a,l.getTransform(),l.globalAlpha])};
+ l.save();l.beginPath();l.rect(0,0,LW,FLOOR);l.clip();
+ try{fn()}finally{l.restore();shadowPx=keep.shadowPx;drawHPool=keep.drawHPool;cueStar=keep.cueStar;drawCue=keep.drawCue;pxStar=keep.pxStar}
+ for(const[f,a,T,A]of q){l.save();l.setTransform(T);l.globalAlpha=A;f(...a);l.restore()}}
 function draw(){
  if(G.mode==='title'){drawTitle();syncButtons();syncUI();return}
  if(dbg.bgOff){l.fillStyle='#4a4a50';l.fillRect(0,0,LW,LH)}else drawBG();
@@ -612,7 +619,7 @@ function draw(){
  if(G.state==='ko'&&G.stop>0){l.fillStyle='rgba(8,2,6,.6)';l.fillRect(0,0,LW,LH)}
  const IA=(G.iai||G.xs)&&G.stop>0&&G.state!=='ko'&&!G.uk;if(IA){l.fillStyle='rgba(4,2,12,.7)';l.fillRect(0,0,LW,LH)}
  if(G.uk){const t=G.uk.t;l.fillStyle=`rgba(3,1,8,${t<UK.CUT?.86:t<UK.HIT?.72:t<UK.END-6?.5:.25})`;l.fillRect(0,0,LW,LH)}
- drawHole();seeThru(dbg.foeSee,()=>{drawEnemy();drawLordKo()});drawSlamShadow();seeThru(dbg.heroSee,drawHero);if(!dbg.fxOff){drawFX();drawIai();drawUK();drawXSlash();drawWhis();drawRally();drawUKV()}
+ drawHole();seeThru(dbg.foeSee,()=>floorClip(()=>{drawEnemy();drawLordKo()}));drawSlamShadow();seeThru(dbg.heroSee,drawHero);if(!dbg.fxOff){drawFX();drawIai();drawUK();drawXSlash();drawWhis();drawRally();drawUKV()}
  if(G.state==='enter'&&G.enter&&G.enter.t<70){l.fillStyle=`rgba(0,0,0,${Math.max(0,.92-G.enter.t/70*.92).toFixed(3)})`;l.fillRect(0,0,LW,LH)}
  const KC=G.state==='ko'&&G.t<=koZoomEnd()?G.ko.cam:IA?{z:S*1.4,fx:(HX+EX)/2,fy:FLOOR-30}:null,z=KC?KC.z:S,w=960/z,h=540/z;
  const x0=KC?Math.max(0,Math.min(LW-w,Math.round(KC.fx-w/2))):0,y0=KC?Math.max(0,Math.min(LH-h,Math.round(KC.fy-h/2))):0;

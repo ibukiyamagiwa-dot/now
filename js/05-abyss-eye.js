@@ -13,7 +13,8 @@ function drawLordBkReady(x,y,A,v,e){if(!A.bk||!G.strikes)return;const R=[x+A.bk[
  for(let i=0;i<3;i++){if(act.has(i))continue;const P=bkPoise(R,i),E=[P[0]+Math.sin(G.anim*.09+i*2)*.8,P[1]];lordTent([R,[R[0]+4,R[1]-14],[P[0]+6,P[1]-14],E],2.6,1,v,e,26)}}
 function drawLordReach(s,x,y,A,v,e,cur){const fh=[x+A.fh[0],y+A.fh[1]],d=G.et-s.impact,u=Math.min(1,Math.max(0,(G.et-s.start)/16)),H2=[HX+18,FLOOR-16],a=A.fa*Math.PI/180;let E,C;
  if(d>8)return;
- if(d>0){const k=1-d/8,Ln=20+30*k;E=[fh[0]+Math.cos(a)*Ln,fh[1]+Math.sin(a)*Ln];C=lerp2(fh,E,.5)}
+ /* 引き戻す剣先は床より下へ行かない（床と間合い） */
+ if(d>0){const k=1-d/8,sa=Math.sin(a),Ln=Math.min(20+30*k,sa>0?(FLOOR-1-fh[1])/sa:99);E=[fh[0]+Math.cos(a)*Ln,fh[1]+Math.sin(a)*Ln];C=lerp2(fh,E,.5)}
  else if(d>=-3){const t=(d+3)/3,hi=[fh[0]-20,fh[1]-46];E=lerp2(hi,H2,t*t);C=[(fh[0]+E[0])/2,Math.min(fh[1],E[1])-26*(1-t*.6)]}
  else{const Ln=18+22*u,a2=-76*Math.PI/180;E=[fh[0]+Math.cos(a2)*Ln,fh[1]+Math.sin(a2)*Ln];C=lerp2(fh,E,.5)}
  const N=26,pts=[];for(let i=0;i<=N;i++){const t=i/N,u2=1-t;pts.push([u2*u2*fh[0]+2*u2*t*C[0]+t*t*E[0],u2*u2*fh[1]+2*u2*t*C[1]+t*t*E[1]])}

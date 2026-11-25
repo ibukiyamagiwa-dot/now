@@ -2,6 +2,8 @@
 // 2023-08-12「デバッグは終わらない」：組み合わせは人の手では当たりきれない。押す時間・選ぶ技・敵をばらばらにして、人が試さない組み合わせを機械に当てさせる。
 // 敵ごとに練習で戦わせ、ボットが技を選び、A をでたらめな時間・ちょうどの時間・押さない、のどれかで押す。ゲームの時間は止めて tick() を直接進めるので、速い。
 // 見ること：①tick と draw で例外が出ない ②HP が数（NaN でない）で、0〜最大のあいだ ③同じ状態に長く止まらない（詰み）
+// 　　　　　④床と間合い（design/GAME_REQUESTS.md「床と間合い」）：敵の絵だけを描いて、床（FLOOR）より下に見える画素が0、
+//         床で切る前の絵の沈み（剣先も含む）が【床に沈んでよい深さ】以内、だれも振っていないときに主人公と重ならない。床の影・床をすべるたまり・合図の光は数えない。
 // 使い方: node tests/soak.mjs [フォルダ=.] [敵ごとのフレーム数=2400] [種=1]
 //   check.sh では短く走らせる。夜通し回すなら: node tests/soak.mjs . 200000 7
 // 落ちたときは、敵・種・フレームを出すので、同じ種で走らせれば同じところで落ちる。敵ごとの押した回数と状態は SOAK_STATS=1 で出る。
@@ -27,6 +29,24 @@ const res = await page.evaluate(({ FR, SEED }) => {
   // ボットの乱数はゲームの乱数と分ける（ボットのせいでゲームの流れが変わりすぎないように）
   let bs = SEED * 7919 + 1; const rnd = () => ((bs = (bs * 1103515245 + 12345) >>> 0) / 2 ** 32);
   const STUCK = 60 * 60;          // 同じ状態に 60 秒いたら詰みとみなす
+  const SINK = 3;                 // 【床に沈んでよい深さ】（画素）。足・ひづめ・ひっくり返った背中のように床につく部分の分
+  const NOFX = { shadowPx: () => {}, drawHPool: () => {}, cueStar: () => {}, drawCue: () => {}, pxStar: () => {} };
+  // 敵だけ（clip＝床で切る）か主人公だけを描いて、描いた画素の印を返す。床の影・床をすべるたまり・合図の光は描かない
+  const layer = (fn) => { const keep = {}; for (const k in NOFX) { keep[k] = globalThis[k]; globalThis[k] = NOFX[k] }
+    l.clearRect(0, 0, LW, LH); try { fn() } finally { Object.assign(globalThis, keep) }
+    const d = l.getImageData(0, 0, LW, LH).data, m = new Uint8Array(LW * LH); for (let i = 0; i < m.length; i++) m[i] = d[i * 4 + 3] > 0; return m };
+  const below = m => { let n = 0, dep = 0; for (let y = FLOOR; y < LH; y++) for (let x = 0; x < LW; x++) if (m[y * LW + x]) { n++; dep = y - FLOOR + 1 } return { n, dep } };
+  const floorCheck = (k, f) => {
+    // 沈みは毎回、床で切れているかと重なりは間引いて見る（全部を毎回見ると check.sh が遅くなるため）
+    const raw = below(layer(() => { drawEnemy(); drawLordKo() })), cut = f % 12 === 0 ? below(layer(() => floorClip(() => { drawEnemy(); drawLordKo() }))) : { n: 0 };
+    const mv = ((G.strikes || []).find(s => !s.done) || {}).mv || '';
+    if (cut.n) return `${k}：${f}F（状態 ${G.state}${mv && '・' + mv}）床より下に見える画素が ${cut.n}`;
+    if (raw.dep > SINK) return `${k}：${f}F（状態 ${G.state}${mv && '・' + mv}）床に ${raw.dep}画素沈んだ（${SINK}まで）`;
+    // だれも振っていないとき（技を選ぶ間、敵の番で構えより前か当たりの16Fあと、主人公が構えのまま）は重ならない
+    const quiet = G.state === 'cmd' || (G.state === 'enemy' && (G.strikes || []).every(s => s.done ? G.et - s.impact > 16 : G.et < s.start) && !(G.hpose && G.hpose.k !== 'idle'));
+    if (quiet && f % 6 === 0) { const E = layer(() => floorClip(() => { drawEnemy(); drawLordKo() })), H = layer(drawHero); let n = 0; for (let i = 0; i < E.length; i++) n += E[i] & H[i];
+      if (n) return `${k}：${f}F（状態 ${G.state}${mv && '・' + mv}）主人公と ${n}画素重なった` }
+    return '' };
   const keys = Object.keys(EN), out = [], stats = {};
   for (const k of keys) {
     const st = stats[k] = { frames: 0, presses: 0, parry: 0, states: {} };
@@ -44,6 +64,7 @@ const res = await page.evaluate(({ FR, SEED }) => {
         } else if (rnd() < .05) { press(); st.presses++ }
         tick(); if (f % 9 === 0) draw();
       } catch (e) { out.push(`${k}：${f}F（状態 ${s0}）で例外：${e.message}`); break }
+      if (f % 4 === 0) { const bad = floorCheck(k, f); if (bad) { out.push(bad); break } }
       st.frames++; st.states[G.state] = (st.states[G.state] || 0) + 1;
       const h = G.hero, en = G.en;
       if (!Number.isFinite(h.hp) || h.hp < 0 || h.hp > h.max) { out.push(`${k}：${f}F 主人公の HP がおかしい（${h.hp}/${h.max}）`); break }

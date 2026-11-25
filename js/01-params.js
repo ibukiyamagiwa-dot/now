@@ -4,13 +4,27 @@ const DEF=[
  {k:'justMul',n:'【ジャスト回避の受付倍率】',v:2,min:1,max:4,step:.5,u:'×',g:'main'},
  {k:'guardF',n:'【ガードの受付フレーム】',v:30,min:8,max:60,step:1,u:'F',g:'main'},
  {k:'cueF',n:'【予兆から着弾までのフレーム】',v:28,min:10,max:60,step:1,u:'F',g:'main'},
- {k:'parryStopF',n:'【パリィ時のヒットストップフレーム】',v:12,min:0,max:30,step:1,u:'F',g:'main'},
+ {k:'stopParryF',n:'【パリィ時のヒットストップフレーム】',v:12,min:0,max:30,step:1,u:'F',g:'main'},
  {k:'shake',n:'【画面振動の強さ】',v:10,min:0,max:30,step:1,u:'',g:'main'},
  {k:'counterMul',n:'【反撃の倍率】',v:1.5,min:0,max:4,step:.1,u:'×',g:'main'},
  {k:'golemBeatF',n:'【岩の巨人：ゴンの間隔フレーム】',v:13,min:4,max:16,step:1,u:'F',g:'adv'},
  {k:'golemLastF',n:'【岩の巨人：最後のゴンから当たるまでのフレーム】',v:8,min:2,max:16,step:1,u:'F',g:'adv'},
  {k:'earlyLockF',n:'【早押しの硬直フレーム】',v:24,min:0,max:60,step:1,u:'F',g:'adv'},
- {k:'hitStopF',n:'【被弾時のヒットストップフレーム】',v:6,min:0,max:30,step:1,u:'F',g:'adv'},
+ {k:'stopHitF',n:'【被弾時のヒットストップフレーム】',v:6,min:0,max:30,step:1,u:'F',g:'adv'},
+ /* ヒットストップ（名前の頭は stop…）。ここより下は、コードに直書きだったものを外へ出した。初期値は前と同じ */
+ {k:'stopMag1F',n:'【まほうのヒットストップフレーム】ほのお（1段）',v:6,min:0,max:40,step:1,u:'F',g:'adv'},
+ {k:'stopMag2F',n:'【まほうのヒットストップフレーム】かみなり（2段）',v:10,min:0,max:40,step:1,u:'F',g:'adv'},
+ {k:'stopMag3F',n:'【まほうのヒットストップフレーム】ひかり（3段）',v:18,min:0,max:40,step:1,u:'F',g:'adv'},
+ {k:'stopThrowF',n:'【投げ返しのヒットストップフレーム】（1個ごと）',v:3,min:0,max:20,step:1,u:'F',g:'adv'},
+ {k:'stopDeflectF',n:'【受け流されたときのヒットストップフレーム】',v:8,min:0,max:30,step:1,u:'F',g:'adv'},
+ {k:'stopCounterAddF',n:'【居合返し・見切り返しで足すヒットストップフレーム】（パリィ時に足す）',v:18,min:0,max:60,step:1,u:'F',g:'adv'},
+ {k:'stopRedAddF',n:'【赤い一撃をパリィしたときに足すヒットストップフレーム】',v:6,min:0,max:30,step:1,u:'F',g:'adv'},
+ {k:'stopJustMul',n:'【ジャスト回避のヒットストップ倍率】（パリィ時に対して）',v:.33,min:0,max:1,step:.01,u:'×',g:'adv'},
+ {k:'stopGuardF',n:'【ガードのヒットストップフレーム】',v:3,min:0,max:20,step:1,u:'F',g:'adv'},
+ {k:'stopRhythmMaxF',n:'【拍の連撃の途中のヒットストップの上限フレーム】',v:6,min:0,max:20,step:1,u:'F',g:'adv'},
+ {k:'stopKoQuietF',n:'【打ち返しで倒したときのヒットストップフレーム】',v:14,min:0,max:60,step:1,u:'F',g:'adv'},
+ {k:'stopKoMidMul',n:'【中ボスのとどめのヒットストップ倍率】（とどめに対して）',v:1.3,min:.5,max:3,step:.1,u:'×',g:'adv'},
+ {k:'stopKoParryMul',n:'【返し斬りのとどめのヒットストップ倍率】（とどめに対して）',v:.6,min:.1,max:2,step:.1,u:'×',g:'adv'},
  {k:'guardDmgMul',n:'【ガード時の被ダメージ倍率】',v:.5,min:0,max:1,step:.05,u:'×',g:'adv'},
  {k:'potCap',n:'【薬の所持上限】',v:3,min:1,max:9,step:1,u:'',g:'adv'},
  {k:'winHeal',n:'【勝利後のHP回復量】',v:0,old:[30],min:0,max:100,step:5,u:'',g:'adv'},
@@ -34,15 +48,15 @@ const DEF=[
  {k:'lateF',n:'【追撃・重い一撃の遅れの許容フレーム】',v:2,min:0,max:6,step:1,u:'F',g:'gauge'},
  {k:'chaseMul',n:'【追撃の倍率】',v:.5,min:0,max:2,step:.1,u:'×',g:'gauge'},
  {k:'critMul',n:'【重い一撃の倍率】',v:2,min:0,max:3,step:.1,u:'×',g:'gauge'},
- {k:'hit1StopF',n:'【通常の一撃のヒットストップフレーム】',v:4,min:0,max:20,step:1,u:'F',g:'gauge'},
- {k:'chaseStopF',n:'【追撃のヒットストップフレーム】',v:8,min:0,max:30,step:1,u:'F',g:'gauge'},
+ {k:'stopHit1F',n:'【通常の一撃のヒットストップフレーム】',v:4,min:0,max:20,step:1,u:'F',g:'gauge'},
+ {k:'stopChaseF',n:'【追撃のヒットストップフレーム】',v:8,min:0,max:30,step:1,u:'F',g:'gauge'},
  {k:'bite',n:'【ヒットストップ中の刃の食い込み】',v:.03,min:0,max:.1,step:.01,u:'',g:'gauge'},
- {k:'critStopF',n:'【重い一撃のヒットストップフレーム】',v:16,min:0,max:40,step:1,u:'F',g:'gauge'},
+ {k:'stopCritF',n:'【重い一撃のヒットストップフレーム】',v:16,min:0,max:40,step:1,u:'F',g:'gauge'},
  {k:'mkCrit',n:'【重い一撃の見切り獲得量】',v:15,min:0,max:100,step:5,u:'',g:'gauge'},
  {k:'mkStreak',n:'【連続パリィ（3回以上）のボーナス見切り】',v:15,min:0,max:100,step:5,u:'',g:'adv'},
  {k:'autoNextF',n:'【勝利後に自動で次へ進むまでのフレーム】',v:80,min:20,max:240,step:10,u:'F',g:'adv'},
- {k:'koStopF',n:'【とどめのヒットストップフレーム】',v:26,old:[40],min:0,max:120,step:2,u:'F',g:'ko'},
- {k:'bossStopF',n:'【ボス撃破のヒットストップフレーム】',v:72,min:0,max:180,step:2,u:'F',g:'ko'},
+ {k:'stopKoF',n:'【とどめのヒットストップフレーム】',v:26,old:[40],min:0,max:120,step:2,u:'F',g:'ko'},
+ {k:'stopBossF',n:'【ボス撃破のヒットストップフレーム】',v:72,min:0,max:180,step:2,u:'F',g:'ko'},
  {k:'koSlowF',n:'【とどめ後のスローフレーム】',v:27,old:[45],min:0,max:120,step:5,u:'F',g:'ko'},
  {k:'koZoom',n:'【とどめのカメラ寄り】',v:2,min:0,max:2,step:1,u:'段',g:'ko'},
  {k:'koShake',n:'【とどめの画面振動】',v:24,min:0,max:40,step:1,u:'',g:'ko'},
@@ -105,7 +119,7 @@ function save(){try{const o={};DEF.forEach(d=>{if(P[d.k]!==d.v)o[d.n]=P[d.k]});l
 
 /* 細かい項目は種類ごとの見出しに分け、ふだんは閉じておく（2022-12-06「調整をしやすくする仕組み」：めったに使わない数値は隠し、要点を見やすくする）。
    どの見出しに入るかは名前の頭で決まる（名前は種類→対象→強さの順。iv…＝連撃の間、stg…＝ステージ）。どれにも当たらないものは「戦いの決まり」 */
-const ADV_SUB=[['戦いの決まり',null],['合図・やられ・パリィされ',/^(cue|hitFlash|hurt|pry)/],['連撃の間',/^iv/],['敵ごとの拍',/^golem/],['ステージ（背景）　色は「数値をコピー／読み込む」で変える',/^stg/]];
+const ADV_SUB=[['戦いの決まり',null],['ヒットストップ',/^stop/],['合図・やられ・パリィされ',/^(cue|hitFlash|hurt|pry)/],['連撃の間',/^iv/],['敵ごとの拍',/^golem/],['ステージ（背景）　色は「数値をコピー／読み込む」で変える',/^stg/]];
 const advSub=d=>{const i=ADV_SUB.findIndex(([,re])=>re&&re.test(d.k));return i<0?0:i};
 /* g の項目を、行を作る関数 row で並べる。細かい項目だけは、見出しごとに閉じた入れもの（sub）に入れる */
 function defRows(g,row,sub){const L=DEF.filter(d=>d.g===g&&d.t!=='col');if(g!=='adv')return L.map(row).join('');

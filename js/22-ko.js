@@ -14,7 +14,7 @@ function ko(parry,quiet){
  const ex=G.ex!=null?Math.round(G.ex):e.kind==='boar'?boarX():Math.round(ENX(e)+p.lean*5-p.lunge*lungeDist(e)-p.twitch*6),hx=heroX();
  G.strikes.forEach(x=>x.done=true);G.state='ko';G.t=0;e.hurt=0;e.broken=0;
  const l0=Math.min(hx,ex)-26,r0=Math.max(hx,ex)+34;let z=S;for(let zz=S+P.koZoom;zz>S;zz--){if(960/zz>=r0-l0+8){z=zz;break}}
- G.stop=quiet?14:b?P.bossStopF:e.mid&&!parry?Math.round(P.koStopF*1.3):parry?Math.round(P.koStopF*.6):P.koStopF;
+ G.stop=quiet?P.stopKoQuietF:b?P.stopBossF:e.mid&&!parry?Math.round(P.stopKoF*P.stopKoMidMul):parry?Math.round(P.stopKoF*P.stopKoParryMul):P.stopKoF;
  G.ko={boss:b,parry:!!parry,shattered:false,sliced:false,ex,stop0:G.stop,cam:{z,fx:(l0+r0)/2,fy:FLOOR-22}};
  const f=[];
  if(parry){for(let i=0;i<(b?5:2);i++)f.push('#ffffff','#7fe3ff','#000000')}

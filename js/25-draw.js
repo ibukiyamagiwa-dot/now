@@ -441,7 +441,7 @@ function anticip(e){if(G.state!=='enemy'||!ANT.has(e.kind)||e.skin)return null;c
  const set=Math.min(1,k/4),tr=d>-12&&(G.anim>>1)%2?1:0;return{sx:1.18-.04*set,sy:.76+.06*set,dx:7+tr}}
 function ghostAlpha(){const e=G.en;if(G.state==='ko'||G.state==='win'||G.state==='clear')return{a:1};
  if(G.state==='enemy'){const s=G.strikes.find(s=>!s.cx&&s.mv==='step'&&G.et>=s.cue+(s.bf||12)*((s.bn||2)+1)&&G.et<=s.impact+10);if(s){const d=G.et-s.impact,w=G.et-s.cue-(s.bf||12)*((s.bn||2)+1);return{a:d<=0?Math.min(.9,.25+w*.12):1-Math.max(0,d-4)/7,x:GHX,wind:d<=0?w:-1,d}}const w=G.strikes.find(s=>s.mv==='step'&&!s.done);if(w&&G.et<w.cue+4){const k=G.et-w.start;return{a:Math.min(.55,k/10)*(G.et<w.cue?1:1-(G.et-w.cue)/4),x:ghostStart(w.bn)}}return{a:.04}}
- return{a:e.hurt?.9:.32+.08*Math.sin(G.anim*.1)}}
+ return{a:e.hurt?P.ghostHurtA:P.ghostIdleA+P.ghostIdleSwayA*Math.sin(G.anim*.1)}}
 /* 三つ首：首の位置（待機のゆらぎ・光る予告・噛みつき） */
 function hydraHeadPos(i,x,y){const base=[[x-48,y-42],[x-30,y-58],[x-6,y-64]][i],sw=Math.sin(G.anim*.07+i*2.1)*2;let hx=base[0],hy=base[1]+sw;
  if(G.state==='enemy'){const s=G.strikes.find(s=>!s.cx&&s.heads&&s.heads.includes(i)&&s.res!=='cut'&&G.et>=s.cue-2&&G.et<=s.impact+8);if(s){const d=G.et-s.impact,T=s.heads.length>1?[HX+24+(i-1)*4,FLOOR-14+(i-1)*6]:[HX+24,FLOOR-14];

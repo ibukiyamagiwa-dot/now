@@ -11,6 +11,22 @@ const DEF=[
  {k:'golemLastF',n:'【岩の巨人：最後のゴンから当たるまでのフレーム】',v:8,min:2,max:16,step:1,u:'F',g:'adv'},
  {k:'earlyLockF',n:'【早押しの硬直フレーム】',v:24,min:0,max:60,step:1,u:'F',g:'adv'},
  {k:'stopHitF',n:'【被弾時のヒットストップフレーム】',v:6,min:0,max:30,step:1,u:'F',g:'adv'},
+ /* 画面振動（名前の頭は shake…）：どの敵とも毎回起きる手応えだけ外に出す。【画面振動の強さ】に対する倍率なので、全体を変えても出来事どうしの強さの関係は変わらない。ボスごとの演出の揺れは、それぞれのファイルに置く */
+ {k:'shakeParryMul',n:'【パリィの画面振動】（画面振動の強さに対する倍率）',v:1.6,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeCounterMul',n:'【居合返し・見切り返しの画面振動】（画面振動の強さに対する倍率）',v:2.2,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeHitMul',n:'【被弾の画面振動】（画面振動の強さに対する倍率）',v:1,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeGuardMul',n:'【ガードの画面振動】（画面振動の強さに対する倍率）',v:0.5,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeHit1Mul',n:'【通常の一撃の画面振動】（画面振動の強さに対する倍率）',v:0.4,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeChaseMul',n:'【追撃の画面振動】（画面振動の強さに対する倍率）',v:0.9,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeCritMul',n:'【重い一撃の画面振動】（画面振動の強さに対する倍率）',v:1.6,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeMag1Mul',n:'【まほう ほのお（1段）の画面振動】（画面振動の強さに対する倍率）',v:0.7,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeMag2Mul',n:'【まほう かみなり（2段）の画面振動】（画面振動の強さに対する倍率）',v:1.1,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeMag3Mul',n:'【まほう ひかり（3段）の画面振動】（画面振動の強さに対する倍率）',v:1.8,min:0,max:4,step:.1,u:'×',g:'adv'},
+ {k:'shakeDeflectMul',n:'【受け流されたときの画面振動】（画面振動の強さに対する倍率）',v:0.6,min:0,max:4,step:.1,u:'×',g:'adv'},
+ /* 見た目（敵ごと）：幽霊は「見えにくい敵」。待機中は半透明で、ゆっくり濃くなったり薄くなったりする（光る動きにしない） */
+ {k:'ghostIdleA',n:'【幽霊の待機中の不透明度】',v:.32,min:0,max:1,step:.02,u:'',g:'adv'},
+ {k:'ghostIdleSwayA',n:'【幽霊の待機中の不透明度のゆれ幅】',v:.08,min:0,max:.3,step:.01,u:'',g:'adv'},
+ {k:'ghostHurtA',n:'【幽霊がやられたときの不透明度】',v:.9,min:0,max:1,step:.05,u:'',g:'adv'},
  /* ヒットストップ（名前の頭は stop…）。ここより下は、コードに直書きだったものを外へ出した。初期値は前と同じ */
  {k:'stopMag1F',n:'【まほうのヒットストップフレーム】ほのお（1段）',v:6,min:0,max:40,step:1,u:'F',g:'adv'},
  {k:'stopMag2F',n:'【まほうのヒットストップフレーム】かみなり（2段）',v:10,min:0,max:40,step:1,u:'F',g:'adv'},
@@ -119,7 +135,7 @@ function save(){try{const o={};DEF.forEach(d=>{if(P[d.k]!==d.v)o[d.n]=P[d.k]});l
 
 /* 細かい項目は種類ごとの見出しに分け、ふだんは閉じておく（2022-12-06「調整をしやすくする仕組み」：めったに使わない数値は隠し、要点を見やすくする）。
    どの見出しに入るかは名前の頭で決まる（名前は種類→対象→強さの順。iv…＝連撃の間、stg…＝ステージ）。どれにも当たらないものは「戦いの決まり」 */
-const ADV_SUB=[['戦いの決まり',null],['ヒットストップ',/^stop/],['合図・やられ・パリィされ',/^(cue|hitFlash|hurt|pry)/],['連撃の間',/^iv/],['敵ごとの拍',/^golem/],['ステージ（背景）　色は「数値をコピー／読み込む」で変える',/^stg/]];
+const ADV_SUB=[['戦いの決まり',null],['ヒットストップ',/^stop/],['画面振動',/^shake[A-Z]/],['合図・やられ・パリィされ',/^(cue|hitFlash|hurt|pry)/],['連撃の間',/^iv/],['敵ごと（拍・見え方）',/^(golem|ghost)/],['ステージ（背景）　色は「数値をコピー／読み込む」で変える',/^stg/]];
 const advSub=d=>{const i=ADV_SUB.findIndex(([,re])=>re&&re.test(d.k));return i<0?0:i};
 /* g の項目を、行を作る関数 row で並べる。細かい項目だけは、見出しごとに閉じた入れもの（sub）に入れる */
 function defRows(g,row,sub){const L=DEF.filter(d=>d.g===g&&d.t!=='col');if(g!=='adv')return L.map(row).join('');

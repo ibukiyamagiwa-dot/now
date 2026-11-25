@@ -87,10 +87,10 @@ function checkBreak(e){if(has('brk')&&e.brk>=breakNeed()&&e.hp>0){tipOnce('brk',
 function resolve(s){
  G.fxAt=G.en&&G.en.kind==='hydra'&&s.heads?HX+40:null;s.done=true;bossHitFx(s);if(G.bs){G.bs.n=(G.bs.n||0)+1;if(s.res==='just')G.bs.just=(G.bs.just||0)+1;if(!s.res)G.bs.hits=(G.bs.hits||0)+1}const h=G.hero,e=G.en,base=e.atk*s.m*P.enemyAtkMul*kEff().atk,cx=HX+16,cy=FLOOR-16;
  if(s.res==='parry'){
-  tutOn('parry');G.stats.parry++;G.bs.parry++;gain(P.mkParry);SFX.parry();streakUp(cx,cy);G.stop=P.stopParryF;shake(P.shake*1.6);flash(['#ffffff','#000000','#c8f6ff','#000000']);
+  tutOn('parry');G.stats.parry++;G.bs.parry++;gain(P.mkParry);SFX.parry();streakUp(cx,cy);G.stop=P.stopParryF;shake(P.shake*P.shakeParryMul);flash(['#ffffff','#000000','#c8f6ff','#000000']);
   burst(cx,cy,'#bff4ff',26,2.4,2);burst(cx,cy,'#ffffff',10,3.4,1);G.spark={x:cx,y:cy,t:0};
   text(cx,cy-24,'パリィ！','#7fe3ff',true);pose('parry',20);
-  if(s.counter){G.txt=G.txt.filter(t=>t.s!=='パリィ！');G.stop=P.stopParryF+P.stopCounterAddF;G.vib='e';G.iai={t:0,y:cy-2};SFX.iai();shake(P.shake*2.2);flash(['#ffffff','#000000','#000000','#7fe3ff','#000000']);text((HX+EX)/2,cy-40,e.kind==='lord'?'見切り返し！':'居合返し！','#fff3b0',true);if(e.kind==='lord'){G.iai=null;G.xs={t:0}}gain(25);for(let i=0;i<30;i++)G.pts.push({x:HX+20+Math.random()*(EX-HX-30),y:cy-2+(Math.random()-.5)*3,vx:(Math.random()-.5)*3.2,vy:-.6-Math.random()*1.6,t:0,life:22+Math.random()*16,col:i%3?'#fff3b0':'#ffffff',sz:1,drag:.95,g:.08})}
+  if(s.counter){G.txt=G.txt.filter(t=>t.s!=='パリィ！');G.stop=P.stopParryF+P.stopCounterAddF;G.vib='e';G.iai={t:0,y:cy-2};SFX.iai();shake(P.shake*P.shakeCounterMul);flash(['#ffffff','#000000','#000000','#7fe3ff','#000000']);text((HX+EX)/2,cy-40,e.kind==='lord'?'見切り返し！':'居合返し！','#fff3b0',true);if(e.kind==='lord'){G.iai=null;G.xs={t:0}}gain(25);for(let i=0;i<30;i++)G.pts.push({x:HX+20+Math.random()*(EX-HX-30),y:cy-2+(Math.random()-.5)*3,vx:(Math.random()-.5)*3.2,vy:-.6-Math.random()*1.6,t:0,life:22+Math.random()*16,col:i%3?'#fff3b0':'#ffffff',sz:1,drag:.95,g:.08})}
   else if(s.red){G.stop+=P.stopRedAddF;pose('parryH',HV_T);for(let i=0;i<10;i++)G.pts.push({x:HX+2+Math.random()*8,y:FLOOR-1,vx:-.4-Math.random()*1.4,vy:-.2-Math.random()*.6,t:0,life:18+Math.random()*10,col:i%2?'#8a7a66':'#5a4a3e',sz:i%3?1:2,drag:.93,g:.03});SFX.block();setTimeout(()=>{try{SFX.thud&&SFX.thud(1)}catch(_){}},60);flash(['#ffffff','#ff4a5a','#ffffff','#000000']);if(s.crush)text(cx+10,cy-44,'しのいだ！','#d9e2f2',true);else{text(cx+10,cy-44,'見切った！','#fff3b0',true);gain(25)}ring(cx,cy,3,40,20,'#ff7b86')}
   if(!e.noCounter&&!s.proj&&!s.nc)dmgEnemy(heroAtk()*(P.counterMul+RM2.counter)*(s.red?2:1)*(e.broken?P.breakMul:1),'#7fe3ff','counter');
   /* パリィされの震え：連撃の途中は小、最後の一撃・赤は大 */
@@ -106,10 +106,10 @@ function resolve(s){
   tutOn('just');tipOnce('just','ジャスト回避　ダメージを受けず、見切りも少し溜まります');G.stats.just++;gain(P.mkJust);SFX.just();G.stop=Math.round(P.stopParryF*P.stopJustMul);burst(cx-6,cy,'#9dffc4',12,1.3,1);
   text(cx,cy-24,'ジャスト！','#9dffc4',true);pose('dodge',18);if(RM2.justC)dmgEnemy(heroAtk()*.6,'#9dffc4','counter');
  }else if(s.res==='guard'){
-  tutOn('guard');G.stats.guard++;G.streak=0;SFX.guard();G.stop=P.stopGuardF;shake(P.shake*.5);burst(cx,cy,'#9cc4ff',10,1,1);
+  tutOn('guard');G.stats.guard++;G.streak=0;SFX.guard();G.stop=P.stopGuardF;shake(P.shake*P.shakeGuardMul);burst(cx,cy,'#9cc4ff',10,1,1);
   hurt(Math.max(1,Math.round(base*P.guardDmgMul*(1-RM2.guardCut))),'#9cc4ff');text(cx,cy-24,'ガード','#9cc4ff');pose('guard',12);
  }else{
-  tutOn('hit');G.stats.hit++;G.streak=0;lose(P.mkHit);SFX.hit();G.stop=P.stopHitF;shake(P.shake);flash(['#5a0f18','#000000']);burst(cx-8,cy,'#ff7b86',16,1.6,2);
+  tutOn('hit');G.stats.hit++;G.streak=0;lose(P.mkHit);SFX.hit();G.stop=P.stopHitF;shake(P.shake*P.shakeHitMul);flash(['#5a0f18','#000000']);burst(cx-8,cy,'#ff7b86',16,1.6,2);
   const hv=Math.round(base*(s.red?1.5:1));hurt(hv,'#ff7b86');pose('hit',16);
   if(s.sdrain&&e.hp>0){const dv=Math.min(e.hpMax-e.hp,hv);if(dv>0){e.hp+=dv;SFX.maw();text(EXc(),FLOOR-50,'くらやみが吸った +'+dv,'#e0b0ff');burst(EXc()-4,FLOOR-28,'#b07ad0',12,1,1)}}
 

@@ -1,4 +1,4 @@
-// 判断待ちの一覧：日報の「決めてほしいこと」でまだ決まっていないものと、ゲームへの依頼の「保留」を、古い順に並べる。
+// 判断待ちの一覧：日報の「決めてほしいこと」でまだ決まっていないもの、ゲームへの依頼の「保留」、保留のチケットを並べる。
 // 2023-12-29「その日のうちに全てこなす」：判断を待つ時間は、ほかの人を待たせる時間。2024-02-16「決断を先送りにするな」。
 // 決めたら、日報のその行の末尾に「→ 決まった：（選んだ案）」を足す。保留の節は状態を直す。
 // 使い方: node tools/handan.mjs [フォルダ=.]
@@ -12,6 +12,11 @@ for (const f of fs.existsSync(nd) ? fs.readdirSync(nd).filter(f => /^\d{4}-\d{2}
     const l = lines[k]; if (!l.startsWith('- ') || l.trim() === '- なし' || l.includes('→ 決まった')) continue;
     items.push({ d: f.slice(0, 10), from: `nippo/${f}`, s: l.slice(2) });
   }
+}
+const tdir = path.join(dir, 'tickets');
+for (const f of fs.existsSync(tdir) ? fs.readdirSync(tdir).filter(f => /^T\d{3}_.+\.md$/.test(f)).sort() : []) {
+  const md = fs.readFileSync(path.join(tdir, f), 'utf8'); if (!/^- 状態：保留$/m.test(md)) continue;
+  items.push({ d: null, from: `tickets/${f}`, s: `${md.split('\n')[0].slice(2)}：${(md.match(/^- 決めること：(.*)$/m) || [])[1] || ''}` });
 }
 const rq = path.join(dir, 'design/GAME_REQUESTS.md');
 if (fs.existsSync(rq)) for (const l of fs.readFileSync(rq, 'utf8').split('\n')) {

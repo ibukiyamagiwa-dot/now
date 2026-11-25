@@ -2212,19 +2212,21 @@ heroCard({id:'hh_idle',cat:'idle',n:'待機：構えて待つ',len:120,hpp:(P,t)
  cap:'肘を曲げて剣を前に立て、盾を引いて待つ。ゆっくり息をして、肩がわずかに上下する。',why:'いつでも弾ける構え。ボタン一つでガードも攻撃もするので、待機は「どちらにも動ける」姿にした。'});
 
 /* ---------- こうげき ---------- */
-const HATK=(X,extra)=>[K(0,{}),K(10,{}),K(20,Object.assign({x:X*.88},HUP),'out'),K(30,Object.assign({x:X*.88},HUP)),K(33,Object.assign({x:X},HDN),'in'),K(40,Object.assign({x:X},HDN2))].concat(extra||[K(60,Object.assign({x:X*.15,lean:-.1},HREST),'out'),K(68,HREST),K(200,HREST)]);
+/* こうげきの時刻（ゲームと同じ。2026-11-26 Ibuki）：振りかぶって止まった瞬間に剣先が光り（HGL）、光ってから28Fで当たる（HHIT）。最後の6Fで斬り下ろす */
+const HGL=20,HHIT=HGL+28;
+const HATK=(X,extra)=>[K(0,{}),K(10,{}),K(HGL,Object.assign({x:X*.88},HUP),'out'),K(HHIT-6,Object.assign({x:X*.88},HUP)),K(HHIT,Object.assign({x:X},HDN),'in'),K(HHIT+7,Object.assign({x:X},HDN2))].concat(extra||[K(HHIT+27,Object.assign({x:X*.15,lean:-.1},HREST),'out'),K(HHIT+35,HREST),K(220,HREST)]);
 const HX_=-((EXX-6)-22-25)/.72;/* 門番の胴まで届く踏みこみ */
 function heroTip(t,HM){const P=poseAt0(HM,t,hbase()),H=new Buf(1,1),J=joints(CW-HXX,FL,SPEC.hero,Object.assign({},hbase(),P)),tp=add(J.hdF,dir(P.sw,SPEC.hero.w.len*SPEC.hero.k));return[CW-1-tp[0],tp[1]]}
-function heroAtkCard(id,n,kind,cap,why){const extra=kind==='chase'?[K(44,Object.assign({x:HX_},HDN2)),K(48,Object.assign({x:HX_},HUPS),'in'),K(54,Object.assign({x:HX_},HUPS)),K(72,Object.assign({x:HX_*.15,lean:-.1},HREST),'out'),K(80,HREST),K(200,HREST)]:kind==='heavy'?[K(52,Object.assign({x:HX_},HDN2)),K(72,Object.assign({x:HX_*.15,lean:-.1},HREST),'out'),K(80,HREST),K(200,HREST)]:null;
+function heroAtkCard(id,n,kind,cap,why){const extra=kind==='chase'?[K(HHIT+11,Object.assign({x:HX_},HDN2)),K(HHIT+15,Object.assign({x:HX_},HUPS),'in'),K(HHIT+21,Object.assign({x:HX_},HUPS)),K(HHIT+39,Object.assign({x:HX_*.15,lean:-.1},HREST),'out'),K(HHIT+47,HREST),K(220,HREST)]:kind==='heavy'?[K(HHIT+19,Object.assign({x:HX_},HDN2)),K(HHIT+39,Object.assign({x:HX_*.15,lean:-.1},HREST),'out'),K(HHIT+47,HREST),K(220,HREST)]:null;
  const HM={keys:HATK(HX_,extra)},hp=[EXX-6,FL-22];
- return heroCard({id,n,cat:'atk',len:120,hero:HM.keys,
-  gate:[K(0,{}),K(33,{}),K(37,{x:kind==='heavy'?10:5,lean:-.25,hd:-.3},'out'),K(kind==='chase'?48:44,{x:kind==='heavy'?12:4,lean:-.2}),K(kind==='chase'?52:50,{x:kind==='chase'?10:kind==='heavy'?14:5,lean:-.3,hd:-.3},'out'),K(90,{},'io'),K(120,{})],
-  fx:(B,J,t)=>{/* 剣先の光（押す合図）：振りかぶりの最後に、うすい青で */const tp=heroTip(t,HM);if(t>=27&&t<33){const d=t-27;for(let i=-3+(d>>1);i<=3-(d>>1);i++){B.set(tp[0]+i,tp[1],HSL[0],4);B.set(tp[0],tp[1]+i,HSL[0],4)}}
-   if(kind==='heavy'){if(t>=33&&t<37)for(let i=0;i<B.c.length;i++){if(B.t[i]===1&&(i%CW)>EXX-12)B.c[i]=((i%CW+((i/CW)|0))&1)?'#ffffff':'#fff3b0'}const d=t-33;if(d>=0&&d<16){ghit(B,hp[0],hp[1],d,['#ffffff','#fff3b0'],true);if(d<4)for(let x=0;x<CW;x++)if((x+d)%3)B.set(x,hp[1]+((x*7)%5)-2,d<2?'#ffffff':'#fff3b0',5)}}
-   else{heroSlash(B,hp,t-33,false);heroSpark(B,hp,t-33)}
-   if(kind==='chase'){const d=t-48;heroSlash(B,[hp[0],hp[1]-2],d,true);if(d>=0&&d<10){for(let i=-5+(d>>1);i<=5-(d>>1);i++){B.set(hp[0]+i,hp[1]-3+i,'#ffd27a',4);B.set(hp[0]+i,hp[1]-3-i,'#ffd27a',4)}}}},
+ return heroCard({id,n,cat:'atk',len:140,hero:HM.keys,
+  gate:[K(0,{}),K(HHIT,{}),K(HHIT+4,{x:kind==='heavy'?10:5,lean:-.25,hd:-.3},'out'),K(HHIT+(kind==='chase'?15:11),{x:kind==='heavy'?12:4,lean:-.2}),K(HHIT+(kind==='chase'?19:17),{x:kind==='chase'?10:kind==='heavy'?14:5,lean:-.3,hd:-.3},'out'),K(HHIT+57,{},'io'),K(140,{})],
+  fx:(B,J,t)=>{/* 剣先の光（押す合図）：振りかぶりの最後に、うすい青で */const tp=heroTip(t,HM);if(t>=HGL&&t<HGL+6){const d=t-HGL;for(let i=-3+(d>>1);i<=3-(d>>1);i++){B.set(tp[0]+i,tp[1],HSL[0],4);B.set(tp[0],tp[1]+i,HSL[0],4)}}
+   if(kind==='heavy'){if(t>=HHIT&&t<HHIT+4)for(let i=0;i<B.c.length;i++){if(B.t[i]===1&&(i%CW)>EXX-12)B.c[i]=((i%CW+((i/CW)|0))&1)?'#ffffff':'#fff3b0'}const d=t-HHIT;if(d>=0&&d<16){ghit(B,hp[0],hp[1],d,['#ffffff','#fff3b0'],true);if(d<4)for(let x=0;x<CW;x++)if((x+d)%3)B.set(x,hp[1]+((x*7)%5)-2,d<2?'#ffffff':'#fff3b0',5)}}
+   else{heroSlash(B,hp,t-HHIT,false);heroSpark(B,hp,t-HHIT)}
+   if(kind==='chase'){const d=t-HHIT-15;heroSlash(B,[hp[0],hp[1]-2],d,true);if(d>=0&&d<10){for(let i=-5+(d>>1);i<=5-(d>>1);i++){B.set(hp[0]+i,hp[1]-3+i,'#ffd27a',4);B.set(hp[0]+i,hp[1]-3-i,'#ffd27a',4)}}}},
   cap,why})}
-heroAtkCard('hh_atk','こうげき：斬りかかる','one','駆け寄って振りかぶり、剣先がうすく光ったら、斬り下ろす。光ってから当たるまでは6F。','剣先の光は「押せる」合図。押さなければ、ふつうの一太刀で終わる。');
+heroAtkCard('hh_atk','こうげき：斬りかかる','one','駆け寄って振りかぶり、止まった瞬間に剣先がうすく光る。光ってから28Fで当たる（敵の予兆と同じ）。最後の6Fで斬り下ろす。','剣先の光は「押せる」合図。押さなければ、ふつうの一太刀で終わる。');
 heroAtkCard('hh_chase','追撃：二の太刀','chase','剣先が光ってから当たるまでのあいだ（当たりの8F前から）に押すと、斬り下ろしのあとに、もう一度斬り上げる。二太刀目には金の×の印。','敵の連撃をタイミングで受けるのと同じく、自分の攻撃もタイミングで伸ばせる。「いまだ！」の名前どおり、攻めにもタイミングの遊びがある。');
 heroAtkCard('hh_heavy','重い一撃','heavy','当たるちょうどその瞬間（3F）に押すと、重い一撃になる。当たった瞬間、相手が白く光り、画面が長く止まって揺れる。','いちばん狭い受付に、いちばん大きなごほうび。手応え（止まり・光・揺れ）を最大にして、狙いたくなるようにした。');
 

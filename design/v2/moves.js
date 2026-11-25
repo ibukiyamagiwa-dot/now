@@ -3,19 +3,23 @@
    cues:合図の光（t:フレーム col:w白 r赤 p紫 g金）  hits:当たる瞬間  trails:剣の軌跡 */
 const K=(t,p,e)=>({t,p,e});
 const MV=[];const mv=o=>{MV.push(o);return o};
-/* 連撃の間を伸ばす（2026-11-25：一撃ごとに予兆→当たり28Fを置き、予兆の間は体を止める）。
-   hs＝新しい当たりの時刻。伸ばすぶんは、各撃の「振る直前の構え」（前の当たりより後で、当たりの3F前までの最後のキー）でそのまま止める（静）。
-   キー・合図・当たり・軌跡の時刻をずらし、時刻を使う関数（pp・fx・pre・post など）は、止めている間を同じ時刻に読みかえる */
-const RESPACE=(M,hs)=>{if(typeof M==='string')M=MV.find(m=>m.id===M);if(!M)return;const o=(M.hits||[]).slice().sort((a,b)=>a-b);if(o.length!==hs.length)throw new Error('RESPACE '+M.id);
- const H=[];let acc=0;for(let i=1;i<o.length;i++){const D=(hs[i]-hs[0])-(o[i]-o[0])-acc;if(D<=0){if(D<0)throw new Error('RESPACE shrink '+M.id);continue}
-  const ks=M.keys.filter(k=>k.t>o[i-1]&&k.t<=o[i]-3);const a=ks.length?ks[ks.length-1].t:o[i]-3;H.push({a,D});acc+=D}
- const nT=t=>{let s=t;for(const h of H)if(t>h.a)s+=h.D;return s};
- const oT=t=>{let s=0;for(const h of H){const n0=h.a+s;if(t<=n0)return t-s;if(t<=n0+h.D)return h.a;s+=h.D}return t-s};
+/* 連撃の間を伸ばす（2026-11-25：一撃ごとに予兆→当たり28Fを置き、予兆の間は読めないほど激しく動かない。ゆっくり動くのはよい）。
+   hs＝新しい当たりの時刻。how[i-1]＝i撃目の前の伸ばし方：数＝その古い時刻の姿勢で待つ（振る直前の構え）、's'＝その区間をゆっくりにする（タタンなど短い伸ばし）。
+   書かなければ、前の当たりより後で当たりの3F前までの最後のキーで待つ。
+   キー・合図・当たり・軌跡の時刻をずらし、時刻を使う関数（pp・fx・pre・post など）は、待っている間を同じ時刻に読みかえる */
+const RESPACE=(M,hs,how)=>{if(typeof M==='string')M=MV.find(m=>m.id===M);if(!M)return;const o=(M.hits||[]).slice().sort((a,b)=>a-b);if(o.length!==hs.length)throw new Error('RESPACE '+M.id);
+ const BP=[[0,0]],holds=[];let acc=0;/* 折れ線 [古い時刻, 新しい時刻] */
+ for(let i=1;i<o.length;i++){const D=(hs[i]-hs[0])-(o[i]-o[0])-acc;if(D<0)throw new Error('RESPACE shrink '+M.id);if(!D)continue;const w=how&&how[i-1];
+  if(w==='s'){BP.push([o[i-1],o[i-1]+acc]);acc+=D;BP.push([o[i],o[i]+acc])}
+  else{const ks=M.keys.filter(k=>k.t>o[i-1]&&k.t<=o[i]-3),a=typeof w==='number'?w:ks.length?ks[ks.length-1].t:o[i]-3;BP.push([a,a+acc]);acc+=D;BP.push([a,a+acc]);holds.push([a,a+acc])}}
+ const pl=(t,x,y)=>{if(t<=BP[0][x])return t;for(let q=1;q<BP.length;q++){const A=BP[q-1],B=BP[q];if(t<=B[x]){if(B[x]===A[x])return x===0?A[y]:A[y];return A[y]+(t-A[x])*(B[y]-A[y])/(B[x]-A[x])}}const L=BP[BP.length-1];return t+(L[y]-L[x])};
+ const nT=t=>pl(t,0,1),oT=t=>pl(t,1,0);
  const base=Object.assign({},PDEF,(SPEC[M.f]||{}).pose),ks=M.keys.map(k=>K(nT(k.t),k.p,k.e));
- for(const h of H){if(!M.keys.some(k=>k.t===h.a))ks.push(K(nT(h.a),poseAt0(M,h.a,base)));ks.push(K(nT(h.a)+h.D,poseAt0(M,h.a,base),'lin'))}
- M.keys=ks.sort((a,b)=>a.t-b.t);M.hits=M.hits.map(nT);
- M.cues=(M.cues||[]).map(c=>{const i=o.findIndex(h=>Math.abs(h-(c.t+28))<=3);return Object.assign({},c,{t:i>=0?nT(o[i])-(o[i]-c.t):nT(c.t)})});/* 合図は、その撃の当たりからの間を保つ */
- if(M.trails)M.trails=M.trails.map(r=>r&&[nT(r[1])-(r[1]-r[0]),nT(r[1]),...r.slice(2)]);if(M.gifHits)M.gifHits=M.gifHits.map(nT);M.len+=acc;
+ for(const[a,e]of holds){if(!M.keys.some(k=>k.t===a))ks.push(K(nT(a),poseAt0(M,a,base)));ks.push(K(e,poseAt0(M,a,base),'lin'))}
+ M.keys=ks.sort((a,b)=>a.t-b.t);M.hits=M.hits.map(h=>Math.round(nT(h)));
+ M.cues=(M.cues||[]).map(c=>{const i=o.findIndex(h=>Math.abs(h-(c.t+28))<=3);return Object.assign({},c,{t:i>=0?Math.round(nT(o[i]))-(o[i]-c.t):Math.round(nT(c.t))})});/* 合図は、その撃の当たりからの間を保つ */
+ if(M.trails)M.trails=M.trails.map(r=>r&&(holds.some(([a])=>a>=r[0]&&a<r[1])?[Math.round(nT(r[1]))-(r[1]-r[0]),Math.round(nT(r[1])),...r.slice(2)]:[Math.round(nT(r[0])),Math.round(nT(r[1])),...r.slice(2)]));
+ if(M.gifHits)M.gifHits=M.gifHits.map(h=>Math.round(nT(h)));M.len+=acc;
  for(const f of['pp','heroP','fAt','auraOff','auraK']){const g=M[f];if(g)M[f]=f==='pp'?(P,t,...r)=>g(P,oT(t),...r):(t,...r)=>g(oT(t),...r)}
  for(const f of['fx','post']){const g=M[f];if(g)M[f]=(B,J,t,...r)=>g(B,J,oT(t),...r)}
  if(M.pre){const g=M.pre;M.pre=(B,t,...r)=>g(B,oT(t),...r)}M.spaced=hs;return M};
@@ -909,10 +913,10 @@ const COMBO=(id,seq,W0)=>{/* W0：最初の構え（予兆まで）を技ごと�
  M.keys=ks.sort((a,b)=>a.t-b.t);M.trails=hs.map((h,i)=>seq[i]==='tent'?null:[h-4,h+2,(M.hitCol==='r'&&i===hs.length-1)||(M.trails||[]).some(r=>r&&r[0]<=h&&r[1]>=h&&r[2]==='r')?'r':'w',0,seq[i]==='thrust'?'line':'arc']).filter(Boolean);M.combo=seq};
 /* 連撃の間（2026-11-25）：一撃ごとに合図を置き、予兆の間は止まる長さへ伸ばす。数値はゲームの【連撃の間】（DEF の iv…）にそろえる。
    「タタン」（十文字・解錠のタタ・参段のタタン・十文字と触手のタタン）は二回当たる一回の攻撃として、間は14F（8Fは速すぎた） */
-for(const[id,hs]of[['g_two',[42,86]],['dg_two',[42,86]],['l_two',[44,88]],['l_rev',[44,88]],['l2_tri',[42,86,132]],['f_sa',[42,86,132]],
+for(const[id,hs,how]of[['g_two',[42,86]],['dg_two',[42,86]],['l_two',[44,88]],['l_rev',[44,88]],['l2_tri',[42,86,132]],['f_sa',[42,86,132]],
  ['r_two',[42,84]],['r_swap',[42,84]],['r_combo4',[40,82,124,174]],['r_three',[42,78,114]],['r2_tsubame',[42,84]],['f2_tsubame',[42,84]],
  ['f_cutten',[42,86]],['f_twin',[42,84]],['f2_four',[40,82,124,174]],['f2_fingers',[42,52,62,106]],['d_stab',[42,80,124]],['d_bitetail',[42,82]],
- ['l_unlock',[46,90,104]],['r2_three',[42,86,100]],['f2_juji',[42,56,100]],['r2_juji',[42,56]]])RESPACE(id,hs);
+ ['l_unlock',[46,90,104],[null,'s']],['r2_three',[42,86,100],[57,'s']],['f2_juji',[42,56,100],['s',52]],['r2_juji',[42,56],['s']]])RESPACE(id,hs,how);
 /* 合図は、攻撃するものに出す（2026-11-25 作者）：後ろの剣で振る撃は後ろの剣先、触手の撃は触手の腕の先 */
 {const on=(id,i,o)=>{const M=MV.find(m=>m.id===id),h=M.hits.slice().sort((a,b)=>a-b)[i],c=M.cues.find(c=>Math.abs(h-(c.t+28))<=3);Object.assign(c,o)};
  on('g_two',1,{w:2});on('dg_two',1,{w:2});on('f_cutten',1,{at:J=>J.hdB});on('l2_tri',2,{at:J=>J.hdB});on('f_sa',2,{at:J=>J.hdB});on('f2_four',2,{at:J=>J.hdB})}

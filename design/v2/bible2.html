@@ -3430,11 +3430,11 @@ const LT=[
   cap:'まだ地上に近い階。高い格子窓から、白い外の光がひとすじ落ちる。石のすきまに苔、天井から根。',why:'はじめて潜る人のための、いちばん明るく、いちばん静かな段。外の光が届くのはここだけ。あとの段で、この光が二度と来ないことが効いてくる。'},
  {n:'ふつう',st:'迷宮の階',wall:['#120910','#26141e','#321c28'],far:'#0e070c',floor:['#10070c','#1e0f17','#3a2230'],glow:['#64404a','#34202a'],gk:.85,torch:{on:1,c:['#a85a2a','#c8703a'],pool:'#ff9040',pk:.2},
   cap:'いまのゲームの背景（赤黒い石、左右のたいまつ）を、そのまま正本にした段。奥の通路から、遠くのたいまつの光がにじむ。',why:'基準の段。ほかの段はここから「光だけ」を変える。場所が同じなので、段が上がるたびに「同じ迷宮が、のまれていく」と分かる。'},
- {n:'つよき',st:'赤い階',wall:['#140708','#2a1214','#38191a'],far:'#100506','floor':['#110606','#1f0c0c','#46201c'],glow:['#703426','#3a1a14'],gk:.85,torch:{on:1,c:['#8a3020','#b8482a'],pool:'#ff5030',pk:.22},rust:1,
+ {n:'つよき',st:'赤い階',wall:['#140708','#2a1214','#38191a'],far:'#100506','floor':['#110606','#1f0c0c','#46201c'],glow:['#7a3e2e','#3a1a14'],gk:.9,torch:{on:1,c:['#8a3020','#b8482a'],pool:'#ff5030',pk:.22},rust:1,
   cap:'たいまつの火が赤くなり、奥の通路から石へ、赤い筋（ひび）がのびてくる。床には赤黒いしみ。',why:'赤い段の敵に走る「筋」と同じものが、壁にも走る。浸食は奥（下の階）から来るので、ひびは通路から外へ広がる。'},
- {n:'しにものぐるい',st:'黒い階',wall:['#0e0e12','#222226','#2c2c30'],far:'#0a0a0c',floor:['#0a0a0c','#18181b','#3a3a40'],glow:['#62606a','#2e2d33'],gk:.85,torch:{on:0},ink:1,
+ {n:'しにものぐるい',st:'黒い階',wall:['#0e0e12','#222226','#2c2c30'],far:'#0a0a0c',floor:['#0a0a0c','#18181b','#3a3a40'],glow:['#5a5862','#2e2d33'],gk:.85,torch:{on:0},ink:1,
   cap:'たいまつは消え、すすだけが残る。色が抜けて灰色になった石に、天井と目地から黒いしみが垂れる。奥の通路だけが、色のない灰の光でうすく明るい。',why:'黒い段の敵は黒い。だから、この段だけ逆光をいちばん強くして、敵を「赤い目の影」として立たせる。くらやみは光を奪うのではなく、色を奪う。'},
- {n:'ならく',st:'紫の階',wall:['#0c0812','#1e1828','#2a2236'],far:'#08050c','floor':['#08050c','#140e1c','#2e2240'],glow:['#4e3a6a','#281c3a'],gk:.85,torch:{on:0,gone:1},ink:2,eyes:1,crack:1,
+ {n:'ならく',st:'紫の階',wall:['#0c0812','#1e1828','#2a2236'],far:'#08050c','floor':['#08050c','#140e1c','#2e2240'],glow:['#5a4678','#281c3a'],gk:.95,torch:{on:0,gone:1},ink:2,eyes:1,crack:1,
   cap:'壁はほとんどくらやみに覆われ、ところどころに三つずつ目が開いている。目はばらばらにまばたき、こちらは見ない。光は床のひびの下から、紫にうすく上がってくる。',why:'紫の段の敵は紫に明るいので、ここでは逆光を弱め、背景を暗く沈めて、明るさの差で立たせる。光が上からでなく下から来る＝穴に近い。目は「のまれたものほど目が増える」。'}];
 /* 描きこみの重み：画面の真ん中（主人公と敵のあいだ、x 80〜215）は静かに、端ほど描く（2023-11-17「監修あれこれ」三島道場：左右の遠景に情報量を割く） */
 const edgeW=x=>{const d=Math.min(Math.abs(x-20),Math.abs(x-226));return Math.max(0,Math.min(1,1.15-d/52))};
@@ -3451,11 +3451,32 @@ function stoneWall(B,L,t,K){const[jt,fc,hi]=L.wall;
   if(!jn&&ew<.3)c=mix(c,fc,.5);/* 真ん中は目地の差を弱める */
   /* 天井ぎわと床ぎわは暗く（光が届かない） */const top=Math.max(0,1-y/34),low=Math.max(0,(y-(SFL-10))/10);c=dith(c,L.far,Math.min(.85,top*.9+low*.45),x,y);
   B.set(x,y,c,6)}}
-function archDraw(B,L,t,K){const cx=(ARCH.x0+ARCH.x1)/2;
- for(let y=0;y<SFL;y++)for(let x=ARCH.x0;x<=ARCH.x1;x++){const a=archIn(x,y);if(a<0){/* アーチの縁石：1段だけ明るい石。ふちはかたい線にしない */const b=archIn(x,y+2),s=archIn(x+2,y),s2=archIn(x-2,y);if(b>=0||s>=0||s2>=0){if((x+y)%2===0)B.set(x,y,mix(L.wall[1],L.wall[2],.6),6)}continue}
-  /* 中：奥行きのある暗がりに、遠くの光 */const g=glowAt(L,x,y);let c=mix(L.far,L.glow[1],Math.min(1,a*2.2));c=dith(c,mix(L.glow[1],L.glow[0],Math.min(1,g*1.25)),Math.min(1,g*1.6),x,y);
-  /* 奥の床と、遠くの柱（小さく、うすく＝遠い） */if(y>=SFL-14&&y<SFL&&(y===SFL-14||((x-cx)*(SFL-y))%23===0))c=mix(c,L.glow[0],.25*L.gk);
-  B.set(x,y,c,6)}}
+/* 奥への通路：遠近で奥行きを見せる。消失点は敵の胸の高さ（VP）。
+   通路の床・左右の壁・天井は消失点へすぼまり、石の目地もすぼまる。途中にアーチの帯を2本（くり返しの大きさで距離が分かる）。
+   いちばん奥の小さな口が光源で、光は奥ほど強く、手前ほど弱い（奥ほど色が光に寄り、目地の差も弱まる＝空気遠近）。
+   敵は奥の口の前に立つので、いつも逆光になる */
+const VP={x:(ARCH.x0+ARCH.x1)/2,y:74},FARS=.36;
+function archGauge(x,y){/* この画素が、通路の何倍に縮めた輪郭の上にあるか（1＝入口、FARS＝奥の口） */let lo=.02,hi=1;if(archIn(x,y)<0)return 2;
+ for(let i=0;i<14;i++){const m=(lo+hi)/2,qx=VP.x+(x-VP.x)/m,qy=VP.y+(y-VP.y)/m;if(archIn(qx,qy)>=0&&qy<SFL)hi=m;else lo=m}return hi}
+const BANDS=[1,.8,.62,.47];/* 通路を、奥へ4つの帯に分ける（帯の境目がアーチの帯石） */
+function archDraw(B,L,t,K){const{x0,x1,top,spring}=ARCH,hw=(x1-x0)/2,mk=[.22,.44,.64,.84].map(v=>Math.min(1,v*L.gk*1.2));
+ const col=(face,i)=>{const base=face==='f'?L.floor[1]:face==='c'?mix(L.wall[0],L.wall[1],.6):L.wall[1];return mix(base,L.glow[0],mk[i]*(face==='c'?.7:1))};
+ const G=new Float32Array(SW*SFL),F=new Uint8Array(SW*SFL);
+ for(let y=0;y<SFL;y++)for(let x=x0;x<=x1;x++){const a=archIn(x,y);
+  if(a<0){/* 入口の縁石：1段だけ明るい石 */const b=archIn(x,y+2),sd=archIn(x+2,y),s2=archIn(x-2,y);if(b>=0||sd>=0||s2>=0){if((x+y)%2===0)B.set(x,y,mix(L.wall[1],L.wall[2],.6),6)}continue}
+  const s=archGauge(x,y);G[y*SW+x]=s;
+  if(s<=FARS){/* 奥の口：光そのもの。平らな色で、下ほど少し明るい（奥の床の照り返し） */F[y*SW+x]=4;B.set(x,y,y>VP.y+4?L.glow[0]:mix(L.glow[0],L.glow[1],.3),6);continue}
+  const qx=VP.x+(x-VP.x)/s,qy=VP.y+(y-VP.y)/s;const face=qy>=SFL-1.5?'f':(qy>spring&&Math.abs(qx-VP.x)>=hw-1.5)?'w':'c';F[y*SW+x]=face==='f'?1:face==='w'?2:3;
+  let i=0;while(i<3&&s<BANDS[i+1])i++;B.set(x,y,col(face,i),6)}
+ /* 帯の境目：アーチの帯石。手前側に暗い線、奥側に光を受けた明るい線（くっきりした線で、もやにしない） */
+ for(let y=1;y<SFL;y++)for(let x=x0;x<=x1;x++){const i0=y*SW+x,s=G[i0];if(!s||F[i0]===4)continue;
+  for(const r of BANDS.slice(1).concat([FARS])){const sR=G[i0+1]||s,sL=G[i0-1]||s,sU=G[i0-SW]||s,sD=G[i0+SW]||s;const cross=(s>=r)&&(sR<r||sL<r||sU<r||sD<r);
+   if(cross){B.set(x,y,mix(B.get(x,y),L.wall[0],F[i0]===1?.35:.5),6)}}}
+ /* 目地：入口の石の線を、消失点へまっすぐ引く。床は16ごと、壁は8段ごと。奥の口の手前で止める */
+ const ray=(sx,sy,fc)=>{const n=Math.ceil(Math.hypot(sx-VP.x,sy-VP.y));for(let k=0;k<=n;k++){const x=Math.round(sx+(VP.x-sx)*k/n),y=Math.round(sy+(VP.y-sy)*k/n);if(x<x0||x>x1||y<0||y>=SFL)continue;const i0=y*SW+x;if(F[i0]!==fc)continue;if(G[i0]<=FARS+.01)break;B.set(x,y,mix(B.get(x,y),L.wall[0],.28),6)}};
+ for(let x=VP.x%16;x<SW+60;x+=16)ray(x,SFL-1,1);
+ for(let y=spring+2;y<SFL;y+=8){ray(x0,y,2);ray(x1,y,2)}
+ /* 奥の口の床ぎわ：光の線 */for(let x=Math.round(VP.x-hw*FARS)+1;x<VP.x+hw*FARS;x++){const y=Math.round(VP.y+(SFL-VP.y)*FARS);B.set(x,y,mix(L.glow[0],L.wall[2],.15),6)}}
 function torchK(B,L,x,y,t){const T=L.torch;
  if(T.gone){/* 紫の段：たいまつ受けごと、くらやみに埋まっている */for(let i=0;i<9;i++)B.set(x,y+i,i%3?'#0e0a16':'#1a1226',6);return}
  /* 受け金 */for(let i=0;i<8;i++){B.set(x,y+i,'#120910',6);B.set(x+1,y+i,i<2?'#5a3a2a':'#3a2620',6)}B.set(x-1,y+1,'#3a2620',6);B.set(x+2,y+1,'#3a2620',6);
@@ -3539,7 +3560,7 @@ function banner(B,x,y,K,t){/* 旗：紺に金の「閉じた門」（門番の�
   if(K>=3&&!tear&&yy>h-eat-6&&hsh2(xx+x,yy)<.5)c='#0e0a14';B.set(x+xx,y+yy,c,6)}
  if(K<3||eat<20){const ex=x+5,ey=y+8;for(let yy=0;yy<9;yy++)for(let xx=0;xx<6;xx++){const ar=yy<2&&(xx===0||xx===5);if(!ar)B.set(ex+xx,ey+yy,xx===2||xx===3?(yy>2?'#140a10':'#6e5a36'):'#6e5a36',6)}}
  if(K>=3)for(let i=0;i<4;i++){const dx=x+3+i*3,len=4+((t>>3)+i*5)%9;for(let j=0;j<len;j++)B.set(dx,y+h-eat+2+j,'#07050b',6)}}
-STG.gate2=(B,t,K)=>{const L=Object.assign({},LT[K],{gk:Math.min(1,LT[K].gk*1.1)},K===4?{gk:1,glow:['#5e4880','#2e2242']}:{});/* 格子で光がさえぎられる分、通路の光を少し強く */stoneWall(B,L,t,K);archDraw(B,L,t,K);grate(B,L,t,K,K>=3);floorK(B,L,t);
+STG.gate2=(B,t,K)=>{const L=Object.assign({},LT[K],{gk:Math.min(1,LT[K].gk*(K>=3?1.1:1))},K===4?{gk:1,glow:['#685290','#2e2242']}:{});/* 格子で光がさえぎられる分、通路の光を少し強く */stoneWall(B,L,t,K);archDraw(B,L,t,K);grate(B,L,t,K,K>=3);floorK(B,L,t);
  if(K>=3){const LL=Object.assign({},L,{rust:0,eyes:0,crack:0});overlayK(B,LL,t,K)}else if(K===0){/* 関所は浅い階でも苔は少ない（人の手が入っている） */}
  banner(B,30,12,K,t);banner(B,50,12,K,t);torchK(B,L,22,41,t);torchK(B,L,218,41,t);
  if(K===4){const LL=Object.assign({},L,{ink:0,rust:0});overlayK(B,Object.assign(LL,{eyes:1,crack:1}),t,K)}};

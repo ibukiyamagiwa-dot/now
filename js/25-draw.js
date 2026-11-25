@@ -27,6 +27,16 @@ function pxArc(cx,cy,r,a0,a1,col){if(!isFinite(r)||r>400)return;const st=1/Math.
 function pxDisc(cx,cy,r,col){l.fillStyle=col;for(let y=-r;y<=r;y++){const w=Math.round(Math.sqrt(r*r-y*y));l.fillRect(Math.round(cx-w),Math.round(cy+y),w*2+1,1)}}
 function pxStar(x,y,r,col){x=Math.round(x);y=Math.round(y);r=Math.round(r);const d=Math.round(r*.45);
  for(const[a,b,cc,dd]of[[x-r,y,x+r,y],[x,y-r,x,y+r],[x-d,y-d,x+d,y+d],[x-d,y+d,x+d,y-d]])outLine(a,b,cc,dd,col)}
+/* 合図の光（資料集 cards.js の cueStar・ring）：十字は半径最大10ドット、斜めの光、白い芯、まわりのにじみ。紫の輪は二重線。表示は【合図の表示フレーム】 */
+const CUEC={w:['#ffffff','#bfe8ff'],r:['#ff4040','#ffb0a0'],g:['#ffd040','#fff0a0'],p:['#b060ff','#e0c0ff']},CUER=[4,7,9,10,10,9,9,8,7,6,5,5,4,3,3,2,2,1];
+function cueStar(x,y,k,col){x=Math.round(x);y=Math.round(y);const R=CUER[k]||1,[c1,c2]=CUEC[col],hz=mixHex(c1,'#000000',.35);
+ for(let yy=-R;yy<=R;yy++)for(let xx=-R;xx<=R;xx++){const r=Math.hypot(xx,yy);if(r<R*.7&&r>1.5&&((xx+yy)&1)===0)px(x+xx,y+yy,hz)}
+ for(let i=-R;i<=R;i++){const a=Math.abs(i)<R*.45?c2:c1;px(x+i,y,a);px(x,y+i,a);if(Math.abs(i)<R*.3){px(x+i,y-1,c2);px(x+i,y+1,c2);px(x-1,y+i,c2);px(x+1,y+i,c2)}}
+ const dd=Math.round(R*.5);for(let i=-dd;i<=dd;i++){px(x+i,y+i,c1);px(x+i,y-i,c1)}
+ for(const[a,b]of[[0,0],[1,0],[0,1],[-1,0],[0,-1]])px(x+a,y+b,'#ffffff')}
+function drawCue(x,y,d,col){const k=Math.min(17,Math.floor(d*18/Math.max(1,P.cueShowF)));
+ if(col==='p'){const c=CUEC.p[0];for(const r of k<8?[3,4,5]:[3,4])pxArc(x,y,r+k*.9,0,Math.PI*2,c);return}
+ cueStar(x,y,k,col);if(col==='g'&&k<12)pxArc(x,y,3+k,0,Math.PI*2,CUEC.g[0])}
 function shadowPx(x,w){l.fillStyle='rgba(0,0,0,.45)';l.fillRect(Math.round(x-w),FLOOR,w*2+1,2);l.fillRect(Math.round(x-w+2),FLOOR+2,w*2-3,1)}
 
 /* 背景（静的部分は一度だけ描く） */
@@ -136,26 +146,41 @@ function knight(x,y,k,bob,hit){
  if(A&&chased(A)&&A.t===I&&G.stop>0&&G.stopMax)ang+=(G.stopMax-G.stop)*P.bite;
  const hx=ox+13,hy=oy+14,ex=hx+Math.cos(ang)*15,ey=hy+Math.sin(ang)*15,nx=-Math.sin(ang),ny=Math.cos(ang);
  if(A){const t=A.t;
-  if(t>=I-3&&t<I+4){const k=(t-(I-3))/7,a1=Math.min(ang,CA);pxArc(hx,hy,14,-2.1,a1,`rgba(255,255,255,${.9-k*.6})`);pxArc(hx,hy,16,-1.8,a1,`rgba(255,255,255,${.6-k*.5})`)}
-  if(A.chase==='ok'&&t>=I+6&&t<I+13){const k=(t-(I+6))/7,cc='255,210,122';pxArc(hx,hy,15,-1.0,.95,`rgba(${cc},${1-k*.7})`);pxArc(hx,hy,17,-.8,.95,`rgba(${cc},${.8-k*.7})`);pxArc(hx,hy,13,-.9,.9,`rgba(${cc},${.6-k*.5})`)}}
+  if(t>=I-3&&t<I+4){const k=(t-(I-3))/7,a1=Math.min(ang,CA);pxArc(hx,hy,14,-2.1,a1,`rgba(223,242,255,${.9-k*.6})`);pxArc(hx,hy,16,-1.8,a1,`rgba(138,184,224,${.6-k*.5})`)}
+  if(A.chase==='ok'&&t>=I+6&&t<I+13){const k=(t-(I+6))/7,cc='191,224,255';pxArc(hx,hy,15,-1.0,.95,`rgba(${cc},${1-k*.7})`);pxArc(hx,hy,17,-.8,.95,`rgba(${cc},${.8-k*.7})`);pxArc(hx,hy,13,-.9,.9,`rgba(${cc},${.6-k*.5})`)}}
  const ack=A&&chased(A)&&A.t<I;
- outLine(hx,hy,ex,ey,ack?(A.chase==='crit'?'#fff3b0':'#ffffff'):'#e9f2ff');
- if(ack&&(G.anim>>1)%2)pxStar(ex,ey,A.chase==='crit'?4:3,A.chase==='crit'?'#fff3b0':'#ffffff');
- if(G.act&&G.act.n===1&&!G.act.chase){const d=G.act.t-G.act.C;if(d>=0&&d<6)pxStar(ex,ey,2+Math.round(4*(1-d/6)),'#ffffff')}pxLine(hx+nx*2,hy+ny*2,hx-nx*2,hy-ny*2,'#e8c46a');
+ outLine(hx,hy,ex,ey,ack?HSWD[0]:'#e9f2ff');
+ if(ack&&(G.anim>>1)%2)pxStar(ex,ey,A.chase==='crit'?4:3,A.chase==='crit'?HSWD[0]:HSWD[1]);
+ if(G.act&&G.act.n===1&&!G.act.chase){const d=G.act.t-G.act.C;if(d>=0&&d<6)pxStar(ex,ey,2+Math.round(4*(1-d/6)),HSWD[0])}pxLine(hx+nx*2,hy+ny*2,hx-nx*2,hy-ny*2,'#e8c46a');
  if(k==='parry'){pxArc(hx,hy,19,-1.5,.7,'#bff4ff');pxArc(hx,hy,20,-1.3,.5,'#ffffff')}
  if(hu>=0&&hu<4){pxArc(hx,hy,19,-1.2,.9,'#ffffff');pxArc(hx,hy,21,-1,.8,'#ff7b86')}
  if(hu>=10&&hu<18){const q=(hu-10)/8,a1=Math.max(-2.05,.5-2.55*Math.min(1,(hu-10)/6));pxArc(hx,hy,16,a1,.5,`rgba(255,210,122,${1-q*.8})`);pxArc(hx,hy,18,a1,.4,`rgba(255,123,134,${.8-q*.7})`)}
 }
 
 /* 敵 */
+/* 連撃の静と動：次の撃が近いときは、当たったポーズで3F止まり、素早く構えへ戻って止まり、最後の3Fで振る */
+function afterL(s,d){const g=s.nxG;if(!g||g>=24)return 1-d/9;if(d<3)return 1;const R=Math.max(2,Math.min(6,g-8));return Math.max(0,1-(d-3)/R)}
+/* やられ：【ヒットフラッシュ】だけ白く光る。止めるのは主人公だけで、敵は約4Fで押され（【やられの押され幅】）、【震えの大きさ】から横にだけ小さくなる */
+function hitWhite(e){return(e.hurtAt!=null&&G.anim-e.hurtAt>=0&&G.anim-e.hurtAt<P.hitFlashF)||(!!G.uk&&e.hurt>5)}
+function enemyVib(e){const sg=G.anim%2?1:-1;
+ if(e.shkAt!=null){const a=G.anim-e.shkAt;if(a>=0&&a<P.hurtShakeF)return Math.round(P.hurtShake*(1-a/P.hurtShakeF))*sg}
+ if(!(G.stop>0&&G.stopMax))return 0;
+ /* パリィされ：横だけ、だんだん小さく（【パリィされの震え幅】小・大） */
+ if(G.vib==='p')return Math.round((e.pryAmp||P.pryShakeS)*G.stop/G.stopMax)*sg;
+ return Math.round((G.vib==='e'?3:1)*G.stop/G.stopMax)*sg}
+function hurtDx(e){if(e.shkAt==null||!e.shkPush||RIG.on(e))return 0;const a=G.anim-e.shkAt;if(a<0||a>40)return 0;return Math.round(P.hurtPush*(a<4?Math.sin(a/4*Math.PI/2):Math.exp(-(a-4)/6)))}
+/* ブレイクの印：主人公の色（うすい青）の小さな星を3つ、頭の上で回す（光らせない。金は打ち合いの合図の色なので使わない） */
+function brkStars(cx,cy){const HSL=['#dff2ff','#8ab8e0','#5a7ca8'];
+ for(let i=0;i<3;i++){const a=G.anim*.09+i*Math.PI*2/3,sx=Math.round(cx+Math.cos(a)*11),sy=Math.round(cy+Math.sin(a)*2),back=Math.sin(a)<0;
+  px(sx,sy,back?HSL[1]:HSL[0]);const cc=back?HSL[2]:HSL[1];px(sx+1,sy,cc);px(sx-1,sy,cc);px(sx,sy+1,cc);px(sx,sy-1,cc)}}
 function enemyPose(){
  let gold=false,lean=0,lunge=0,twitch=0,cue=-1,red=false,hold=0,fake=false,pulse=false,proj=false,rise=0,mv=null;
  if(G.state==='blown'){const t=G.t;if(t<34){lean=Math.min(1,t/16);if(t>=22){cue=t-22;red=true}}else lunge=Math.max(0,1-(t-34)/24);return{lean,lunge,twitch,cue,red,hold}}
  if(G.state==='enemy'){
-  const LF=G.en.lungeF||4;for(const s of G.strikes){if(s.proj||s.cx)continue;if(s.ft){const d=G.et-s.impact;if(d>=0&&d<s.ft){lunge=Math.max(lunge,d<20?1:1-(d-20)/(s.ft-20));continue}}if(s.mv==='charge'||s.mv==='pool')continue;const sc=s.mv==='hslam'?.5:s.mv==='slam'?.45:s.mv==='stab'?.2:s.mv==='tail'||s.mv==='breath'||s.mv==='step'||s.mv==='bite'||s.mv==='arm'||s.mv==='bk'||s.mv==='reach'||s.mv==='vlash'||s.mv==='cape'?0:1;const d=G.et-s.impact;if(d>-LF&&d<9)lunge=Math.max(lunge,(d<0?(LF+d)/LF:1-d/9)*sc)}
+  const LF=G.en.lungeF||4;for(const s of G.strikes){if(s.proj||s.cx)continue;if(s.ft){const d=G.et-s.impact;if(d>=0&&d<s.ft){lunge=Math.max(lunge,d<20?1:1-(d-20)/(s.ft-20));continue}}if(s.mv==='charge'||s.mv==='pool')continue;const LS=s.nth>0&&!s.rally?3:LF,sc=s.mv==='hslam'?.5:s.mv==='slam'?.45:s.mv==='stab'?.2:s.mv==='tail'||s.mv==='breath'||s.mv==='step'||s.mv==='bite'||s.mv==='arm'||s.mv==='bk'||s.mv==='reach'||s.mv==='vlash'||s.mv==='cape'?0:1;const d=G.et-s.impact;if(d>-LS&&d<9)lunge=Math.max(lunge,(d<0?(LS+d)/LS:afterL(s,d))*sc)}
   const s=G.strikes.find(s=>!s.done);
-  if(s&&G.et>=s.start){
-   lean=Math.min(1,(G.et-s.start)/10);
+  if(s&&(G.et>=s.start||s.iv)){
+   lean=s.iv?1:Math.min(1,(G.et-s.start)/10);
    if(G.et<s.cue){if(s.feint&&(s.cue-G.et)%38<5&&s.cue-G.et>12)twitch=1}
    else{cue=s.dark||s.lob||s.nolight?-1:G.et-s.cue;red=s.red;gold=!!s.rallyOpen;proj=s.proj;if(s.beats&&!s.lob){const k=G.et-s.cue;pulse=s.beats.some(b=>k>=b&&k<b+4);hold=Math.min(1,k/20)}if(s.fake){lean=0;lunge=cue<4?cue/4*.3:Math.max(0,.3*(1-(cue-4)/10));fake=true}else if(s.beat&&!s.dark){const B=s.bf||P.golemBeatF,N=s.bn||4;hold=s.mv==='smash'?Math.min(1,(Math.min(N,Math.floor(cue/B))+Math.min(1,(cue%B)/4)*(cue<B*N?1:0))/N):Math.min(1,cue/(B*2));pulse=cue>=B&&cue%B<B/2&&cue<=B*N+B/2}
    if(s.mv==='hslam')rise=Math.min(1,cue/(s.cl-4));if(s.mv==='slam'){const B=s.bf||10,kk=cue-(s.bo||0),h=Math.min(3,Math.max(0,Math.floor(kk/B))),lv=[.12,.45,.75,1],pv=h?lv[h-1]:0;rise=pv+(lv[h]-pv)*Math.min(1,Math.max(0,kk-h*B)/4)}mv=s.mv}
@@ -169,10 +194,10 @@ function drawEnemy(){
  if(G.ko&&G.ko.shattered)return;
  if((G.state==='win'||G.state==='clear')&&(G.t>30||(G.t>>1)%2))return;
  const white=G.ko&&(G.stop>0||(G.ko.boss&&(!G.ko.lord||G.t<16)&&(G.anim>>1)%2));
- const v=white||e.hurt>5?'w':e.broken?'b':'n',pal=enemyPal(e,v),img=eSpr(e,v),w=img.width,h=img.height;
+ const v=white||hitWhite(e)?'w':e.broken?'b':'n',pal=enemyPal(e,v),img=eSpr(e,v),w=img.width,h=img.height;
  const idle=(G.state!=='enemy'?(G.anim>>4)%2:0)+(e.fly?e.fly+Math.round(Math.sin(G.anim*.12)*2):0);
- const vb=G.stop>0&&G.stopMax?Math.round((G.vib==='e'?3:1)*G.stop/G.stopMax)*(G.anim%2?1:-1):0;
- const AN=G.ko?null:anticip(e);const x=(G.state==='enter'&&G.enter?G.enter.dx:0)+(AN?AN.dx:0)+(G.ko?G.ko.ex:e.kind==='boar'?boarX():Math.round(ENX(e)+p.lean*5-p.lunge*lungeDist(e)-p.twitch*6+Math.round(G.knock)+(e.hurt&&!G.stop?(e.hurt%4<2?2:-2):0)))+vb,y=FLOOR;
+ const vb=enemyVib(e)+hurtDx(e);
+ const AN=G.ko?null:anticip(e);const x=(G.state==='enter'&&G.enter?G.enter.dx:0)+(AN?AN.dx:0)+(G.ko?G.ko.ex:e.kind==='boar'?boarX():Math.round(ENX(e)+p.lean*5-p.lunge*lungeDist(e)-p.twitch*6+Math.round(G.knock)))+vb,y=FLOOR;
  const SC=e.sc||1,PX=e.kind==='ghost'&&!G.ko?(ghostAlpha().x??x):x;if(e.kind!=='ghost'||(ghostAlpha().a||0)>.2)shadowPx(PX,e.shw||((w*SC)>>1));if(SC>1){l.save();l.translate(PX,y);l.scale(SC,SC);l.translate(-PX,-y)}
  if(G.ko&&G.ko.sliced){
   const x0=x-(w>>1),y0=y-h,g=sliceGeo(w,h,x0,y0),o=sliceOff();
@@ -227,12 +252,16 @@ function drawEnemy(){
  else{tip={x:x-19,y:y-18-idle}}
  if(e.kind==='dragon')drawFire(x,y);
  if(e.broken&&RIG.on(e))RIG.brkStars(e,x,y-idle);
- else if(e.broken){for(let i=0;i<3;i++){const an=G.anim*.08+i*2.1;pxStar(x+Math.cos(an)*11,y-h-5+Math.sin(an)*2,2,'#e8c46a')}}
+ else if(e.broken)brkStars(x,y-h-5);
  if(tip){const SR=PORTV?LW-42:LW-10,SL=PORTV?42:10;tip={x:Math.max(SL,Math.min(SR,tip.x)),y:Math.max(14,tip.y)}}
- if(p.cue>=0&&p.cue<12){if(p.fake)pxArc(tip.x,tip.y,2+Math.round(p.cue/2),0,Math.PI*2,'#c9a8ff');else{pxStar(tip.x,tip.y,3+Math.round(6*(1-p.cue/12)),p.red?'#ff4a5a':p.gold?'#ffd27a':'#ffffff');if(p.gold)pxArc(tip.x,tip.y,3+p.cue,0,Math.PI*2,'#ffd27a')}}
- else if(p.pulse){pxStar(tip.x,tip.y,4,p.red?'#ff4a5a':'#ffffff')}
+ /* 合図は光った場所に残す（剣先についていかない）。二撃目以降は覚悟しだいで出さない（cueHid） */
+ if(G.state==='enemy'&&tip)for(const s of G.strikes){if(s.dark||s.lob||s.nolight||cueHid(s))continue;const d=G.et-s.cue;if(d<0||d>=P.cueShowF)continue;if(!s.cueP){if(s.cx||(s.done&&!s.fake))continue;s.cueP=cueTip(e,s,x,y,p,tip)}drawCue(s.cueP.x,s.cueP.y,d,s.fake?'p':s.red?'r':s.rallyOpen?'g':'w')}
+ if(G.state==='blown'&&tip&&p.cue>=0&&p.cue<P.cueShowF){if(!G.blowP)G.blowP={x:tip.x,y:tip.y};drawCue(G.blowP.x,G.blowP.y,p.cue,'r')}else if(G.state!=='blown')G.blowP=null;
+ if(p.pulse&&!(p.cue>=0&&p.cue<12)){pxStar(tip.x,tip.y,4,p.red?'#ff4a5a':'#ffffff')}
  if(SC>1)l.restore();
 }
+/* 合図の位置：ふつうは今の剣先。三つ首は、その撃の首から */
+function cueTip(e,s,x,y,p,tip){if(e.kind==='hydra'&&s.heads&&!s.lob&&s.mv!=='pool'){const hp=hydraHeadPos(s.heads[s.heads.length>1?1:0],x,y),SR=PORTV?LW-42:LW-10,SL=PORTV?42:10;return{x:Math.max(SL,Math.min(SR,Math.round(hp[0])-6)),y:Math.max(14,Math.round(hp[1])+2)}}return{x:tip.x,y:tip.y}}
 function pxEllipse(cx,cy,rx,ry,col){const st=1/Math.max(6,rx);for(let a=0;a<Math.PI*2;a+=st)px(cx+Math.cos(a)*rx,cy+Math.sin(a)*ry,col)}
 function bolt(x0,y0,x1,y1,seed,col){let r=seed;const rnd=()=>{r=(r*16807)%2147483647;return r/2147483647};let ax=x0,ay=y0;for(let i=1;i<=8;i++){const k=i/8,nx=x0+(x1-x0)*k+(i<8?(rnd()-.5)*16:0),ny=y0+(y1-y0)*k;outLine(ax,ay,nx,ny,col);ax=nx;ay=ny}}
 function drawSpell(a){

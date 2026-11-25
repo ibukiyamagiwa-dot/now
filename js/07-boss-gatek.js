@@ -1,7 +1,7 @@
 /* ===== 黒い門番（覚悟3・6階の中ボス）：深淵に飲まれかけた門番。剣はそのまま、触手が勝手に襲う ===== */
 function gateKTurn(){const e=G.en,last=e.lastMv;e.tn=(e.tn||0)+1;const R=P.cueF;
  const mv=dbg.lordMv||G.pmv||(e.demo?'two':pick(['two','vlash','cape','yank'].filter(m=>m!==last)));e.lastMv=mv;
- if(mv==='two')return[{pre:16,mv:'cut',m:1},{pre:8,mv:'cut2',m:1}];
+ if(mv==='two')return[{pre:16,mv:'cut',m:1},{pre:8,mv:'cut2',m:1,iv:'ivGateK2'}];
  if(mv==='yank')return[{fake:true,pre:16,mv:'yank'},{pre:8,mv:'cut',m:1.3}];
  if(mv==='cape')return[{pre:28,mv:'cape',m:1.5,red:Math.random()<.5}];
  const ord=shuffle([0,1,2]),L=ord.map((h,i)=>({ping:true,pre:i?R:30,note:h}));ord.forEach((h,i)=>L.push(Object.assign({m:.9,mv:'vlash',ten:h,note:h,rhythm:true,st:30+R*i},i?{gap:R,cl:R}:{pre:R,cl:R})));tipOnce('eye',EYE_TIP);return L}

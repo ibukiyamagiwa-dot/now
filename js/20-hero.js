@@ -33,25 +33,27 @@ function move(d){if(G.state==='pick'){G.psel=(G.psel+d+3)%3;tone(1200,.03,'squar
 function pick1(n){if(G.state==='pick'){ac();if(G.psel===n-1){if(G.t>12)choose(n-1)}else{G.psel=n-1;tone(1200,.03,'square',.04)}return}if(G.state!=='cmd'||!usable(n))return;ac();if(G.sel===n){if(G.t>=10)cmd(n)}else{G.sel=n;tone(1200,.03,'square',.04)}}
 function mark(x,y,kind,size,col){G.marks.push({x,y,kind,size,col,t:0,life:kind==='slash'?8:14})}
 function knock(px){G.knock=Math.max(G.knock||0,px)}
+/* 主人公の剣の光・跡・火花はうすい青（合図の4色と分ける）。追撃の×だけ金 */
+const HSWD=['#dff2ff','#8ab8e0','#5a7ca8'];
 const MAT={golem:'rock',bomb:'rock',slime:'goo',armor:'metal',samurai:'metal'};
 function matHit(e){const m=MAT[e.kind],x=EXc()-8,y=FLOOR-14;
  if(m==='rock'){SFX.rock();for(let i=0;i<10;i++)G.pts.push({x,y:y-4,vx:(Math.random()-.2)*2.4,vy:-1.4-Math.random()*1.4,t:0,life:26,col:i%2?shade(e.col,-.3):shade(e.col,.2),sz:2,drag:.98,g:.12})}
  else if(m==='goo'){SFX.goo();for(let i=0;i<12;i++)G.pts.push({x,y,vx:(Math.random()-.3)*2,vy:-1-Math.random()*1.6,t:0,life:24,col:i%3?e.col:shade(e.col,.4),sz:Math.random()<.4?2:1,drag:.98,g:.1})}
- else if(m==='metal'){SFX.metal();for(let i=0;i<10;i++){const an=Math.random()*Math.PI*2,v=2+Math.random()*2;G.pts.push({x,y:y-4,vx:Math.cos(an)*v,vy:Math.sin(an)*v-.6,t:0,life:10,col:i%2?'#fff3b0':'#ffffff',sz:1,drag:.9,g:.05})}}}
+ else if(m==='metal'){SFX.metal();for(let i=0;i<10;i++){const an=Math.random()*Math.PI*2,v=2+Math.random()*2;G.pts.push({x,y:y-4,vx:Math.cos(an)*v,vy:Math.sin(an)*v-.6,t:0,life:10,col:i%2?HSWD[1]:HSWD[0],sz:1,drag:.9,g:.05})}}}
 function dmgEnemy(v,col,kind){
  const e=G.en,sword=kind==='slash'||kind==='chase'||kind==='heavy';
- if(e.shield&&e.guardUp&&sword){tipOnce('shield','盾に剣は効きません　パリィで盾を崩しましょう');SFX.block();text(EXc()-6,FLOOR-40,'キン！','#cfd8e6',true);burst(EXc()-14,FLOOR-16,'#ffffff',10,1.6,1);G.vib='e';e.hurt=4;return}
+ if(e.shield&&e.guardUp&&sword){tipOnce('shield','盾に剣は効きません　パリィで盾を崩しましょう');SFX.block();text(EXc()-6,FLOOR-40,'キン！','#cfd8e6',true);burst(EXc()-14,FLOOR-16,'#ffffff',10,1.6,1);G.vib='e';e.hurt=4;e.shkAt=G.anim;e.shkPush=false;return}
  if(e.hard&&(kind==='slash'||kind==='chase')){v*=.5;if(Math.random()<.5)text(EXc()+10,FLOOR-30,'かたい','#bba9b0')}
  if(e.air&&(kind==='slash'||kind==='chase')){v*=.5;if(Math.random()<.5)text(EXc()+10,FLOOR-34,'とどかない','#bba9b0')}
  if(rallyFoe(e)&&kind==='counter'&&!G.rp)v*=.6;
  v=Math.round(v);
  /* 3) 決着は打ち合い：各形態の残り2割は、打ち返しでしか削れない */
  if(rallyFoe(e)&&e.finale&&kind==='rally'&&!G.rp)v=Math.max(v,e.hp);
- if(rallyFoe(e)&&!G.rp&&G.mode!=='tut'&&kind!=='rally'){const fl=Math.ceil(e.hpMax*.2);if(e.hp-v<fl){v=Math.max(0,e.hp-fl);if(!e.finale){e.finale=true;e.finFail=0;text(EXc(),FLOOR-70,'踏みとどまった！','#ff9a9a',true);SFX.block();shake(P.shake);msg(`${e.name}は踏みとどまった　……打ち返しで決めろ`);tipOnce('finale','大ボスの最後の2割は、打ち合いの「打ち返し」でしか削れない')}if(v<=0){text(EXc()+6,FLOOR-40,'とどかない','#bba9b0');SFX.block();e.hurt=4;return}}}
- const an0=e._an0??aliveN();e._an0=null;if(e.uhp&&kind!=='magicAll'){let r=v;for(let i=0;i<e.uhp.length&&r>0;i++){const d=Math.min(r,e.uhp[i]);e.uhp[i]-=d;r-=d}}e.hp=Math.max(0,e.hp-v);if(e.uhp)e.hp=e.uhp.reduce((a,b)=>a+b,0);e.hurt=10;G.vib='e';matHit(e);
+ if(rallyFoe(e)&&!G.rp&&G.mode!=='tut'&&kind!=='rally'){const fl=Math.ceil(e.hpMax*.2);if(e.hp-v<fl){v=Math.max(0,e.hp-fl);if(!e.finale){e.finale=true;e.finFail=0;text(EXc(),FLOOR-70,'踏みとどまった！','#ff9a9a',true);SFX.block();shake(P.shake);msg(`${e.name}は踏みとどまった　……打ち返しで決めろ`);tipOnce('finale','大ボスの最後の2割は、打ち合いの「打ち返し」でしか削れない')}if(v<=0){text(EXc()+6,FLOOR-40,'とどかない','#bba9b0');SFX.block();e.hurt=4;e.shkAt=G.anim;e.shkPush=false;return}}}
+ const an0=e._an0??aliveN();e._an0=null;if(e.uhp&&kind!=='magicAll'){let r=v;for(let i=0;i<e.uhp.length&&r>0;i++){const d=Math.min(r,e.uhp[i]);e.uhp[i]-=d;r-=d}}e.hp=Math.max(0,e.hp-v);if(e.uhp)e.hp=e.uhp.reduce((a,b)=>a+b,0);e.hurt=10;e.hurtAt=G.anim;if(kind!=='counter'){e.shkAt=G.anim;e.shkPush=true}G.vib='e';matHit(e);
  if(e.swarm&&e.hp>0&&aliveN()<an0){const bx=EXc()-6;if(e.kind==='hydra'){burst(bx-10,FLOOR-40,e.col,22,2,2);SFX.crit();shake(P.shake*1.2);text(bx,FLOOR-60,`首を落とした！ あと${aliveN()}本`,'#9dffc4',true);{let c=0;G.strikes.forEach(x=>{if(x.heads&&!x.done&&x.heads.every(h=>e.uhp[h]<=0)){cancelS(x);x.res='cut';c++}});if(c&&G.state==='enemy')trimEnd()}}else{burst(bx,FLOOR-8,e.col,18,1.8,2);SFX.goo();text(bx,FLOOR-30,`あと${aliveN()}匹`,'#9dffc4',true)}}
  if(e.boss&&!e.noRage&&!e.rage&&e.hp>0&&e.hp<e.hpMax/2){e.rage=true;e.roared=false;shake(P.shake*.6);SFX.rage()}
- const nn=G.txt.filter(t=>t.t<24&&/^\d+$/.test(t.s)).length;text(EXc()-4+nn*12+(EXc()-HX<60?10:0),(EXc()-HX<60?FLOOR-60:FLOOR-44)-nn*9,String(v),col||'#fff',true);burst(EXc()-8,FLOOR-14,col||'#ffe7a8',14,1.6,2);
+ const nn=G.txt.filter(t=>t.t<24&&/^\d+$/.test(t.s)).length;text(EXc()-4+nn*12+(EXc()-HX<60?10:0),(EXc()-HX<60?FLOOR-60:FLOOR-44)-nn*9,String(v),col||'#fff',true);burst(EXc()-8,FLOOR-14,sword?HSWD[1]:(col||'#ffe7a8'),14,1.6,2);
 }
 function heroStep(){
  const a=G.act,h=G.hero,e=G.en;a.t++;
@@ -64,12 +66,12 @@ function heroStep(){
  if(a.n===1&&a.t===a.I){const gl=a.chase==='miss'&&a.early,cr=a.chase==='crit',cp=contactPt(),mx=cp.x,my=cp.y;
   if(gl)text(EX-14,FLOOR-56,'かすり','#9a8f96');
   if(cr){tutOn('heavy');G.stats.heavy++;syncStats();SFX.crit();gain(P.mkCrit);G.stop=P.critStopF;shake(P.shake*1.6);flash(['#ffffff','#000000','#fff3b0','#000000']);
-   mark(mx,my,'x',16,'#fff3b0');mark(mx,my,'star',14,'#ffffff');ring(mx,my,3,34,18,'#ffd27a');burst(mx,my,'#fff3b0',24,2.6,2);burst(mx,my,'#ffffff',10,3.4,1);knock(8);
+   mark(mx,my,'x',16,HSWD[0]);mark(mx,my,'star',14,HSWD[0]);ring(mx,my,3,34,18,HSWD[1]);burst(mx,my,HSWD[1],24,2.6,2);burst(mx,my,HSWD[0],10,3.4,1);knock(8);
    text(EX-14,FLOOR-56,'重い一撃！','#fff3b0',true);if(RM2.heavyMk)gain(RM2.heavyMk);dmgEnemy(heroAtk()*(P.critMul+RM2.heavy)*mul,'#fff3b0','heavy')}
-  else{SFX.slash();dmgEnemy(heroAtk()*mul*(gl?P.missMul:1),'#ffe7a8','slash');mark(mx,my,'slash',7,'#ffffff');G.stop=P.hit1StopF;shake(P.shake*.4)}
+  else{SFX.slash();dmgEnemy(heroAtk()*mul*(gl?P.missMul:1),'#ffe7a8','slash');mark(mx,my,'slash',7,HSWD[0]);G.stop=P.hit1StopF;shake(P.shake*.4)}
   if(e.hp<=0)return ko(false)}
  if(a.n===1&&a.chase==='ok'&&(a.t===a.I+8||(RM2.triple&&a.t===a.I+16))){const cp=contactPt(),mx=cp.x,my=cp.y;tutOn('chase');G.stats.chase++;syncStats();
-  SFX.chase();G.stop=P.chaseStopF;shake(P.shake*.9);flash(['#ffffff','#000000']);mark(mx,my,'x',11,'#ffd27a');mark(mx,my,'star',7,'#ffffff');burst(mx,my,'#ffd27a',16,2,2);knock(4);
+  SFX.chase();G.stop=P.chaseStopF;shake(P.shake*.9);flash(['#ffffff','#000000']);mark(mx,my,'x',11,'#ffd27a');mark(mx,my,'star',7,HSWD[0]);burst(mx,my,HSWD[1],16,2,2);knock(4);
   text(EX-14,FLOOR-56,a.t>a.I+8?'三の太刀！':'追撃！','#ffd27a',true);dmgEnemy(heroAtk()*(P.chaseMul+RM2.chase)*mul,'#ffd27a','chase');if(e.hp<=0)return ko(false)}
  if(a.n===2){const lv=a.lv,T=magT(lv),t=a.t;
   if(t===1){h.mk-=lv*100;SFX.cast(lv);text(HX,FLOOR-44,SPELL[lv]+'！',SCOL[lv],true);a.seed=1+(Math.random()*9999|0)}

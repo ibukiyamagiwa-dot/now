@@ -1,9 +1,17 @@
 /* ===== 敵の行動：予兆（キラッ）から着弾までは常に一定 ===== */
-function buildStrikes(L,t,lastI){const e=G.en,cl0=e.cue||P.cueF;const list=L.map(s=>{
+/* 二撃目以降の合図（予兆の光と音）は、覚悟「みならい」だけで出す（【二撃目以降の合図】）。紫の輪・別の「見る場所」（目・首・触手の目・ランプ・拍）・打ち合い・技の始まり（lead）は、どの覚悟でも出す */
+function cueK(){return G.mode==='run'?G.K:G.mode==='prac'?PV+1:G.mode==='tut'?0:1}
+/* 連携・切り返しのあとに続く技は、その技の最初の本物の撃に合図を出す */
+function leadFirst(L){const j=L.findIndex(x=>!x.fake&&!x.ping);return j<0?L:L.map((x,i)=>i===j?Object.assign({},x,{lead:true}):x)}
+function cueHid(s){return s.nth>0&&!s.fake&&!s.rally&&!s.lead&&!s.keep&&s.note==null&&!s.heads&&s.ten==null&&!s.beat&&!s.beats&&cueK()>P.cue2K}
+/* iv：【連撃の間】の名前（P のキー）。二撃目以降は、前の当たりから P[iv] F後に当たる（ヒットストップは数えない） */
+function buildStrikes(L,t,lastI){const e=G.en,cl0=e.cue||P.cueF;let nth=0;const list=L.map(s=>{
   if(s.ping){t+=s.pre||0;G.pings.push({t,heads:s.heads||(s.head!=null?[s.head]:null),note:s.note??G.pings.length,done:false,i:G.pings.length});return null}
   if(s.fake){t+=s.pre||12;const o={fake:true,mv:s.mv,cue:t,end:t+14,start:t-12,impact:Infinity,cl:14,m:0,red:false,res:null,done:false,cued:false};t+=30;return o}
-  const cl=s.cl||cl0;if(s.gap!=null)t=lastI+s.gap;else t+=(s.pre||0)+cl;lastI=t;const red=!!s.red||(!!e.redP&&!dbg.fix&&Math.random()<e.redP);if(red)tipOnce('red','赤い光は重い攻撃　痛いですが、弾けば大きく返せます');
-  const o={impact:t,cue:t-cl,cl,beat:!!s.beat,mv:s.mv,bf:s.bf,bn:s.bn,proj:!!s.proj,melee:!!s.melee,start:s.st!=null?s.st:t-cl-(s.pre||0),ft:s.ft||0,m:s.m||1,feint:!!s.feint,red,boom:!!s.boom,counter:!!s.counter,dark:!!s.dark,back:s.back||0,beats:s.beats,lob:!!s.lob,head:s.head,heads:s.heads,spit:!!s.spit,note:s.note,rhythm:!!s.rhythm,rally:!!s.rally,rallyOpen:!!s.rallyOpen,rallyEnd:!!s.rallyEnd,lock:!!s.lock,nc:!!s.nc,bo:s.bo||0,sdrain:!!s.drain,ten:s.ten,nolight:!!s.nolight,res:null,done:false,cued:false};t+=8;return o}).filter(Boolean);return{list,t}}
+  const cl=s.cl||cl0,iv=s.iv&&nth>0?P[s.iv]:null,pI=lastI;if(s.gap!=null)t=lastI+s.gap;else if(iv!=null)t=lastI+iv;else t+=(s.pre||0)+cl;lastI=t;const red=!!s.red||(!!e.redP&&!dbg.fix&&Math.random()<e.redP);if(red)tipOnce('red','赤い光は重い攻撃　痛いですが、弾けば大きく返せます');
+  const o={impact:t,cue:t-cl,cl,beat:!!s.beat,mv:s.mv,bf:s.bf,bn:s.bn,proj:!!s.proj,melee:!!s.melee,start:s.st!=null?s.st:iv!=null?Math.max(pI+3,t-cl-(s.pre||0)):t-cl-(s.pre||0),nth:nth++,iv:iv!=null,lead:!!s.lead,keep:!!s.keep,ft:s.ft||0,m:s.m||1,feint:!!s.feint,red,boom:!!s.boom,counter:!!s.counter,dark:!!s.dark,back:s.back||0,beats:s.beats,lob:!!s.lob,head:s.head,heads:s.heads,spit:!!s.spit,note:s.note,rhythm:!!s.rhythm,rally:!!s.rally,rallyOpen:!!s.rallyOpen,rallyEnd:!!s.rallyEnd,lock:!!s.lock,nc:!!s.nc,bo:s.bo||0,sdrain:!!s.drain,ten:s.ten,nolight:!!s.nolight,res:null,done:false,cued:false};t+=8;return o}).filter(Boolean);
+ /* 次の撃までの間（静と動：当たったポーズで止まり、次の構えへ移って止まる） */
+ const R=list.filter(x=>!x.fake);for(let i=0;i+1<R.length;i++)if(R[i+1].nth>0)R[i].nxG=R[i+1].impact-R[i].impact;return{list,t}}
 function startEnemy(list){
  const e=G.en;
  if(!list){
@@ -26,7 +34,7 @@ function turnEnd(){const e=G.en;
 function enemyStep(){
  G.et++;G.fxAt=null;
  for(const s of G.strikes){
-  if(!s.cued&&G.et>=s.cue){s.cued=true;if(s.lob)SFX.toss();else if(s.dark){}else if(s.mv==='tick'){SFX.kiri()}else if(s.heads&&G.en.kind==='hydra'){s.heads.forEach(h=>SFX.headCue(h));if(s.red)SFX.cueRed()}else if(s.note!=null){SFX.cue();if(!eyeFoe())SFX.ping(s.note)}else s.fake?SFX.cueFake():s.red?SFX.cueRed():SFX.cue();if(s.red&&G.en.kind==='dragon'){SFX.rage();shake(P.shake*.6)}if(s.rallyOpen)SFX.rallyCue();if((G.en.kind==='lord'||G.en.key==='gateK')&&!s.fake&&(s.mv==='arm'||s.mv==='bk'||s.mv==='maw'||s.mv==='reach'||s.mv==='vlash'||s.mv==='cape'))SFX.wet()}
+  if(!s.cued&&G.et>=s.cue){s.cued=true;if(s.lob)SFX.toss();else if(s.dark){}else if(s.mv==='tick'){SFX.kiri()}else if(s.heads&&G.en.kind==='hydra'){s.heads.forEach(h=>SFX.headCue(h));if(s.red)SFX.cueRed()}else if(s.note!=null){SFX.cue();if(!eyeFoe())SFX.ping(s.note)}else if(cueHid(s)){}else s.fake?SFX.cueFake():s.red?SFX.cueRed():SFX.cue();if(s.red&&G.en.kind==='dragon'){SFX.rage();shake(P.shake*.6)}if(s.rallyOpen)SFX.rallyCue();if((G.en.kind==='lord'||G.en.key==='gateK')&&!s.fake&&(s.mv==='arm'||s.mv==='bk'||s.mv==='maw'||s.mv==='reach'||s.mv==='vlash'||s.mv==='cape'))SFX.wet()}
   if(s.beat&&!s.done){const k=G.et-s.cue-(s.bo||0),B=s.bf||P.golemBeatF,N=s.bn||4;if(k>=B&&k%B===0&&k<=B*N){if(s.mv==='slam'||s.mv==='hslam'){SFX.thud(k/B-1);shake(P.shake*.25)}else if(s.mv==='tail'||s.mv==='htent')SFX.rattle(k/B-1);else if(s.mv==='breath'){SFX.charge(k/B-1);shake(P.shake*.15)}else if(s.mv==='smash'){SFX.gong(k/B-1);shake(P.shake*.3)}else if(s.mv==='step'&&k===B*(N+1)){}else if(s.mv==='pool'){SFX.step(k/B-1,N);const fx=poolX(s,G.et);for(let q=0;q<6;q++)G.pts.push({x:fx+(Math.random()-.5)*12,y:FLOOR-1,vx:(Math.random()-.5)*.9,vy:-.4-Math.random()*.7,t:0,life:18,col:'#6a3a8a',sz:1,drag:.95,g:.04})}else if(s.mv==='step'){SFX.step(k/B-1,N);const fx=ghostStart(N)-(k/B)*GSTEP;for(let q=0;q<5;q++)G.pts.push({x:fx+(Math.random()-.5)*6,y:FLOOR,vx:(Math.random()-.5)*.8,vy:-.3-Math.random()*.5,t:0,life:18,col:'#4a4058',sz:1,drag:.95,g:0});mark(fx,FLOOR+1,'star',1,'#6a6080')}else SFX.holdTick(k/B-1)}}
   if(s.mv==='pool'&&!s.done&&G.et-s.cue===(s.bf||12)*((s.bn||2)+1)){SFX.whisper();const fx=poolX(s,G.et);for(let q=0;q<10;q++)G.pts.push({x:fx+(Math.random()-.5)*10,y:FLOOR-2,vx:(Math.random()-.5)*.8,vy:-.6-Math.random()*.8,t:0,life:20,col:'#9a62b4',sz:1,drag:.96,g:.05})}
   if(s.mv==='step'&&!s.done&&G.et-s.cue===(s.bf||12)*((s.bn||2)+1)){SFX.whisper();for(let q=0;q<10;q++)G.pts.push({x:GHX+(Math.random()-.5)*14,y:FLOOR-6-Math.random()*20,vx:(Math.random()-.5)*.6,vy:-.4-Math.random()*.6,t:0,life:20,col:'#8a9ac8',sz:1,drag:.96,g:0})}
@@ -85,6 +93,8 @@ function resolve(s){
   if(s.counter){G.txt=G.txt.filter(t=>t.s!=='パリィ！');G.stop=P.parryStopF+18;G.vib='e';G.iai={t:0,y:cy-2};SFX.iai();shake(P.shake*2.2);flash(['#ffffff','#000000','#000000','#7fe3ff','#000000']);text((HX+EX)/2,cy-40,e.kind==='lord'?'見切り返し！':'居合返し！','#fff3b0',true);if(e.kind==='lord'){G.iai=null;G.xs={t:0}}gain(25);for(let i=0;i<30;i++)G.pts.push({x:HX+20+Math.random()*(EX-HX-30),y:cy-2+(Math.random()-.5)*3,vx:(Math.random()-.5)*3.2,vy:-.6-Math.random()*1.6,t:0,life:22+Math.random()*16,col:i%3?'#fff3b0':'#ffffff',sz:1,drag:.95,g:.08})}
   else if(s.red){G.stop+=6;pose('parryH',HV_T);for(let i=0;i<10;i++)G.pts.push({x:HX+2+Math.random()*8,y:FLOOR-1,vx:-.4-Math.random()*1.4,vy:-.2-Math.random()*.6,t:0,life:18+Math.random()*10,col:i%2?'#8a7a66':'#5a4a3e',sz:i%3?1:2,drag:.93,g:.03});SFX.block();setTimeout(()=>{try{SFX.thud&&SFX.thud(1)}catch(_){}},60);flash(['#ffffff','#ff4a5a','#ffffff','#000000']);if(s.crush)text(cx+10,cy-44,'しのいだ！','#d9e2f2',true);else{text(cx+10,cy-44,'見切った！','#fff3b0',true);gain(25)}ring(cx,cy,3,40,20,'#ff7b86')}
   if(!e.noCounter&&!s.proj&&!s.nc)dmgEnemy(heroAtk()*(P.counterMul+RM2.counter)*(s.red?2:1)*(e.broken?P.breakMul:1),'#7fe3ff','counter');
+  /* パリィされの震え：連撃の途中は小、最後の一撃・赤は大 */
+  if(!s.counter){G.vib='p';e.pryAmp=s.red||!G.strikes.some(x=>!x.done&&!x.fake)?P.pryShakeB:P.pryShakeS}
   if(s.counter&&e.hp>0&&!e.broken&&!e.noCounterBrk){e.broken=1;e.brk=0;G.knock=10;text(EXc()+4,FLOOR-40,'構えが崩れた！','#e8c46a',true);msg(`${e.name}の構えが崩れた！ 次の一撃は${fmt(P.breakMul)}倍`)}
   if(RM2.fire&&e.hp>0){dmgEnemy(8,'#ff9a3a','fire');burst(EXc()-8,FLOOR-14,'#ff9a3a',14,1.6,2)}
   if(s.proj&&e.kind==='imp'&&e.hp>0){text(EXc()+8,FLOOR-48,`弾き落とした　足元に岩${G.floorD=(G.floorD||0)+1}個`,'#fff3b0',true);SFX.rock();for(let i=0;i<6;i++)G.pts.push({x:HX+24,y:FLOOR-6,vx:-.4+Math.random()*1.6,vy:-1.2-Math.random(),t:0,life:26,col:'#8a7d74',sz:1,drag:.98,g:.14,bounce:1})}

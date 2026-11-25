@@ -118,7 +118,7 @@ const RIG=(()=>{
   if(i<0)return IDLE(t);
   const s=ss[i],d=G.et-s.impact;if(d>=0)return afterHit(s,d,t);
   const prev=ss[i-1],from=prev?afterHit(prev,s.start-prev.impact,t):IDLE(t),WU=s.mv==='cut2'?W2:W1,SW=s.mv==='cut2'?S2:S1;
-  if(G.et<s.impact-SWING){const span=Math.max(1,Math.min(WIND,s.cue-s.start));return mixP(from,WU,ease.out(cl01((G.et-s.start)/span)))}
+  if(G.et<s.impact-SWING){const span=Math.max(1,Math.min(WIND,s.cue>s.start?s.cue-s.start:s.impact-SWING-s.start-2));/* 間が短い連撃は合図が前の撃の最中に来るので、振る前に止まる2Fを残して構えへ移る */return mixP(from,WU,ease.out(cl01((G.et-s.start)/span)))}
   const u=ease.in(cl01((G.et-(s.impact-SWING))/SWING));if(s.mv==='cut2')return u<.5?mixP(WU,M2,u*2):mixP(M2,SW,(u-.5)*2);
   return mixP(WU,SW,u)}
 

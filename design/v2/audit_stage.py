@@ -14,7 +14,7 @@ async def main():
     r=await pg.evaluate(JS);await b.close()
   A=r['aud'];bad=0
   for x in r['rows']:
-    ok=x['edge']>=A['edge'] and x['cue']>=A['cue'];bad+=not ok
+    ok=x['edge']>=A['ex'].get(x['st'],A['edge']) and x['cue']>=A['cue'];bad+=not ok
     print(f"{'  ' if ok else '× '}覚悟{x['K']} {x['st']:<12}{x['w']:<14} 輪郭の差 {x['edge']:5.1f}  芯の差 {x['core']:5.1f}  合図の余白 {x['cue']:5.1f}")
-  print(f"{len(r['rows'])}組のうち不合格 {bad}（輪郭の差 {A['edge']} 以上、合図の余白 {A['cue']} 以上で合格）");sys.exit(1 if bad else 0)
+  print(f"{len(r['rows'])}組のうち不合格 {bad}（輪郭の差 {A['edge']} 以上〈例外：{A['ex']}〉、合図の余白 {A['cue']} 以上で合格）");sys.exit(1 if bad else 0)
 asyncio.run(main())

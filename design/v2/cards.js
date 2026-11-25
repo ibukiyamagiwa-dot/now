@@ -1,12 +1,13 @@
 /* 覚悟の段（ページ全体で切りかえる）：n ふつう／r 赤い／k 黒い／v 紫の。段を描いてある敵（tintable）だけ変わる */
 let KTINT=null;
-/* いちばん大事な原則：連撃の二撃目以降の合図は出さない（数と間は構えで読む）。覚悟「みならい」（MINARAI）だけは全部出す。
-   ふだんも残す合図：フェイントの紫の輪、別の「見る場所」に出る合図（目・首・輪・尾など、at のあるもの）、残心に手を出したときの一撃（決まった連撃ではない）。
-   同じ場所にもう一度出る合図は、at があっても隠す（CUE_HIDE）。 */
+/* いちばん大事な原則（2026-11-25）：合図は一回の攻撃ごとに、どの覚悟でも出す。連撃も一撃ごとに当たりの28F前に置く。
+   意図して間の速い連撃（前の当たりから28Fより短い撃、「タタン」）は二回当たる一回の攻撃で、続きの撃の合図は覚悟「みならい」（MINARAI）だけ出す（ゲームの【速い連撃の二撃目以降の合図】＝0）。
+   速くても残す合図：フェイントの紫の輪、別の「見る場所」に順に灯る合図（目・首・輪・触手など、at のあるもの）、残心に手を出したときの一撃。
+   同じ場所にもう一度出る合図は、at があっても速い続きなら隠す（CUE_HIDE）。 */
 let MINARAI=false;
-const CUE_KEEP=new Set(['r_zanpunish','r2_zanpunish','f_zanpunish','f2_zanpunish']),CUE_HIDE=new Set(['d_stab','smM_ni','r2_three']);
+const CUE_KEEP=new Set(['r_zanpunish','r2_zanpunish','f_zanpunish','f2_zanpunish']),CUE_HIDE=new Set(['r2_three']);
 function cueHidden(M,c){const id=M.cueOf||M.id,src=M.cueOf?MV.find(m=>m.id===M.cueOf):M,c0=c._src||c;if(!src||CUE_KEEP.has(id)||c0.col==='p')return false;
- const hs=(src.hits||[]).slice().sort((a,b)=>a-b);if(hs.length<2)return false;const i=hs.findIndex(h=>Math.abs(h-(c0.t+28))<=3);if(i<1)return false;
+ const hs=(src.hits||[]).slice().sort((a,b)=>a-b);if(hs.length<2)return false;const i=hs.findIndex(h=>Math.abs(h-(c0.t+28))<=3);if(i<1||hs[i]-hs[i-1]>=28)return false;/* 前の当たりから28F以上あれば、ふつうの一撃 */
  return CUE_HIDE.has(id)||!c0.at}
 /* ===== カードの描画：一枚に「主人公」と「敵」と「床」 ===== */
 const CW=136,CH=118,FL=94,HXX_=26,FL_=94,EXX=92,HXX=26;

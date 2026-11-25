@@ -75,25 +75,41 @@ const DEF=[
  {k:'ivBat',n:'【連撃の間】夜のコウモリ：二連撃',v:42,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivBeast',n:'【連撃の間】牙の盗賊：短剣の投げ',v:40,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivShadeM',n:'【連撃の間】うそつきの影：本物が2回続く',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
+ /* ステージ（design/stages.md）：覚悟ごとの5段。場所の作りは同じで、光の色・強さだけ変える。色は【数値をコピー／読み込む】で変える */
+ {k:'stgGlow0',n:'【通路の光の色】覚悟0 みならい（上の階）',v:'#6e523e',t:'col',g:'stg'},
+ {k:'stgGlow1',n:'【通路の光の色】覚悟1 ふつう（迷宮の階）',v:'#6c4650',t:'col',g:'stg'},
+ {k:'stgGlow2',n:'【通路の光の色】覚悟2 つよき（赤い階）',v:'#7a3e2e',t:'col',g:'stg'},
+ {k:'stgGlow3',n:'【通路の光の色】覚悟3 しにものぐるい（黒い階）',v:'#5a5862',t:'col',g:'stg'},
+ {k:'stgGlow4',n:'【通路の光の色】覚悟4 ならく（紫の階）',v:'#5a4678',t:'col',g:'stg'},
+ {k:'stgGk0',n:'【通路の光の強さ】覚悟0 みならい',v:0.85,min:0,max:1.2,step:.05,u:'',g:'adv'},
+ {k:'stgGk1',n:'【通路の光の強さ】覚悟1 ふつう',v:0.85,min:0,max:1.2,step:.05,u:'',g:'adv'},
+ {k:'stgGk2',n:'【通路の光の強さ】覚悟2 つよき',v:0.9,min:0,max:1.2,step:.05,u:'',g:'adv'},
+ {k:'stgGk3',n:'【通路の光の強さ】覚悟3 しにものぐるい',v:0.85,min:0,max:1.2,step:.05,u:'',g:'adv'},
+ {k:'stgGk4',n:'【通路の光の強さ】覚悟4 ならく',v:0.95,min:0,max:1.2,step:.05,u:'',g:'adv'},
+ {k:'stgLmax',n:'【背景の明るさの上限】（画面の真ん中 x 70〜215・y 12〜105 の L*。合図の赤 L* 57 より14暗く）',v:43,min:20,max:70,step:1,u:'',g:'adv'},
+ {k:'stgFire01a',n:'【たいまつの火】覚悟0・1（暗い色）',v:'#a85a2a',t:'col',g:'stg'},
+ {k:'stgFire01b',n:'【たいまつの火】覚悟0・1（明るい色）',v:'#c8703a',t:'col',g:'stg'},
+ {k:'stgFire2a',n:'【たいまつの火】覚悟2（暗い色）',v:'#8a3020',t:'col',g:'stg'},
+ {k:'stgFire2b',n:'【たいまつの火】覚悟2（明るい色）',v:'#b8482a',t:'col',g:'stg'},
 ];
 const P={};DEF.forEach(d=>P[d.k]=d.v);
 const justF=()=>Math.round((P.parryF+(typeof RM2==='object'&&RM2?RM2.parryW:0))*P.justMul);
 const magDmg=lv=>P.magBase*lv*(1+P.magBonus*(lv-1))*(1+(typeof RM2==='object'&&RM2?RM2.magic:0));
 const toJ=()=>{const o={};DEF.forEach(d=>o[d.n]=P[d.k]);return o};
 const fmt=v=>Number.isInteger(v)?String(v):(+v.toFixed(2)).toString();
-function applyJ(o){let n=0;for(const d of DEF){if(typeof o[d.n]==='number'){P[d.k]=Math.min(d.max,Math.max(d.min,o[d.n]));n++}}return n}
+function applyJ(o){let n=0;for(const d of DEF){if(d.t==='col'){if(typeof o[d.n]==='string'&&/^#[0-9a-f]{6}$/i.test(o[d.n])){P[d.k]=o[d.n].toLowerCase();n++}continue}if(typeof o[d.n]==='number'){P[d.k]=Math.min(d.max,Math.max(d.min,o[d.n]));n++}}return n}
 try{const s=JSON.parse(localStorage.getItem('parryRPG.P')||'null');if(s){for(const d of DEF)if(d.old&&d.old.includes(s[d.n]))delete s[d.n];applyJ(s)}}catch(e){}
 function save(){try{const o={};DEF.forEach(d=>{if(P[d.k]!==d.v)o[d.n]=P[d.k]});localStorage.setItem('parryRPG.P',JSON.stringify(o))}catch(e){}}
 
 function buildPanel(){
  for(const g of ['main','gauge','ko','adv']){
-  $(g).innerHTML=DEF.filter(d=>d.g===g).map(d=>`<div class="row"><label for="p_${d.k}">${d.n}</label><output id="o_${d.k}"></output><input type="range" id="p_${d.k}" min="${d.min}" max="${d.max}" step="${d.step}"></div>`).join('');
+  $(g).innerHTML=DEF.filter(d=>d.g===g&&d.t!=='col').map(d=>`<div class="row"><label for="p_${d.k}">${d.n}</label><output id="o_${d.k}"></output><input type="range" id="p_${d.k}" min="${d.min}" max="${d.max}" step="${d.step}"></div>`).join('');
  }
- DEF.forEach(d=>{const i=$('p_'+d.k);i.value=P[d.k];i.addEventListener('input',()=>{P[d.k]=+i.value;syncOut();save()})});
+ DEF.forEach(d=>{if(d.t==='col')return;const i=$('p_'+d.k);i.value=P[d.k];i.addEventListener('input',()=>{P[d.k]=+i.value;syncOut();save()})});
  syncOut();
 }
 function syncOut(){
- DEF.forEach(d=>{$('o_'+d.k).textContent=fmt(P[d.k])+d.u;$('p_'+d.k).value=P[d.k]});
+ DEF.forEach(d=>{if(d.t==='col')return;$('o_'+d.k).textContent=fmt(P[d.k])+d.u;$('p_'+d.k).value=P[d.k]});
  $('der').textContent=`→ ジャスト回避の受付：${justF()}F（パリィ×倍率）`;
  $('der2').textContent=`→ まほうの威力：ほのお ${Math.round(magDmg(1))}／かみなり ${Math.round(magDmg(2))}／ひかり ${Math.round(magDmg(3))}　追撃は敵と同じく、剣が光ってから${P.cueF}F後に着弾　着弾の${P.chaseF}F前から押すと追撃、${P.critF}F前から（剣が触れる瞬間）なら重い一撃`;
  $('json').value=JSON.stringify(toJ(),null,1);

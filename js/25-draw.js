@@ -1,7 +1,7 @@
 for(const k in LANC){const base=LANC[k.slice(0,3)+'idle']||LANC.lA_idle;for(const n in base)if(!(n in LANC[k]))LANC[k][n]=base[n]}
 const ANC={"beast":[[6,-23],[8,-23],[10,-23]],"imp":[-11,-21],"golemS":[-9,-22],"golemR":[[-4,-20],[1,-20],[6,-20]],"armorSh":[-22,-28],"dollL":[[-5,-16],[-2,-16],[1,-16],[4,-16]],"dollK":[14,-16],"ghostS":[11,-36],"ghostH":[-8,-18],"samuraiH":[-10,-18],"samuraiBH":[-14,-24],"shadeT":[-17,-31],"bombF":[0,-21],"hydraN":[[-4,-34],[6,-42],[16,-40]],"hydraHead":[[15,12],[15,12]],"boarT":[-18,-12],"batT":[0,-6],"shroomT":[-11,-18],"slimeT":[-6,-8],"beastT":[-13,-12],"armorT":[-22,-18],"dollT":[-13,-4],"impT":[-11,-21],"knT":[[-7,-34],[-5,-34],[-3,-34],[-1,-34]],"knH":[[-10,-22],[3,-22]],"kgT":[[-8,-34],[-6,-34],[-4,-34],[-2,-34],[-7,-34],[-3,-34]],"kgH":[[-11,-22],[2,-22]],"kgC":[[7,-7],[11,-7],[15,-8]],"kgV":[-5,-44]};
 const NCH='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&*+-/:;<=>?@^_~',NCACHE={};
-function nCol(c,v,t){if(v==='w')return'#fff4ee';if(t==='r')c=mixHex(c,'#d83a2a',.32);else if(t==='k')c=mixHex(c,'#2a1838',.5);else if(t==='v')c=mixHex(c,'#4a1a7a',.45);if(v==='b')c=mixHex(c,'#6a6070',.62);return c}
+function nCol(c,v,t){if(v==='w')return'#fff4ee';/* 輪郭と瞳（ごく暗い色）は段の色に寄せない：背景の逆光の前で、黒い輪郭として立たせる（design/stages.md 背景の約束2） */if(t&&Math.max(...[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)))<0x24){}else if(t==='r')c=mixHex(c,'#d83a2a',.32);else if(t==='k')c=mixHex(c,'#2a1838',.5);else if(t==='v')c=mixHex(c,'#4a1a7a',.45);if(v==='b')c=mixHex(c,'#6a6070',.62);return c}
 function nspr(name,v,t){const k=name+'|'+v+'|'+(t||'');if(NCACHE[k])return NCACHE[k];const d=NSPR[name];if(d.z){d.r=d.r.map(r=>r.indexOf('`')<0?r:r.replace(/`(.)/g,(m,c)=>'.'.repeat(NCH.indexOf(c)+4)));d.z=0}const h=d.r.length,w=d.r[0].length,o=document.createElement('canvas');o.width=w;o.height=h;const x=o.getContext('2d');const cols=d.p.map(c=>nCol(c,v,t));
  d.r.forEach((r,y)=>{for(let i=0;i<w;i++){const ch=r[i];if(ch==='.')continue;x.fillStyle=cols[NCH.indexOf(ch)];x.fillRect(i,y,1,1)}});return NCACHE[k]=o}
 function an_(k,x,y,i){return an(k,x,y,i)}
@@ -39,26 +39,109 @@ function drawCue(x,y,d,col){const k=Math.min(17,Math.floor(d*18/Math.max(1,P.cue
  cueStar(x,y,k,col);if(col==='g'&&k<12)pxArc(x,y,3+k,0,Math.PI*2,CUEC.g[0])}
 function shadowPx(x,w){l.fillStyle='rgba(0,0,0,.45)';l.fillRect(Math.round(x-w),FLOOR,w*2+1,2);l.fillRect(Math.round(x-w+2),FLOOR+2,w*2-3,1)}
 
-/* 背景（静的部分は一度だけ描く） */
-const BG=document.createElement('canvas');BG.width=LW;BG.height=LH;
-{const b=BG.getContext('2d');
- const band=['#1c0d16','#221019','#28141f','#2e1826'];
- for(let y=0;y<FLOOR;y++){b.fillStyle=band[Math.min(3,y/FLOOR*4|0)];b.fillRect(0,y,LW,1)}
- for(let y=4,i=0;y<FLOOR;y+=8,i++){b.fillStyle=OUT;b.fillRect(0,y,LW,1);b.fillStyle='rgba(255,220,230,.07)';b.fillRect(0,y+1,LW,1);
-  for(let x=(i%2)*8;x<LW;x+=16){b.fillStyle=OUT;b.fillRect(x,y,1,8)}}
- const fl=['#24121b','#1f0f17','#1a0c13','#150a10','#10070c'];
- for(let y=FLOOR;y<LH;y++){b.fillStyle=fl[Math.min(4,(y-FLOOR)/6|0)];b.fillRect(0,y,LW,1)}
- b.fillStyle='rgba(255,220,230,.08)';for(let y=FLOOR+3,k=4;y<LH;y+=k,k+=2)b.fillRect(0,y,LW,1);
- b.fillStyle='rgba(255,220,230,.06)';for(let i=-6;i<=6;i++){for(let y=FLOOR;y<LH;y++){b.fillRect(Math.round(LW/2+i*(10+(y-FLOOR)*1.1)),y,1,1)}}
-}
-function drawBG(){
- l.drawImage(BG,0,0);
- for(const tx of [22,218]){
-  const f=(G.anim>>3)%3,r=l.createRadialGradient(tx,38,1,tx,38,46+f*2);r.addColorStop(0,'rgba(255,170,80,.38)');r.addColorStop(1,'rgba(255,120,40,0)');l.fillStyle=r;l.fillRect(tx-50,0,100,100);
-  l.fillStyle=OUT;l.fillRect(tx-2,41,5,9);l.fillStyle='#5a3a2a';l.fillRect(tx-1,42,3,7);
-  const fh=[5,6,4][f];l.fillStyle='#ff8a3a';l.fillRect(tx-1,41-fh,3,fh);l.fillStyle='#ffd27a';l.fillRect(tx,41-fh+1,1,fh-1);px(tx+(f-1),40-fh,'#ff8a3a');
- }
-}
+/* ===== 背景：覚悟ごとの5段（決まりは design/stages.md、絵の見本は design/v2/stage2.js）=====
+   覚悟で変えるのは光の色・強さと「のまれ方」だけで、場所の作り（石 8段・16幅、床の線、手前のたいまつ x=22、
+   奥への通路のアーチ x 126〜236・上 y 20、消失点 x 120・y≈97）はどの段も同じ。
+   動かない部分は段ごと・数値ごとに一度だけ描いて取っておき、毎フレームは炎の形と目のまばたきだけ描く。
+   背景は光る・輪になる・急に明るくなる動きをしない（予兆とまちがえるから）。数値は DEF の stg…（【通路の光の色】など） */
+const STAGE=(()=>{
+ const W=LW,H=LH,F=FLOOR,HXS=HX;
+ const rgb=h=>{const n=parseInt(h.slice(1),16);return[n>>16,n>>8&255,n&255]};
+ const hex=c=>'#'+c.map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+ const mix=(a,b,t)=>[0,1,2].map(i=>Math.round(a[i]+(b[i]-a[i])*t));
+ const BAY=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+ const dith=(a,b,t,x,y)=>t*16>BAY[y&3][x&3]?b:a;
+ const hsh=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
+ const lrp=(a,b,t)=>a+(b-a)*t;
+ function vn(x,y,sc,seed){const X=x/sc,Y=y/sc,x0=Math.floor(X),y0=Math.floor(Y),fx=X-x0,fy=Y-y0,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),h=(a,b)=>hsh(a+seed*17,b-seed*13);return lrp(lrp(h(x0,y0),h(x0+1,y0),u),lrp(h(x0,y0+1),h(x0+1,y0+1),u),v)}
+ function lstar(c){const f=v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)},Y=.2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2]);return Y>.008856?116*Math.cbrt(Y)-16:903.3*Y}
+ /* 段ごとの石と床の色。wall＝[目地, 面, 上の明るい縁]、far＝天井ぎわ、floor＝[手前, 奥, 線]。光（通路の光の色・強さ、たいまつの火）は DEF から */
+ const LT=[
+  {wall:['#171012','#2c2224','#3a2e2c'],far:'#120c0e',floor:['#120c0c','#22191a','#3c2e2a'],fire:'01',pool:'#ff9a48',pk:.2,win:1},
+  {wall:['#120910','#26141e','#321c28'],far:'#0e070c',floor:['#10070c','#1e0f17','#3a2230'],fire:'01',pool:'#ff9040',pk:.2},
+  {wall:['#140708','#2a1214','#38191a'],far:'#100506',floor:['#110606','#1f0c0c','#46201c'],fire:'2',pool:'#ff5030',pk:.22,rust:1},
+  {wall:['#0e0e12','#222226','#2c2c30'],far:'#0a0a0c',floor:['#0a0a0c','#18181b','#3a3a40'],soot:1,ink:1,shut:1},
+  {wall:['#0c0812','#1e1828','#2a2236'],far:'#08050c',floor:['#08050c','#140e1c','#2e2240'],gone:1,ink:2,eyes:1,crack:1}];
+ const lightOf=K=>{const L=LT[K],o={wall:L.wall.map(rgb),far:rgb(L.far),floor:L.floor.map(rgb),glow:rgb(P['stgGlow'+K]),gk:P['stgGk'+K]};
+  if(L.fire)o.fire=[rgb(P['stgFire'+L.fire+'a']),rgb(P['stgFire'+L.fire+'b'])];return o};
+ const edgeW=x=>{const d=Math.min(Math.abs(x-20),Math.abs(x-226));return Math.max(0,Math.min(1,1.15-d/52))};/* 描きこみは端ほど、真ん中は静かに */
+ const ARCH={x0:126,x1:236,top:20,spring:46},ACX=(ARCH.x0+ARCH.x1)/2;
+ function archIn(x,y){const{x0,x1,top,spring}=ARCH,hw=(x1-x0)/2;if(x<x0||x>x1||y>=F)return-1;const dx=(x-ACX)/hw;if(y<spring){const yt=spring-(spring-top)*Math.sqrt(Math.max(0,1-dx*dx));if(y<yt)return-1;return Math.min(1-Math.abs(dx),(y-yt)/12)}return 1-Math.abs(dx)}
+ const glowAt=(L,x,y)=>{const u=1-Math.min(1,Math.abs(x-ACX)/((ARCH.x1-ARCH.x0)/2)),v=Math.max(0,1-(F-y)/(F-ARCH.top));return Math.max(0,Math.min(1,(u*.75+.25)*(v*.8+.2)))*L.gk};
+ const VP={x:W/2,y:F-10/1.1},THK=.86,FAR=.5;/* 消失点は床の線が集まる所 */
+ function build(K){
+  const L=lightOf(K),D=LT[K],C=new Array(W*H);
+  const set=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x>=0&&x<W&&y>=0&&y<H)C[y*W+x]=c},get=(x,y)=>C[Math.round(y)*W+Math.round(x)];
+  /* 石の壁：8段・16幅 */
+  {const[jt,fc,hi]=L.wall;for(let y=0;y<F;y++)for(let x=0;x<W;x++){
+   const row=Math.floor((y-4)/8),ry=((y-4)%8+8)%8,off=(row&1)?8:0,bx=((x+off)%16+16)%16,id=row*31+Math.floor((x+off)/16),jn=ry===0||bx===0,ew=edgeW(x);
+   let c=jn?jt:ry===1?mix(fc,hi,.4+ew*.6):fc;if(!jn&&hsh(id,7)<.25)c=mix(c,jt,.18+.12*ew);if(!jn&&ew<.3)c=mix(c,fc,.5);
+   const top=Math.max(0,1-y/34),low=Math.max(0,(y-(F-10))/10);set(x,y,dith(c,L.far,Math.min(.85,top*.9+low*.45),x,y))}}
+  /* 奥への通路：①壁の厚み（右の側面とアーチの裏）②向こうの部屋（石が半分＝遠い）。平らな段で塗り、ディザでぼかさない */
+  {const inA=(x,y,k)=>archIn(VP.x+(x-VP.x)/k,VP.y+(y-VP.y)/k)>=0,yF=Math.round(VP.y+(F-VP.y)*FAR),fw=[.5,.66,.8].map(v=>Math.min(1,v*L.gk*1.15));
+   for(let y=0;y<F;y++)for(let x=ARCH.x0;x<=ARCH.x1;x++){const a=archIn(x,y);
+    if(a<0){if((archIn(x,y+2)>=0||archIn(x+2,y)>=0||archIn(x-2,y)>=0)&&(x+y)%2===0)set(x,y,mix(L.wall[1],L.wall[2],.6));continue}
+    if(!inA(x,y,THK)){const sx=(x-VP.x)/(ARCH.x1-VP.x),side=sx<1&&sx>THK-.01&&VP.y+(y-VP.y)/sx>ARCH.spring;let c;
+     if(side){const dk=(1-sx)/(1-THK);c=mix(L.wall[1],L.glow,(.18+.32*dk)*L.gk);const y0=VP.y+(y-VP.y)/sx;if(((y0-4)%8+8)%8<1.2/sx)c=mix(c,L.wall[0],.4);if(Math.abs(sx-THK)<.012)c=mix(c,L.glow,.25)}
+     else c=inA(x,y+1,THK)?mix(L.wall[1],L.glow,.3*L.gk):mix(L.wall[0],L.wall[1],.45);
+     set(x,y,c);continue}
+    let c;
+    if(y>=yF){const k=(y-yF)/(F-yF);c=mix(mix(L.floor[1],L.glow,.55*L.gk),L.floor[1],k*.5);const fx=(x-VP.x)/((y-VP.y)/(F-VP.y));if(((fx%16)+16)%16<1.2||y===yF)c=mix(c,L.wall[0],y===yF?.45:.22)}
+    else{const row=Math.floor((yF-1-y)/4),ry=((yF-1-y)%4+4)%4,off=(row&1)?4:0,bx=((x+off)%8+8)%8,band=row<3?2:row<7?1:0;c=mix(L.wall[1],L.glow,fw[band]);if(ry===3||bx===0)c=mix(c,L.wall[0],.16+.06*(2-band))}
+    set(x,y,c)}
+   /* 右のたいまつは向こうの部屋の壁に小さく、にごった火で（光のたまりは描かない） */
+   if(L.fire){const tx=224,ty=yF-26;for(let i=0;i<4;i++)set(tx,ty+i,mix(L.wall[0],L.glow,.3));set(tx,ty-1,mix(L.fire[0],L.glow,.4));set(tx,ty-2,mix(L.fire[1],L.glow,.4))}}
+  /* 床：石だたみの線は真ん中から広がる。通路の光が床ぎわに落ちる */
+  {const[d,m,ln]=L.floor;for(let y=F;y<H;y++)for(let x=0;x<W;x++){let c=dith(m,d,(y-F)/(H-F),x,y);const g=glowAt(L,x,F)*Math.max(0,1-(y-F)/14);if(g>0)c=dith(c,mix(c,L.glow,.5),Math.min(1,g*1.4),x,y);set(x,y,c)}
+   for(let y=F+3,k=4;y<H;y+=k,k+=2)for(let x=0;x<W;x++)set(x,y,mix(get(x,y),ln,.35));
+   for(let i=-6;i<=6;i++)for(let y=F+1;y<H;y++){const x=Math.round(W/2+i*(10+(y-F)*1.1));if(x>=0&&x<W)set(x,y,mix(get(x,y),ln,.3))}
+   for(let x=0;x<W;x++)set(x,F,mix(ln,L.glow,Math.min(1,glowAt(L,x,F)*1.2)))}
+  /* ---- 段の印（端と上だけ） ---- */
+  if(D.win){/* 上の階：高い格子窓と外の光のすじ（左下へ落ち、主人公にかからない）。苔と根 */const wx=34,wy=8,sky=rgb('#c8d4dc');
+   for(let y=wy;y<wy+11;y++)for(let x=wx;x<wx+13;x++)set(x,y,rgb((x-wx)%4===0||y===wy||x===wx+12?'#2a2428':'#5e6670'));
+   for(let y=wy+11;y<H;y++){const x0=wx-(y-wy-11)*.42;for(let x=Math.floor(x0);x<x0+13;x++){if(x<0||x>=W)continue;const e=Math.min(x-x0,x0+13-x)/3,k=Math.min(1,e)*(.42-(y-wy)/(H-wy)*.22);set(x,y,dith(get(x,y),mix(get(x,y),sky,.16),k,x,y))}}
+   for(let x=0;x<W;x++){const w=edgeW(x);if(w<.2)continue;for(let y=F-8;y<F;y++)if(hsh(x,y)<w*.25*(y-(F-8))/8)set(x,y,rgb(hsh(y,x)<.5?'#2a3420':'#3a4628'));
+    if(hsh(x,1)<w*.18){const len=4+Math.floor(hsh(x,2)*14);for(let y=0;y<len;y++)set(x+Math.round(Math.sin(y*.5+x)*.6),y,rgb(y===len-1?'#4a3a2a':'#2e221a'))}}}
+  if(D.rust){/* 赤い階：通路の縁から外へ枝分かれする赤い筋（敵の筋と同じ）。真ん中の高さには入れない。床の赤黒いしみ */const v1=rgb('#4e1214'),v2=rgb('#2a0a0c'),v3=rgb('#6e2420'),st=rgb('#2a0a0a');
+   const vein=(x,y,an,len,dep,sd)=>{for(let i=0;i<len;i++){an+=(hsh(i,sd)-.5)*.5;x+=Math.cos(an);y+=Math.sin(an);if(x<0||x>=W||y<1||y>=F-1)return;const w=edgeW(x)+(y<30?.5:0);if(w<.3)return;
+    set(x,y,v1);if(dep===0&&w>.4)set(x,y+1,v2);if(dep===0&&i%6===2)set(x,y,v3);if(dep<2&&i>3&&hsh(i,sd+5)<.09)vein(x,y,an+(hsh(i,sd+6)<.5?-.7:.7),len*.45,dep+1,sd*3+i)}};
+   [[ARCH.x0+2,40,3.5,52],[ARCH.x0+10,26,3.9,46],[ARCH.x0+28,21,4.3,30],[ARCH.x1-4,34,-.5,24],[ARCH.x1-12,24,-1.1,22],[ARCH.x0+48,20,4.6,20],[4,96,-.6,30],[236,92,3.6,18]].forEach(([x,y,an,len],i)=>vein(x,y,an,len,0,i*7+1));
+   for(let i=0;i<14;i++){const x=Math.floor(hsh(i,3)*W),y=F+2+Math.floor(hsh(i,4)*26);if(edgeW(x)<.25&&i%3)continue;for(let j=0;j<3+i%4;j++)set(x+j,y+(j&1),st)}}
+  if(D.ink){/* 黒いしみ：天井と目地から垂れる（止まっている）。ならくでは壁のほとんどがくらやみ */const i1=rgb('#06050a'),i2=rgb('#16121c'),N=D.ink===2?46:20;
+   for(let i=0;i<N;i++){const x=Math.floor(hsh(i,11)*W),w=edgeW(x);if(D.ink===1&&hsh(i,12)>w+.3)continue;const len=Math.floor((8+hsh(i,13)*40)*(D.ink===2?1.6:1)*(.4+w*.8)),ph=(i*7)%6;
+    for(let y=0;y<Math.min(F,len+ph);y++){const ww=y<4?2:hsh(i,y)<.5?1:0;for(let d=-ww;d<=ww;d++)set(x+d,y,y>len-2?i2:i1)}}
+   if(D.ink===2){const k1=rgb('#1c1428'),k2=rgb('#0b0812');for(let y=0;y<F;y++)for(let x=0;x<W;x++){const keep=Math.hypot(x-22,y-50)<16+vn(x,y,6,9)*16||Math.hypot(x-218,y-50)<12+vn(x,y,6,8)*14||archIn(x,y)>=0;if(keep)continue;
+    const cov=.55+edgeW(x)*.25+(1-y/F)*.35-vn(x,y,16,3)*.55-vn(x,y,5,4)*.18;if(cov>0)set(x,y,cov<.05&&vn(x,y-1,16,3)*.55<vn(x,y,16,3)*.55+.02?k1:k2)}}
+   /* 床のくらやみ：通路から手前へ流れる */const f1=rgb('#1e1628'),f2=rgb('#07050b');for(let x=ARCH.x0-30;x<W;x++){const h=Math.max(0,Math.round((D.ink===2?5:3)*(1-Math.abs(x-ACX)/80)+Math.sin(x*.37)));for(let y=F+1;y<F+1+h;y++)set(x,y,y===F+1?f1:f2)}}
+  if(D.shut){/* 黒い階：閉じた目がひとつずつ（敵の額と同じ）。端のしみの中だけ */const e1=rgb('#2e2c34'),e2=rgb('#06050a');for(const[x,y]of [[14,30],[226,62],[36,70]]){for(let i=-3;i<=3;i++)set(x+i,y+(Math.abs(i)===3?0:1),e1);for(let i=-2;i<=2;i++)set(x+i,y,e2)}}
+  if(D.crack){/* ならく：床のひびの下から、紫がうすく上がる */const c1=rgb('#3e2656'),c2=rgb('#2a1a3c'),c3=rgb('#4a2c66'),cs=[[40,108],[96,110],[150,112],[200,109]];
+   for(const[x0,y0]of cs){let x=x0,y=y0;for(let i=0;i<26;i++){x+=hsh(i,x0)<.5?1:-1;if(i%2)x+=1;y+=hsh(i,y0)<.35?1:0;if(y>=H)break;set(x,y,c1);if(i%5===2)set(x,y-1,c2)}}
+   for(let x=0;x<W;x++)for(let y=F-16;y<F;y++){const near=Math.min(...cs.map(c=>Math.abs(c[0]+6-x)));if(near<14&&hsh(x,y)<(1-near/14)*(y-(F-16))/16*.35)set(x,y,mix(get(x,y),c3,.25))}}
+  /* 手前のたいまつ（x 22・y 41）。火の色は合図の一番暗い色より暗く、光のたまりは大きさも明るさも変えない */
+  {const x=22,y=41;
+   if(D.gone){for(let i=0;i<9;i++)set(x,y+i,rgb(i%3?'#0e0a16':'#1a1226'))}
+   else{for(let i=0;i<8;i++){set(x,y+i,rgb('#120910'));set(x+1,y+i,rgb(i<2?'#5a3a2a':'#3a2620'))}set(x-1,y+1,rgb('#3a2620'));set(x+2,y+1,rgb('#3a2620'));
+    if(D.soot){const s=rgb('#050506');for(let j=1;j<16;j++)for(let i=-2;i<=2;i++)if(hsh(x+i,y-j)<.55-j*.03-Math.abs(i)*.1)set(x+i,y-j,mix(get(x+i,y-j),s,.55))}
+    else{const R=40,pool=rgb(D.pool);for(let yy=Math.max(0,y-R);yy<Math.min(F,y+R);yy++)for(let xx=Math.max(0,x-R);xx<=x+R;xx++){const r=Math.hypot(xx-x,(yy-y+2)/.9);if(r>=R)continue;const k=Math.pow(1-r/R,1.6)*D.pk*4,c=get(xx,yy);set(xx,yy,dith(c,mix(c,pool,.2),Math.min(1,k),xx,yy))}}}}
+  /* 【背景の明るさの上限】：合図が出る所（x 70〜215、y 12〜105）は、上限より明るい画素を暗く落とす */
+  let zmax=0;{const cap=P.stgLmax;for(let y=12;y<F;y++)for(let x=70;x<216;x++){const i=y*W+x;let c=C[i],Ls=lstar(c);if(Ls>cap){let k=1;while(Ls>cap&&k>0){k-=.02;c=C[i].map(v=>v*k);Ls=lstar(c)}C[i]=c.map(Math.round);Ls=lstar(C[i])}zmax=Math.max(zmax,Ls)}}
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d'),im=g.createImageData(W,H);
+  for(let i=0;i<W*H;i++){const c=C[i]||[0,0,0];im.data[i*4]=c[0];im.data[i*4+1]=c[1];im.data[i*4+2]=c[2];im.data[i*4+3]=255}
+  g.putImageData(im,0,0);return{cv,C,zmax,fire:L.fire&&L.fire.map(hex)}}
+ /* 動く部分：炎は形だけゆらぐ（明るさは変えない）。ならくの目は、ばらばらにまばたき、光らず、主人公を見ない */
+ const EYES=[[16,30],[24,78],[234,40],[206,9],[70,12],[134,8]];
+ function live(K,S,t){const D=LT[K];
+  if(S.fire){const x=22,y=41,f=(t>>3)%3,fh=[5,6,4][f];for(let i=0;i<fh;i++){px(x,y-1-i,i>fh-3?S.fire[0]:S.fire[1]);px(x+1,y-1-i,S.fire[0])}px(x+(f-1),y-1-fh,S.fire[0])}
+  if(D.eyes)EYES.forEach(([x,y],g)=>[[-7,2],[7,2],[0,-4]].forEach(([dx,dy],j)=>{const ex=x+dx,ey=y+dy,shut=(t+g*71+j*37)%260<10,row=(y0,a,b,col)=>{l.fillStyle=col;l.fillRect(ex+a,ey+y0,b-a+1,1)};
+   if(shut){row(0,-4,4,'#2a2034');return}
+   row(0,-4,4,'#2a2034');row(0,-3,3,'#4a3e56');row(-1,-3,3,'#2a2034');row(-1,-2,2,'#3e3448');row(1,-3,3,'#221a2c');row(-2,-2,2,'#2a2034');row(2,-2,2,'#16101e');
+   const pd=ex<HXS?-2:2;px(ex+pd,ey,'#07040b');px(ex+pd,ey-1,'#07040b');px(ex+pd-1,ey,'#1a1224');px(ex+pd+1,ey-1,'#1a1224')}))}
+ const cache={};
+ function get(K){const key=[P['stgGlow'+K],P['stgGk'+K],P.stgLmax,P.stgFire01a,P.stgFire01b,P.stgFire2a,P.stgFire2b].join('|');if(!cache[K]||cache[K].key!==key){cache[K]=build(K);cache[K].key=key}return cache[K]}
+ /* どの段か：本番は覚悟、チュートリアルは上の階、ほか（練習・道場・タイトル）は基準の迷宮の階 */
+ const nowK=()=>typeof G==='object'&&G?(G.mode==='run'&&G.K!=null?Math.max(0,Math.min(4,G.K)):G.mode==='tut'?0:1):1;
+ return{draw(K){if(K==null)K=nowK();const S=get(K);l.drawImage(S.cv,0,0);live(K,S,typeof G==='object'&&G?G.anim:0)},get,nowK,lstar,rgb}})();
+function drawBG(){STAGE.draw()}
 
 /* 赤い光（重い一撃）を弾いたときの専用の動き：受けた重さで押し下げられ、足を滑らせて踏ん張り、剣をはね上げて返す
    0〜9F：押される（剣は下がり、盾は前）　10〜15F：はね上げ　16〜27F：元の位置へ　※止め（ヒットストップ）中は0Fのまま止まる */

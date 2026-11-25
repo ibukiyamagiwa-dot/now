@@ -67,7 +67,7 @@ const DEF=[
  {k:'ivRed2',n:'【連撃の間】赤い騎士：二連撃',v:42,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivRed4',n:'【連撃の間】赤い騎士：四連撃（二・三撃目）',v:42,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivRed4z',n:'【連撃の間】赤い騎士：四連撃（最後の突き）',v:50,min:6,max:60,step:1,u:'F',g:'adv'},
- {k:'ivRedT',n:'【連撃の間】赤い騎士：三段突き',v:32,min:6,max:60,step:1,u:'F',g:'adv'},
+ {k:'ivRedT',n:'【連撃の間】赤い騎士：三段突き',v:36,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivDrS',n:'【連撃の間】くらやみの竜：三段突き（二撃目）',v:38,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivDrSz',n:'【連撃の間】くらやみの竜：三段突き（三撃目）',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivDrB',n:'【連撃の間】くらやみの竜：赤い息から突き',v:42,min:6,max:60,step:1,u:'F',g:'adv'},
@@ -75,6 +75,8 @@ const DEF=[
  {k:'ivBat',n:'【連撃の間】夜のコウモリ：二連撃',v:42,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivBeast',n:'【連撃の間】牙の盗賊：短剣の投げ',v:40,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivShadeM',n:'【連撃の間】うそつきの影：本物が2回続く',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
+ {k:'ivImp',n:'【連撃の間】石なげ小鬼：拍（4拍目で石が落ちる）',v:16,min:8,max:30,step:1,u:'F',g:'adv'},
+ {k:'ivImpM',n:'【連撃の間】小鬼のおかしら：拍（4拍目で石が落ちる）',v:13,min:8,max:30,step:1,u:'F',g:'adv'},
  /* ステージ（design/stages.md）：覚悟ごとの5段。場所の作りは同じで、光の色・強さだけ変える。色は【数値をコピー／読み込む】で変える */
  {k:'stgGlow0',n:'【通路の光の色】覚悟0 みならい（上の階）',v:'#6e523e',t:'col',g:'stg'},
  {k:'stgGlow1',n:'【通路の光の色】覚悟1 ふつう（迷宮の階）',v:'#6c4650',t:'col',g:'stg'},

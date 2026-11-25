@@ -221,14 +221,15 @@ SPEC.imp=Object.assign({},IMBASE,{name:'石なげ小鬼',k:.7,draw:(B,ox,oy,S,P,
 SPEC.impM=Object.assign({},IMBASE,{name:'小鬼のおかしら',k:.875,big:true,draw:(B,ox,oy,S,P,T)=>impFig(B,ox,oy,S,Object.assign({},P,{_who:'impM'}),T),knightLike:true,tintable:true,pose:IMPOSE});
 for(const k of['imp','impM'])SPEC[k+'@w']=flashSpec(k);
 
-/* 石の飛び方：投げた手から、主人公の頭へ、高い山なり。13Fごとに「ヒュ」（音の輪）、足元の影が一段ずつ濃く大きくなり、4拍目（52F）で落ちる */
-const LOB=52,BEAT=13,HEADP=[HXX+4,FL-15];
+/* 石の飛び方：投げた手から、主人公の頭へ、高い山なり。1拍ごとに「ヒュ」（音の輪）、足元の影が一段ずつ濃く大きくなり、4拍目で落ちる。
+   拍はおかしら13F（4拍目＝52F）、石なげ小鬼（モブ）16F（4拍目＝64F。2026-11-25：序盤のモブに13Fは速い） */
+const LOB=52,BEAT=13,BEAT_MOB=16,HEADP=[HXX+4,FL-15];
 function soundArc(B,c,d){if(d<0||d>=8)return;const r=2+d*.9;for(let a=-.8;a<=.8;a+=.2){B.set(c[0]-Math.cos(a)*r,c[1]+Math.sin(a)*r,d<4?'#a8a0b0':'#6a6278',4);B.set(c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r,d<4?'#a8a0b0':'#6a6278',4)}}
-function lobFx(B,t,t0,from,P,big){const d=t-t0;if(d<0)return;const r=big?BIGR:impRockR(.7);
- if(d<=LOB){const u=d/LOB,x=lerp(from[0],HEADP[0],u),y=lerp(from[1],HEADP[1],u)-58*4*u*(1-u);(big?sealRock:rock)(B,x,y,r);
-  const st=Math.min(3,Math.floor(d/BEAT)),w=3+st*3;for(let dx=-w;dx<=w;dx++)if((dx+st)%(4-st)===0||st===3)B.set(HXX+5+dx,FL+1,st>=2?'#000000':'#1a1620',5);/* 足元の影 */
-  for(const b of[BEAT,BEAT*2,BEAT*3])soundArc(B,[x,y],d-b)}
- else if(!P.parried){const e=d-LOB;if(e<18){const x=HEADP[0]-e*1.1,y=HEADP[1]-e*2.2+e*e*.22;if(y<FL-1)rock(B,x,y,r);else rock(B,x,FL-r,r)}}}
+function lobFx(B,t,t0,from,P,big,bt){bt=bt||BEAT;const lob=bt*4,d=t-t0;if(d<0)return;const r=big?BIGR:impRockR(.7);
+ if(d<=lob){const u=d/lob,x=lerp(from[0],HEADP[0],u),y=lerp(from[1],HEADP[1],u)-58*4*u*(1-u);(big?sealRock:rock)(B,x,y,r);
+  const st=Math.min(3,Math.floor(d/bt)),w=3+st*3;for(let dx=-w;dx<=w;dx++)if((dx+st)%(4-st)===0||st===3)B.set(HXX+5+dx,FL+1,st>=2?'#000000':'#1a1620',5);/* 足元の影 */
+  for(const b of[bt,bt*2,bt*3])soundArc(B,[x,y],d-b)}
+ else if(!P.parried){const e=d-lob;if(e<18){const x=HEADP[0]-e*1.1,y=HEADP[1]-e*2.2+e*e*.22;if(y<FL-1)rock(B,x,y,r);else rock(B,x,FL-r,r)}}}
 /* 大きな岩：持ち上げた頭の上から、短い山なりで投げる */
 function bigFx(B,t,t0,t1,from,P){if(t<t0)return;if(t<=t1){const u=(t-t0)/(t1-t0);sealRock(B,lerp(from[0],HEADP[0]+4,u),lerp(from[1],HEADP[1]-2,u)-14*4*u*(1-u),BIGR)}
  else if(!P.parried){const e=t-t1;if(e<26){sealRock(B,HEADP[0]+4-e*.4,Math.min(FL-BIGR,HEADP[1]-2+e*e*.3),BIGR);if(e>8&&e<20)for(let i=0;i<5;i++)B.set(HEADP[0]+i*3-6,FL-1-(i%2),ROCK[0],5)}}}
@@ -266,12 +267,12 @@ function imCards(f,pre,isM){const ox=isM?4:10,bg='def',S=SPEC[f],k=S.k;
   cap:isM?'背中で大きな封印の石を引きずって歩いてくる。止まって、石をぽんとたたき、にやりとする。':'上の暗がりから飛び降りて、しゃがんで着地する。ケケケと肩をゆらして笑う。',
   why:isM?'封印の石は、おかしらのお気に入りのおもちゃ。いつも持ち歩いている。':'迷宮の高いところに住みつく。どこからでも降ってくる。'});
  /* 攻撃 */
- if(!isM)mv({f,ox,id:pre+'_two',n:'二つ投げ（ヒュ・ヒュ・ヒュ・ドン・ドン）',bg,len:130,
-  keys:[K(0,{}),K(8,IM2,'out'),K(26,IM2),K(28,Object.assign({},IM2,IMW1),'out'),K(30,Object.assign({},IM2,IMR1),'in'),K(39,Object.assign({},IM2,IMR1,IMW2),'out'),K(41,Object.assign({},IM2,IMR1,IMW2)),K(43,Object.assign({},IM2,IMR1,IMR2),'in'),K(60,{grin:1},'io'),K(130,{})],
-  pp:(P,t)=>{if(t>=8&&t<28)P.cr+=Math.abs(Math.sin((t-8)*Math.PI/13))*.9;if(t>=30)P.rF=0;if(t>=43)P.rB=0},
-  cues:[{t:30,col:'w',silent:true},{t:43,col:'w',silent:true}],hits:[30+LOB,43+LOB],
-  fx:(B,J,t,S2,M)=>{const P=J.P||{};lobFx(B,t,30,handF(J),P);lobFx(B,t,43,handF(J),P)},
-  cap:'袋から石を二つ出し、両手に一つずつ持って、ひざで拍をとる（手の石の数＝投げる数）。ポイ、ポイと13Fおきに二つ投げる。石は光らない。飛んでいる石がヒュ・ヒュ・ヒュと鳴るたび、足元の影が一段ずつ大きく濃くなり、その次の拍（投げてから52F）で落ちる。二つ目はその13F後。',
+ if(!isM)mv({f,ox,id:pre+'_two',n:'二つ投げ（ヒュ・ヒュ・ヒュ・ドン・ドン）',bg,len:150,
+  keys:[K(0,{}),K(8,IM2,'out'),K(26,IM2),K(28,Object.assign({},IM2,IMW1),'out'),K(30,Object.assign({},IM2,IMR1),'in'),K(42,Object.assign({},IM2,IMR1,IMW2),'out'),K(44,Object.assign({},IM2,IMR1,IMW2)),K(46,Object.assign({},IM2,IMR1,IMR2),'in'),K(63,{grin:1},'io'),K(150,{})],
+  pp:(P,t)=>{if(t>=8&&t<28)P.cr+=Math.abs(Math.sin((t-8)*Math.PI/16))*.9;if(t>=30)P.rF=0;if(t>=46)P.rB=0},
+  cues:[{t:30,col:'w',silent:true},{t:46,col:'w',silent:true}],hits:[30+BEAT_MOB*4,46+BEAT_MOB*4],
+  fx:(B,J,t,S2,M)=>{const P=J.P||{};lobFx(B,t,30,handF(J),P,0,BEAT_MOB);lobFx(B,t,46,handF(J),P,0,BEAT_MOB)},
+  cap:'袋から石を二つ出し、両手に一つずつ持って、ひざで拍をとる（手の石の数＝投げる数）。ポイ、ポイと16Fおきに二つ投げる。石は光らない。飛んでいる石がヒュ・ヒュ・ヒュと鳴るたび、足元の影が一段ずつ大きく濃くなり、その次の拍（投げてから64F）で落ちる。二つ目はその16F後。拍はおかしら（13F）よりゆっくり。',
   why:'拍（リズム）の読み方は、おかしらで先に教わっている。光の代わりに、音と影で数える。持っている石が二つなら二つ来る。'});
  else{mv({f,ox,id:pre+'_three',n:'三つ投げ（お手玉から・ドン・ドン・ドン）',bg,len:160,
   keys:[K(0,{}),K(8,IMJ,'out'),K(26,IMJ),K(28,Object.assign({},IMJ,IMW1),'out'),K(30,Object.assign({},IMJ,IMR1),'in'),K(41,Object.assign({},IMJ,IMW1),'out'),K(43,Object.assign({},IMJ,IMR1),'in'),K(54,Object.assign({},IMJ,IMW1),'out'),K(56,Object.assign({},IMJ,IMR1),'in'),K(72,{grin:1},'io'),K(160,{})],

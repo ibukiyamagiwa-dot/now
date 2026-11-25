@@ -1852,8 +1852,20 @@ mv({f:'boarM',ox:BOAR.boarM.ox,id:'bM_look',n:'下をかいで、おびえる',b
 /* たおれる（撃破）：泥に覆われて、爆散する。ザコは何度も倒すので短く、気持ちよく（「遅さは罪」「閃光、爆発、残煙」）
    【泥が覆う時間】○、【閃光】○、【かけらの数】○、【残煙】○ は、ゲームでは調整できる値にする */
 const BDOWN={boar:{cover:[6,30],flash:36,n:18,len:96},boarM:{cover:[6,36],flash:42,n:28,len:110}};
+/* 撃破の閃光（全員共通の芯）：ただの丸にしない（2023-01-02「閃光、爆発、残煙」：閃光は瞬間で「何か激しいことが起きた」と伝える。黒をまぜ、光の筋とフレアを描く）。
+   形：芯の白＋長さも向きもばらばらの光の筋7本（左右対称にしない）＋横に長く細いフレア→筋が細って点になり、芯は黒紫に抜け、ところどころ切れた暗い衝撃の輪が広がって消える。白のふちには黒をまぜる（どんな背景でも見える）。明るい紫の輪は使わない（フェイントの合図） */
+const FLSPK=[[-.35,1.0],[.45,.62],[1.25,.85],[1.95,.5],[2.55,1.1],[3.35,.7],[4.3,.9],[5.1,.55]];
+function flashCore(B,c,d,k){if(d<-1||d>=7)return;const put=(x,y,col)=>B.set(c[0]+x,c[1]+y,col,4),W='#ffffff',D='#000000';
+ if(d===-1){for(let y=-7;y<=7;y++)for(let x=-7;x<=7;x++){const q=Math.hypot(x,y*1.2);if(q<=4*k)put(x,y,W);else if(q<=6*k&&(x+y)&1)put(x,y,D)}return}
+ if(d<=1){const R=(d?13:10)*k;/* 芯 */for(let y=-R;y<=R;y++)for(let x=-R;x<=R;x++){const q=Math.hypot(x,y*1.25);if(q<=R-1.5)put(x,y*1,W);else if(q<=R+.5)put(x,y,(x+y)&1?D:W)}
+  /* 光の筋：ばらばらの長さと向き。根元は太く、先は細い。ふちに黒 */for(const[a,l]of FLSPK){const L=(18+l*20)*k*(d?1.25:1),w0=(d?2:3)*k;for(let r=R-2;r<L;r+=.5){const w=Math.max(.5,w0*(1-(r-R)/(L-R)));const x=Math.cos(a)*r,y=Math.sin(a)*r*.8,nx=-Math.sin(a),ny=Math.cos(a);for(let o=-w-1;o<=w+1;o+=.5){const col=Math.abs(o)>w?D:W;if(col===D&&r>L-3)continue;put(Math.round(x+nx*o),Math.round(y+ny*o*.8),col)}}}
+  /* フレア：横に長い1画素の線（左右で長さをかえる） */for(let x=-46*k;x<=34*k;x++){if(Math.abs(x)<R)continue;put(x,0,Math.abs(x)>(x<0?40:28)*k?((x&1)?W:null):W);if(Math.abs(x)<(x<0?30:20)*k)put(x,1,D)}return}
+ /* 2〜6：筋は点にほどけ、芯は黒紫に抜け、切れ目のある暗い衝撃の輪が広がる */const u=d-2,R=(15+u*4)*k;
+ for(const[a,l]of FLSPK){const L=(18+l*20)*k*1.3;for(let r=R*.6;r<L*(1+u*.15);r+=3+u){if(hsh(Math.round(r),Math.round(a*10)+d)<.35+u*.12)continue;put(Math.round(Math.cos(a)*r),Math.round(Math.sin(a)*r*.8),u<2?'#d8d0e0':'#43365a')}}
+ for(let t=0;t<Math.PI*2;t+=.6/R){const gap=vn2(t*3+d*.7)>.62;if(gap)continue;for(let w=0;w<(u<2?3:2);w++){const r=R-w;put(Math.round(Math.cos(t)*r),Math.round(Math.sin(t)*r*.75),w===0?((Math.round(t*20))&1?D:'#3e2e54'):u<1?'#d8d0e0':'#2c2238')}}}
+function vn2(x){const i=Math.floor(x),f=x-i,h=n=>{const s=Math.sin(n*127.1)*43758.5;return s-Math.floor(s)};return h(i)+(h(i+1)-h(i))*f*f*(3-2*f)}
 function boarBurst(B,c,d,n,k,mid){/* 閃光：中心は白、まわりに黒を混ぜる（明るい背景でも暗い背景でも見える） */
- if(d>=-1&&d<6){/* 体より大きく、短く。はじめは白に黒のふち、すぐに黒紫の暗い衝撃の輪になって広がり消える（明るい紫の輪は使わない＝フェイントの合図と紛れる） */const r=(d<0?15:21+d*2.6)*k;for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const q=Math.hypot(x,y);if(q>r)continue;const ring=q>r-2.2,hole=d>=2&&q<r-2.2-(d-1)*5;if(hole)continue;B.set(c[0]+x,c[1]+y*.75,d<=1?(ring?((x+y)&1?'#000000':'#ffffff'):'#ffffff'):ring?((x+y)&1?'#000000':'#3e2e54'):d<3?'#d8d0e0':((x+y)&1?'#1d1728':'#2c2238'),4)}}
+ flashCore(B,c,d,k);
  /* かけら：泥の塊が飛び、落ちて床にしみこむ */
  for(let i=0;i<n;i++){const a=-Math.PI*(.08+.84*hsh(i,1)),v=(1.4+hsh(i,2)*2.6)*k,s=hsh(i,3)>.45?3:2,tl=d-1;if(tl<0)continue;let x=c[0]+Math.cos(a)*v*tl,y=c[1]+Math.sin(a)*v*tl+.11*tl*tl;const land=y>=FL;if(land){y=FL;x=c[0]+Math.cos(a)*v*Math.min(tl,(Math.sqrt(Math.max(0,(Math.sin(a)*v)**2+.44*(FL-c[1])))-Math.sin(a)*v)/.22)}
   const life=34+hsh(i,4)*14;if(d<1)continue;if(tl>life)continue;const fade=land?Math.max(0,1-(tl-life*.55)/(life*.45)):1;if(fade<=0||(land&&hsh(i,tl)>fade))continue;
@@ -3421,7 +3433,7 @@ const KOMAT={/* かけらの色：[かけら1, かけら2, ふち, 床に落ち�
  im:{n:'石と土ぼこり',frag:['#5a5048','#3e3832','#8a7e70','#4a423a'],smoke:['#4a4038','#5e5248']},
  dl:{n:'木くずと歯車と真鍮の歯',frag:['#6a4a2e','#4a3220','#806428','#3a2818'],smoke:['#5a4630','#6e5a40']}};
 function koBurst(B,c,d,n,k,mid,m){/* boarBurst と同じ芯。かけらと煙の色だけ材料にする */
- if(d>=-1&&d<6){const r=(d<0?15:21+d*2.6)*k;for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const q=Math.hypot(x,y);if(q>r)continue;const ring=q>r-2.2,hole=d>=2&&q<r-2.2-(d-1)*5;if(hole)continue;B.set(c[0]+x,c[1]+y*.75,d<=1?(ring?((x+y)&1?'#000000':'#ffffff'):'#ffffff'):ring?((x+y)&1?'#000000':'#3e2e54'):d<3?'#d8d0e0':((x+y)&1?'#1d1728':'#2c2238'),4)}}
+ flashCore(B,c,d,k);
  for(let i=0;i<n;i++){const a=-Math.PI*(.08+.84*hsh(i,1)),v=(1.4+hsh(i,2)*2.6)*k,s=hsh(i,3)>.45?3:2,tl=d-1;if(tl<0)continue;let x=c[0]+Math.cos(a)*v*tl,y=c[1]+Math.sin(a)*v*tl+.11*tl*tl;const land=y>=FL;if(land){y=FL;x=c[0]+Math.cos(a)*v*Math.min(tl,(Math.sqrt(Math.max(0,(Math.sin(a)*v)**2+.44*(FL-c[1])))-Math.sin(a)*v)/.22)}
   const life=34+hsh(i,4)*14;if(d<1||tl>life)continue;const fade=land?Math.max(0,1-(tl-life*.55)/(life*.45)):1;if(fade<=0||(land&&hsh(i,tl)>fade))continue;
   /* からくりの歯車：かけらの3つに1つは、歯のある真鍮の輪 */if(m===KOMAT.dl&&i%3===0&&!land){for(const[dx,dy]of[[0,-1],[1,0],[0,1],[-1,0],[-1,-1],[1,1]])B.set(x+dx+1,y+dy-1,dx===0&&dy===0?'#2a1e10':m.frag[2],4);continue}

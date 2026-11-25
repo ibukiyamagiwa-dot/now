@@ -8,7 +8,7 @@ const KOMAT={/* かけらの色：[かけら1, かけら2, ふち, 床に落ち�
  im:{n:'石と土ぼこり',frag:['#5a5048','#3e3832','#8a7e70','#4a423a'],smoke:['#4a4038','#5e5248']},
  dl:{n:'木くずと歯車と真鍮の歯',frag:['#6a4a2e','#4a3220','#806428','#3a2818'],smoke:['#5a4630','#6e5a40']}};
 function koBurst(B,c,d,n,k,mid,m){/* boarBurst と同じ芯。かけらと煙の色だけ材料にする */
- if(d>=-1&&d<6){const r=(d<0?15:21+d*2.6)*k;for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const q=Math.hypot(x,y);if(q>r)continue;const ring=q>r-2.2,hole=d>=2&&q<r-2.2-(d-1)*5;if(hole)continue;B.set(c[0]+x,c[1]+y*.75,d<=1?(ring?((x+y)&1?'#000000':'#ffffff'):'#ffffff'):ring?((x+y)&1?'#000000':'#3e2e54'):d<3?'#d8d0e0':((x+y)&1?'#1d1728':'#2c2238'),4)}}
+ flashCore(B,c,d,k);
  for(let i=0;i<n;i++){const a=-Math.PI*(.08+.84*hsh(i,1)),v=(1.4+hsh(i,2)*2.6)*k,s=hsh(i,3)>.45?3:2,tl=d-1;if(tl<0)continue;let x=c[0]+Math.cos(a)*v*tl,y=c[1]+Math.sin(a)*v*tl+.11*tl*tl;const land=y>=FL;if(land){y=FL;x=c[0]+Math.cos(a)*v*Math.min(tl,(Math.sqrt(Math.max(0,(Math.sin(a)*v)**2+.44*(FL-c[1])))-Math.sin(a)*v)/.22)}
   const life=34+hsh(i,4)*14;if(d<1||tl>life)continue;const fade=land?Math.max(0,1-(tl-life*.55)/(life*.45)):1;if(fade<=0||(land&&hsh(i,tl)>fade))continue;
   /* からくりの歯車：かけらの3つに1つは、歯のある真鍮の輪 */if(m===KOMAT.dl&&i%3===0&&!land){for(const[dx,dy]of[[0,-1],[1,0],[0,1],[-1,0],[-1,-1],[1,1]])B.set(x+dx+1,y+dy-1,dx===0&&dy===0?'#2a1e10':m.frag[2],4);continue}

@@ -103,9 +103,16 @@ function applyJ(o){let n=0;for(const d of DEF){if(d.t==='col'){if(typeof o[d.n]=
 try{const s=JSON.parse(localStorage.getItem('parryRPG.P')||'null');if(s){for(const d of DEF)if(d.old&&d.old.includes(s[d.n]))delete s[d.n];applyJ(s)}}catch(e){}
 function save(){try{const o={};DEF.forEach(d=>{if(P[d.k]!==d.v)o[d.n]=P[d.k]});localStorage.setItem('parryRPG.P',JSON.stringify(o))}catch(e){}}
 
+/* 細かい項目は種類ごとの見出しに分け、ふだんは閉じておく（2022-12-06「調整をしやすくする仕組み」：めったに使わない数値は隠し、要点を見やすくする）。
+   どの見出しに入るかは名前の頭で決まる（名前は種類→対象→強さの順。iv…＝連撃の間、stg…＝ステージ）。どれにも当たらないものは「戦いの決まり」 */
+const ADV_SUB=[['戦いの決まり',null],['合図・やられ・パリィされ',/^(cue|hitFlash|hurt|pry)/],['連撃の間',/^iv/],['敵ごとの拍',/^golem/],['ステージ（背景）　色は「数値をコピー／読み込む」で変える',/^stg/]];
+const advSub=d=>{const i=ADV_SUB.findIndex(([,re])=>re&&re.test(d.k));return i<0?0:i};
+/* g の項目を、行を作る関数 row で並べる。細かい項目だけは、見出しごとに閉じた入れもの（sub）に入れる */
+function defRows(g,row,sub){const L=DEF.filter(d=>d.g===g&&d.t!=='col');if(g!=='adv')return L.map(row).join('');
+ return ADV_SUB.map(([nm],i)=>{const M=L.filter(d=>advSub(d)===i);return M.length?sub(nm,M.map(row).join('')):''}).join('')}
 function buildPanel(){
  for(const g of ['main','gauge','ko','adv']){
-  $(g).innerHTML=DEF.filter(d=>d.g===g&&d.t!=='col').map(d=>`<div class="row"><label for="p_${d.k}">${d.n}</label><output id="o_${d.k}"></output><input type="range" id="p_${d.k}" min="${d.min}" max="${d.max}" step="${d.step}"></div>`).join('');
+  $(g).innerHTML=defRows(g,d=>`<div class="row"><label for="p_${d.k}">${d.n}</label><output id="o_${d.k}"></output><input type="range" id="p_${d.k}" min="${d.min}" max="${d.max}" step="${d.step}"></div>`,(nm,h)=>`<details><summary>${nm}</summary>${h}</details>`);
  }
  DEF.forEach(d=>{if(d.t==='col')return;const i=$('p_'+d.k);i.value=P[d.k];i.addEventListener('input',()=>{P[d.k]=+i.value;syncOut();save()})});
  syncOut();

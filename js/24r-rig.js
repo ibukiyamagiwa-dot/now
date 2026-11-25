@@ -27,16 +27,16 @@ const RIG=(()=>{
  /* ---- 騎士の骨組み（rig.js）：角度は画面の向き。0＝右、π/2＝下、π＝左（主人公の方） ---- */
  const PDEF={x:0,lean:0,cr:0,ff:-6,fb:5,kn:0,ua:1.95,fa:2.75,sw:3.4,ua2:1.75,fa2:1.9,sw2:null,hd:0,lift:0};
  const PRO={hk:1.45,lk:.74,tk:.86};
- function joints(ox,oy,S,P){const k=S.k,lk=S.lk||PRO.lk,tk=S.tk||PRO.tk,hk=S.hk||PRO.hk;
-  const cr=P.cr+P.kn*9*k*lk,hip=[ox+P.x*k,oy-20*k*lk+cr-P.lift*k];
-  const sc=add(hip,rot([0,-14*k*tk],-P.lean)),neck=add(sc,rot([0,-2*k],-P.lean)),head=add(neck,rot([0,-5*k*hk],-P.lean-P.hd));
-  const shF=add(sc,rot([-3.5*k,-.5*k],-P.lean)),shB=add(sc,rot([4*k,-.5*k],-P.lean));
-  const elF=add(shF,dir(P.ua,7*k)),hdF=add(elF,dir(P.fa,6.5*k)),elB=add(shB,dir(P.ua2,7*k)),hdB=add(elB,dir(P.fa2,6.5*k));
-  let footF=[hip[0]+P.ff*k,oy-P.lift*k],footB=[hip[0]+P.fb*k,oy-P.lift*k],kneeF,kneeB;
+ function joints(ox,oy,S,posture){const k=S.k,lk=S.lk||PRO.lk,tk=S.tk||PRO.tk,hk=S.hk||PRO.hk;
+  const cr=posture.cr+posture.kn*9*k*lk,hip=[ox+posture.x*k,oy-20*k*lk+cr-posture.lift*k];
+  const sc=add(hip,rot([0,-14*k*tk],-posture.lean)),neck=add(sc,rot([0,-2*k],-posture.lean)),head=add(neck,rot([0,-5*k*hk],-posture.lean-posture.hd));
+  const shF=add(sc,rot([-3.5*k,-.5*k],-posture.lean)),shB=add(sc,rot([4*k,-.5*k],-posture.lean));
+  const elF=add(shF,dir(posture.ua,7*k)),hdF=add(elF,dir(posture.fa,6.5*k)),elB=add(shB,dir(posture.ua2,7*k)),hdB=add(elB,dir(posture.fa2,6.5*k));
+  let footF=[hip[0]+posture.ff*k,oy-posture.lift*k],footB=[hip[0]+posture.fb*k,oy-posture.lift*k],kneeF,kneeB;
   const hpF=add(hip,[-2*k,0]),hpB=add(hip,[2*k,0]);
-  if(P.kn>0){const kb0=ik(hpB,footB,10*k*lk,10*k*lk,1);kneeB=[lerp(kb0[0],hip[0]+3*k,P.kn),lerp(kb0[1],oy-1.5*k,P.kn)];footB=[lerp(footB[0],kneeB[0]+9*k,P.kn),oy];kneeF=ik(hpF,footF,10*k*lk,10*k*lk,1)}
+  if(posture.kn>0){const kb0=ik(hpB,footB,10*k*lk,10*k*lk,1);kneeB=[lerp(kb0[0],hip[0]+3*k,posture.kn),lerp(kb0[1],oy-1.5*k,posture.kn)];footB=[lerp(footB[0],kneeB[0]+9*k,posture.kn),oy];kneeF=ik(hpF,footF,10*k*lk,10*k*lk,1)}
   else{kneeF=ik(hpF,footF,10*k*lk,10*k*lk,1);kneeB=ik(hpB,footB,10*k*lk,10*k*lk,1)}
-  return{k,hip,sc,neck,head,shF,shB,elF,hdF,elB,hdB,footF,footB,kneeF,kneeB,hpF,hpB,lean:P.lean}}
+  return{k,hip,sc,neck,head,shF,shB,elF,hdF,elB,hdB,footF,footB,kneeF,kneeB,hpF,hpB,lean:posture.lean}}
  function drawLeg(B,S,Hp,K,F,front){const k=S.k,p=S.pal,d=front?0:1;
   const U=p.under,UH=p.underHi,UL=p.underLo;B.thick(Hp,K,2.2*k,d?UL:U,d?U:UH,UL);B.thick(K,F,1.8*k,d?UL:U,d?U:UH,UL);
   const sh=[lerp(K[0],F[0],.15),lerp(K[1],F[1],.15)],sf=[lerp(K[0],F[0],.8),lerp(K[1],F[1],.8)];B.thick(sh,sf,2*k,d?p.armLo:p.arm,d?p.arm:p.armHi,p.armLo);
@@ -55,7 +55,7 @@ const RIG=(()=>{
   for(let x=-(tw-.5);x<=tw-.5;x+=.5)B.set(...R([x*k,(t.len+1.5-Math.abs(x)/(tw-.5)*1.5)*k]),t.edge,2);
   const M=v=>R([v[0],v[1]-7*k]),q=k*1.2;B.poly([M([-2*q,1*q]),M([2*q,1*q]),M([2*q,6*q]),M([-2*q,6*q])],t.mark,null,null);B.line(...M([0,1.5*q]),...M([0,6*q]),'#140a10')}
  /* 筒形の兜：ぬしの兜をまねた形（主従の印）。目の切れ込みと、上から下まで貫く縦の線 */
- function drawHead(B,S,J,P){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-P.hd,R=v=>add(J.head,rot(v,a)),hm=S.helm;
+ function drawHead(B,S,J,posture){const k=S.k*(S.hk||PRO.hk),p=S.pal,a=-J.lean-posture.hd,R=v=>add(J.head,rot(v,a)),hm=S.helm;
   B.poly([R([-4.3*k,4.2*k]),R([4.3*k,4.2*k]),R([4.3*k,-4.2*k]),R([3.6*k,-4.8*k]),R([-3.6*k,-4.8*k]),R([-4.3*k,-4.2*k])],p.arm,p.armHi,p.armLo);
   for(let x=-4;x<=4;x+=.5)B.set(...R([x*k,-3.4*k]),hm.band[0],2);for(let x=-3.5;x<=3.5;x+=1.4)B.set(...R([x*k,-3.4*k]),hm.band[1],2);
   for(let x=-4.2;x<=1.2;x+=.5)B.set(...R([x*k,-.4*k]),OUT,2);for(let y=-2;y<=2.6;y+=.5)B.set(...R([-1.6*k,y*k]),OUT,2);
@@ -76,13 +76,13 @@ const RIG=(()=>{
   helm:{band:['#8a6a3a','#c8a050'],dents:[[-3,-2],[2,1]]},
   tabard:{len:12,w:4.3,col:'#2e4288',hi:'#4a62b8',lo:'#1a2658',edge:'#c8a050',mark:'#e0b860'}};
  /* 描く順：後ろの腕→後ろの剣→後ろの脚→胴→前の脚→前垂れ→兜→前の剣→前の腕→かせ */
- function knight(B,ox,oy,S,P,T){const J=joints(ox,oy,S,P);
+ function knight(B,ox,oy,S,posture,T){const J=joints(ox,oy,S,posture);
   drawArm(B,S,J.shB,J.elB,J.hdB,false);
   drawLeg(B,S,J.hpB,J.kneeB,J.footB,false);
   drawTorso(B,S,J);drawLeg(B,S,J.hpF,J.kneeF,J.footF,true);drawTabard(B,S,J);
-  drawHead(B,S,J,P);
-  if(P.sw2!=null)J.tip2=drawBlade(B,S,J.hdB,P.sw2,W_SHORT);
-  J.tip=drawBlade(B,S,J.hdF,P.sw,W_SHORT);
+  drawHead(B,S,J,posture);
+  if(posture.sw2!=null)J.tip2=drawBlade(B,S,J.hdB,posture.sw2,W_SHORT);
+  J.tip=drawBlade(B,S,J.hdF,posture.sw,W_SHORT);
   drawArm(B,S,J.shF,J.elF,J.hdF,true);
   cuff(B,J.hdF,S.k);dangle(B,J.hdF,S.k,T,0);cuff(B,J.hdB,S.k);dangle(B,J.hdB,S.k,T,1);
   return J}
@@ -124,17 +124,17 @@ const RIG=(()=>{
 
  /* パリィされ（knightKit）：小＝連撃の途中、前の剣だけがはね上がる／大＝最後の一撃、二本の剣がこじ開けられて体ごとのけぞる */
  const STOP=12;
- function pryTarget(kind,which){const P=which===2?S2:S1;
-  if(kind==='s'){const T={ua:P.ua+.55,fa:P.fa+1.2,sw:P.sw+1.9};return Object.assign(T,{x:(P.x||0)+3,lean:(P.lean||0)-.2,hd:-.15})}
+ function pryTarget(kind,which){const posture=which===2?S2:S1;
+  if(kind==='s'){const T={ua:posture.ua+.55,fa:posture.fa+1.2,sw:posture.sw+1.9};return Object.assign(T,{x:(posture.x||0)+3,lean:(posture.lean||0)-.2,hd:-.15})}
   const T={ua2:4.9,fa2:5.4,sw2:5.8,ua:5.0,fa:5.5,sw:5.9};if(which!==2)Object.assign(T,{ua:4.9,fa:5.4,sw:5.8,ua2:.6,fa2:.3,sw2:.1});
-  return Object.assign(T,{x:(P.x||0)+11,lean:-.4,hd:-.35,cr:1.5})}
+  return Object.assign(T,{x:(posture.x||0)+11,lean:-.4,hd:-.35,cr:1.5})}
  function pryW(r,d){if(d<0)return 0;if(d<STOP)return Math.min(1,(d+1)/4);const e=d-STOP;if(r.kind==='s')return 1-ease.s(cl01(e/6));return e<10?1:1-ease.s(cl01((e-10)/18))}
  /* やられ（g_hurt）：体ごと押されるが、交差はほどかない。二太刀目で腰が落ちる */
  const kb=(a,dur)=>a<0?0:a<4?Math.sin(a/4*Math.PI/2):Math.exp(-(a-4)/dur);
 
- function st(e){return e._rig||(e._rig={key:'',from:null,at:0,dur:1,ez:'io',prev:null,rx:[],seen:new WeakSet(),hurt:[],lastHurt:0,memo:-1,P:null,J:null,img:{}})}
+ function st(e){return e._rig||(e._rig={key:'',from:null,at:0,dur:1,ez:'io',prev:null,rx:[],seen:new WeakSet(),hurt:[],lastHurt:0,memo:-1,posture:null,J:null,img:{}})}
  /* 1フレームに1回だけ姿勢を進める（同じフレームで何度呼ばれても同じ結果） */
- function pose(e){const R=st(e),t=G.anim;if(R.memo===t&&R.P)return R.P;R.memo=t;
+ function pose(e){const R=st(e),t=G.anim;if(R.memo===t&&R.posture)return R.posture;R.memo=t;
   let key,T;
   if(G.ko){key='ko';const k=G.t-6;T=k<10?(R.prev||IDLE(t)):mixP(R.koFrom||(R.koFrom=Object.assign({},R.prev||BASE)),KNEEL,ease.out(cl01((k-10)/24)))}
   else if(e.broken){key='brk';T=BRK(t)}
@@ -143,22 +143,22 @@ const RIG=(()=>{
   if(key!=='ko')R.koFrom=null;
   if(key!==R.key){const old=R.key;R.key=key;R.from=R.prev;R.at=t;
    if(key==='brk'){R.dur=16;R.ez='s'}else if(old==='brk'){R.dur=5;R.ez='back'}else if(key==='idle'){R.dur=20;R.ez='io'}else{R.dur=6;R.ez='io'}}
-  let P=T;if(R.from&&t-R.at<R.dur&&key!=='ko'){const u=ease[R.ez](cl01((t-R.at)/R.dur));P=mixP(R.from,T,u)}
+  let posture=T;if(R.from&&t-R.at<R.dur&&key!=='ko'){const u=ease[R.ez](cl01((t-R.at)/R.dur));posture=mixP(R.from,T,u)}
   /* パリィされた撃を拾う（最後の撃なら大） */
   if(G.state==='enemy'&&G.strikes){const ss=G.strikes.filter(isMain),last=ss[ss.length-1];for(const s of ss){if(s.done&&s.res==='parry'&&!R.seen.has(s)){R.seen.add(s);const which=s.mv==='cut2'?2:1,kind=s===last?'b':'s';R.rx.push({at:t-Math.max(0,G.et-s.impact),kind,which,T:pryTarget(kind,which)})}}}
   R.rx=R.rx.filter(r=>t-r.at<STOP+60);
-  for(const r of R.rx){const w=pryW(r,t-r.at);if(w>0)P=mixP(P,r.T,w)}
+  for(const r of R.rx){const w=pryW(r,t-r.at);if(w>0)posture=mixP(posture,r.T,w)}
   /* 斬られた瞬間を拾う（30F以内の二太刀目は大きく） */
   if(e.hurt>0&&!R.lastHurt){const two=R.hurt.length&&t-R.hurt[R.hurt.length-1].at<30;R.hurt.push({at:t,two})}R.lastHurt=e.hurt;
   R.hurt=R.hurt.filter(h=>t-h.at<60);
-  for(const h of R.hurt){const a=kb(t-h.at,h.two?9:6),o=h.two?{x:7,lean:-.3,hd:-.3,cr:2}:{x:4,lean:-.22,hd:-.25};P=Object.assign({},P);for(const k in o)P[k]=(P[k]||0)+o[k]*a}
-  R.prev=P;R.P=P;return P}
+  for(const h of R.hurt){const a=kb(t-h.at,h.two?9:6),o=h.two?{x:7,lean:-.3,hd:-.3,cr:2}:{x:4,lean:-.22,hd:-.25};posture=Object.assign({},posture);for(const k in o)posture[k]=(posture[k]||0)+o[k]*a}
+  R.prev=posture;R.posture=posture;return posture}
 
  /* 交差に戻るときの「キン」：両手の間に小さな十字 */
  function kin(B,J,e){const c=[(J.hdF[0]+J.hdB[0])/2,(J.hdF[1]+J.hdB[1])/2-9];for(let i=-3+(e>>1);i<=3-(e>>1);i++){B.set(c[0]+i,c[1],'#c8ccd8',4);B.set(c[0],c[1]+i,'#c8ccd8',4)}}
  /* 骨組みを画素にし、ゲームの色の決まり（nCol：白い光・覚悟の色・ブレイクの色あせ）を通して、キャンバスにする */
- function render(e,v){const R=st(e),P=pose(e),t=G.anim,k=t+'|'+v+'|'+(e.tint||'');if(R.img.k===k)return R.img.c;
-  const B=new Buf(W,H),J=knight(B,OX,H,GATE,P,t);R.J=J;
+ function render(e,v){const R=st(e),posture=pose(e),t=G.anim,k=t+'|'+v+'|'+(e.tint||'');if(R.img.k===k)return R.img.c;
+  const B=new Buf(W,H),J=knight(B,OX,H,GATE,posture,t);R.J=J;
   for(const r of R.rx){if(r.kind!=='b')continue;const d=t-r.at-(STOP+38);if(d>=0&&d<8)kin(B,J,d)}
   B.outline();
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d'),im=cx.createImageData(W,H),memo={};

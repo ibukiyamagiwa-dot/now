@@ -17,6 +17,8 @@ function devRender(){const d=$('devp');
  <div class="rw"><select id="dvTut">${opt(TUT.map((t,i)=>[i,(t.key==='pro'?'最初の演出（竜）':i+'. '+t.title)]),st.tut)}</select><button data-dv="tut">チュートリアルのここから</button></div>
  <h3>デバッグ</h3>
  <div class="rw">${[['bar','受付バーと着弾リング'],['slow','スロー（1/4倍）'],['god','自分が倒れない'],['fix','敵の行動を固定']].map(([k,n])=>`<label class="ck"><input type="checkbox" data-dbg="${k}"${dbg[k]?' checked':''}>${n}</label>`).join('')}</div>
+ <p class="note">見え方（動きを確かめる用。保存はしない）</p>
+ <div class="rw">${[['bgOff','背景を消す（灰色）'],['foeSee','敵を半透明'],['heroSee','主人公を半透明'],['fxOff','光と粒を消す'],['uiOff','文字と枠を消す']].map(([k,n])=>`<label class="ck"><input type="checkbox" data-dbg="${k}"${dbg[k]?' checked':''}>${n}</label>`).join('')}</div>
  <div class="rw"><button data-dv="unlock">すべて解放（覚悟・練習・チュートリアル済み）</button><button data-dv="wipe">記録を消す</button></div>
  <h3>調整</h3><p class="note">単位はフレーム（60F＝1秒）　次の攻撃から反映　このブラウザに保存されます</p>
  ${groups.map(([g,n])=>`<p class="note" style="color:#e8c46a;margin-top:12px">${n}</p>`+defRows(g,x=>`<div class="pr"><span class="nm">${x.n.replace(/[【】]/g,'')}</span><span class="vl" id="dvv_${x.k}">${fmt(P[x.k])}${x.u}</span><div class="ct"><button class="x" data-st="${x.k}" data-d="-1">−</button><input type="range" data-pk="${x.k}" min="${x.min}" max="${x.max}" step="${x.step}" value="${P[x.k]}"><button class="x" data-st="${x.k}" data-d="1">＋</button></div></div>`,(nm,h)=>`<details><summary style="color:#fff3b0;font-size:15px;min-height:36px;cursor:pointer">${nm}</summary>${h}</details>`)).join('')}

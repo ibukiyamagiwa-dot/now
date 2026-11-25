@@ -39,7 +39,7 @@ function drawLordArm(s,x,y,A,v,e,cur){const R=[x+A.S2[0],y+A.S2[1]],H2=[HX+18,FL
  const rest=[R[0]+6,R[1]+12],up=[R[0]+2,R[1]-34],C1=[R[0]+12,R[1]-6];let E,C2;
  if(d>0){const q=Math.min(1,d/12);E=lerp2(H2,rest,q*q);C2=lerp2([HX+60,FLOOR-58],[R[0]+16,R[1]-10],q)}
  else if(d>=-SW){const t=(d+SW)/SW,q=t*t;E=lerp2(up,H2,q);C2=lerp2([R[0]+14,R[1]-30],[HX+60,FLOOR-58],q)}
- else{const ea=1-(1-u)*(1-u);E=lerp2(rest,up,ea);E=[E[0]+Math.sin(G.anim*.1)*.7,E[1]];C2=lerp2([R[0]+16,R[1]-10],[R[0]+14,R[1]-30],ea)}
+ else{const ea=1-(1-u)*(1-u);E=lerp2(rest,up,ea);E=[E[0]+(G.et<s.cue?Math.sin(G.anim*.1)*.7:0),E[1]];C2=lerp2([R[0]+16,R[1]-10],[R[0]+14,R[1]-30],ea)}
  const pts=lordTent([R,C1,C2,E],3.2,1.4,v,e);
  const a=pts[pts.length-4],b=pts[pts.length-1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,tx=b[0]+ux*15,ty=b[1]+uy*15;
  lineP(b[0]-uy*3,b[1]+ux*3,b[0]+uy*3,b[1]-ux*3,'#c8a24a');lineP(b[0],b[1],tx,ty,v==='w'?'#fff4ee':'#c4ccd8');lineP(b[0]+uy,b[1]-ux,tx+uy*.6,ty-ux*.6,'#7a8292');
@@ -50,7 +50,7 @@ function bkPoise(R,i){return[R[0]-8-i*10,R[1]-40+i*7]}
 function drawLordBk(s,x,y,A,v,e,cur){if(!A.bk)return;const R=[x+A.bk[0],y+A.bk[1]],i=s.ten||0,d=G.et-s.impact,H2=[HX+16,FLOOR-18],SW=5,poise=bkPoise(R,i),side=[R[0]+6+i*4,R[1]-10-i*3],C1=[R[0]+4,R[1]-14];let E,C2;
  if(d>0){const q=Math.min(1,d/10);E=lerp2(H2,side,q);C2=lerp2([H2[0]+34,R[1]-50],[R[0]+8,R[1]-22],q)}
  else if(d>=-SW){const t=(d+SW)/SW,q=t*t;E=lerp2(poise,H2,q);C2=lerp2([poise[0]+6,poise[1]-14],[H2[0]+34,R[1]-50],q)}
- else{const k=G.et-s.cue,pb=k>=0?Math.min(1,k/8)*2:0;E=[poise[0]+pb+Math.sin(G.anim*.09+i*2)*.8,poise[1]-pb];C2=[poise[0]+6,poise[1]-14]}
+ else{const k=G.et-s.cue,pb=k>=0?Math.min(1,k/8)*2:0;E=[poise[0]+pb+(k<0?Math.sin(G.anim*.09+i*2)*.8:0),poise[1]-pb];C2=[poise[0]+6,poise[1]-14]}
  lordTent([R,C1,C2,E],2.6,1,v,e,26);{const a=eyeAge(s);if(a>=0)abyssEye(E[0],E[1]-1,a)}
  if(d>=-SW&&d<=0)for(let j=1;j<=3;j++){const q=Math.max(0,((d+SW)/SW)-j*.16),P2=lerp2(poise,H2,q*q);px(P2[0],P2[1],j<2?'#ffffff':'#e0c8ff')}
  if(s===cur)G.lordTip={x:Math.round(E[0]),y:Math.round(E[1])}}

@@ -47,7 +47,7 @@ const DEF=[
  {k:'koZoom',n:'【とどめのカメラ寄り】',v:2,min:0,max:2,step:1,u:'段',g:'ko'},
  {k:'koShake',n:'【とどめの画面振動】',v:24,min:0,max:40,step:1,u:'',g:'ko'},
  /* 合図・やられ・パリィされ（design/GAME_REQUESTS.md の「合図・軌跡」「やられ」「パリィされとブレイク」） */
- {k:'cue2K',n:'【二撃目以降の合図】（この覚悟まで出す　0＝みならいだけ、-1＝出さない）',v:0,min:-1,max:4,step:1,u:'',g:'adv'},
+ {k:'cue2K',n:'【速い連撃の二撃目以降の合図】（間が予兆→着弾より短い撃。この覚悟まで出す　0＝みならいだけ、4＝全部、-1＝出さない）',v:0,min:-1,max:4,step:1,u:'',g:'adv'},
  {k:'cueShowF',n:'【合図の表示フレーム】',v:18,min:6,max:30,step:1,u:'F',g:'adv'},
  {k:'hitFlashF',n:'【ヒットフラッシュ】',v:2,min:0,max:12,step:1,u:'F',g:'adv'},
  {k:'hurtShake',n:'【震えの大きさ】（やられ）',v:1.6,min:0,max:4,step:.1,u:'画素',g:'adv'},
@@ -56,7 +56,7 @@ const DEF=[
  {k:'pryShakeS',n:'【パリィされの震え幅】（小：連撃の途中）',v:1.4,min:0,max:4,step:.1,u:'画素',g:'adv'},
  {k:'pryShakeB',n:'【パリィされの震え幅】（大：最後の一撃・赤）',v:2,min:0,max:4,step:.1,u:'画素',g:'adv'},
  /* 【連撃の間】：パリィのタイミング同士の間（ヒットストップは数えない）。同じ技なら固定 */
- {k:'ivGate2',n:'【連撃の間】門番：二連撃',v:13,min:6,max:60,step:1,u:'F',g:'adv'},
+ {k:'ivGate2',n:'【連撃の間】門番：二連撃',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivGateK2',n:'【連撃の間】黒い門番：二連撃',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivLord2',n:'【連撃の間】門のぬし：二連撃',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivLordW',n:'【連撃の間】門のぬし：ささやきの二連撃',v:44,min:6,max:60,step:1,u:'F',g:'adv'},

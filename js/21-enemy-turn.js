@@ -1,15 +1,15 @@
 /* ===== 敵の行動：予兆（キラッ）から着弾までは常に一定 ===== */
-/* 二撃目以降の合図（予兆の光と音）は、覚悟「みならい」だけで出す（【二撃目以降の合図】）。紫の輪・別の「見る場所」（目・首・触手の目・ランプ・拍）・打ち合い・技の始まり（lead）は、どの覚悟でも出す */
+/* 合図（予兆の光と音）は一回の攻撃ごとに出す。意図して間の速い連撃（前の当たりから【予兆から着弾までのフレーム】より短い撃）は「二回当たる一回の攻撃」なので、続きの撃には合図を出さない（覚悟「みならい」だけ出す：【速い連撃の二撃目以降の合図】）。紫の輪・別の「見る場所」（目・首・触手の目・ランプ・拍）・打ち合い・技の始まり（lead）は、いつも出す */
 function cueK(){return G.mode==='run'?G.K:G.mode==='prac'?PV+1:G.mode==='tut'?0:1}
 /* 連携・切り返しのあとに続く技は、その技の最初の本物の撃に合図を出す */
 function leadFirst(L){const j=L.findIndex(x=>!x.fake&&!x.ping);return j<0?L:L.map((x,i)=>i===j?Object.assign({},x,{lead:true}):x)}
-function cueHid(s){return s.nth>0&&!s.fake&&!s.rally&&!s.lead&&!s.keep&&s.note==null&&!s.heads&&s.ten==null&&!s.beat&&!s.beats&&cueK()>P.cue2K}
+function cueHid(s){return s.nth>0&&s.prevG!=null&&s.prevG<P.cueF&&!s.fake&&!s.rally&&!s.lead&&!s.keep&&s.note==null&&!s.heads&&s.ten==null&&!s.beat&&!s.beats&&cueK()>P.cue2K}
 /* iv：【連撃の間】の名前（P のキー）。二撃目以降は、前の当たりから P[iv] F後に当たる（ヒットストップは数えない） */
 function buildStrikes(L,t,lastI){const e=G.en,cl0=e.cue||P.cueF;let nth=0;const list=L.map(s=>{
   if(s.ping){t+=s.pre||0;G.pings.push({t,heads:s.heads||(s.head!=null?[s.head]:null),note:s.note??G.pings.length,done:false,i:G.pings.length});return null}
   if(s.fake){t+=s.pre||12;const o={fake:true,mv:s.mv,cue:t,end:t+14,start:t-12,impact:Infinity,cl:14,m:0,red:false,res:null,done:false,cued:false};t+=30;return o}
   const cl=s.cl||cl0,iv=s.iv&&nth>0?P[s.iv]:null,pI=lastI;if(s.gap!=null)t=lastI+s.gap;else if(iv!=null)t=lastI+iv;else t+=(s.pre||0)+cl;lastI=t;const red=!!s.red||(!!e.redP&&!dbg.fix&&Math.random()<e.redP);if(red)tipOnce('red','赤い光は重い攻撃　痛いですが、弾けば大きく返せます');
-  const o={impact:t,cue:t-cl,cl,beat:!!s.beat,mv:s.mv,bf:s.bf,bn:s.bn,proj:!!s.proj,melee:!!s.melee,start:s.st!=null?s.st:iv!=null?Math.max(pI+3,t-cl-(s.pre||0)):t-cl-(s.pre||0),nth:nth++,iv:iv!=null,lead:!!s.lead,keep:!!s.keep,ft:s.ft||0,m:s.m||1,feint:!!s.feint,red,boom:!!s.boom,counter:!!s.counter,dark:!!s.dark,back:s.back||0,beats:s.beats,lob:!!s.lob,head:s.head,heads:s.heads,spit:!!s.spit,note:s.note,rhythm:!!s.rhythm,rally:!!s.rally,rallyOpen:!!s.rallyOpen,rallyEnd:!!s.rallyEnd,lock:!!s.lock,nc:!!s.nc,bo:s.bo||0,sdrain:!!s.drain,ten:s.ten,nolight:!!s.nolight,res:null,done:false,cued:false};t+=8;return o}).filter(Boolean);
+  const o={impact:t,cue:t-cl,cl,beat:!!s.beat,mv:s.mv,bf:s.bf,bn:s.bn,proj:!!s.proj,melee:!!s.melee,start:s.st!=null?s.st:iv!=null?Math.max(pI+3,t-cl-(s.pre||0)):t-cl-(s.pre||0),prevG:nth>0?t-pI:null,nth:nth++,iv:iv!=null,lead:!!s.lead,keep:!!s.keep,ft:s.ft||0,m:s.m||1,feint:!!s.feint,red,boom:!!s.boom,counter:!!s.counter,dark:!!s.dark,back:s.back||0,beats:s.beats,lob:!!s.lob,head:s.head,heads:s.heads,spit:!!s.spit,note:s.note,rhythm:!!s.rhythm,rally:!!s.rally,rallyOpen:!!s.rallyOpen,rallyEnd:!!s.rallyEnd,lock:!!s.lock,nc:!!s.nc,bo:s.bo||0,sdrain:!!s.drain,ten:s.ten,nolight:!!s.nolight,res:null,done:false,cued:false};t+=8;return o}).filter(Boolean);
  /* 次の撃までの間（静と動：当たったポーズで止まり、次の構えへ移って止まる） */
  const R=list.filter(x=>!x.fake);for(let i=0;i+1<R.length;i++)if(R[i+1].nth>0)R[i].nxG=R[i+1].impact-R[i].impact;return{list,t}}
 function startEnemy(list){

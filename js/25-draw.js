@@ -159,7 +159,7 @@ function knight(x,y,k,bob,hit){
 
 /* 敵 */
 /* 連撃の静と動：次の撃が近いときは、当たったポーズで3F止まり、素早く構えへ戻って止まり、最後の3Fで振る */
-function afterL(s,d){const g=s.nxG;if(!g||g>=24)return 1-d/9;if(d<3)return 1;const R=Math.max(2,Math.min(6,g-8));return Math.max(0,1-(d-3)/R)}
+function afterL(s,d){const g=s.nxG;if(!g||g>=24){const rt=g?g-P.cueF:9;/* 次の予兆までに戻りきる（予兆の間は止まる） */return rt>=9||rt<1?1-d/9:Math.max(0,1-d/rt)}if(d<3)return 1;const R=Math.max(2,Math.min(6,g-8));return Math.max(0,1-(d-3)/R)}
 /* やられ：【ヒットフラッシュ】だけ白く光る。止めるのは主人公だけで、敵は約4Fで押され（【やられの押され幅】）、【震えの大きさ】から横にだけ小さくなる */
 function hitWhite(e){return(e.hurtAt!=null&&G.anim-e.hurtAt>=0&&G.anim-e.hurtAt<P.hitFlashF)||(!!G.uk&&e.hurt>5)}
 function enemyVib(e){const sg=G.anim%2?1:-1;
@@ -180,7 +180,8 @@ function enemyPose(){
   const LF=G.en.lungeF||4;for(const s of G.strikes){if(s.proj||s.cx)continue;if(s.ft){const d=G.et-s.impact;if(d>=0&&d<s.ft){lunge=Math.max(lunge,d<20?1:1-(d-20)/(s.ft-20));continue}}if(s.mv==='charge'||s.mv==='pool')continue;const LS=s.nth>0&&!s.rally?3:LF,sc=s.mv==='hslam'?.5:s.mv==='slam'?.45:s.mv==='stab'?.2:s.mv==='tail'||s.mv==='breath'||s.mv==='step'||s.mv==='bite'||s.mv==='arm'||s.mv==='bk'||s.mv==='reach'||s.mv==='vlash'||s.mv==='cape'?0:1;const d=G.et-s.impact;if(d>-LS&&d<9)lunge=Math.max(lunge,(d<0?(LS+d)/LS:afterL(s,d))*sc)}
   const s=G.strikes.find(s=>!s.done);
   if(s&&(G.et>=s.start||s.iv)){
-   lean=s.iv?1:Math.min(1,(G.et-s.start)/10);
+   /* 静と動：構えは予兆までに終え、予兆が出ている間は止まる */
+   lean=s.iv||s.cue<=s.start?1:Math.min(1,(G.et-s.start)/Math.max(1,Math.min(10,s.cue-s.start)));
    if(G.et<s.cue){if(s.feint&&(s.cue-G.et)%38<5&&s.cue-G.et>12)twitch=1}
    else{cue=s.dark||s.lob||s.nolight?-1:G.et-s.cue;red=s.red;gold=!!s.rallyOpen;proj=s.proj;if(s.beats&&!s.lob){const k=G.et-s.cue;pulse=s.beats.some(b=>k>=b&&k<b+4);hold=Math.min(1,k/20)}if(s.fake){lean=0;lunge=cue<4?cue/4*.3:Math.max(0,.3*(1-(cue-4)/10));fake=true}else if(s.beat&&!s.dark){const B=s.bf||P.golemBeatF,N=s.bn||4;hold=s.mv==='smash'?Math.min(1,(Math.min(N,Math.floor(cue/B))+Math.min(1,(cue%B)/4)*(cue<B*N?1:0))/N):Math.min(1,cue/(B*2));pulse=cue>=B&&cue%B<B/2&&cue<=B*N+B/2}
    if(s.mv==='hslam')rise=Math.min(1,cue/(s.cl-4));if(s.mv==='slam'){const B=s.bf||10,kk=cue-(s.bo||0),h=Math.min(3,Math.max(0,Math.floor(kk/B))),lv=[.12,.45,.75,1],pv=h?lv[h-1]:0;rise=pv+(lv[h]-pv)*Math.min(1,Math.max(0,kk-h*B)/4)}mv=s.mv}
@@ -239,7 +240,7 @@ function drawEnemy(){
  else if(e.kind==='dragon'){const ts=tailStrike();if(ts){const tp=tailPose(ts,x,y);drawTail(tp,pal)}dragonBeatLamps(x,y);tip=p.mv==='tail'&&ts?(()=>{const tp=tailPose(ts,x,y);return{x:Math.round(tp.E[0]),y:Math.round(tp.E[1])}})():p.mv==='tail'?{x:x+37,y:y-38}:p.mv==='slam'?{x:x-14,y:y-40-Math.round((p.rise||0)*9)}:p.mv==='breath'?{x:x-34,y:y-57}:{x:x-36,y:y-17}}
  else if(e.kind==='imp'){const Hd=an('imp',x,y);tip={x:Hd.x,y:Hd.y};const thr=G.state==='enemy'&&G.strikes.some(s=>s.lob&&!s.done&&G.et>=s.cue&&G.et<s.cue+4);const ls=G.state==='enemy'&&G.strikes.find(s=>s.lob&&!s.done&&G.et>=s.start&&G.et<s.cue);if(!thr){const k=ls?Math.min(1,(G.et-ls.start)/Math.max(1,ls.cue-ls.start)):0,rx=Hd.x,ry=Math.round(Hd.y-10*k);disc(rx,ry,3,OUT);disc(rx,ry,2.2,'#8a7d74');px(rx-1,ry-1,'#c8bcb0')}}
  else if(e.kind==='knight'&&e.key==='gateK'){tip=drawGateK(e,x,y-idle,v)}
- else if(e.kind==='knight'){const ns=G.state==='enemy'&&G.strikes.find(s=>!s.done),k=ns&&G.et>=ns.start?Math.max(0,1-Math.abs(G.et-ns.cue)/10):0,LN=[6, 9, 7, 3],ct=nCol('#4a2260',v,e.tint),cT=nCol('#9a62b4',v,e.tint);
+ else if(e.kind==='knight'){const ns=G.state==='enemy'&&G.strikes.find(s=>!s.done),k=ns&&G.et>=ns.start?(G.et<ns.cue?Math.max(0,1-(ns.cue-G.et)/10):1):0,LN=[6, 9, 7, 3],ct=nCol('#4a2260',v,e.tint),cT=nCol('#9a62b4',v,e.tint);
   if(!G.ko)for(let j=0;j<4;j++){const R=an('knT',x,y,j),L=LN[j];for(let i=0;i<L;i++){const f=i/L,sw=Math.sin(G.anim*.06+j*1.9+i*.45)*f*1.6,cu=-k*f*f*(5+j),yy=R.y+Math.round(i*(1-.3*k));px(Math.round(R.x+sw+cu),yy,i===L-1?cT:ct)}}
   tip=an('knH',x,y,ns?G.strikes.filter(s=>s.done).length%2:0)}
  else if(RIG.on(e)){tip=RIG.tip(e,x,y-idle)}

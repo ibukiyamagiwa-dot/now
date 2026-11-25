@@ -1101,9 +1101,6 @@ mv({f:'dgate',id:'dg_turn',n:'のまれかけ：門番が黒い門番になる',
   if(t>=138&&t<150){const u=(t-138)/12,Bd=new Buf(CW,CH);knight(Bd,EXX,FL,SPEC.dgate,J.P,t);for(let i=0;i<B.c.length;i++){const x=i%CW,y=i/CW|0;if(hsh(x+7,y+3)<u){if(Bd.c[i]){B.c[i]=Bd.c[i];B.t[i]=Bd.t[i]}else if(B.t[i]===1){B.c[i]=0;B.t[i]=0}}}}}});
 mv({f:'dgate',id:'dg_state',n:'派生の立ち絵：目の数',bg:'gate',len:180,noHero:true,cap:'目が1つ、2つ、3つ。開いている目の数で、のまれ具合がわかる。',why:'「目＝上位の存在の視線、のまれたものほど目が増える」というモチーフを、一体の中で見せる。',
  keys:[K(0,{}),K(180,{})],pp:(P,t)=>{P.eyes=t<60?1:t<120?2:3}});
-mv({f:'dgate',id:'dg_chain',n:'鎖の打ち払い',bg:'gate',len:120,cap:'手首の黒い鎖を後ろへ引いて、白く光る。鞭のように横に払う。',why:'門番の短い鎖が、のまれて長く黒くなった。仕えるための鎖が、武器になってしまった。',
- keys:[K(0,X),K(16,Object.assign({},X,{ua2:.2,fa2:-.4,lean:-.1})),K(30,Object.assign({},X,{ua2:.2,fa2:-.4,lean:-.1})),K(44,Object.assign({},X,{ua2:2.9,fa2:3.0,lean:.2,x:-4}),'in'),K(70,Object.assign({},X,{ua2:2.9,fa2:3.0,lean:.2,x:-4})),K(110,X)],cues:[{t:16,col:'w',at:J=>J.hdB}],hits:[44],
- fx:(B,J,t)=>{if(t>=38&&t<60){const u=t<44?(t-38)/6:1-(t-44)/16,h=J.hdB;for(let i=0;i<24;i++){const s=i/24,x=lerp(h[0],HXX+8,s*u),y=h[1]+Math.sin(s*3.14)*(-10*(1-u))+s*(FL-14-h[1])*u;B.set(x,y,i%2?'#22142e':'#4e2c70',1)}}}});
 mv({f:'dgate',id:'dg_down2',n:'たおれる：鎖だけが残る',bg:'gate',len:140,noHero:true,cap:'体はくらやみに溶ける。床には交差した剣と、黒い鎖だけが残る。',why:'残った鎖は、門のぬしの鎖と同じもの。この先にいる者の正体を、ここで一度だけ見せておく。',
  keys:MV.find(m=>m.id==='dg_down').keys,post:MV.find(m=>m.id==='dg_down').post});
 
@@ -1118,9 +1115,6 @@ mv({f:'lord2',id:'l2_threat',n:'派生の立ち絵：門が口をあける',bg:'
 mv({f:'lord2',id:'l2_extf',n:'伸びる刃（ふり）',bg:'lord',len:120,cap:'のびた刃の先に紫の輪が出たら、ふり。押さずに待つ。本物は次の赤い光。',why:'本物（赤）とふり（紫の輪）は、刃が伸びるところまで同じ。見るのは光の色だけ。',
  keys:[K(0,L2I),K(16,LBK),K(40,LBK),K(52,Object.assign({},LBK,{x:-2})),K(70,LBK),K(110,L2I)],cues:[{t:18,col:'p',at:J=>J.tip?[J.tip[0]-20,J.tip[1]]:J.hdF}],
  fx:(B,J,t)=>{if(J.tip&&t>=18&&t<60){const u=Math.min(1,(t-18)/12)*.5*(t<44?1:Math.max(0,1-(t-44)/16));for(let i=0;i<30*u;i++){const x=J.tip[0]-i,y=J.tip[1]+Math.sin(i*.6+t*.4)*(i/30);B.set(x,y,INK.col,1);B.set(x,y-1,i%3?INK.hi:INK.eye,1)}}}});
-mv({f:'lord2',id:'l2_whip',n:'ちぎれた鎖の鞭',bg:'lord',len:120,cap:'手首からちぎれた鎖を、触手が拾って振り回す。白く光ったら、上から叩きつける。',why:'門と自分をつないでいた鎖が、もう鞭でしかない。つながりが切れたことを技で見せる。',
- keys:[K(0,L2I),K(16,Object.assign({},L2I,{ua2:-1.2,fa2:-1.6,lean:-.15})),K(30,Object.assign({},L2I,{ua2:-1.2,fa2:-1.6,lean:-.15})),K(44,Object.assign({},L2I,{ua2:2.6,fa2:2.9,lean:.25}),'in'),K(70,Object.assign({},L2I,{ua2:2.6,fa2:2.9,lean:.25})),K(110,L2I)],cues:[{t:16,col:'w',at:J=>J.hdB}],hits:[44],
- fx:(B,J,t)=>{const h=J.hdB;let tip;if(t<44){const a=-1.4-Math.min(1,t/16)*.8;tip=add(h,dir(a,20))}else{const u=Math.min(1,(t-44)/4);tip=[lerp(h[0]-6,HXX+8,u),lerp(h[1]-20,FL-12,u)]}if(t>=44&&t>70)return;for(let i=0;i<20;i++){const s=i/20,x=lerp(h[0],tip[0],s),y=lerp(h[1],tip[1],s)-Math.sin(s*3.14)*6;B.set(x,y,i%2?'#5e566e':'#b8902a',1)}}});
 /* 門の向こうの指の動き：縁にかかって指先がのぞく→合図で目が光り、いったん引く（構え）→3Fで突き出る→当たって口が裂け、伸びたまま粘る→もがきながら戻る */
 const GFU=(t,cue,hit,i)=>t<cue?.1+.05*Math.sin(t*.31+i*2):t<hit-3?Math.max(.02,.1-(t-cue)*.02):t<hit?lerp(.02,1,(t-(hit-3))/3):t<hit+8?1:Math.max(.1,1-(t-hit-8)/22)+.04*Math.sin(t*.5+i);
 const GFT=[[HXX+6,FL-30],[HXX+12,FL-17],[HXX+6,FL-5]];
@@ -1139,19 +1133,10 @@ mv({f:'dgate',id:'dg_beat',n:'鎖の拍',bg:'gate',len:150,cap:'黒い鎖で床�
  keys:[K(0,X),K(14,Object.assign({},X,{ua2:.6,fa2:1.4})),K(130,Object.assign({},X,{ua2:.6,fa2:1.4})),K(146,X)],cues:[{t:20,col:'w',at:J=>[J.hdB[0]+10,FL-2]}],hits:[48],
  fx:(B,J,t)=>{const h=J.hdB;const beats=[20,30,40];let up=1;for(const b of beats)if(t>=b&&t<b+4)up=0;if(t<48){for(let i=0;i<18;i++){const s=i/18,x=h[0]+s*14,y=lerp(h[1],FL-1,up?Math.min(1,s*1.4)*.7:Math.min(1,s*1.5));B.set(x,y,i%2?'#22142e':'#4e2c70',1)}for(const b of beats)if(t>=b&&t<b+5)spark(B,h[0]+13,FL-2,t-b,'w')}
   else if(t<64){const u=Math.min(1,(t-44)/4);for(let i=0;i<24;i++){const s=i/24,x=lerp(h[0],HXX+8,s*u),y=lerp(h[1],FL-14,s*u)-Math.sin(s*3.14)*4;B.set(x,y,i%2?'#22142e':'#4e2c70',1)}}}});
-const LPULL={ua:.5,fa:.2,sw:-1.2,ua2:.4,fa2:.2,lean:-.25,cr:2,x:4};
-mv({f:'lord',id:'l_pull',n:'門の重み',bg:'lord',len:140,cap:'背中の鎖を両手で引き、背後の門がきしむ。鍵の大剣を振り上げて止まり、その先が赤く光ったら、叩きつける。重い。',why:'ぬしの力は門とつながっていることから来る。鎖を引く＝門の重さを自分の一撃に乗せる。',
- keys:[K(0,LI),K(18,LPULL),K(36,Object.assign({},LPULL,{lean:-.3,x:6})),K(40,LUP),K(56,LUP),K(68,Object.assign({},LDN,{x:-16,cr:4}),'in'),K(100,Object.assign({},LDN,{x:-16,cr:4})),K(132,LI)],
- cues:[{t:40,col:'r'}],hits:[68],hitCol:'r',trails:[[64,70,'r']],pp:(P,t)=>{P.chainL=t>=18&&t<40?44:60},
- fx:(B,J,t)=>{if(t>=18&&t<40&&(t>>1)%2)for(let i=0;i<3;i++)B.set(CW-2,J.sc[1]-6+i*8,'#c8a050',4);if(t>=68&&t<80){for(let x=HXX;x<EXX;x+=2)B.set(x,FL-1-((x+t)%3===0?1:0),'#ffb0a0',4)}}});
 mv({f:'lord2',id:'l2_pool',n:'足元の溜まりから',bg:'lord',len:130,cap:'ぬしの足元のくらやみが、床を這ってこちらの足元まで広がる。泡が白く光ったら、真下から触手が突き上がる。',why:'黒い門番を染めた「溜まり」が、ついにこちらへ届く。くらやみは悪意ではなく、ただ広がるもの。',
  keys:[K(0,L2I),K(16,Object.assign({},L2I,{lean:.15,cr:3})),K(120,Object.assign({},L2I,{lean:.15,cr:3})),K(128,L2I)],cues:[{t:22,col:'w',at:J=>[HXX+6,FL-2]}],hits:[50],
  pre:(B,t)=>{const u=Math.min(1,t/22);for(let x=Math.round(lerp(EXX-10,HXX-4,u));x<EXX;x++){B.set(x,FL,INK.hi,6);if((x+t)%4===0)B.set(x,FL-1,INK.col,6)}},
  fx:(B,J,t)=>{if(t>=18&&t<46&&(t>>2)%2){B.set(HXX+5,FL-2,'#9a5ad0',4);B.set(HXX+8,FL-3,'#9a5ad0',4)}if(t>=46&&t<70){const u=t<50?(t-46)/4:1-(t-50)/20;for(let i=0;i<3;i++){const x=HXX+3+i*3;B.tube([x,FL],[x+(i-1)*2,FL-10*u],[x+(i-1)*4,FL-22*u],2,.5,'#4e2c70','#9a5ad0','#22142e',1)}}}});
-mv({f:'lord2',id:'l2_doors',n:'扉のかみ合わせ',bg:'lord',len:120,cap:'胸の扉を大きく開いたまま前に出る。赤く光ったら、扉があごのように閉じて挟みにくる。重い。',why:'扉＝門。閉じる門に挟まれる。胸の口（回復）とは別の、扉そのものの技。',
- keys:[K(0,L2I),K(16,Object.assign({},L2I,{door:2,lean:-.1})),K(34,Object.assign({},L2I,{door:2.2,lean:.2,x:-14})),K(44,Object.assign({},L2I,{door:.2,lean:.35,x:-18}),'in'),K(70,Object.assign({},L2I,{door:.2,lean:.35,x:-18})),K(112,L2I)],
- cues:[{t:16,col:'r',at:J=>add(J.sc,[0,9*J.k])}],hits:[44],hitCol:'r'});
-
 /* ===== 赤の系統（第2版） ===== */
 mv({f:'red',id:'r_delay',n:'遅らせ突き',bg:'red',len:130,cap:'剣先を引いたまま長く溜める。溜めるあいだ、何度も柄を握り直す。体ではなく、光で押す。',why:'溜めの長さで焦らせる。早く斬りたい力みが、握り直しになって漏れる。本気の溜めは、ぴたりと止まったまま。',
  keys:[K(0,RI),K(14,{ua:1.2,fa:3.0,sw:3.14,x:4,cr:3}),K(60,{ua:1.2,fa:3.0,sw:3.14,x:5,cr:3.5}),K(80,RTH,'in'),K(100,RTH),K(126,RI)],cues:[{t:52,col:'w'}],hits:[80],trails:[[77,82,'w']]});
@@ -2016,9 +2001,9 @@ const FORMS=[
  parts:[['両方そろった牙','体でいちばん明るい。合図は手前の牙の先に出る'],['短いたてがみ','まだ若い。おびえると逆立つ'],['ふつうのひづめ','地をかく癖がない＝赤い溜め突進を持たない'],['足の黒い泥','下の階を走ってきた跡']],
  pal:[['#6a4630','こげ茶の毛','ふつうの生きた獣'],['#e8dcc6','骨色の牙','合図が出る場所'],['#1d1728','黒紫の泥','下の階のくらやみ']]},
 ];
-const MOVES_OF={gate:['g_idle','g_bored','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_chain','dg_beat','dg_down2'],
- lord:['l_enter','l_idle','l_bored','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_unlock','l_r_open','l_r_tame','l_r_tsume','l_r_feint','l_r_tfeint','l_r_lock','l_r_last','l_r_crush','l_pull','l_kneel'],
- lord2:['l2_open','l2_idle','l2_bored','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_r_open','l2_r_tame','l2_r_tsume','l2_r_arm','l2_r_heavy','l2_r_feint','l2_r_tfeint','l2_r_lock','l2_r_last','l2_r_crush','l2_whip','l2_pool','l2_doors','l2_gate','l2_down'],
+const MOVES_OF={gate:['g_idle','g_bored','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_beat','dg_down2'],
+ lord:['l_enter','l_idle','l_bored','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_unlock','l_r_open','l_r_tame','l_r_tsume','l_r_feint','l_r_tfeint','l_r_lock','l_r_last','l_r_crush','l_kneel'],
+ lord2:['l2_open','l2_idle','l2_bored','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_r_open','l2_r_tame','l2_r_tsume','l2_r_arm','l2_r_heavy','l2_r_feint','l2_r_tfeint','l2_r_lock','l2_r_last','l2_r_crush','l2_pool','l2_gate','l2_down'],
  red:['r_idle','r_bored','r_kamae','r_stance','r_two','r_swap','r_three','r_delay','r_thrust','r_feint','r_combo4','r_parry','r_counter','r_seefeint','r_q_open','r_q_tame','r_q_tsume','r_q_feint','r_q_tfeint','r_q_heavy','r_q_lock','r_q_last','r_q_crush','r_zanshin','r_zanpunish','r_rage'],
  red2:['r2_idle','r2_bored','r2_iai','r2_iai2','r2_three','r2_hold','r2_holdfeint','r2_thrust','r2_silent','r2_moon','r2_tsubame','r2_juji','r2_double','r2_seefeint','r2_kamae','r2_counter','r2_zanpunish','r2_q_open','r2_q_tame','r2_q_tsume','r2_q_feint','r2_q_tfeint','r2_q_heavy','r2_q_lock','r2_q_last','r2_q_crush','r2_last'],
  fallen:['f_rise','f_idle','f_bored','f_kneel','f_cutten','f_back','f_arm','f_sa','f_reach','f_maw','f_dark','f_double','f_seefeint','f_counter','f_zanpunish','f_shift','f_twin','f_iai','f_silent','f_cage','f_q_open','f_q_tame','f_q_tsume','f_q_feint','f_q_tfeint','f_q_heavy','f_q_lock','f_q_last','f_q_crush','f_swallow'],

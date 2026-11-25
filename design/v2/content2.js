@@ -53,9 +53,9 @@ const FORMS=[
  parts:[['両方そろった牙','体でいちばん明るい。合図は手前の牙の先に出る'],['短いたてがみ','まだ若い。おびえると逆立つ'],['ふつうのひづめ','地をかく癖がない＝赤い溜め突進を持たない'],['足の黒い泥','下の階を走ってきた跡']],
  pal:[['#6a4630','こげ茶の毛','ふつうの生きた獣'],['#e8dcc6','骨色の牙','合図が出る場所'],['#1d1728','黒紫の泥','下の階のくらやみ']]},
 ];
-const MOVES_OF={gate:['g_idle','g_bored','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_chain','dg_beat','dg_down2'],
- lord:['l_enter','l_idle','l_bored','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_unlock','l_r_open','l_r_tame','l_r_tsume','l_r_feint','l_r_tfeint','l_r_lock','l_r_last','l_r_crush','l_pull','l_kneel'],
- lord2:['l2_open','l2_idle','l2_bored','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_r_open','l2_r_tame','l2_r_tsume','l2_r_arm','l2_r_heavy','l2_r_feint','l2_r_tfeint','l2_r_lock','l2_r_last','l2_r_crush','l2_whip','l2_pool','l2_doors','l2_gate','l2_down'],
+const MOVES_OF={gate:['g_idle','g_bored','g_enter','g_two','g_kneel'],dgate:['dg_turn','dg_idle','dg_state','dg_eyes','dg_sweep','dg_feint','dg_two','dg_beat','dg_down2'],
+ lord:['l_enter','l_idle','l_bored','l_plant','l_seal','l_two','l_rev','l_thrust','l_feint','l_unlock','l_r_open','l_r_tame','l_r_tsume','l_r_feint','l_r_tfeint','l_r_lock','l_r_last','l_r_crush','l_kneel'],
+ lord2:['l2_open','l2_idle','l2_bored','l2_threat','l2_back','l2_arm','l2_tri','l2_ext','l2_extf','l2_dark','l2_maw','l2_r_open','l2_r_tame','l2_r_tsume','l2_r_arm','l2_r_heavy','l2_r_feint','l2_r_tfeint','l2_r_lock','l2_r_last','l2_r_crush','l2_pool','l2_gate','l2_down'],
  red:['r_idle','r_bored','r_kamae','r_stance','r_two','r_swap','r_three','r_delay','r_thrust','r_feint','r_combo4','r_parry','r_counter','r_seefeint','r_q_open','r_q_tame','r_q_tsume','r_q_feint','r_q_tfeint','r_q_heavy','r_q_lock','r_q_last','r_q_crush','r_zanshin','r_zanpunish','r_rage'],
  red2:['r2_idle','r2_bored','r2_iai','r2_iai2','r2_three','r2_hold','r2_holdfeint','r2_thrust','r2_silent','r2_moon','r2_tsubame','r2_juji','r2_double','r2_seefeint','r2_kamae','r2_counter','r2_zanpunish','r2_q_open','r2_q_tame','r2_q_tsume','r2_q_feint','r2_q_tfeint','r2_q_heavy','r2_q_lock','r2_q_last','r2_q_crush','r2_last'],
  fallen:['f_rise','f_idle','f_bored','f_kneel','f_cutten','f_back','f_arm','f_sa','f_reach','f_maw','f_dark','f_double','f_seefeint','f_counter','f_zanpunish','f_shift','f_twin','f_iai','f_silent','f_cage','f_q_open','f_q_tame','f_q_tsume','f_q_feint','f_q_tfeint','f_q_heavy','f_q_lock','f_q_last','f_q_crush','f_swallow'],

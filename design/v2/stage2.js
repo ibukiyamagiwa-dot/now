@@ -129,22 +129,22 @@ function stageAudit(list){const rows=[];for(const it of list){const K=it.K,bg=st
    rows.push({K,st:it.s.n||it.s.st,w,ttl:(FORMS.find(F=>F.key===w)||{}).ttl||w,edge:e/T.length,core:c/T.length,fig:f/T.length,ring:r/T.length,zm,cue:CUEL-zm})}}return rows}
 /* ===== 関所：門番の持ち場。迷宮の「奥への通路」を、格子戸で閉じた所（通路と同じ形・同じ光） =====
    覚悟0は門番。覚悟3・4は黒い門番：格子戸は内側から押し曲げられ、旗はくらやみに食われている */
-function grate(B,L,t,K,broken){/* 落とし格子：壁の厚みの中ほど（0.93）に収める。棒は2画素で、向こうの光を受ける側（上・左）だけ明るい。下の端はとがる */
- const GS=.93,inG=(x,y)=>archIn(VP.x+(x-VP.x)/GS,VP.y+(y-VP.y)/GS)>=0,iron=mix(L.wall[0],'#3c3a44',.55),hi=mix(iron,L.glow[0],.45),lo='#09070c',cx=(ARCH.x0+ARCH.x1)/2;
+function grate(B,L,t,K,broken){/* 落とし格子：壁の厚みの中ほど（0.93）に収める。黒い鉄のかたまりとして、向こうの光の前に立てる。
+   棒は3画素、横木は4本だけ（4画素、鋲つき）で、横木は棒の前を切れずに通る（点線に見せない）。光は棒のふちに1画素だけ。下の端はとがる */
+ const GS=.93,inG=(x,y)=>archIn(VP.x+(x-VP.x)/GS,VP.y+(y-VP.y)/GS)>=0,iron='#14111a',edge=mix(iron,L.glow[0],.28),lo='#07050a',cx=(ARCH.x0+ARCH.x1)/2;
  const lift=x=>broken?Math.max(0,24-Math.abs(x-cx)*.75):0;/* 黒い門番の版：下の真ん中が内側から押し上げられている */
- for(let y=0;y<SFL;y++)for(let x=ARCH.x0;x<=ARCH.x1;x++){if(!inG(x,y))continue;const bx=((x-ARCH.x0-4)%10+10)%10,ry=((y-ARCH.top-8)%14+14)%14,lf=lift(x),bot=SFL-1-lf;
-  const isBar=bx<3,isRail=ry<3&&y>ARCH.top+4&&y<bot-4;let c=null;
-  if(isBar&&y<=bot){const tip=y>bot-3;c=tip?(bx===1?(y===bot?hi:iron):(y<bot-1?(bx===0?hi:lo):null)):[hi,iron,lo][bx]}
-  if(isRail){c=[hi,iron,lo][ry];if(isBar)c=(bx===1&&ry===1)?mix(hi,L.wall[2],.5):ry===2?lo:iron}
-  if(broken&&!isBar&&y>bot-3&&y<=bot&&bx<4&&lf>0)c=lo;/* 曲がった棒の先 */
+ const rails=[ARCH.top+18,ARCH.top+40,ARCH.top+62,SFL-14];
+ for(let y=0;y<SFL;y++)for(let x=ARCH.x0;x<=ARCH.x1;x++){if(!inG(x,y))continue;const bx=((x-ARCH.x0-4)%11+11)%11,lf=lift(x),bot=SFL-1-lf;let c=null;
+  if(bx<3&&y<=bot){const tip=y>bot-4;c=tip?(bx===1?(y===bot?edge:iron):(y<bot-2?(bx===0?edge:iron):null)):bx===0?edge:bx===1?iron:lo}
+  for(const ry of rails){const d=y-ry;if(d>=0&&d<4&&y<bot-5){c=d===0?edge:d===3?lo:iron;if(bx===1&&d===1)c=mix(edge,L.wall[2],.5)/* 鋲 */}}
   if(c)B.set(x,y,c,6)}
- /* 格子の上の梁：鉄の帯と鋲 */for(let x=ARCH.x0;x<=ARCH.x1;x++)for(let y=0;y<SFL;y++){if(!inG(x,y)||inG(x,y-2))continue;B.set(x,y,iron,6);B.set(x,y+1,(x%6===0)?hi:lo,6);break}}
+ /* 格子の上の梁：太い鉄の帯と鋲 */for(let x=ARCH.x0;x<=ARCH.x1;x++)for(let y=0;y<SFL;y++){if(!inG(x,y)||inG(x,y-3))continue;B.set(x,y,edge,6);B.set(x,y+1,iron,6);B.set(x,y+2,(x%7===0)?mix(edge,L.wall[2],.5):iron,6);B.set(x,y+3,lo,6);break}}
 function banner(B,x,y,K,t){/* 旗：紺に金の「閉じた門」（門番の前垂れと同じ紋）。黒い段からは、下からくらやみに食われて短くなる */const eat=K>=3?(K===4?20:12):0,h=30;
  for(let yy=0;yy<h;yy++)for(let xx=0;xx<16;xx++){const tear=eat&&yy>h-eat+Math.floor(vn(xx+x,yy,3,x)*8)-4;if(tear)continue;let c=yy<2?'#6e5a36':'#24305a';if(xx===0||xx===15)c='#1a2446';
   if(K>=3&&!tear&&yy>h-eat-6&&hsh2(xx+x,yy)<.5)c='#0e0a14';B.set(x+xx,y+yy,c,6)}
  if(K<3||eat<20){const ex=x+5,ey=y+8;for(let yy=0;yy<9;yy++)for(let xx=0;xx<6;xx++){const ar=yy<2&&(xx===0||xx===5);if(!ar)B.set(ex+xx,ey+yy,xx===2||xx===3?(yy>2?'#140a10':'#6e5a36'):'#6e5a36',6)}}
  if(K>=3)for(let i=0;i<4;i++){const dx=x+3+i*3,len=4+((t>>3)+i*5)%9;for(let j=0;j<len;j++)B.set(dx,y+h-eat+2+j,'#07050b',6)}}
-STG.gate2=(B,t,K)=>{const L=Object.assign({},LT[K],{flatFar:1,gk:Math.min(1,LT[K].gk*(K>=3?1.18:1))},K===4?{gk:1,glow:['#685290','#2e2242']}:{});/* 格子で光がさえぎられる分、通路の光を少し強く */stoneWall(B,L,t,K);archDraw(B,L,t,K);grate(B,L,t,K,K>=3);floorK(B,L,t);
+STG.gate2=(B,t,K)=>{const L=Object.assign({},LT[K],{flatFar:1,gk:Math.min(1,LT[K].gk*(K>=3?1.18:1))},K===4?{gk:1,glow:['#6e5896','#2e2242']}:{});/* 格子で光がさえぎられる分、通路の光を少し強く */stoneWall(B,L,t,K);archDraw(B,L,t,K);grate(B,L,t,K,K>=3);floorK(B,L,t);
  if(K>=3){const LL=Object.assign({},L,{rust:0,eyes:0,crack:0});overlayK(B,LL,t,K)}else if(K===0){/* 関所は浅い階でも苔は少ない（人の手が入っている） */}
  banner(B,30,12,K,t);banner(B,50,12,K,t);torchK(B,L,22,41,t);
  if(K===4){const LL=Object.assign({},L,{ink:0,rust:0});overlayK(B,Object.assign(LL,{eyes:1,crack:1}),t,K)}};
@@ -155,13 +155,15 @@ function sealPlate(B,x,y,w,K,open){for(let yy=0;yy<5;yy++)for(let xx=-w;xx<=w;xx
 function leakDown(B,cx,y0,base,leak){for(let y=y0;y<base+12;y++){const w=y<base?Math.floor(leak*.6*((y-y0)/(base-y0))):leak*2+Math.floor((y-base)*leak*.8);for(let d=-w;d<=w;d++){const x=cx+d+(y>=base?Math.round(Math.sin(y*.7)*.5):0);if(y>=base&&hsh2(x,y)<Math.abs(d)/(w+1))continue;B.set(x,y,y<base?'#07040b':(Math.abs(d)===w?'#1c1426':'#07040b'),6)}}}
 /* 門の扉：鉄で留めた厚い板。板は縦、鉄の帯は横に3本、帯には鋲。両わきに大きな蝶番。真ん中の合わせ目に封印の札3枚。
    pw＝板の幅（遠い門前は5、近い大門の間は11）。遠いほど空気にかすみ（色が光に寄り）、差が弱い */
-function doorFace(B,L,K,inside,x0,x1,y0,y1,pw,haze,open,lit){lit=lit||.18;const cx=Math.round((x0+x1)/2),bh=Math.max(2,Math.round(pw*.55)),bands=[.22,.52,.82].map(v=>Math.round(y0+(y1-y0)*v));
- const wood=mix(mix('#2a2026',L.wall[1],.4),L.glow[0],lit>.3?.3:0),woodD=mix(wood,'#06040a',.35),iron=mix('#2e2c36',L.wall[0],.3),ironH=mix(iron,L.glow[0],.5),hz=c=>mix(c,L.glow[0],haze),hz2=c=>mix(c,L.glow[1],haze*.6);
+function doorFace(B,L,K,inside,x0,x1,y0,y1,pw,haze,open,lit,halo0){lit=lit||.18;const cx=halo0?EXS+4:Math.round((x0+x1)/2),bh=Math.max(3,Math.round(pw*.8)),bands=[.22,.52,.82].map(v=>Math.round(y0+(y1-y0)*v));
+ const wood=mix('#1e1820',L.wall[1],.3),woodD=mix(wood,'#05030a',.5),iron='#121018',ironH=mix(iron,L.glow[0],.35),hz=c=>mix(c,L.glow[0],haze),hz2=c=>mix(c,L.glow[1],haze*.6);
  for(let y=y0;y<y1;y++)for(let x=x0;x<=x1;x++){if(!inside(x,y))continue;const px=((x-cx)%pw+pw)%pw,pl=Math.floor((x-cx)/pw);
-  let c=(pl&1)?wood:mix(wood,woodD,.35);if(px===0)c=woodD;if(px===1)c=mix(c,L.wall[2],.25);
-  /* 下ほど、向こうの光（すき間と床の照り返し）を受ける */const v=(y-y0)/(y1-y0);c=mix(c,L.glow[0],lit*(.4+.6*v)*L.gk);
-  for(const by of bands){if(y>=by&&y<by+bh){c=y===by?ironH:y===by+bh-1?'#08060c':iron;if(px===Math.floor(pw/2)&&y===by+Math.floor(bh/2))c=ironH}}
-  if(Math.abs(x-cx)<=(open?2+(y%9>6?1:0):0))c=open?dith('#2a1a3e','#4e3468',(y%11)/11,x,y):'#07050b';
+  let c=(pl&1)?wood:mix(wood,woodD,.3);if(px===0)c=woodD;else if(px===1)c=mix(c,L.wall[2],.22);
+  /* 板を留める釘：板の真ん中に、縦に並ぶ */if(pw>=8&&px===(pw>>1)&&((y-y0)%12===6))c=mix(ironH,L.wall[2],.3);if(pw>=8&&px===(pw>>1)&&((y-y0)%12===7))c='#06040a';
+  /* 光は下からだけ（すき間と床の照り返し）。上は重く暗い。4段に分け、段の境目だけ2行の網目でつなぐ */const v=(y-y0)/(y1-y0),hd=Math.abs(x-cx),halo=halo0?Math.max(0,3.6-hd/(open?12:12))*Math.min(1,(v-.05)*4):0,l=Math.max(0,Math.min(3,Math.max(halo,halo0?((v-.7)/.3)*2.2:Math.min(1,(v-.12)/.8)*3))),st=Math.floor(l),fr=l-st;
+  const lv=k=>lit*[0,.45,.72,1][Math.min(3,k)]*L.gk;c=dith(mix(c,L.glow[0],lv(st)),mix(c,L.glow[0],lv(st+1)),fr>.82?.5:0,x,y);
+  for(const by of bands){if(y>=by&&y<by+bh){const d=y-by;c=d===0?ironH:d===bh-1?'#06040a':iron;c=mix(c,L.glow[0],lv(st)*.8);if(((x-cx)%pw+pw)%pw===(pw>>1)&&(d===2||d===bh-3)){c=pw>=8?mix(ironH,L.wall[2],.4):ironH}}}
+  if(Math.abs(x-cx)<=(open?2+(y%9>6?1:0):0))c=open?dith('#2a1a3e','#4e3468',(y%11)/11,x,y):halo0?mix(L.glow[0],'#000',.1):'#07050b';
   B.set(x,y,hz(c),6)}
  /* 蝶番：両わきから伸びる鉄のつめ */for(const by of bands)for(const sd of [-1,1]){const ex=sd<0?x0:x1;for(let i=0;i<pw*2.4;i++){const x=ex-sd*i,w=i<pw*2?bh+2:bh;for(let j=-1;j<w-1;j++){const y=by+j;if(!inside(x,y))continue;B.set(x,y,hz(j===-1?ironH:j===w-2?'#08060c':iron),6)}}}
  /* 封印の札3枚：鈍い金。開くと破れて黒ずむ */for(let i=0;i<3;i++){const y=Math.round(y0+(y1-y0)*(.3+i*.17)),w=Math.max(2,Math.round(pw*.45));for(let yy=0;yy<w+2;yy++)for(let xx=-w;xx<=w;xx++){if(!inside(cx+xx,y+yy))continue;if(open&&(xx+yy*3+i)%4===0)continue;B.set(cx+xx,y+yy,hz(open?(yy===0?'#3a2e40':'#241c2a'):(yy===0?'#665636':K>=3?'#3e3628':'#54462c')),6)}B.set(cx,y+1+(w>>1),'#1a1208',6)}}
@@ -173,7 +175,7 @@ function farGate(B,L,t,K){/* 門前：遠くの大門。通路と同じアーチ
  /* 門の前の段：3段（手前ほど広い） */const haze=mix(L.wall[1],L.glow[0],.5);for(let st=0;st<3;st++){const y0=base+st*4;for(let y=y0;y<y0+4;y++)for(let x=ARCH.x0+10-st*10;x<SW;x++)B.set(x,y,y===y0?mix(haze,L.floor[2],.5):mix(L.floor[1],haze,.3-st*.08),6)}
  /* すき間から漏れるくらやみ：段が深いほど太い */leakDown(B,Math.round(cx),ARCH.top+20,base,[1,1,2,3,4][K])}
 function nearGate(B,L,t,K,open){/* 大門の間：同じ門を真下から。板は太く、鉄の帯と鋲がはっきり見える（近い）。上は画面の外 */const gx0=110;
- doorFace(B,L,K,(x,y)=>x>=gx0&&y<SFL,gx0,SW+18,-30,SFL,11,0,open,open?.72:.62);
+ doorFace(B,L,K,(x,y)=>x>=gx0&&y<SFL,gx0,SW+18,-30,SFL,11,0,open,open?.95:.92,1);/* 光は、扉の合わせ目からにじむ向こうの光と、床ぎわだけ。ぬしは合わせ目の前に立つので逆光になる。扉のほかは重く暗い */
  /* 門の左の柱：大きな石の柱。右の面は向こうの光を受けない（門の手前） */for(let y=0;y<SFL;y++)for(let x=gx0-14;x<gx0;x++)B.set(x,y,x===gx0-14||y%16===0?L.wall[0]:x>=gx0-3?mix(L.wall[0],L.wall[1],.5):x===gx0-13?L.wall[2]:L.wall[1],6);
  /* 敷居 */for(let x=gx0-14;x<SW;x++){B.set(x,SFL-2,L.wall[2],6);B.set(x,SFL-1,L.wall[0],6)}}
 STG.monzen=(B,t,K,s)=>{const L=LT[K];stoneWall(B,L,t,K);
@@ -183,7 +185,7 @@ STG.monzen=(B,t,K,s)=>{const L=LT[K];stoneWall(B,L,t,K);
    初版の中身（鎖・封印・一本の光・剣の墓標・水）はそのまま残し、背景の約束に合わせて描き直した：
    敵のうしろは逆光、合図の色（赤い目・明るい紫・明るい金）は背景から外す */
 function pillars(B,xs,c,hi,top){for(const x of xs)for(let y=top||0;y<SFL;y++)for(let i=0;i<12;i++){const xx=x+i;if(xx<0||xx>=SW)continue;B.set(xx,y,i===1?hi:i===11?mix(c,'#000',.4):c,6)}}
-STG.lord=(B,t,K,s)=>{const open=s&&s.open,L=Object.assign({},LT[4],{gk:1,glow:open?['#6a5088','#30243e']:['#625474','#2e2640']});
+STG.lord=(B,t,K,s)=>{const open=s&&s.open,L=Object.assign({},LT[4],{gk:1,glow:open?['#765c96','#30243e']:['#6e6082','#2e2640']});
  stoneWall(B,L,t,4);pillars(B,[8,64],'#18121e','#261e2e');
  if(open){/* 開きかけ：壁は一気にくらやみに覆われ、三つずつの目が開く（紫の階と同じ。光らない） */overlayK(B,Object.assign({},L,{rust:0,ink:2,crack:0,eyes:0,nokeep:1}),t,4)}
  nearGate(B,L,t,4,open);if(open)overlayK(B,Object.assign({},L,{rust:0,ink:0,crack:1,eyes:1}),t,4);

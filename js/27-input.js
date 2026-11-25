@@ -1,6 +1,8 @@
 /* ===== 入力 ===== */
 document.addEventListener('keydown',e=>{
  const tg=e.target;if(tg.tagName==='TEXTAREA'||tg.tagName==='INPUT'||tg.tagName==='SELECT')return;{const dv=$('devp');if(dv&&!dv.hidden){if(e.key==='Escape')closeDev();return}}
+ /* コマ送り（開発者ページの「止める」）：. で1F進める。押しっぱなしで続けて進む（2024-03-01「デバッグモード」、2023-02-28「エフェクトをスローで見てみよう」） */
+ if(dbg.stop&&e.key==='.'&&!MENU&&G.mode!=='title'){e.preventDefault();try{tick()}catch(err){loopErr(err)}return}
  if(e.repeat)return;
  const isA=e.code==='Space'||e.key==='Enter'||'jkzJKZ'.includes(e.key),up=e.key==='ArrowUp'||e.key==='w'||e.key==='W',dn=e.key==='ArrowDown'||e.key==='s'||e.key==='S';
  if(e.key==='Escape'||e.key==='p'||e.key==='P'){e.preventDefault();if(MENU)menuBack();else if(G.mode!=='title')openMenu();return}

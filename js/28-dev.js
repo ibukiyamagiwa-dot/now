@@ -16,7 +16,7 @@ function devRender(){const d=$('devp');
  <div class="rw"><button class="go" data-dv="run">この階から本番を始める</button></div>
  <div class="rw"><select id="dvTut">${opt(TUT.map((t,i)=>[i,(t.key==='pro'?'最初の演出（竜）':i+'. '+t.title)]),st.tut)}</select><button data-dv="tut">チュートリアルのここから</button></div>
  <h3>デバッグ</h3>
- <div class="rw">${[['bar','受付バーと着弾リング'],['slow','スロー（1/4倍）'],['god','自分が倒れない'],['fix','敵の行動を固定']].map(([k,n])=>`<label class="ck"><input type="checkbox" data-dbg="${k}"${dbg[k]?' checked':''}>${n}</label>`).join('')}</div>
+ <div class="rw">${[['bar','受付バーと着弾リング'],['slow','スロー（1/4倍）'],['stop','止める（. キーで1F進める）'],['god','自分が倒れない'],['fix','敵の行動を固定']].map(([k,n])=>`<label class="ck"><input type="checkbox" data-dbg="${k}"${dbg[k]?' checked':''}>${n}</label>`).join('')}</div>
  <p class="note">見え方（動きを確かめる用。保存はしない）</p>
  <div class="rw">${[['bgOff','背景を消す（灰色）'],['foeSee','敵を半透明'],['heroSee','主人公を半透明'],['fxOff','光と粒を消す'],['uiOff','文字と枠を消す']].map(([k,n])=>`<label class="ck"><input type="checkbox" data-dbg="${k}"${dbg[k]?' checked':''}>${n}</label>`).join('')}</div>
  <div class="rw"><button data-dv="unlock">すべて解放（覚悟・練習・チュートリアル済み）</button><button data-dv="wipe">記録を消す</button></div>

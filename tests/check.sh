@@ -8,5 +8,6 @@ node tests/params.mjs . > /tmp/params.txt && echo "数値の台帳 OK" || { echo
 node tests/requests.mjs . > /tmp/requests.txt && echo "依頼の一覧 OK" || { echo "依頼の一覧 NG"; cat /tmp/requests.txt; exit 1; }
 node tests/smoke.mjs . > /tmp/smoke.json && echo "起動テスト OK" || { echo "起動テスト NG"; cat /tmp/smoke.json | head -c 2000; exit 1; }
 node tests/newdraw.mjs . > /tmp/newdraw.json && echo "?new（骨組みの門番）のテスト OK" || { echo "?new のテスト NG"; cat /tmp/newdraw.json; exit 1; }
+node tests/soak.mjs . > /tmp/soak.txt 2>&1 && echo "自動で戦わせるテスト OK" || { echo "自動で戦わせるテスト NG"; grep -v agent-proxy /tmp/soak.txt; exit 1; }
 node tests/stage.mjs . > /tmp/stage.txt && echo "背景の点検 OK" || { echo "背景の点検 NG"; cat /tmp/stage.txt; exit 1; }
 if [ -f rally.html ]; then node tests/pages.mjs . > /tmp/pages.json && echo "3ページのテスト OK" || { echo "3ページのテスト NG"; cat /tmp/pages.json; exit 1; }; fi

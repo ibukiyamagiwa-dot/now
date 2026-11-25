@@ -152,7 +152,7 @@ function syncOut(){
  $('der2').textContent=`→ まほうの威力：ほのお ${Math.round(magDmg(1))}／かみなり ${Math.round(magDmg(2))}／ひかり ${Math.round(magDmg(3))}　追撃は敵と同じく、剣が光ってから${P.cueF}F後に着弾　着弾の${P.chaseF}F前から押すと追撃、${P.critF}F前から（剣が触れる瞬間）なら重い一撃`;
  $('json').value=JSON.stringify(toJ(),null,1);
 }
-const dbg={bar:false,slow:false,god:false,fix:false,all:false,/* 見え方（開発者ページ） */bgOff:false,heroSee:false,foeSee:false,fxOff:false,uiOff:false};
+const dbg={bar:false,slow:false,stop:false,god:false,fix:false,all:false,/* 見え方（開発者ページ） */bgOff:false,heroSee:false,foeSee:false,fxOff:false,uiOff:false};
 let CFG={guide:false,vol:7,bgm:5,shake:100,flash:100,dev:false,vib:true};
 /* ?new：資料集の骨組みの描き方（js/24r-rig.js）で描く。いまは門番だけ。保存はしない */
 const NEWDRAW=/[?&]new(?:[&=]|$)/.test(location.search);

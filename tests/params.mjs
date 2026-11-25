@@ -1,7 +1,7 @@
 // 数値の台帳（js/01-params.js の DEF）と、コードの食いちがいを見つける。ブラウザは使わない。
 // 2023-12-12「多くの人がファイルをいじる方法」：同じファイルを何人もいじると、直したものが消える「先祖帰り」が起きる。
 // 2022-12-06「調整をしやすくする仕組み」・2023-01-30「パラメーターを【】でくくる」：数値は外に出し、【名前】で誰が見ても分かるようにする。
-// 見ること：①キーと【名前】が重なっていない ②コードが読む P.○○ が台帳にある ③台帳の数値がどこかで使われている ④名前が【】でくくられている
+// 見ること：①キーと【名前】が重なっていない ②コードが読む P.○○ が台帳にある ③台帳の数値がどこかで使われている ④名前が【】でくくられている ⑤台帳の行が全部読めている（コメントの中の名前は使っているに数えない）
 // 使い方: node tests/params.mjs [フォルダ=.]
 import fs from 'node:fs'; import path from 'node:path';
 const dir = path.resolve(process.argv[2] || '.');
@@ -10,7 +10,12 @@ const body = src.slice(src.indexOf('const DEF=['), src.indexOf('\n];', src.index
 const defs = [...body.matchAll(/\{k:'([A-Za-z0-9_]+)',n:'([^']*)'/g)].map(m => ({ k: m[1], n: m[2] }));
 const code = ['js', 'pages'].flatMap(d => fs.existsSync(path.join(dir, d)) ? fs.readdirSync(path.join(dir, d)).filter(f => f.endsWith('.js')).map(f => [`${d}/${f}`, fs.readFileSync(path.join(dir, d, f), 'utf8')]) : []);
 const all = code.map(([, s]) => s).join('\n'), bad = [];
+/* コメントの中に名前が出てきても「使っている」とは数えない */
+const noComment = t => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 const keys = new Set(defs.map(d => d.k));
+/* ⑤ 台帳の行は {k:'…',n:'…' の順で書く。順がちがうと上の読み取りから漏れるので、k: の数と比べる */
+const kCount = (body.match(/\bk:'/g) || []).length;
+if (kCount !== defs.length) bad.push(`台帳に読めない行がある（k: が ${kCount}個、読めたのは ${defs.length}個）。{k:'…',n:'…' の順で書く`);
 const dup = (a, f) => a.map(f).filter((v, i, x) => x.indexOf(v) !== i);
 for (const k of dup(defs, d => d.k)) bad.push(`キーが重なっている：${k}`);
 for (const n of dup(defs, d => d.n)) bad.push(`【名前】が重なっている：${n}`);
@@ -20,7 +25,7 @@ const prefixes = [...all.matchAll(/\bP\[\s*'([A-Za-z0-9_]+)'\s*\+/g)].map(m => m
 for (const [f, s] of code) for (const m of s.matchAll(/\bP\.([A-Za-z_][A-Za-z0-9_]*)/g))
   if (!keys.has(m[1])) bad.push(`台帳にない数値を読んでいる：${f} の P.${m[1]}`);
 /* 使われていない数値：P.キー、'キー'（技のデータの iv:'ivGate2' など）、頭で組み立てる P['頭'+…] のどれでもないもの */
-const rest = all.replace(body, '');
+const rest = noComment(all.replace(body, ''));
 for (const d of defs) {
   const used = new RegExp(`\\bP\\.${d.k}\\b|'${d.k}'|"${d.k}"`).test(rest) || prefixes.some(p => d.k.startsWith(p));
   if (!used) bad.push(`どこからも使われていない数値：${d.k} ${d.n}`);

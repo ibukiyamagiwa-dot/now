@@ -626,6 +626,7 @@ function draw(){
  if(G.fadeIn>0){G.fadeIn--;c.globalAlpha=G.fadeIn/40;c.fillStyle='#000';c.fillRect(0,0,960,540);c.globalAlpha=1}
  if(G.banner&&++G.banner.t>150)G.banner=null;
  if(G.banner&&!dbg.uiOff){const a=Math.min(1,G.banner.t/15,(150-G.banner.t)/25);c.globalAlpha=Math.max(0,a);c.textAlign='center';c.font=`${Math.round(32*Math.min(UIS,1.6))}px ${FONT}`;c.lineWidth=8;c.strokeStyle='#120509';c.strokeText(G.banner.s,480,230);c.fillStyle='#fff3b0';c.fillText(G.banner.s,480,230);c.globalAlpha=1;c.textAlign='left'}
+ if(dbg.stop){c.globalAlpha=1;c.textAlign='left';c.font=`16px ${FONT}`;c.lineWidth=4;c.strokeStyle='#000';const s=`止めている　. で1F進める　${G.anim}F　${G.state}`;c.strokeText(s,10,528);c.fillStyle='#ffe066';c.fillText(s,10,528)}
  syncButtons();syncUI();
 }
 let lastKey='';

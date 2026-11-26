@@ -3054,7 +3054,7 @@ const IMHEAD={
 function imGrid(H,P){const g=H.face.map(r=>r.split(''));const put=(ox,oy,rows)=>rows.forEach((r,y)=>[...r].forEach((c,x)=>{if(c==='.')return;const Y=oy+y,X=ox+x;while(g.length<=Y)g.push([]);while(g[Y].length<=X)g[Y].push('.');g[Y][X]=c}));
  const ear=P.ear>=.5?H.earFlat:H.ear;put(ear.at[0],ear.at[1],ear.rows);
  const g2=P.grin||0;if(P.ear>=.5)put(0,H.mouth.y,H.mouth.o);else if(g2>=.6)put(0,H.mouth.y,H.mouth.laugh);
- const es=P.daze?'daze':P.ear>=.5?'wide':g2>=.9?'shut':null;if(es)H.eye.forEach(([x,y],i)=>{g[y][x]=H.eyes[es][i]});
+ const es=P.daze?'daze':(P.ear>=.5||P.ear<=-.5)?'wide':/* ear<=-.5＝びくっとして目をむく（耳は寝かせない） */g2>=.9?'shut':null;if(es)H.eye.forEach(([x,y],i)=>{g[y][x]=H.eyes[es][i]});
  /* 外まわりの黒は描かない（体全体の輪郭線が引く）。内側の線だけ残す */
  const W=Math.max(...g.map(r=>r.length)),at=(x,y)=>(g[y]&&g[y][x])||'.';const o=g.map((r,y)=>r.map((c,x)=>c==='x'&&[[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>at(x+a,y+b)==='.')?'.':c));return o}
 function imStamp(B,H,P,at,a,V,y0){y0=y0||0;const g=imGrid(H,P),sk=V.skin,col={'1':sk[0],'2':sk[1],'3':sk[2],'4':sk[3],x:OUT,p:OUT,e:IMEYE,m:IMMOUTH,t:IMTOOTH,n:mix(sk[0],'#9a4a4a',.45),o:IMTONGUE,w:IMHAIR[0],u:IMHAIR[1],v:IMHAIR[2],s:IMSCAR,k:sk[0]};
@@ -3075,7 +3075,7 @@ const BIGR=7.4;
 function sealRock(B,x,y,r){rock(B,x,y,r,SEAL);/* 閉じた門の紋章（くすんだ金）：アーチと、まん中の合わせ目。削られて欠けている */for(let a=Math.PI;a<=Math.PI*2.01;a+=.3)B.set(x+Math.cos(a)*r*.5,y+Math.sin(a)*r*.5+r*.1,SEALG,2);B.line(x-r*.5,y+r*.12,x-r*.5,y+r*.5,SEALG);B.line(x+r*.5,y+r*.12,x+r*.5,y+r*.5,SEALG);B.line(x,y-r*.35,x,y+r*.5,SEALG);
  B.line(x+r*.35,y-r*.8,x+r*.75,y-r*.15,SEAL[2]);B.line(x+r*.42,y-r*.7,x+r*.8,y-r*.1,SEAL[2]);/* 爪で削った欠け */for(const[dx,dy]of[[-.3,-.6],[.6,.3],[-.7,.0]])B.set(x+r*dx,y+r*dy,SEAL[2],2)}
 const impRockR=k=>2.2*k/.7;
-function impBehind(B,J,T,P,S){if(S.big&&!P.bigUp&&!P.bigGone)sealRock(B,J.hip[0]+(14*J.k)+3+(P.bigX||0),FL-BIGR+.5,BIGR)}
+function impBehind(B,J,T,P,S){if(S.big&&!(P.bigUp>0)&&!P.bigGone)sealRock(B,J.hip[0]+(14*J.k)+3+(P.bigX||0),FL-BIGR+.5,BIGR)}
 function impFront(B,J,T,P,S){const k=J.k,rr=impRockR(k);
  if(P.rF)rock(B,J.hdF[0]-1,J.hdF[1]-rr*.7,rr);if(P.rB)rock(B,J.hdB[0],J.hdB[1]-rr*.7,rr);
  if(P.jug>0&&P.jn>0){const c=J.jc||[J.head[0]-13*k/.7,J.head[1]+1];for(let i=0;i<P.jn;i++){const a=(T/39+i/3)*Math.PI*2;rock(B,c[0]+Math.cos(a)*4*k,c[1]+Math.sin(a)*7*k,rr)}}
@@ -3084,7 +3084,7 @@ const lerpP=(a,b,u)=>[lerp(a[0],b[0],u),lerp(a[1],b[1],u)];
 /* ===== 体：騎士の部品を使わない、小鬼だけの体 =====
    約2頭身。猫背で、腹が出て、脚は短く、腕は長い（手が地面に届きそう）。大きな手に爪。手が大きいのは、石を持つ手がいちばん大事だから。
    モブ：門番の前垂れとは関係のない、ただの麻のぼろ布の腰巻と縄の帯。腰に石の袋。
-   おかしら：拾った門番の紺の前垂れ（金のふちがすり切れている）を、首に結んでマントにしている。首には、削り取った封印のかけらの首飾り。年寄りで、まゆと耳の先に白い毛、目をまたぐ古傷、鼻にいぼ、欠けた歯。 */
+   おかしら：拾った門番の紺の前垂れ（金のふちがすり切れている）を、首に結んでマントにしている。あごひげの先を、削り取った封印のかけらで結ぶ（首飾りはやめた）。年寄りで、まゆと耳の先に白い毛、目をまたぐ古傷、欠けた歯。 */
 function imArm(B,sh,el,hd,k,sk,front){const b=front?sk[1]:sk[0],h=front?sk[2]:sk[1],l=sk[0];
  B.thick(sh,el,1.05*k,b,h,l);B.thick(lerpP(el,hd,.1),lerpP(el,hd,.8),1.35*k,b,h,l);B.disc(el[0],el[1],1.25*k,b,h,l);
  const u=[hd[0]-el[0],hd[1]-el[1]],L=Math.hypot(u[0],u[1])||1,d=[u[0]/L,u[1]/L],n=[-d[1],d[0]];B.disc(hd[0],hd[1],1.75*k,b,h,l);
@@ -3106,7 +3106,7 @@ function impFig(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{})
  const hb=R([-1.8*k,-10.5*k]),HD=IMHEAD[isM?'impM':'imp'];let a=-P.lean*.35-P.hd;if(Math.abs(a)<.12)a=0;
  {const dx=HD.ctr[0]+.5-HD.piv[0],dy=HD.ctr[1]+.5-HD.piv[1];J.head=[Math.round(hb[0])+dx*Math.cos(a)-dy*Math.sin(a),Math.round(hb[1])+dx*Math.sin(a)+dy*Math.cos(a)]}
  /* 大きな岩：頭の上にのせ、両手をのばして両わきを支える（腕は届くところまでのびる） */
- if(P.bigUp){const top=J.head[1]-HD.ctr[1]-1,c=[J.head[0]+1,top-BIGR+3];J.big=c;for(const[s,sh,ky]of[[-1,J.shF,'F'],[1,J.shB,'B']]){const hd=[c[0]+s*(BIGR-1),c[1]+2],d=Math.hypot(hd[0]-sh[0],hd[1]-sh[1]),L=Math.max(7*k,d/2+.6);J['hd'+ky]=hd;J['el'+ky]=ik(sh,hd,L,L,s<0?1:-1)}}
+ if(P.bigUp){const top=J.head[1]-HD.ctr[1]-1,c1=[J.head[0]+1,top-BIGR+3],c0=[J.hip[0]+(14*k)+3,FL-BIGR+.5],u=Math.min(1,P.bigUp),e=u*u*(3-2*u),c=[c0[0]+(c1[0]-c0[0])*e,c0[1]+(c1[1]-c0[1])*e];/* bigUp 0→1：背中側の床から頭の上へ持ち上げる */J.big=c;for(const[s,sh,ky]of[[-1,J.shF,'F'],[1,J.shB,'B']]){const hd=[c[0]+s*(BIGR-1),c[1]+2],d=Math.hypot(hd[0]-sh[0],hd[1]-sh[1]),L=Math.max(7*k,d/2+.6);J['hd'+ky]=hd;J['el'+ky]=ik(sh,hd,L,L,s<0?1:-1)}}
  /* お手玉：石の輪は顔の前。両手は輪の下で受ける（手が拍ごとに上下する） */
  if(P.jug>0&&P.jn>0){const kk=k/.7,c=[J.head[0]-13*kk,J.head[1]+1];J.jc=c;const bob=Math.sin(T/39*Math.PI*6)*1;for(const[s,sh,ky,bd]of[[-1,J.shF,'F',1],[1,J.shB,'B',1]]){const hd=[c[0]+s*3*k,c[1]+7*k+(s<0?bob:-bob)],d=Math.hypot(hd[0]-sh[0],hd[1]-sh[1]),L=Math.max(7*k,d/2+.6);J['hd'+ky]=hd;J['el'+ky]=ik(sh,hd,L,L,bd)}}
  imArm(B,J.shB,J.elB,J.hdB,k,sk,false);
@@ -3134,7 +3134,7 @@ function impFig(B,ox,oy,S,P0,T){const P=Object.assign({},PDEF,S.pose||{},P0||{})
   B.set(end[0],end[1]-1,IMROPE,1);B.set(end[0]+1,end[1]-1,IMROPE,1);B.disc(end[0]+.5,end[1]+1.4,1.2*kk,SEAL[0],SEAL[1],SEAL[2],1);B.set(end[0]+.5,end[1]+1.4,SEALG,1)}}
  /* ひげをなでる（おかしらの、ひまなとき） */
  if(P.stroke>0&&J.beard){const b=ST.L2D(9,22.5+Math.sin(T*.22)*2.5),hd=[b[0]+1,b[1]],d=Math.hypot(hd[0]-J.shF[0],hd[1]-J.shF[1]),L2=Math.max(7*k,d/2+.6),u2=Math.min(1,P.stroke);J.hdF=lerpP(J.hdF,hd,u2);J.elF=ik(J.shF,J.hdF,L2,L2,1)}
- /* おかしらの首飾り：削り取った封印のかけら（くすんだ金の紋のかけら） */
+ /* おかしらのひげ飾り：削り取った封印のかけら（くすんだ金の紋のかけら）で、あごひげの先を結ぶ */
  if(!P.bigUp)imArm(B,J.shF,J.elF,J.hdF,k,sk,true);
  /* ひげは手前の腕より手前：腕はひげの奥を通る（貫通して見えない）。なでるときだけ、手をひげの上に出す */
  if(HD.front){imStamp(B,HD,P,hb,a,V,HD.front);if(J.beardDraw)J.beardDraw();if(P.stroke>.5&&!P.bigUp)imHand(B,J.elF,J.hdF,k,sk,true)}
@@ -3164,7 +3164,7 @@ function bigFx(B,t,t0,t1,from,P){if(t<t0)return;if(t<=t1){const u=(t-t0)/(t1-t0)
 const rocksAtFeet=(B,n)=>{for(let i=0;i<n;i++)rock(B,HXX+14+i*6,FL-2-(i%2),impRockR(.7))};
 
 /* 構え */
-const IMW1={ua:-2.5,fa:-2.0,rF:1},IMR1={ua:-1.0,fa:-.55,rF:0,lean:.24},IMW2={ua2:-2.3,fa2:-1.9,rB:1},IMR2={ua2:-1.0,fa2:-.6,rB:0,lean:.24};
+const IMW1={ua:-2.5,fa:-2.0,rF:1},IMW1J={ua:-2.5,fa:-2.0},/* お手玉のときは、振りかぶりで手に石を足さない（石の数＝投げる数） */IMR1={ua:-1.0,fa:-.55,rF:0,lean:.24},IMW2={ua2:-2.3,fa2:-1.9,rB:1},IMR2={ua2:-1.0,fa2:-.6,rB:0,lean:.24};
 const IM2={ua:1.6,fa:-.4,ua2:1.3,fa2:-.7,rF:1,rB:1,cr:3.2,lean:.12,grin:.6};/* 二つ投げ：両手に石を一つずつ持ち、ひざで拍をとる */
 const IMJ={ua:2.6,fa:-2.3,ua2:2.4,fa2:-2.0,jug:1,jn:3,cr:2.6,lean:.02,hd:-.25,grin:.8};/* 三つ投げ：三つでお手玉 */
 const IMB={ua:-1.85,fa:-1.6,ua2:-1.4,fa2:-1.75,bigUp:1,cr:4.2,lean:-.04,ff:-8,fb:8,hd:-.1,grin:.2};/* 大きな岩：封印の石を頭の上へ */
@@ -3189,7 +3189,7 @@ function imCards(f,pre,isM){const ox=isM?4:10,bg='def',S=SPEC[f],k=S.k;
   cap:'後ろ手で、背中側の大きな石の紋章を爪でガリガリ削る。石くずが飛ぶ。削り終えると、こちらを見て目を細め、満足そうにひげをなでる。光らない。',
   why:'門の紋章は封印の印。小鬼たちは、それを遊びで壊している。封印がゆるむ理由の一つ。'});
  mv({f,ox,id:pre+'_enter',n:isM?'出現：大きな石を引きずってくる':'出現：上から飛び降りる',bg,len:110,
-  keys:isM?[K(0,{x:44,ua2:.4,fa2:.2,lean:.3,bigX:0}),K(56,{x:0,ua2:.4,fa2:.2,lean:.3},'lin'),K(68,{grin:1},'io'),K(110,{})]:[K(0,{lift:70,ua:-2.4,fa:-2.2,ua2:-2.2,fa2:-2.0,cr:0}),K(18,{lift:0,ua:-2.4,fa:-2.2,ua2:-2.2,fa2:-2.0,cr:0},'in'),K(22,{cr:6,lean:.3}),K(30,{cr:1.5},'out'),K(40,{grin:1}),K(70,{grin:1}),K(90,{},'io'),K(110,{})],
+  keys:isM?[K(0,{x:44,ua2:.4,fa2:.2,lean:.3,bigX:0}),K(56,{x:0,ua2:.4,fa2:.2,lean:.3},'lin'),K(60,{ua2:-.9,fa2:-1.5,lean:.1},'out'),K(64,{ua2:.6,fa2:.1,lean:.2},'in')/* 石をぽんとたたく */,K(68,{grin:1},'io'),K(110,{})]:[K(0,{lift:70,ua:-2.4,fa:-2.2,ua2:-2.2,fa2:-2.0,cr:0}),K(18,{lift:0,ua:-2.4,fa:-2.2,ua2:-2.2,fa2:-2.0,cr:0},'in'),K(22,{cr:6,lean:.3}),K(30,{cr:1.5},'out'),K(40,{grin:1}),K(70,{grin:1}),K(90,{},'io'),K(110,{})],
   pp:(P,t)=>{if(isM&&t<56){const s=Math.sin(t*TAU_/16);P.ff=-6+s*3;P.fb=6-s*3}if(t>=40&&t<70)P.lean=(P.lean||0)+((t>>2)&1)*.06},
   fx:(B,J,t)=>{if(!isM&&t>=18&&t<26)for(let i=0;i<6;i++)B.set(J.footF[0]-6+i*3,FL-((t+i)%2),'#6a6278',5)},
   cap:isM?'背中で大きな封印の石を引きずって歩いてくる。止まって、石をぽんとたたき、にやりとする。':'上の暗がりから飛び降りて、しゃがんで着地する。ケケケと肩をゆらして笑う。',
@@ -3197,31 +3197,31 @@ function imCards(f,pre,isM){const ox=isM?4:10,bg='def',S=SPEC[f],k=S.k;
  /* 攻撃 */
  if(!isM)mv({f,ox,id:pre+'_two',n:'二つ投げ（ヒュ・ヒュ・ヒュ・ドン・ドン）',bg,len:150,
   keys:[K(0,{}),K(8,IM2,'out'),K(26,IM2),K(28,Object.assign({},IM2,IMW1),'out'),K(30,Object.assign({},IM2,IMR1),'in'),K(42,Object.assign({},IM2,IMR1,IMW2),'out'),K(44,Object.assign({},IM2,IMR1,IMW2)),K(46,Object.assign({},IM2,IMR1,IMR2),'in'),K(63,{grin:1},'io'),K(150,{})],
-  pp:(P,t)=>{if(t>=8&&t<28)P.cr+=Math.abs(Math.sin((t-8)*Math.PI/16))*.9;if(t>=30)P.rF=0;if(t>=46)P.rB=0},
+  pp:(P,t)=>{if(t>=14&&t<30)P.cr+=Math.abs(Math.sin((t-14)*Math.PI/16))*.9;/* ひざで1拍（16F）とって、その拍のまま30Fで投げる */if(t>=30)P.rF=0;if(t>=46)P.rB=0},
   cues:[{t:30,col:'w',silent:true},{t:46,col:'w',silent:true}],hits:[30+BEAT_MOB*4,46+BEAT_MOB*4],
   fx:(B,J,t,S2,M)=>{const P=J.P||{};lobFx(B,t,30,handF(J),P,0,BEAT_MOB);lobFx(B,t,46,handF(J),P,0,BEAT_MOB)},
   cap:'袋から石を二つ出し、両手に一つずつ持って、ひざで拍をとる（手の石の数＝投げる数）。ポイ、ポイと16Fおきに二つ投げる。石は光らない。飛んでいる石がヒュ・ヒュ・ヒュと鳴るたび、足元の影が一段ずつ大きく濃くなり、その次の拍（投げてから64F）で落ちる。二つ目はその16F後。拍はおかしら（13F）よりゆっくり。',
   why:'拍（リズム）の読み方は、おかしらで先に教わっている。光の代わりに、音と影で数える。持っている石が二つなら二つ来る。'});
  else{mv({f,ox,id:pre+'_three',n:'三つ投げ（お手玉から・ドン・ドン・ドン）',bg,len:160,
-  keys:[K(0,{}),K(8,IMJ,'out'),K(26,IMJ),K(28,Object.assign({},IMJ,IMW1),'out'),K(30,Object.assign({},IMJ,IMR1),'in'),K(41,Object.assign({},IMJ,IMW1),'out'),K(43,Object.assign({},IMJ,IMR1),'in'),K(54,Object.assign({},IMJ,IMW1),'out'),K(56,Object.assign({},IMJ,IMR1),'in'),K(72,{grin:1},'io'),K(160,{})],
+  keys:[K(0,{}),K(8,IMJ,'out'),K(26,IMJ),K(28,Object.assign({},IMJ,IMW1J),'out'),K(30,Object.assign({},IMJ,IMR1),'in'),K(41,Object.assign({},IMJ,IMW1J),'out'),K(43,Object.assign({},IMJ,IMR1),'in'),K(54,Object.assign({},IMJ,IMW1J),'out'),K(56,Object.assign({},IMJ,IMR1),'in'),K(72,{grin:1},'io'),K(160,{})],
   pp:(P,t)=>{P.jn=t<30?3:t<43?2:t<56?1:0;if(t>=56)P.jug=0},
   cues:[{t:30,col:'w',silent:true},{t:43,col:'w',silent:true},{t:56,col:'w',silent:true}],hits:[30+LOB,43+LOB,56+LOB],
-  fx:(B,J,t,S2,M)=>{const P=J.P||{};for(const t0 of[30,43,56])lobFx(B,t,t0,handF(J),P);if(t>=8&&t<56&&(t-8)%13<3)soundArc(B,add(J.sc,[-5*J.k,-18*J.k]),(t-8)%13)},
+  fx:(B,J,t,S2,M)=>{const P=J.P||{};for(const t0 of[30,43,56])lobFx(B,t,t0,handF(J),P);if(t>=8&&t<56&&(t-4)%13<3)soundArc(B,add(J.sc,[-5*J.k,-18*J.k]),(t-4)%13)/* 受ける音は投げる拍（17・30・43F）にそろえる */},
   cap:'石を三つ出して、お手玉をする（石の数＝投げる数）。お手玉は13Fの拍で、受けるたびに小さく音が鳴る。その拍のまま一つずつ投げる。石は光らない。ヒュ・ヒュ・ヒュの次の拍（投げてから52F）で落ち、13Fおきに三つ。',
   why:'拍で来る攻撃は、ここで初めて教わる（中ボスで先に出す）。お手玉の拍が、そのまま石の落ちる拍になる。数は手の石で、間はお手玉で、構えのうちに全部見えている。'});
   mv({f,ox,id:pre+'_big',n:'大きな岩（赤・重い）',bg,len:130,
    keys:[K(0,{}),K(10,IMB,'out'),K(54,IMB),K(56,Object.assign({},IMB,{lean:-.2,cr:3.6}),'out'),K(60,IMBT,'in'),K(66,IMBT),K(90,IMBT),K(110,{},'io'),K(130,{})],
-   pp:(P,t)=>{if(t>=10&&t<56)P.x=(P.x||0)+(((t>>1)&1)?.6:-.6);if(t>=60)P.bigGone=1},
+   pp:(P,t)=>{if(t>=10&&t<56){const s=(t>>1)&1;P.x=(P.x||0)+(s?.6:-.6);P.cr=(P.cr||0)+s*.5;/* 重くてひざがふるえる */}if(t>=60)P.bigGone=1},
    cues:[{t:40,col:'r',at:J=>add(J.head,[0,-14*J.k])}],hits:[68],hitCol:'r',
    fx:(B,J,t)=>{bigFx(B,t,60,68,add(J.head,[-4,-12]),J.P||{})},
    cap:'背中側の封印の石を、両手で頭の上へ持ち上げる。重くてひざがふるえ、体が小刻みにゆれる（お手玉とはまるでちがう形）。石が赤く光り、いつもの間で、主人公へ投げつける。重い一撃。弾くと、石は三つに割れて足元に落ちる（三つとも投げ返せる）。',
    why:'中ボスだけの技（モブより一つ多い）。拍ではなく光で来るので、読み方がお手玉とまったくちがう。赤＝重い、の約束どおり。封印の石を投げてしまうほど、遊びに容赦がない。'});}
- /* パリィされ：攻撃した部位（石）が弾き落とされる。小鬼は、小＝びくっと耳が立つ、大＝地団駄を踏んで怒る */
+ /* パリィされ：攻撃した部位（石）が弾き落とされる。小鬼は、小＝びくっと目をむく、大＝地団駄を踏んで怒る */
  const kit=(kind,th,P)=>kind==='s'?{ear:-1,hd:(P.hd||0)-.25,x:(P.x||0)+1,grin:0}:{ear:1,grin:0,ua:-2.6,fa:-2.3,ua2:-2.4,fa2:-2.1,lean:-.3,hd:-.3,cr:1};
  const stamp=(P,t,Hc,stop)=>{P.parried=1;const H=Hc[Hc.length-1],d=t-H-stop;if(d>=0&&d<36){const s=(d>>2)&1;P.ff=s?-9:-5;P.fb=s?3:7;P.cr=(P.cr||0)+s*.8}};
  if(!isM)parriedCard({id:pre+'_pry',src:pre+'_two',n:'パリィされ：二つ投げ（小→大）',kit,rx:[{kind:'s'},{kind:'b'}],pp:stamp,
   fx:(B,J,t,Hc)=>rocksAtFeet(B,Hc.filter(H=>t>=H).length),
-  cap:'一つ目を弾くと、石は足元に落ちる。小鬼はびくっと耳を立てる。二つ目も弾かれると、両手を振り上げて地団駄を踏む（子どものように怒る）。足元の石は、次のこうげきで投げ返せる。',
+  cap:'一つ目を弾くと、石は足元に落ちる。小鬼はびくっと首をすくめ、目をむく。二つ目も弾かれると、両手を振り上げて地団駄を踏む（子どものように怒る）。足元の石は、次のこうげきで投げ返せる。',
   why:'弾かれるのは小鬼ではなく石。小鬼のほうは、遊びをじゃまされた子どもの反応で返す。'});
  else{parriedCard({id:pre+'_pry',src:pre+'_three',n:'パリィされ：三つ投げ（小→大）',kit,rx:[{kind:'s'},{kind:'s'},{kind:'b'}],pp:stamp,
   fx:(B,J,t,Hc)=>rocksAtFeet(B,Hc.filter(H=>t>=H).length),
@@ -3235,18 +3235,18 @@ function imCards(f,pre,isM){const ox=isM?4:10,bg='def',S=SPEC[f],k=S.k;
  const BRK=t=>({cr:7.5,lean:-.32+Math.sin(t*.1)*.04,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.32+Math.sin(t*.13)*.12,ear:1,grin:0,x:2,daze:1});
  parriedCard({id:pre+'_brk',src:isM?pre+'_big':pre+'_two',n:'ブレイク：しりもちをついて目を回す',len:isM?230:250,kit,rx:isM?[{kind:'b'}]:[{kind:'s'},{kind:'b'}],pp:stamp,brk:{at:6,P:BRK,star:J=>add(J.head,[0,-12])},
   fx:(B,J,t,Hc)=>{rocksAtFeet(B,isM?3:Hc.filter(H=>t>=H).length);const T0=Hc[Hc.length-1]+20;if(t>T0)for(let i=0;i<3;i++)rock(B,J.hip[0]+8+i*4,FL-2,impRockR(J.k)*.8)},
-  cap:'四度目を弾くと、しりもちをついて、袋から石がこぼれる。後ろ手をついたまま、頭をふらふらさせて目を回す。頭の上をうすい青の星が回る。',
+  cap:'ブレイクに必要な四度目（この絵では最後に弾いたもの）で、しりもちをついて、袋から石がこぼれる。後ろ手をついたまま、頭をふらふらさせて目を回す。頭の上をうすい青の星が回る。',
   why:'石を持っていない＝投げられない＝いま斬れる。小さな体に大きな頭なので、目を回す形がいちばん読みやすい。'});
  recoverCard({id:pre+'_rec',f,ox,bg,n:'ブレイク：斬られて、飛び起きる',P:BRK,idle:()=>Object.assign({},IMPOSE,{grin:.4}),snap:4,star:J=>add(J.head,[0,-12]),
   react:(P,a,b)=>{const A=kb(a,6),Bk=kb(b,8);P.hd=(P.hd||0)-.4*Math.max(A,Bk);P.ear=1},
   cap:'しりもちのまま斬られると、ぎゃっと頭をのけぞらせる。二太刀目のあと、ぴょんと飛び起きて身構える（少し低くしゃがみすぎてから収まる）。',
   why:'起きるときは一瞬。ゆっくり起きると「まだ斬れる」と勘ちがいさせる。'});
- hurtMove(f,pre+'_hurt',{react:(P,a,b)=>{const A=kb(a,6),Bk=kb(b,9),m=Math.max(A,Bk);P.lift=(P.lift||0)+4*m;P.ear=1;P.grin=0;P.lean=(P.lean||0)-.25*m;P.x=(P.x||0)+2*A+3*Bk},
+ hurtMove(f,pre+'_hurt',{react:(P,a,b)=>{const A=kb(a,6),Bk=kb(b,9),m=Math.max(A,Bk),last=b>=0?b:a;P.lift=(P.lift||0)+4*m;/* 着地したら耳が戻って、またにやける */P.ear=m>.3?1:0;P.grin=m>.3?0:(last>=12?1:0);P.lean=(P.lean||0)-.25*m;P.x=(P.x||0)+2*A+3*Bk},
   cap:'斬られると、ぎゃっと飛び上がり、耳を後ろへ寝かせる。着地すると、またにやける。',
   why:'痛がるが、こりない。遊びはやめない。'});
  /* 撃破：ひっくり返り、石がころがり、体が足元の暗がりへ沈む。石だけが残る */
  mv({f,ox,id:pre+'_down',n:'撃破：暗がりへ沈む',bg,len:140,noHero:true,
-  keys:[K(0,{}),K(6,{lift:6,ear:1,lean:-.3},'out'),K(16,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.3,ear:1,daze:1},'in'),K(40,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.4,ear:1,daze:1}),K(100,{cr:7.5,lean:-.4,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.4,ear:1,daze:1,lift:-62},'in'),K(140,{lift:-62})],
+  keys:[K(0,{}),K(6,{lift:6,ear:1,lean:-.3},'out'),K(16,{cr:7.5,lean:-.8,ff:-14,fb:-1,ua:-.6,fa:-.9,ua2:-.4,fa2:-.7,hd:.5,ear:1,daze:1},'in'),K(40,{cr:7.5,lean:-.8,ff:-12,fb:-3,ua:1.0,fa:.6,ua2:.8,fa2:.4,hd:.4,ear:1,daze:1}),K(100,{cr:7.5,lean:-.8,ff:-14,fb:-1,ua:-.6,fa:-.9,ua2:-.4,fa2:-.7,hd:.5,ear:1,daze:1,lift:-62},'in'),K(140,{lift:-62})],
   post:(B,J,t)=>{for(let i=0;i<B.c.length;i++){const y=i/CW|0;if(y>FL&&(B.t[i]===1||B.t[i]===2||B.t[i]===3)){B.c[i]=0;B.t[i]=0}}
    if(t>=40){const u=Math.min(1,(t-40)/60),x0=J.hip[0];for(let dx=-14;dx<=14;dx++){if(Math.abs(dx)<14*Math.min(1,u*1.5)+2&&hsh(dx,t>>3)<.8)B.set(x0+dx,FL+1,'#0c0910',5)}}
    if(t>=16){const n=isM?3:2;for(let i=0;i<n;i++){const d=Math.min(1,(t-16)/20);rock(B,J.hip[0]-6+i*7+d*(i-1)*6,FL-2,impRockR(J.k)*.9)}}},

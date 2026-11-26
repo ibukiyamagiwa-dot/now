@@ -341,10 +341,21 @@ mv({f:'lord2',id:'l2_gate',gifStart:0,n:'門の向こうの指',bg:'lord',len:20
  pre:(B,t)=>{/* 背後の門のすき間 */const o=Math.min(1,t/20)*4;for(let y=6;y<FL;y++)for(let x=CW-26;x<CW;x++){const cx=CW-12;const g=Math.abs(x-cx)<o+(y%7?0:1);B.set(x,y,g?(((x+y+(t/4|0))%5)?'#1a0a2a':'#c070ff'):((x-CW)%9===0||y%12===0?'#1a1420':'#2a2232'),6)}},
  /* 指はぬしより手前に描く（この技の主役は指。ぬしが指に隠れてよい。2026-11-26 作者） */fx:(B,J,t)=>gfDraw2(B,t,[0,1,2].map(i=>[CW-12,22+i*14]),1)});
 /* ===== 追加の新しい技 ===== */
-mv({f:'dgate',id:'dg_beat',n:'鎖の拍',bg:'gate',len:150,cap:'黒い鎖で床を3回打つ（ガン・ガン・ガン）。その次の拍で、鎖が横から来る。',why:'拍で読む攻撃は、小鬼のおかしらで先に教わっている。「3」は門の数字。門番の誓いの鎖が、拍を刻む道具になった。',
- keys:[K(0,X),K(14,Object.assign({},X,{ua2:.6,fa2:1.4})),K(130,Object.assign({},X,{ua2:.6,fa2:1.4})),K(146,X)],cues:[{t:20,col:'w',at:J=>[J.hdB[0]+10,FL-2]}],hits:[48],
- fx:(B,J,t)=>{const h=J.hdB;const beats=[20,30,40];let up=1;for(const b of beats)if(t>=b&&t<b+4)up=0;if(t<48){for(let i=0;i<18;i++){const s=i/18,x=h[0]+s*14,y=lerp(h[1],FL-1,up?Math.min(1,s*1.4)*.7:Math.min(1,s*1.5));B.set(x,y,i%2?'#22142e':'#4e2c70',1)}for(const b of beats)if(t>=b&&t<b+5)spark(B,h[0]+13,FL-2,t-b,'w')}
-  else if(t<64){const u=Math.min(1,(t-44)/4);for(let i=0;i<24;i++){const s=i/24,x=lerp(h[0],HXX+8,s*u),y=lerp(h[1],FL-14,s*u)-Math.sin(s*3.14)*4;B.set(x,y,i%2?'#22142e':'#4e2c70',1)}}}});
+/* 鎖の拍：拍は28F（予兆→当たりと同じテンポ）。打つたびに床に暗い打ち跡が一つずつ残り（光らない）、三つそろった3拍目で鎖の先が白く光る（予兆）。4拍目で来る（2026-11-26 作者。前は拍10Fで数えられず、拍の火花が予兆と同じ白だった） */
+const DGB={beats:[14,42,70],hit:98,x0:EXX+10},XBU=Object.assign({},X,{ua2:-1.2,fa2:-.6}),XBD=Object.assign({},X,{ua2:.6,fa2:1.4});
+mv({f:'dgate',id:'dg_beat',gifStart:0,n:'鎖の拍',bg:'gate',len:160,cap:'黒い鎖で床を打つ（ガン・ガン・ガン）。打つたびに床に暗い打ち跡が一つずつ残る。三つ目の打ち跡と同時に鎖の先が白く光り、次の拍で鎖が横から来る。',why:'拍で読む攻撃は、小鬼のおかしらで先に教わっている。「3」は門の数字。門番の誓いの鎖が、拍を刻む道具になった。拍は予兆→当たりと同じ28Fなので、打つ音を聞いていれば次の拍が当たり。数は光らない打ち跡で数える（目の数は「来る回数」の印なので使わない）。',
+ keys:[K(0,X),K(8,XBU),K(14,XBD,'in'),K(34,XBU),K(42,XBD,'in'),K(62,XBU),K(70,XBD,'in'),K(92,XBD),K(98,Object.assign({},XBD,{ua2:.2,fa2:.3}),'in'),K(116,Object.assign({},XBD,{ua2:.2,fa2:.3})),K(150,X)],
+ cues:[{t:70,col:'w',at:J=>[DGB.x0+24,FL-3]}],hits:[DGB.hit],
+ fx:(B,J,t)=>{const h=J.hdB,bt=DGB.beats,hit=DGB.hit;
+  /* 打ち跡：打った所に暗いひびが残る（光らない）。一つ目は手元、三つ目がいちばん前 */
+  if(t<hit+12)for(let i=0;i<3;i++){if(t<bt[i])continue;const mx=Math.round(DGB.x0+i*12);/* 床をえぐった跡：黒い割れ目と、割れた石の灰色のふち（光らない鈍い灰。暗いステージでも読めるように、ふちで床から浮かせる） */const D='#06030a',G='#6a6470',g='#4a4652';
+   /* 割れ目は下へ細くなるくさび形（幅11→1、深さ6）。ふちに割れた石の灰、まわりに欠けた石 */for(let dy=0;dy<6;dy++){const w=Math.max(0,5-dy);for(let dx=-w;dx<=w;dx++)B.set(mx+dx,FL+dy,D,3);B.set(mx-w-1,FL+dy,dy<3?G:g,3);B.set(mx+w+1,FL+dy,dy<2?g:G,3)}
+   for(const[dx,dy,c]of[[-7,-1,G],[-8,0,g],[7,-1,g],[8,0,G],[6,-2,G],[-5,-2,g]])B.set(mx+dx,FL+dy,c,3)}
+  if(t<hit-6){/* 鎖：打つ前の8Fは持ち上がり、打つとその拍の打ち跡の上に落ちる */let tip=0;for(let i=0;i<3;i++)if(t>=bt[i]-8)tip=i;
+   const rising=bt.some(b=>t>=b-8&&t<b);const tx=DGB.x0+tip*12;
+   for(let i=0;i<20;i++){const s=i/20,x=lerp(h[0],tx,s),y=rising?lerp(h[1],FL-10,s)-Math.sin(s*3.14)*4:lerp(h[1],FL-1,Math.min(1,s*1.3));B.set(x,y,i%2?'#22142e':'#4e2c70',1)}
+   /* 打った瞬間の土煙（暗い紫。光らせない） */for(const b of bt)if(t>=b&&t<b+6){const u=t-b,mx=DGB.x0+bt.indexOf(b)*12;for(let j=0;j<5;j++)B.set(mx-4+j*2,FL-1-((u+j)%3)-(u>>1),j%2?'#3a2450':'#2a1a38',2)}}
+  else if(t<hit+16){/* 4拍目：鎖が床をすべって横から来る（動） */const u=Math.min(1,(t-hit+6)/6),k=t<hit+4?1:Math.max(0,1-(t-hit-4)/12);for(let i=0;i<26;i++){const s=i/26*u*k,x=lerp(h[0],HXX+8,s),y=lerp(FL-1,FL-12,s)-Math.sin(s*3.14)*5;B.set(x,y,i%2?'#22142e':'#4e2c70',1)}}}});
 mv({f:'lord2',id:'l2_pool',n:'足元の溜まりから',bg:'lord',len:130,cap:'ぬしの足元のくらやみが、床を這ってこちらの足元まで広がる。泡が白く光ったら、真下から触手が突き上がる。',why:'黒い門番を染めた「溜まり」が、ついにこちらへ届く。くらやみは悪意ではなく、ただ広がるもの。',
  keys:[K(0,L2I),K(16,Object.assign({},L2I,{lean:.15,cr:3})),K(120,Object.assign({},L2I,{lean:.15,cr:3})),K(128,L2I)],cues:[{t:22,col:'w',at:J=>[HXX+6,FL-2]}],hits:[50],
  pre:(B,t)=>{const u=Math.min(1,t/22);for(let x=Math.round(lerp(EXX-10,HXX-4,u));x<EXX;x++){B.set(x,FL,INK.hi,6);if((x+t)%4===0)B.set(x,FL-1,INK.col,6)}},

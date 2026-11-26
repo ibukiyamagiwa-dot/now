@@ -97,22 +97,54 @@ const RIG=(()=>{
   r:{body:['#0c0408','#1c0a12','#2c121c','#40202c'],rim:'#6a3a4e',tail:'#100608',rip:.35,eyes:0,tailW:1},
   k:{body:['#030205','#09070c','#110e16','#1c1824'],rim:'#46405a',tail:'#020103',rip:.35,eyes:1,tailW:2},
   v:{body:['#0a0414','#180a2a','#28143e','#3c2058'],rim:'#6a4a96',tail:'#0c0418',rip:.5,eyes:3,tailW:2}};
- /* ふつうの騎士として描いてから、明るさで3段の影色に置きかえる。剣（剣なしで描いたときにない画素）だけ明るい灰紫。
-    rip＝輪郭のゆらぎ。背中側（上と右）の内側1画素を明るくして、暗い背景に溶けないようにする。尾はかかとから右へ（画面の外の続きは tail） */
+ /* ふつうの騎士として描いてから、明るさで3段の影色に置きかえる。剣（剣なしで描いたときにない画素）だけ明るい灰紫（design/v2/shade.js の shadeDraw）。
+    stretch＝後ろのかかとより前を、前へ引きのばす（のびる）／flat＝床へ倒れて平たくなる（0〜1）／rip＝輪郭のゆらぎ／cut＝斬られた筋（すき間）。
+    先に影色の絵を作ってから、出力の画素ごとに元の画素を引く（のばしても、すき間ができない）。背中側（上と右）の内側1画素を明るくして、暗い背景に溶けないようにする */
  function shadeDraw(B,ox,oy,S,posture,T,tint){const V=SHV[tint]||SHV.n;
   const W1=new Buf(B.w,B.h),J=knight(W1,ox,oy,S,posture,T),W2=new Buf(B.w,B.h);knight(W2,ox,oy,S,Object.assign({},posture,{sw:null,sw2:null}),T);
-  const rip=Math.max(posture.rip||0,V.rip),ax=J.footB?J.footB[0]:ox,X=(x,y)=>rip?x+Math.round(Math.sin(y*.9+T*.6)*rip):x;
+  const flat=posture.flat||0,st=posture.stretch||0,rip=Math.max(posture.rip||0,V.rip),ax=J.footB?J.footB[0]:ox,cut=posture.cut||0;
+  const X=(x,y)=>{let nx=x<ax?ax-(ax-x)*(1+st):x;if(rip)nx+=Math.round(Math.sin(y*.9+T*.6)*rip);return nx},Y=y=>oy-(oy-y)*(1-flat);
   const tx=Math.round(X(ax,oy-1));for(let x=tx-2;x<B.w;x++){B.set(x,oy-1,V.tail,3);if(V.tailW>1&&(x<tx+30||(x*3+T)%7))B.set(x,oy-2,V.tail,3)}
   const L=c=>{if(!c||c[0]!=='#')return .2;const n=parseInt(c.slice(1),16);return(((n>>16)&255)*.3+((n>>8)&255)*.59+(n&255)*.11)/255};
-  const out=new Buf(B.w,B.h);
+  const src=new Buf(B.w,B.h);let x0=B.w,x1=0,y0=B.h;
   for(let i=0;i<W1.c.length;i++){const c=W1.c[i];if(!c)continue;const x=i%B.w,y=(i/B.w)|0,blade=!W2.c[i],l=L(c),SP=V.body;
-   out.set(X(x,y),y,blade?(l>.75?SHBL[2]:l>.45?SHBL[1]:SHBL[0]):(l>.5?SP[3]:l>.3?SP[2]:l>.15?SP[1]:SP[0]),blade?2:1)}
-  for(let i=0;i<out.c.length;i++){if(out.t[i]!==1)continue;const x=i%B.w,y=(i/B.w)|0;if(!out.get(x,y-1)||!out.get(x+1,y))out.c[i]=V.rim}
+   if(cut&&!blade){const ly=oy-cut*.62*J.k*14+(x-ox)*.45;if(Math.abs(y-ly)<1)continue}
+   src.set(x,y,blade?(l>.75?SHBL[2]:l>.45?SHBL[1]:SHBL[0]):(l>.5?SP[3]:l>.3?SP[2]:l>.15?SP[1]:SP[0]),blade?2:1);x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y)}
+  const out=new Buf(B.w,B.h),dx0=Math.floor(X(x0,y0))-4,dy0=Math.floor(Y(y0))-1;
+  for(let y=Math.max(0,dy0);y<=Math.min(B.h-1,oy+1);y++)for(let x=Math.max(0,dx0);x<=Math.min(B.w-1,x1+4);x++){
+   let sx=x;if(rip)sx-=Math.round(Math.sin(y*.9+T*.6)*rip);if(sx<ax)sx=ax-(ax-sx)/(1+st);const sy=oy-(oy-y)/Math.max(1-flat,.07);
+   let ssx=Math.round(sx),ssy=Math.round(sy);if(cut&&ssy<oy-cut*.62*J.k*14+(ssx-ox)*.45)ssx-=1;
+   const c=src.get(ssx,ssy);if(c)out.set(x,y,c,src.tag(ssx,ssy))}
+  if(flat<.6)for(let i=0;i<out.c.length;i++){if(out.t[i]!==1)continue;const x=i%B.w,y=(i/B.w)|0;if(!out.get(x,y-1)||!out.get(x+1,y))out.c[i]=V.rim}
   for(let i=0;i<out.c.length;i++)if(out.c[i]){B.c[i]=out.c[i];B.t[i]=out.t[i]}
-  if(V.eyes){const ey=[[J.sc,[0,1]],[J.head,[-2,0]],[J.head,[1,0]]].slice(0,V.eyes);for(const[p0,o]of ey){const q=[Math.round(X(p0[0],p0[1])+o[0]),Math.round(p0[1]+o[1])];if(B.get(q[0],q[1])&&(T+q[0]*7)%140>6)B.set(q[0],q[1],SHEYE,1)}}
-  if(rip&&J.tip)J.tip=[X(J.tip[0],J.tip[1]),J.tip[1]];return J}
+  if(V.eyes&&flat<.5){const ey=[[J.sc,[0,1]],[J.head,[-2,0]],[J.head,[1,0]]].slice(0,V.eyes);for(const[p0,o]of ey){const q=[Math.round(X(p0[0],p0[1])+o[0]),Math.round(Y(p0[1])+o[1])];if(B.get(q[0],q[1])&&(T+q[0]*7)%140>6)B.set(q[0],q[1],SHEYE,1)}}
+  const tr=v=>Array.isArray(v)?(v.length===2&&typeof v[0]==='number'?[X(v[0],v[1]),Y(v[1])]:v.map(tr)):v;for(const k in J)if(k!=='k')J[k]=tr(J[k]);return J}
  /* 立ち絵（sh_idle・shM_idle）：腰が120Fでゆっくり上下し、90Fに一度、10Fだけ輪郭がゆらぐ */
  const SH_IDLE=t=>Object.assign({},PDEF,SHADE.pose,{cr:1.9-.4*Math.cos(t/120*TAU),rip:(t%90<10)?.6:0});
+ /* ---- 影の技（design/v2/shade.js の sh_strike・sh_feint・sh_two・shM_feint・shM_dfeint）：資料集のキーを、ゲームの撃の時刻に置き直す ----
+    キーは基本の姿勢（PDEF＋SHADE.pose）との差。補間は行き先のキーの ease（無ければ io）。足は動かさない（寄るのはゲームの lungeDist、体は stretch でのびる） */
+ const SHW={ua:-2.4,fa:-1.8,sw:-1.2,lean:-.12,cr:2.2},SHS={ua:2.75,fa:2.55,sw:2.3,lean:.32,cr:1,stretch:.85};/* 振りかぶり／のびる斬りの当たり */
+ const SHL={ua:1.25,fa:.75,sw:.45,lean:-.04,cr:3.2},SHR={ua:-2.55,fa:-2.75,sw:-2.65,lean:.22,cr:1,stretch:.85};/* 脇構え（剣を低く後ろへ）／すくい上げの当たり */
+ const SHF={ua:3.3,fa:3.5,sw:3.4,lean:.2,cr:1.5,stretch:.35,rip:1.6},SHF0=Object.assign({},SHF,{stretch:0,rip:2}),SHF1=Object.assign({},SHF,{stretch:0,rip:.4});/* ふり／縮む／縮んで止まった姿勢（うそつきの影） */
+ const SHBASE=Object.assign({},PDEF,{ua:1.85,fa:2.75,sw:3.7,ua2:1.45,fa2:1.85,ff:-6,fb:6,cr:1.5,lean:.1,flat:0,stretch:0,rip:0,cut:0});
+ const EZ={lin:u=>u,io:u=>u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,out:u=>1-Math.pow(1-u,3),in:u=>u*u*u};
+ function shKeys(){const ss=G.strikes.filter(s=>!s.cx&&!s.ping),ks=[{t:0,p:{}}];let last=0;
+  const put=(t,p,e)=>{t=Math.max(t,last);ks.push({t,p,e});last=t};
+  for(let i=0;i<ss.length;i++){const s=ss[i],nx=ss[i+1],pv=ss[i-1],liar=pv&&pv.fake&&pv.aft==='afShadeM';
+   if(s.fake){/* ふり：振りかぶって止まり（紫の輪）、ふりの時刻にのびかけて止まり、縮む。影の剣士は振りかぶりへ戻り、うそつきの影は縮んだ姿勢のまま */
+    if(liar){put(s.fk-4,SHF1);put(s.fk,Object.assign({},SHF,{stretch:.5}),'in');put(s.fk+6,SHF1)}
+    else{put(s.cue-14,{});put(s.cue,SHW,'out');put(s.fk-4,SHW);put(s.fk,SHF,'in');if(s.aft==='afShadeM')put(s.fk+8,SHF1);else{put(s.fk+8,SHF0);put(s.fk+16,SHW,'io')}}
+    continue}
+   const h=s.impact;
+   if(nx&&!nx.fake&&nx.iv){/* 本物が2回続く：脇構えで止まり、すくい上げて頭上で止まる */put(s.cue-14,{});put(s.cue,SHL,'out');put(h-4,SHL);put(h,SHR,'in');put(h+3,SHR);put(h+6,SHW,'out');continue}
+   if(liar)put(h-4,SHF1);else if(s.iv||(pv&&pv.fake))put(h-4,SHW);else{put(s.cue-14,{});put(s.cue,SHW,'out');put(h-4,SHW)}
+   put(h,SHS,'in');put(h+8,SHS);if(!nx){put(h+12,Object.assign({},SHS,{stretch:.3}));put(h+26,{},'io')}else put(h+20,{},'io')}
+  return ks}
+ function shPose(e,t){const R=st(e);if(!(G.state==='enemy'&&G.strikes&&G.strikes.length))return SH_IDLE(t);
+  if(R.skFor!==G.strikes){R.skFor=G.strikes;R.sk=shKeys()}const ks=R.sk,T=G.et;let a=ks[0],b=ks[0];
+  for(let i=0;i<ks.length;i++){if(ks[i].t<=T)a=ks[i];if(ks[i].t>=T){b=ks[i];break}if(i===ks.length-1)b=ks[i]}
+  const A=Object.assign({},SHBASE,a.p),Bp=Object.assign({},SHBASE,b.p);if(a===b||b.t===a.t)return A;
+  const u=EZ[b.e||'io'](cl01((T-a.t)/(b.t-a.t))),o={};for(const k in Bp)o[k]=typeof A[k]==='number'&&typeof Bp[k]==='number'?A[k]+(Bp[k]-A[k])*u:(u<.5?A[k]:Bp[k]);return o}
  /* 描く順：後ろの腕→後ろの剣→後ろの脚→胴→前の脚→前垂れ→兜→前の剣→前の腕→かせ */
  function knight(B,ox,oy,S,posture,T){const J=joints(ox,oy,S,posture);
   drawCape(B,S,J,T);
@@ -196,8 +228,8 @@ const RIG=(()=>{
  /* 交差に戻るときの「キン」：両手の間に小さな十字 */
  function kin(B,J,e){const c=[(J.hdF[0]+J.hdB[0])/2,(J.hdF[1]+J.hdB[1])/2-9];for(let i=-3+(e>>1);i<=3-(e>>1);i++){B.set(c[0]+i,c[1],'#c8ccd8',4);B.set(c[0],c[1]+i,'#c8ccd8',4)}}
  /* 骨組みを画素にし、ゲームの色の決まり（nCol：白い光・覚悟の色・ブレイクの色あせ）を通して、キャンバスにする */
- function render(e,v){const R=st(e),SH=e.kind==='shade',posture=SH?SH_IDLE(G.anim):pose(e),t=G.anim,k=t+'|'+v+'|'+(e.tint||'');if(R.img.k===k)return R.img.c;
-  /* 影は立ち絵の姿勢だけ（技・パリィされ・ブレイクの動きは T093・T008）。覚悟の段は影の色そのもので出すので、ゲームの段の色（nCol の tint）は重ねない */
+ function render(e,v){const R=st(e),SH=e.kind==='shade',posture=SH?shPose(e,G.anim):pose(e),t=G.anim,k=t+'|'+v+'|'+(e.tint||'');if(R.img.k===k)return R.img.c;
+  /* 影は立ち絵と技（T093）。パリィされ・ブレイク・やられの動きは T008。覚悟の段は影の色そのもので出すので、ゲームの段の色（nCol の tint）は重ねない */
   const B=new Buf(W,H),J=SH?shadeDraw(B,OX,H,e.key==='shadeM'?SHADE_M:SHADE,posture,t,e.tint):knight(B,OX,H,GATE,posture,t);R.J=J;
   for(const r of R.rx){if(r.kind!=='b')continue;const d=t-r.at-(STOP+38);if(d>=0&&d<8)kin(B,J,d)}
   B.outline();
@@ -215,5 +247,7 @@ const RIG=(()=>{
  function tail(e,x,y){const R=st(e);if(!R.J)render(e,'n');const V=SHV[e.tint]||SHV.n,sc=e.sc||1,x0=Math.round(x+(W>>1)*sc),hx=Math.round(x+(R.J.footB[0]-OX)*sc),T=G.anim;
   for(let q=hx;q<LW+4;q++){if(q<hx+18||(q+T)%5)px(q,y,V.tail);if(q>=x0){px(q,y-1,V.tail);if(V.tailW>1&&(q*3+T)%7)px(q,y-2,V.tail)}}}
  const on=e=>typeof NEWDRAW!=='undefined'&&NEWDRAW&&!!e&&(e.key==='samuraiB'||e.kind==='shade');
- /* own：体の動き（攻撃・パリィされ・やられ）まで骨組みで出す敵。影はまだ立ち絵だけなので、押し下がりなどはゲームの描き方のまま */
- return{on,own:e=>on(e)&&e.key==='samuraiB',img:render,tip,brkStars,tail}})();
+ /* own：パリィされ・やられまで骨組みで出す敵（影はまだ T008 の前なので、押し下がりはゲームの描き方のまま）。act：技の動きを骨組みで出す敵（ゲームの予備動作の伸び縮みを重ねない） */
+ /* 影ののびる斬りの当たり（SHS）で、剣先が足元のまん中からどれだけ前に出るか（画素、前が負）。ゲームの寄せ（lungeDist）を、剣先が主人公に届く長さにするのに使う */
+ const RCH={};function reach(e){const k=e.key==='shadeM'?'M':'n';if(RCH[k]==null){const B=new Buf(W,H),J=shadeDraw(B,OX,H,k==='M'?SHADE_M:SHADE,Object.assign({},SHBASE,SHS),0,null);RCH[k]=J.tip[0]-OX}return RCH[k]}
+ return{on,reach,own:e=>on(e)&&e.key==='samuraiB',act:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),img:render,tip,brkStars,tail}})();

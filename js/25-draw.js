@@ -437,7 +437,7 @@ function boarX(){const s=boarStrike();if(!s)return EX;const SX=EX+s.back;
 const GSTEP=20,GHX=HX+30;function ghostStart(n){return GHX+n*GSTEP}
 /* 予備動作：予兆の瞬間に大きく身を縮めて引き、溜めて震え、伸びて飛びかかり、行き過ぎて戻る */
 const ANT=new Set(['slime','beast','shroom','armor','bat','shade','samurai','bomb','knight']);
-function anticip(e){if(G.state!=='enemy'||!ANT.has(e.kind)||e.skin)return null;const LF=e.lungeF||4;
+function anticip(e){if(G.state!=='enemy'||!ANT.has(e.kind)||e.skin||RIG.act(e))return null;const LF=e.lungeF||4;
  const s=G.strikes.find(s=>!s.cx&&!s.dark&&G.et>=s.cue&&(s.fake?G.et<=s.end:G.et<=s.impact+6));if(!s)return null;
  const k=G.et-s.cue,d=s.fake?-99:G.et-s.impact;
  if(d>0){const q=1-d/6;return{sx:1+.18*q,sy:1-.12*q,dx:0}}

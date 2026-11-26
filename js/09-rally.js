@@ -21,7 +21,7 @@ function rallyList(n,arm,dl,o){o=o||{};{const e=G.en;if(e&&e.finale&&!G.rp){cons
 function mkStrike(impact,o){const cl=P.cueF;return Object.assign({impact,cue:impact-cl,cl,beat:false,mv:'cut',proj:false,melee:false,start:impact-cl-8,ft:0,m:1,feint:false,red:false,boom:false,counter:false,dark:false,back:0,rhythm:false,rally:false,nc:false,res:null,done:false,cued:false},o)}
 function rallyW(){return G.rally?G.rally.w||0:0}
 function ENX(e){const w=e.kind==='lord'?rallyW():0;return EX+(HX+56-EX)*w+(G.rally?G.rally.kick:0)*w}
-function lungeDist(e){const w=e.kind==='lord'?rallyW():0;return (e.lungeD||(e.kind==='dragon'?72:84))*(1-w)+14*w}
+function lungeDist(e){/* 骨組みの影（?new）は体がのびるので、寄せは「のびた剣先が主人公の前【影の剣先が届く位置】に届く長さ」にする */if(e.kind==='shade'&&RIG.act(e))return Math.max(0,EX-heroX()-P.reachShade+RIG.reach(e)*(e.sc||1));const w=e.kind==='lord'?rallyW():0;return (e.lungeD||(e.kind==='dragon'?72:84))*(1-w)+14*w}
 /* 持ち込み：門のぬしたちの連撃の最後（剣のひと振り）を、着弾の3F以内のぎりぎりで弾くと、そのまま打ち合いが始まる */
 const MOCHI_F=3;
 const rallyFoe=e=>!!e&&e.kind==='lord'&&['lord','red','fallen'].includes(e.key);

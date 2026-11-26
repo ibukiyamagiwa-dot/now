@@ -108,6 +108,7 @@ const DEF=[
  {k:'ivShade',n:'【連撃の間】影の剣士：本物が2回続く',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivShadeM',n:'【連撃の間】うそつきの影：本物が2回続く',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
  /* 【ふりのあとの間】：ふり（紫の輪から【予兆から着弾までのフレーム】後）から、次の合図まで。影の剣士は振りかぶりへ戻って止まってから、うそつきの影は戻らずに続ける（design/chars/shade.md の「数値」） */
+ {k:'reachShade',n:'【影の剣先が届く位置】（?new：のびる斬りの剣先が、主人公の前の何画素に届くか）',v:8,min:0,max:30,step:1,u:'px',g:'adv'},
  {k:'afShade',n:'【ふりのあとの間】影の剣士',v:22,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'afShadeM',n:'【ふりのあとの間】うそつきの影',v:10,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivImp',n:'【連撃の間】石なげ小鬼：拍（4拍目で石が落ちる）',v:16,min:8,max:30,step:1,u:'F',g:'adv'},

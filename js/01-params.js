@@ -71,6 +71,7 @@ const DEF=[
  {k:'stopCritF',n:'【重い一撃のヒットストップフレーム】',v:16,min:0,max:40,step:1,u:'F',g:'gauge'},
  {k:'mkCrit',n:'【重い一撃の見切り獲得量】',v:15,min:0,max:100,step:5,u:'',g:'gauge'},
  {k:'mkStreak',n:'【連続パリィ（3回以上）のボーナス見切り】',v:15,min:0,max:100,step:5,u:'',g:'adv'},
+ {k:'boredS',n:'【ひまなときまでの秒】',v:8,min:3,max:30,step:1,u:'秒',g:'adv'},
  {k:'autoNextF',n:'【勝利後に自動で次へ進むまでのフレーム】',v:80,min:20,max:240,step:10,u:'F',g:'adv'},
  {k:'stopKoF',n:'【とどめのヒットストップフレーム】',v:26,old:[40],min:0,max:120,step:2,u:'F',g:'ko'},
  {k:'stopBossF',n:'【ボス撃破のヒットストップフレーム】',v:72,min:0,max:180,step:2,u:'F',g:'ko'},

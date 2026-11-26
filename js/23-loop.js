@@ -22,6 +22,7 @@ function tick(){
  G.marks=G.marks.filter(m=>m.t<m.life);
  if(G.stop>G.stopMax){if(G.stop>=3&&G.stop>G.stopMax+2)buzz(Math.min(90,G.stop*5));G.stopMax=G.stop}
  if(G.uk)ukStep();
+ if(G.bored&&(G.state!=='cmd'||G.anim-G.bored.at>=G.bored.len))G.bored=null;
  if(G.stop>0){G.stop--;return}
  G.stopMax=0;
  if(G.knock>0)G.knock=Math.max(0,G.knock-.6);
@@ -38,6 +39,6 @@ function tick(){
  else if(G.state==='bintro')bintroStep();
  else if(G.state==='hole'){G.t++;holeStep()}
  else if(G.state==='dying'){if(++G.t>28){G.state='lose';G.t=0;SFX.lose();msg(FEAT.unlocks?`力尽きた…… 第${G.bi+1}戦まで到達　A で結果へ`:(G.mode==='run'&&retryLim()<=(G.retries||0)?'やられた…… この覚悟では、その場でやり直せない':'やられた…… A ですぐ再挑戦（この戦闘の最初から）'))}}
- else{G.t++;if(G.state==='tutok'&&G.t>=100)nextTut();if(G.state==='win'&&G.t>=P.autoNextF)(FEAT.picks?enterPick():next())}
+ else{G.t++;if(G.state==='cmd')boredStep();if(G.state==='tutok'&&G.t>=100)nextTut();if(G.state==='win'&&G.t>=P.autoNextF)(FEAT.picks?enterPick():next())}
 }
 

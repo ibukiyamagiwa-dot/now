@@ -195,6 +195,15 @@ const RIG=(()=>{
  const S2=Object.assign({},BASE,{ua:2.6,fa:2.4,sw:2.0,lean:.35},BS);/* 二撃目の当たり */
  const BRK=t=>Object.assign({},BASE,{ua:1.45,fa:1.75,sw:2.5+Math.sin(t*.05)*.05,ua2:1.25,fa2:.9,sw2:.75+Math.sin(t*.05+1)*.05,lean:.2,hd:.45+Math.sin(t*.09+1)*.06,cr:3.5+Math.sin(t*.09)*.6,x:2});/* 交差がほどけて、待つ */
  const IDLE=t=>Object.assign({},BASE,{cr:.5-.5*Math.cos(t/80*TAU)});/* 息で腰がわずかに上下する（80F） */
+ /* ひまなとき（moves.js の g_bored）：剣先で床を二度叩き（34F・44F）、肩越しに背後の門をふり返り、構え直す。光らない。
+    資料集と同じく角度もそのまま補間する（近い回り道にすると、剣が床へ下りる向きが逆になる） */
+ const BTAP={sw:2.2,fa:2.4,cr:1},BTAP2={sw:2.0,fa:2.3,cr:1.2},BLOOK={hd:-.35,lean:-.12,x:3};
+ const BORED=[[0,{}],[20,BTAP,'io'],[34,BTAP2],[38,BTAP],[44,BTAP2],[48,BTAP],[70,BLOOK,'io'],[120,BLOOK],[128,{hd:.05,cr:.6},'io'],[150,{},'io'],[200,{}]].map(([t,p,e])=>({t,p:Object.assign({},BASE,p),e}));
+ const BORED_LEN=200,BORED_TAPS=[34,44];
+ function boredPose(d){let a=BORED[0],b=null;for(const k of BORED){if(k.t<=d)a=k;if(k.t>=d){b=k;break}}if(!b||b===a)return Object.assign({},a.p);
+  const u=ease[b.e||'io'](cl01((d-a.t)/(b.t-a.t))),o={};for(const k of new Set([...Object.keys(a.p),...Object.keys(b.p)])){const A=a.p[k]??PDEF[k]??0,Bv=b.p[k]??PDEF[k]??0;o[k]=typeof A==='number'&&typeof Bv==='number'?A+(Bv-A)*u:(u<.5?A:Bv)}return o}
+ /* 床を叩いた跡：剣先の下で左右へ広がる灰の点（光らせない。白は叩いた瞬間の1点だけ） */
+ function tapFx(B,x,d){for(const s0 of BORED_TAPS){const q=d-s0;if(q<0||q>6)continue;B.set(x-q,H-1,'#c8c0b4',4);B.set(x+q,H-1,'#c8c0b4',4);if(q<2)B.set(x,H-2,'#ffffff',4)}}
  const ANG=['ua','fa','sw','ua2','fa2','sw2'];
  const ease={io:u=>u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,out:u=>1-Math.pow(1-u,3),in:u=>u*u*u,s:u=>u*u*(3-2*u),back:u=>{const c=1.9,v=u-1;return 1+(c+1)*v*v*v+c*v*v}};
  const cl01=u=>u<0?0:u>1?1:u;
@@ -235,6 +244,7 @@ const RIG=(()=>{
   if(G.ko){key='ko';const k=G.t-6;T=k<10?(R.prev||IDLE(t)):mixP(R.koFrom||(R.koFrom=Object.assign({},R.prev||BASE)),KNEEL,ease.out(cl01((k-10)/24)))}
   else if(e.broken){key='brk';T=BRK(t)}
   else if(G.state==='enemy'&&G.strikes&&G.strikes.some(isMain)){key='atk';T=attackPose(t)}
+  else if(G.bored&&G.state==='cmd'&&e===G.en){key='bored';T=boredPose(t-G.bored.at)}
   else{key='idle';T=IDLE(t)}
   if(key!=='ko')R.koFrom=null;
   if(key!==R.key){const old=R.key;R.key=key;R.from=R.prev;R.at=t;
@@ -258,6 +268,7 @@ const RIG=(()=>{
   const B=new Buf(W,H),J=SH?shadeDraw(B,OX,H,e.key==='shadeM'?SHADE_M:SHADE,posture,t,e.tint):knight(B,OX,H,GATE,posture,t);R.J=J;
   for(const r of R.rx){if(r.kind!=='b')continue;const d=t-r.at-(STOP+38);if(d>=0&&d<8)kin(B,J,d)}
   B.outline();
+  if(!SH&&R.key==='bored'&&G.bored&&J.tip)tapFx(B,Math.round(J.tip[0]),t-G.bored.at);
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d'),im=cx.createImageData(W,H),memo={};
   for(let i=0;i<B.c.length;i++){const c0=B.c[i];if(!c0)continue;const c=memo[c0]||(memo[c0]=B.t[i]===4?c0:nCol(c0,v,SH?null:e.tint)),n=parseInt(c.slice(1),16);im.data[i*4]=n>>16&255;im.data[i*4+1]=n>>8&255;im.data[i*4+2]=n&255;im.data[i*4+3]=255}
   cx.putImageData(im,0,0);R.img={k,c:cv};return cv}
@@ -275,4 +286,5 @@ const RIG=(()=>{
  /* own：パリィされ・やられまで骨組みで出す敵（ゲームの押し下がりを重ねない）。act：技の動きを骨組みで出す敵（ゲームの予備動作の伸び縮みを重ねない） */
  /* 影ののびる斬りの当たり（SHS）で、剣先が足元のまん中からどれだけ前に出るか（画素、前が負）。ゲームの寄せ（lungeDist）を、剣先が主人公に届く長さにするのに使う */
  const RCH={};function reach(e){const k=e.key==='shadeM'?'M':'n';if(RCH[k]==null){const B=new Buf(W,H),J=shadeDraw(B,OX,H,k==='M'?SHADE_M:SHADE,Object.assign({},SHBASE,SHS),0,null);RCH[k]=J.tip[0]-OX}return RCH[k]}
- return{on,reach,own:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),act:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),img:render,tip,brkStars,tail}})();
+ const bored=e=>on(e)&&e.key==='samuraiB'?{len:BORED_LEN,taps:BORED_TAPS}:null;
+ return{on,reach,bored,own:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),act:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),img:render,tip,brkStars,tail}})();

@@ -4,6 +4,13 @@ function cueK(){return G.mode==='run'?G.K:G.mode==='prac'?PV+1:G.mode==='tut'?0:
 /* 連携・切り返しのあとに続く技は、その技の最初の本物の撃に合図を出す */
 function leadFirst(L){const j=L.findIndex(x=>!x.fake&&!x.ping);return j<0?L:L.map((x,i)=>i===j?Object.assign({},x,{lead:true}):x)}
 function cueHid(s){return s.nth>0&&s.prevG!=null&&s.prevG<P.cueF&&!s.fake&&!s.rally&&!s.lead&&!s.keep&&s.note==null&&!s.heads&&s.ten==null&&!s.beat&&!s.beats&&cueK()>P.cue2K}
+/* ひまなとき（依頼の一覧「大ボスの『ひまなとき』の待機」、問3）：コマンドを選ばずに【ひまなときまでの秒】たつと、敵ごとの待機を一度だけ見せる。
+   光らない・撃を作らないので攻撃ではない。「まもる」の意味は変えない。どの敵が持つかと長さ・音の時刻は boredOf が返す（いまは ?new の門番だけ） */
+function boredOf(e){return RIG.bored(e)}
+function boredStep(){const e=G.en;
+ if(G.bored){const d=G.anim-G.bored.at;if(G.bored.taps.includes(d))SFX.kotsu();return}
+ if(G.t!==Math.round(P.boredS*60)||G.mode==='tut'||G.rp||G.act||!e||e.hp<=0||e.broken||e.sleep)return;
+ const b=boredOf(e);if(b)G.bored={at:G.anim,len:b.len,taps:b.taps}}
 /* iv：【連撃の間】の名前（P のキー）。二撃目以降は、前の当たりから P[iv] F後に当たる（ヒットストップは数えない） */
 function buildStrikes(L,t,lastI){const e=G.en,cl0=e.cue||P.cueF;let nth=0;const list=L.map(s=>{
   if(s.ping){t+=s.pre||0;G.pings.push({t,heads:s.heads||(s.head!=null?[s.head]:null),note:s.note??G.pings.length,done:false,i:G.pings.length});return null}

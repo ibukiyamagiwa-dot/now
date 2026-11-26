@@ -44,6 +44,7 @@ const SFX={
  whoosh(){sweep(.26,.5,500,2600,1.1);tone(150,.24,'sawtooth',.05,70)},
  rock(){noise(.12,.3,700);tone(95,.14,'square',.07,55)},
  goo(){tone(340,.13,'sine',.11,110);tone(170,.1,'triangle',.05,90)},
+ kotsu(){tone(520,.04,'triangle',.05,380);noise(.03,.1,1400,'lowpass')},
  metal(){tone(2300,.06,'square',.045);tone(3300,.12,'triangle',.04,2900)},
  iai(){tone(3400,.3,'triangle',.08,2600);tone(1700,.45,'square',.045,1100);noise(.18,.55,6500,'highpass');tone(70,.5,'sine',.2,35);setTimeout(()=>tone(4200,.6,'sine',.05,4000),90)},
  parry(){tone(1900,.2,'square',.1,1100);tone(2900,.3,'triangle',.08);noise(.12,.4,5200,'highpass')},

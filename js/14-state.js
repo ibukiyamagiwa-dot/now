@@ -11,7 +11,7 @@ function startBattle(i,retry){
   if(key==='hydra'){const hh=Math.round(hp/3);e.uhp=[hh,hh,hh];e.uhp0=hh;e.swarm=3;e.hpMax=e.hp=hh*3}
   if(key==='slime'){const U=K>=3?[1,1,1,2.4]:K===2?[1,1,1,1]:[1,1,1];e.uhp=U.map(u=>Math.round(18*u*sc));e.ubig=U.map(u=>u>1);e.swarm=U.length;e.hpMax=e.hp=e.uhp.reduce((a,b)=>a+b,0)}
   if(K>=2&&!d.gold&&!d.noTint){const tt=tintOf(K);e.tint=tt;e.col=tt==='r'?mixHex(d.col,'#d83a2a',.7):tt==='k'?mixHex(d.col,'#2a1838',.62):mixHex(d.col,'#4a1a7a',.6);e.name=(tt==='r'?'赤い':tt==='k'?'黒い':'紫の')+d.name;if(K>=3)e.eye=tt==='v'?'#ff6ad8':'#ff4040'}}
- G.state='cmd';G.t=0;G.strikes=[];G.bs={parry:0,hurt:0,n:0,just:0,hits:0};G.streak=0;G.ko=null;G.rings=[];G.marks=[];G.knock=0;if(!usable(G.sel))G.sel=1;G.hpose=null;G.act=null;G.pts=[];G.txt=[];G.fl=[];G.stop=0;G.pings=[];G.ex=null;G.fxAt=null;G.rally=null;if(G.en.mid){G.en.demo=true;G.banner={s:'中ボス　'+G.en.name,t:0};flash(['#000000','#3a1a2a','#000000']);SFX.rage()}
+ G.state='cmd';G.t=0;G.bored=null;G.strikes=[];G.bs={parry:0,hurt:0,n:0,just:0,hits:0};G.streak=0;G.ko=null;G.rings=[];G.marks=[];G.knock=0;if(!usable(G.sel))G.sel=1;G.hpose=null;G.act=null;G.pts=[];G.txt=[];G.fl=[];G.stop=0;G.pings=[];G.ex=null;G.fxAt=null;G.rally=null;if(G.en.mid){G.en.demo=true;G.banner={s:'中ボス　'+G.en.name,t:0};flash(['#000000','#3a1a2a','#000000']);SFX.rage()}
  if(d.boss&&!d.cine&&!retry&&G.mode!=='tut'){G.state='bintro';G.t=0;G.binName=key==='hydra'&&G.mode==='run'?'？？？':d.name}
   if((key==='lord'||key==='red'||key==='fallen')&&!retry&&!G.pmv){G.state='enter';G.t=0;G.enter={t:0,dx:key==='fallen'?0:120,f:'idle',cs:null,rise:key==='fallen'}}
  if(key==='hydra'&&G.mode==='run'){G.banner={s:'？？？',t:0};flash(['#000000','#1a3a22','#000000'])}

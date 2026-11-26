@@ -15,7 +15,7 @@ await new Promise(ok => srv.listen(0, ok));
 const exe = process.env.CI ? null : ['/usr/bin/google-chrome', '/usr/bin/chromium'].find(fs.existsSync);
 const browser = await pw.chromium.launch(exe ? { executablePath: exe } : {});
 // 場面：名前と、そこまで進める手順（ページの中で実行する）
-const SCENES = ['idle', 'wind1', 'swing1', 'hit1', 'wind2', 'hit2', 'parry1', 'parry2', 'broken', 'recover', 'kneel'];
+const SCENES = ['idle', 'bored1', 'bored2', 'wind1', 'swing1', 'hit1', 'wind2', 'hit2', 'parry1', 'parry2', 'broken', 'recover', 'kneel'];
 async function run(q) {
   const page = await browser.newPage({ viewport: { width: 960, height: 600 } }), errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
@@ -34,6 +34,8 @@ async function run(q) {
     T.scene = name => {
       T.fresh();
       if (name === 'idle') T.step(20);
+      if (name === 'bored1') { T.until(() => G.bored); T.step(35) }
+      if (name === 'bored2') { T.until(() => G.bored); T.step(100) }
       if (name === 'wind1') { startEnemy(); T.until(() => G.et >= T.s(0).cue + 2) }
       if (name === 'swing1') { startEnemy(); T.until(() => G.et >= T.s(0).impact - 2) }
       if (name === 'hit1') { startEnemy(); T.until(() => G.et >= T.s(0).impact + 1) }
@@ -53,6 +55,10 @@ async function run(q) {
     info[name] = await page.evaluate(n => window.__T.scene(n), name);
     if (out) { const f = path.join(out, `${q ? 'new' : 'old'}_${name}.png`); await page.locator('#cv').screenshot({ path: f }); shots[name] = f }
   }
+  // ひまなとき（T039）：コマンドを選ばずに【ひまなときまでの秒】たつと一度だけ見せ、光らず（撃も合図も作らない）、終われば戻り、同じ番の中では二度は出ない
+  const bored = await page.evaluate(() => { const T = window.__T; T.fresh(); const F = Math.round(P.boredS * 60); let at = -1, len = 0, starts = 0, strikes = 0, was = false;
+    for (let i = 0; i < F + 900; i++) { tick(); if (G.bored && !was) { starts++; if (at < 0) { at = G.t; len = G.bored.len } } was = !!G.bored; strikes += (G.strikes || []).length + G.rings.length; if (G.state !== 'cmd') break }
+    return { has: !!RIG.bored(G.en), at, F, len, starts, strikes, state: G.state, after: !!G.bored } });
   // 自動で戦わせて、例外が出ないかを見る（パリィとガードをまぜる）
   const auto = await page.evaluate(() => { const T = window.__T; T.fresh(); let turns = 0;
     for (let k = 0; k < 40; k++) { startEnemy(); turns++; for (let i = 0; i < 300 && G.state === 'enemy'; i++) { const s = G.strikes.find(s => !s.done && G.et === s.impact - (k % 3 ? 2 : 12)); if (s) press(); tick() } G.state = 'cmd'; G.en.broken = k % 5 === 4 ? 1 : 0; T.step(20) }
@@ -62,10 +68,11 @@ async function run(q) {
     return { turns, used, ms };
   });
   await page.close();
-  return { errors, info, auto, shots };
+  return { errors, info, auto, shots, bored };
 }
 const oldR = await run(''), newR = await run('?new');
 await browser.close(); srv.close();
-const ok = !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4;
-console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3) }, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
+const B = newR.bored, boredOk = B.has && B.at === B.F && B.starts === 1 && !B.strikes && B.state === 'cmd' && !B.after && !oldR.bored.has && oldR.bored.starts === 0;
+const ok = !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
+console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B }, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
 process.exit(ok ? 0 : 1);

@@ -738,7 +738,7 @@ const BV={
  r:{lbl:'覚悟2 赤い',name:'赤い突進イノシシ',coat:['#160808','#341414','#52201c','#72322a','#94483c'],mane:['#0e0505','#220c0a','#3a1612'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff5a3c',sclera:'#e8c8c0',mudH:.75,smoke:0,third:0,vein:1},
  k:{lbl:'覚悟3 黒い',name:'黒い突進イノシシ',coat:['#08070a','#1a171e','#2c2832','#423c48','#5c5464'],mane:['#050406','#121016','#221e28'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff4040',sclera:'#c8c0c8',mudH:1.3,smoke:1,third:0,vein:1},
  v:{lbl:'覚悟4 紫の',name:'紫の突進イノシシ',coat:['#0c0614','#22122e','#3a2050','#56347a','#7650a0'],mane:['#08040e','#180c24','#2a163c'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff6ad8',sclera:'#e0d0f0',mudH:1.7,smoke:1,third:1,vein:2}};
-const BPDEF={fs:1,seep:0,trem:0,look:0,x:0,y:0,cr:0,hd:0,run:0,runA:0,gal:0,paw:0,pawL:0,brs:0,roll:0,dead:0,blink:0,snort:0,dust:0,lean:0,daze:0,jaw:0};
+const BPDEF={calm:0,fs:1,seep:0,trem:0,look:0,x:0,y:0,cr:0,hd:0,run:0,runA:0,gal:0,paw:0,pawL:0,brs:0,roll:0,dead:0,blink:0,snort:0,dust:0,lean:0,daze:0,jaw:0};
 function drawBoar(B,ox,oy,S,P0,T){const P=Object.assign({},BPDEF,S.pose||{});for(const[a,v]of Object.entries(P0||{}))if(v!==undefined&&!(typeof v==='number'&&!isFinite(v)))P[a]=v;
  if(P.hide)return{k:S.k||1,D:BV[P.tint||'n'],hoofs:[],gone:true};
  const k=S.k||1,D=BV[P.tint||S.tint||'n'],M=!!S.mid,dd=Math.max(0,Math.min(1,P.dead)),fd=c=>dd>0?mix(c,'#0a0608',.35*dd):c;
@@ -792,7 +792,7 @@ function drawBoar(B,ox,oy,S,P0,T){const P=Object.assign({},BPDEF,S.pose||{});for
  /* 中ボス：割れた額。何度も壁にぶつかってきた（弾かれると壁に激突する、の物語） */
  if(M){const a=hq(-4,-6),b=hq(-6.5,-4.5),c=hq(-6,-2.5);B.line(a[0],a[1],b[0],b[1],C[0]);B.line(b[0],b[1],c[0],c[1],C[0]);B.set(...hq(-3.5,-5.5),C[4],1);B.set(...hq(-7,-4),C[0],1)}
  /* 目：小さく、白目をむいている（おびえ）。紫の段では額に三つ目の細い目が開く（のまれるほど目が増える） */
- {const e=hq(-5,-3);if(!(P.blink>0||dd>.7)){B.set(e[0],e[1],D.sclera,2);B.set(e[0]-sg,e[1],dd>.3?C[1]:D.eye,2);B.set(e[0]+sg,e[1],D.sclera,2);B.set(e[0],e[1]+1,D.sclera,2);B.set(e[0]-sg,e[1]-1,C[0],1);B.set(e[0],e[1]-1,C[0],1)}else B.line(e[0]-1,e[1],e[0]+1,e[1],C[0]);J.eye=e;
+ {const e=hq(-5,-3);if(!(P.blink>0||dd>.7)){B.set(e[0],e[1],D.sclera,2);B.set(e[0]-sg,e[1],dd>.3?C[1]:D.eye,2);B.set(e[0]+sg,e[1],D.sclera,2);if(!P.calm)B.set(e[0],e[1]+1,D.sclera,2);/* calm：気がそれている間は白目をむかない */B.set(e[0]-sg,e[1]-1,C[0],1);B.set(e[0],e[1]-1,C[0],1)}else B.line(e[0]-1,e[1],e[0]+1,e[1],C[0]);J.eye=e;
   if(D.third&&dd<.5){const f=hq(-2,-6);B.set(f[0],f[1]-1,D.eye,2);B.set(f[0],f[1],D.sclera,2);B.set(f[0],f[1]+1,D.eye,2)}
   if(D.vein){/* 赤い段から：目のまわりから首へ、くらやみの筋 */for(let i=0;i<2+D.vein;i++){const q=hq(-2+i*2.2,-1+((i*7)%3)*.8);B.set(q[0],q[1],MU[2],1)}}}
  /* 下あご（jaw）と牙。牙は体でいちばん明るい：合図はいつも牙の先に出る。中ボスの手前の牙は折れている */
@@ -1910,7 +1910,7 @@ const B_SPIN=[26,50,68,82,92],B_BACK=116;/* 回る時刻（向きを変え始め
 function boarFs(t){let s=1,v=1;for(const f of B_SPIN.concat([B_BACK])){if(t>=f+3)s=-s;else if(t>=f){const u=(t-f)/3;v=s*(1-2*u);return Math.abs(v)<.35?(v<0?-.35:.35):v}}return s}
 function boarMoth(t){/* 羽虫の位置（尾の付け根からの相対）。光らない、くすんだ色 */const fl=Math.sin(t*1.3)*1.2;if(t<10)return[14+(10-t)*2,-26+fl+(10-t)];if(t<104)return[17,-15+fl];const d=t-104;return[17+d*.6,-15-d*1.1+fl]}
 mv({f:'boar',ox:BOAR.boar.ox,id:'b_bored',n:'ひまなとき：尾を追って回る',bg:'def',len:176,keys:[K(0,{})],
- pp:(P,t)=>{boarIdle(P,t);P.fs=boarFs(t);
+ pp:(P,t)=>{boarIdle(P,t);P.fs=boarFs(t);P.calm=t<B_BACK?1:0;/* 羽虫に気がそれている間は、白目をむかない */
   if(t>=12&&t<26){/* 尾に何かとまった。尾をふり、耳がぴくっと動く */P.brs=.5+.3*Math.sin(t*.9);P.look=.25}
   if(t>=26&&t<104){/* 追いかけて回る：その場で小走り。回るほど速く */const sp=t<68?.6:.9;P.run=(t-26)/(t<68?6:4.5);P.runA=sp;P.hd=.15;P.brs=.7;P.x=Math.sin((t-26)*.12)*3;P.snort=(t%19<3)?.5:0}
   if(t>=104&&t<B_BACK){/* 主人公に背を向けたまま、ぴたりと止まる（羽虫が飛んでいく） */P.run=0;P.runA=0;P.hd=-.1;P.look=.6;P.x=3}

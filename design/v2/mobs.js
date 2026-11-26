@@ -80,7 +80,7 @@ const B_SPIN=[26,50,68,82,92],B_BACK=116;/* 回る時刻（向きを変え始め
 function boarFs(t){let s=1,v=1;for(const f of B_SPIN.concat([B_BACK])){if(t>=f+3)s=-s;else if(t>=f){const u=(t-f)/3;v=s*(1-2*u);return Math.abs(v)<.35?(v<0?-.35:.35):v}}return s}
 function boarMoth(t){/* 羽虫の位置（尾の付け根からの相対）。光らない、くすんだ色 */const fl=Math.sin(t*1.3)*1.2;if(t<10)return[14+(10-t)*2,-26+fl+(10-t)];if(t<104)return[17,-15+fl];const d=t-104;return[17+d*.6,-15-d*1.1+fl]}
 mv({f:'boar',ox:BOAR.boar.ox,id:'b_bored',n:'ひまなとき：尾を追って回る',bg:'def',len:176,keys:[K(0,{})],
- pp:(P,t)=>{boarIdle(P,t);P.fs=boarFs(t);
+ pp:(P,t)=>{boarIdle(P,t);P.fs=boarFs(t);P.calm=t<B_BACK?1:0;/* 羽虫に気がそれている間は、白目をむかない */
   if(t>=12&&t<26){/* 尾に何かとまった。尾をふり、耳がぴくっと動く */P.brs=.5+.3*Math.sin(t*.9);P.look=.25}
   if(t>=26&&t<104){/* 追いかけて回る：その場で小走り。回るほど速く */const sp=t<68?.6:.9;P.run=(t-26)/(t<68?6:4.5);P.runA=sp;P.hd=.15;P.brs=.7;P.x=Math.sin((t-26)*.12)*3;P.snort=(t%19<3)?.5:0}
   if(t>=104&&t<B_BACK){/* 主人公に背を向けたまま、ぴたりと止まる（羽虫が飛んでいく） */P.run=0;P.runA=0;P.hd=-.1;P.look=.6;P.x=3}

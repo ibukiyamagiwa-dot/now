@@ -9,7 +9,7 @@ const BV={
  r:{lbl:'覚悟2 赤い',name:'赤い突進イノシシ',coat:['#160808','#341414','#52201c','#72322a','#94483c'],mane:['#0e0505','#220c0a','#3a1612'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff5a3c',sclera:'#e8c8c0',mudH:.75,smoke:0,third:0,vein:1},
  k:{lbl:'覚悟3 黒い',name:'黒い突進イノシシ',coat:['#08070a','#1a171e','#2c2832','#423c48','#5c5464'],mane:['#050406','#121016','#221e28'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff4040',sclera:'#c8c0c8',mudH:1.3,smoke:1,third:0,vein:1},
  v:{lbl:'覚悟4 紫の',name:'紫の突進イノシシ',coat:['#0c0614','#22122e','#3a2050','#56347a','#7650a0'],mane:['#08040e','#180c24','#2a163c'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff6ad8',sclera:'#e0d0f0',mudH:1.7,smoke:1,third:1,vein:2}};
-const BPDEF={fs:1,seep:0,trem:0,look:0,x:0,y:0,cr:0,hd:0,run:0,runA:0,gal:0,paw:0,pawL:0,brs:0,roll:0,dead:0,blink:0,snort:0,dust:0,lean:0,daze:0,jaw:0};
+const BPDEF={calm:0,fs:1,seep:0,trem:0,look:0,x:0,y:0,cr:0,hd:0,run:0,runA:0,gal:0,paw:0,pawL:0,brs:0,roll:0,dead:0,blink:0,snort:0,dust:0,lean:0,daze:0,jaw:0};
 function drawBoar(B,ox,oy,S,P0,T){const P=Object.assign({},BPDEF,S.pose||{});for(const[a,v]of Object.entries(P0||{}))if(v!==undefined&&!(typeof v==='number'&&!isFinite(v)))P[a]=v;
  if(P.hide)return{k:S.k||1,D:BV[P.tint||'n'],hoofs:[],gone:true};
  const k=S.k||1,D=BV[P.tint||S.tint||'n'],M=!!S.mid,dd=Math.max(0,Math.min(1,P.dead)),fd=c=>dd>0?mix(c,'#0a0608',.35*dd):c;
@@ -63,7 +63,7 @@ function drawBoar(B,ox,oy,S,P0,T){const P=Object.assign({},BPDEF,S.pose||{});for
  /* 中ボス：割れた額。何度も壁にぶつかってきた（弾かれると壁に激突する、の物語） */
  if(M){const a=hq(-4,-6),b=hq(-6.5,-4.5),c=hq(-6,-2.5);B.line(a[0],a[1],b[0],b[1],C[0]);B.line(b[0],b[1],c[0],c[1],C[0]);B.set(...hq(-3.5,-5.5),C[4],1);B.set(...hq(-7,-4),C[0],1)}
  /* 目：小さく、白目をむいている（おびえ）。紫の段では額に三つ目の細い目が開く（のまれるほど目が増える） */
- {const e=hq(-5,-3);if(!(P.blink>0||dd>.7)){B.set(e[0],e[1],D.sclera,2);B.set(e[0]-sg,e[1],dd>.3?C[1]:D.eye,2);B.set(e[0]+sg,e[1],D.sclera,2);B.set(e[0],e[1]+1,D.sclera,2);B.set(e[0]-sg,e[1]-1,C[0],1);B.set(e[0],e[1]-1,C[0],1)}else B.line(e[0]-1,e[1],e[0]+1,e[1],C[0]);J.eye=e;
+ {const e=hq(-5,-3);if(!(P.blink>0||dd>.7)){B.set(e[0],e[1],D.sclera,2);B.set(e[0]-sg,e[1],dd>.3?C[1]:D.eye,2);B.set(e[0]+sg,e[1],D.sclera,2);if(!P.calm)B.set(e[0],e[1]+1,D.sclera,2);/* calm：気がそれている間は白目をむかない */B.set(e[0]-sg,e[1]-1,C[0],1);B.set(e[0],e[1]-1,C[0],1)}else B.line(e[0]-1,e[1],e[0]+1,e[1],C[0]);J.eye=e;
   if(D.third&&dd<.5){const f=hq(-2,-6);B.set(f[0],f[1]-1,D.eye,2);B.set(f[0],f[1],D.sclera,2);B.set(f[0],f[1]+1,D.eye,2)}
   if(D.vein){/* 赤い段から：目のまわりから首へ、くらやみの筋 */for(let i=0;i<2+D.vein;i++){const q=hq(-2+i*2.2,-1+((i*7)%3)*.8);B.set(q[0],q[1],MU[2],1)}}}
  /* 下あご（jaw）と牙。牙は体でいちばん明るい：合図はいつも牙の先に出る。中ボスの手前の牙は折れている */

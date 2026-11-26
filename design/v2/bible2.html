@@ -877,6 +877,7 @@ mv({f:'dgate',id:'dg_feint',n:'手元の触手',bg:'gate',len:120,cap:'紫の輪
  fx:(B,J,t)=>{if(t>=16&&t<44){const u=t<28?(t-16)/12:1-(t-28)/16,k=J.k;tentacle(B,J.hdF,add(J.hdF,[-8*u,-4]),add(J.hdF,[-24*u,2]),1.6*k,.4*k,true)}}});
 mv({f:'dgate',id:'dg_two',n:'くさった二連撃',bg:'gate',len:100,cap:'門番の二連撃と同じ流れ。刃のしずくが落ちたら合図。',why:'同じ動きを繰り返すことで「門番だったもの」とわかる。違いは色としずくだけ。',
  keys:MV.find(m=>m.id==='g_two').keys,cues:[{t:14,col:'w'}],hits:[42,56],trails:[[38,44,'p'],[52,58,'p',2]]});
+/* dg_down は「たおれる：鎖だけが残る」（dg_down2）の土台。資料集のページには出さず、ゲームの撃破は dg_down2 に従う */
 mv({f:'dgate',id:'dg_down',n:'たおれる：剣だけが残る',bg:'gate',len:120,noHero:true,cap:'体はくらやみに溶ける。交差した剣だけがその場に残る。',why:'溶けても剣は交差したまま＝最後まで門番だった。次の門のぬしへの「ここから先は別物」という区切り。',
  keys:[K(0,X),K(30,Object.assign({},KNEEL,{sw:-2.25,ua:1.75,fa:-.5,sw2:-.85,ua2:1.4,fa2:-2.5}),'out'),K(110,Object.assign({},KNEEL,{sw:-2.25,ua:1.75,fa:-.5,sw2:-.85,ua2:1.4,fa2:-2.5}))],
  post:(B,J,t)=>{if(t>40){const u=Math.min(1,(t-40)/50);for(let i=0;i<B.c.length;i++){if(B.t[i]===1&&B.c[i]!==W_ROT.col&&B.c[i]!==W_ROT.hi&&B.c[i]!==W_ROT.lo&&B.c[i]!==OUT){const x=i%CW,y=i/CW|0;if(((x*13+y*7)%17)/17<u)B.c[i]=(y+x)%3?INK.col:0,B.t[i]=B.c[i]?1:0}}}}});

@@ -738,14 +738,15 @@ const BV={
  r:{lbl:'覚悟2 赤い',name:'赤い突進イノシシ',coat:['#160808','#341414','#52201c','#72322a','#94483c'],mane:['#0e0505','#220c0a','#3a1612'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff5a3c',sclera:'#e8c8c0',mudH:.75,smoke:0,third:0,vein:1},
  k:{lbl:'覚悟3 黒い',name:'黒い突進イノシシ',coat:['#08070a','#1a171e','#2c2832','#423c48','#5c5464'],mane:['#050406','#121016','#221e28'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff4040',sclera:'#c8c0c8',mudH:1.3,smoke:1,third:0,vein:1},
  v:{lbl:'覚悟4 紫の',name:'紫の突進イノシシ',coat:['#0c0614','#22122e','#3a2050','#56347a','#7650a0'],mane:['#08040e','#180c24','#2a163c'],tusk:['#5e5446','#a89a84','#e8dcc6','#fffaf0'],mud:BMUD,eye:'#ff6ad8',sclera:'#e0d0f0',mudH:1.7,smoke:1,third:1,vein:2}};
-const BPDEF={seep:0,trem:0,look:0,x:0,y:0,cr:0,hd:0,run:0,runA:0,gal:0,paw:0,pawL:0,brs:0,roll:0,dead:0,blink:0,snort:0,dust:0,lean:0,daze:0,jaw:0};
+const BPDEF={fs:1,seep:0,trem:0,look:0,x:0,y:0,cr:0,hd:0,run:0,runA:0,gal:0,paw:0,pawL:0,brs:0,roll:0,dead:0,blink:0,snort:0,dust:0,lean:0,daze:0,jaw:0};
 function drawBoar(B,ox,oy,S,P0,T){const P=Object.assign({},BPDEF,S.pose||{});for(const[a,v]of Object.entries(P0||{}))if(v!==undefined&&!(typeof v==='number'&&!isFinite(v)))P[a]=v;
  if(P.hide)return{k:S.k||1,D:BV[P.tint||'n'],hoofs:[],gone:true};
  const k=S.k||1,D=BV[P.tint||S.tint||'n'],M=!!S.mid,dd=Math.max(0,Math.min(1,P.dead)),fd=c=>dd>0?mix(c,'#0a0608',.35*dd):c;
  const C=D.coat.map(fd),MA=D.mane.map(fd),TU=D.tusk,MU=D.mud.map(fd),FAR=a=>a.map(c=>mix(c,'#000000',.45));
  /* 体の回転（壁に激突・たおれる）：腰のあたりを中心に回す */
- const ro=P.roll,cx=ox+(P.x+(P.trem?Math.sin(T*2.3)*.6*P.trem:0))*k,cy=oy+P.y*k,piv=[cx,cy-10*k];
- const Q=(x,y)=>{let p=[cx+x*k,cy+(y+P.cr*(y<-4?.8:.2))*k];if(ro){const d=[p[0]-piv[0],p[1]-piv[1]],r=rot(d,ro);p=[piv[0]+r[0],piv[1]+r[1]]}return p};
+ const fs=P.fs,sg=fs<0?-1:1,ro=P.roll,cx=ox+(P.x+(P.trem?Math.sin(T*2.3)*.6*P.trem:0))*k,cy=oy+P.y*k,piv=[cx,cy-10*k];
+ const MX=x=>-8+(x+8)*fs;/* 向きの鏡写しは体の真ん中（x=-8）を軸にする */
+ const Q=(x,y)=>{let p=[cx+MX(x)*k,cy+(y+P.cr*(y<-4?.8:.2))*k];if(ro){const d=[p[0]-piv[0],p[1]-piv[1]],r=rot(d,ro);p=[piv[0]+r[0],piv[1]+r[1]]}return p};
  const br=Math.sin(T*.11)*(1-dd)*(P.runA?0:1);/* 息：おびえて浅く速い */
  const J={k,D};
  /* ===== 脚：肩と腰から、ひざ、ひづめ。足の運びは run（位相）と runA（振れ幅） ===== */
@@ -754,9 +755,9 @@ function drawBoar(B,ox,oy,S,P0,T){const P=Object.assign({},BPDEF,S.pose||{});for
  function leg(L){const hp=Q(L.h[0],L.h[1]+(L.fr?br*.2:0));const ph=(P.run+L.ph)*Math.PI*2,A=P.runA;
   let fx=L.h[0]+(L.fr?-1:1)+Math.cos(ph)*5*A*(P.gal?1.3:1),fy=-Math.max(0,Math.sin(ph))*3.2*A;
   if(L.fr&&!L.far&&(P.paw||P.pawL)){fx+=-4*P.paw+P.pawL*7;fy=-8*P.paw}/* 前足で地をかく：持ち上げて、後ろへかく */
-  let ft=[cx+fx*k,cy+fy*k];if(ro){const d=[ft[0]-piv[0],ft[1]-piv[1]],r=rot(d,ro);ft=[piv[0]+r[0],piv[1]+r[1]]}
+  let ft=[cx+MX(fx)*k,cy+fy*k];if(ro){const d=[ft[0]-piv[0],ft[1]-piv[1]],r=rot(d,ro);ft=[piv[0]+r[0],piv[1]+r[1]]}
   if(dd>.6&&L.fr)ft=LP(ft,add(hp,[-6*k,3*k]),(dd-.6)/.4);
-  const kn=ik(hp,ft,legL[0]*k,legL[1]*k,L.fr?-1:1);
+  const kn=ik(hp,ft,legL[0]*k,legL[1]*k,(L.fr?-1:1)*sg);
   const R=L.far?FAR(C):C,m=new Set();dCurve(m,t=>LP(hp,kn,t),3*k,1.7*k,6);dCurve(m,t=>LP(kn,ft,t),1.6*k,1.2*k,6);dShade(B,m,R,null,null,false);
   /* くらやみの泥：下の階を走ってきた跡。覚悟が上がるほど上までのぼる */
   const mh=Math.min(1,D.mudH+P.seep);for(const key of m){const[x,y]=UK(key),u=(ft[1]-y)/((ft[1]-hp[1])||1);if(u<mh*1.02+(hsh(x,0)-.5)*.18)B.set(x,y,L.far?MU[0]:(u<mh*.5?MU[1]:MU[2]),1)}
@@ -774,37 +775,37 @@ function drawBoar(B,ox,oy,S,P0,T){const P=Object.assign({},BPDEF,S.pose||{});for
  /* 毛並み：胴に斜めの短い毛のすじ（ドットを一つおきに暗く） */
  for(const key of body){const[x,y]=UK(key);if(hsh(x,y)>.82&&B.get(x,y)===C[2]&&B.get(x,y-1)===C[2])B.set(x,y,C[1],1);else if(hsh(x,y)>.93&&B.get(x,y)===C[3])B.set(x,y,C[2],1)}
  /* 尾：短く、先に房。おびえると巻き上がる */
- {const a=Q(16,-12),b=add(a,rot([3*k,(-1-P.brs*2)*k],ro)),c=add(b,rot([1*k,(2-P.brs*4)*k],ro));B.line(a[0],a[1],b[0],b[1],C[1]);B.line(b[0],b[1],c[0],c[1],MA[1]);B.set(c[0],c[1]+1,MA[0],1)}
+ {const a=Q(16,-12),b=add(a,rot([3*k*fs,(-1-P.brs*2)*k],ro)),c=add(b,rot([1*k*fs,(2-P.brs*4)*k],ro));B.line(a[0],a[1],b[0],b[1],C[1]);B.line(b[0],b[1],c[0],c[1],MA[1]);B.set(c[0],c[1]+1,MA[0],1)}
  /* ===== たてがみ：背の高いところに逆立つ硬い毛。おびえと怒りで立つ（brs）。中ボスは長く黒い ===== */
- const nb=M?13:9;for(let i=0;i<nb;i++){const t=i/(nb-1),p=sp(lerp(.15,1.05,t)),root=Q(p[0],p[1]-2.5),H=(M?3.2:2.2)+Math.sin(t*Math.PI)*(M?2.6:1.8)+P.brs*(M?2.2:1.6)+(i%2)*.8,a=-Math.PI/2+.55-t*.5+Math.sin(T*.3+i)*.04*P.brs+ro,tip=add(root,dir(a,H*k));
+ const nb=M?13:9;for(let i=0;i<nb;i++){const t=i/(nb-1),p=sp(lerp(.15,1.05,t)),root=Q(p[0],p[1]-2.5),H=(M?3.2:2.2)+Math.sin(t*Math.PI)*(M?2.6:1.8)+P.brs*(M?2.2:1.6)+(i%2)*.8,a=-Math.PI/2+.55-t*.5+Math.sin(T*.3+i)*.04*P.brs+ro,dv=dir(a,H*k),tip=add(root,[dv[0]*fs,dv[1]]);
   const mid=LP(root,tip,.55);B.line(root[0],root[1],mid[0],mid[1],MA[2]);B.line(mid[0],mid[1],tip[0],tip[1],i%3?MA[1]:MA[0]);
   if(D.smoke&&!dd&&i%2===0){/* 黒い段から：毛の先から細い黒い煙 */const ph=(T*.5+i*7)%14;for(let j=0;j<3;j++){const q=add(tip,[Math.sin((ph+j*4)*.4+i)*1.2,-(ph*.6+j*2)]);if(ph+j*2<12)B.set(q[0],q[1],j?MU[1]:MU[2],5)}}}
  legs.filter(L=>!L.far).forEach(leg);
  /* ===== 頭：低く、前へ。鼻先は地面に近い。hd で下げる（突進の構え） ===== */
- const hA=-.12+P.hd*.55-P.snort*.12+P.daze*.3-P.look*.5,hb=Q(-16,-15),hq=(x,y)=>{const r=rot([x*k,y*k],hA+ro);return[hb[0]+r[0],hb[1]+r[1]]};
+ const hA=-.12+P.hd*.55-P.snort*.12+P.daze*.3-P.look*.5,hb=Q(-16,-15),hq=(x,y)=>{const r=rot([x*k,y*k],hA+ro);return[hb[0]+r[0]*fs,hb[1]+r[1]]};
  const head=new Set();dCurve(head,t=>hq(lerp(2,-15,t),lerp(-3.5,.8,t)),t=>lerp(7,3.4,t)*(M?1.06:1),0,12,.02,3);dDisc(head,...hq(-2,-1),5.6,0,0);
  dShade(B,head,C,null,null,false);
  /* 鼻先（平たい円盤）。中ボスは鼻すじに古い傷 */
- const sn=hq(-17,1.2);B.disc(sn[0],sn[1],2.4*k,C[3],C[4],C[1],1);B.set(sn[0]-1*k,sn[1]-.4*k,'#120a08',1);B.set(sn[0]-1*k,sn[1]+.8*k,'#120a08',1);
- if(P.snort>0&&!dd){/* 鼻息：白い小さな息が二つ */for(let j=0;j<2;j++){const q=add(sn,[-3*k-P.snort*4-j*2,(j?2:-1)+Math.sin(T*.5+j)]);B.set(q[0],q[1],'#9a9090',5);B.set(q[0]-1,q[1],'#6a6266',5)}}
+ const sn=hq(-17,1.2);B.disc(sn[0],sn[1],2.4*k,C[3],C[4],C[1],1);B.set(sn[0]-sg*k,sn[1]-.4*k,'#120a08',1);B.set(sn[0]-sg*k,sn[1]+.8*k,'#120a08',1);
+ if(P.snort>0&&!dd){/* 鼻息：白い小さな息が二つ */for(let j=0;j<2;j++){const q=add(sn,[sg*(-3*k-P.snort*4-j*2),(j?2:-1)+Math.sin(T*.5+j)]);B.set(q[0],q[1],'#9a9090',5);B.set(q[0]-sg,q[1],'#6a6266',5)}}
  /* 耳：寝かせた三角（おびえ） */{const e0=hq(0,-6.5),e1=hq(5.5,-9-P.brs*1.5),e2=hq(3,-4);B.poly([e0,e1,e2],C[2],C[3],C[1],1);B.set(...hq(3,-5.5),MA[1],1)}
  /* 中ボス：割れた額。何度も壁にぶつかってきた（弾かれると壁に激突する、の物語） */
  if(M){const a=hq(-4,-6),b=hq(-6.5,-4.5),c=hq(-6,-2.5);B.line(a[0],a[1],b[0],b[1],C[0]);B.line(b[0],b[1],c[0],c[1],C[0]);B.set(...hq(-3.5,-5.5),C[4],1);B.set(...hq(-7,-4),C[0],1)}
  /* 目：小さく、白目をむいている（おびえ）。紫の段では額に三つ目の細い目が開く（のまれるほど目が増える） */
- {const e=hq(-5,-3);if(!(P.blink>0||dd>.7)){B.set(e[0],e[1],D.sclera,2);B.set(e[0]-1,e[1],dd>.3?C[1]:D.eye,2);B.set(e[0]+1,e[1],D.sclera,2);B.set(e[0],e[1]+1,D.sclera,2);B.set(e[0]-1,e[1]-1,C[0],1);B.set(e[0],e[1]-1,C[0],1)}else B.line(e[0]-1,e[1],e[0]+1,e[1],C[0]);J.eye=e;
+ {const e=hq(-5,-3);if(!(P.blink>0||dd>.7)){B.set(e[0],e[1],D.sclera,2);B.set(e[0]-sg,e[1],dd>.3?C[1]:D.eye,2);B.set(e[0]+sg,e[1],D.sclera,2);B.set(e[0],e[1]+1,D.sclera,2);B.set(e[0]-sg,e[1]-1,C[0],1);B.set(e[0],e[1]-1,C[0],1)}else B.line(e[0]-1,e[1],e[0]+1,e[1],C[0]);J.eye=e;
   if(D.third&&dd<.5){const f=hq(-2,-6);B.set(f[0],f[1]-1,D.eye,2);B.set(f[0],f[1],D.sclera,2);B.set(f[0],f[1]+1,D.eye,2)}
   if(D.vein){/* 赤い段から：目のまわりから首へ、くらやみの筋 */for(let i=0;i<2+D.vein;i++){const q=hq(-2+i*2.2,-1+((i*7)%3)*.8);B.set(q[0],q[1],MU[2],1)}}}
  /* 下あご（jaw）と牙。牙は体でいちばん明るい：合図はいつも牙の先に出る。中ボスの手前の牙は折れている */
  const jw=hq(-13,2.8+P.jaw*2);{const m=new Set();dCurve(m,t=>LP(hq(-1,2.8),jw,t),2.8*k,1.6*k,8);dShade(B,m,C.map(c=>mix(c,'#000000',.15)),null,null,false)}
  const tusk=(base,far,broken)=>{const L=(M?11:9.5)*(broken?.38:1),pts=[];for(let i=0;i<=10;i++){const t=i/10,p=hq(base[0]-Math.sin(t*2.6)*L*.42+t*L*.2,base[1]-t*L*.9);pts.push(p)}
-  const lit=!far||M;for(let i=0;i<pts.length;i++){const p=pts[i],c=!lit?TU[1]:i>pts.length-3?TU[3]:i>3?TU[2]:TU[1];if(i)B.line(pts[i-1][0],pts[i-1][1],p[0],p[1],c,2);else B.set(p[0],p[1],c,2);if(i<6&&!far){B.set(p[0]+1,p[1],TU[1],2)}if(i<3)B.set(p[0]+1,p[1]+1,TU[0],2)}
+  const lit=!far||M;for(let i=0;i<pts.length;i++){const p=pts[i],c=!lit?TU[1]:i>pts.length-3?TU[3]:i>3?TU[2]:TU[1];if(i)B.line(pts[i-1][0],pts[i-1][1],p[0],p[1],c,2);else B.set(p[0],p[1],c,2);if(i<6&&!far){B.set(p[0]+sg,p[1],TU[1],2)}if(i<3)B.set(p[0]+sg,p[1]+1,TU[0],2)}
   if(broken){const e=pts[pts.length-1];B.set(e[0]-1,e[1],TU[0],2);B.set(e[0],e[1]-1,TU[2],2)}return pts[pts.length-1]};
  const tf=tusk([-13.5,1.4],true,false);J.tip=tusk([-15.5,2.2],false,M);if(M)J.tip=tf;/* 中ボスは折れていない奥の牙が合図の場所 */
- J.tipNear=J.tip;J.head=hq(-6,-3);J.snout=sn;J.hoofs=hoofs;J.back=Q(-6,-24);J.hip=Q(10,-10);
+ J.tipNear=J.tip;J.head=hq(-6,-3);J.snout=sn;J.hoofs=hoofs;J.back=Q(-6,-24);J.hip=Q(10,-10);J.tail=Q(16,-12);
  /* 気絶：頭のまわりを小さな星がまわる（ただの飾り、合図の色は使わない） */
  if(P.daze>0)for(let i=0;i<3;i++){const a=T*.18+i*2.1,q=add(hq(-3,-9),[Math.cos(a)*5*k,Math.sin(a)*1.6*k]);B.set(q[0],q[1],'#b8b0a0',5);B.set(q[0],q[1]-1,'#6a645a',5)}
  /* 土ぼこり（足元） */
- if(P.dust>0)for(let i=0;i<6;i++){const h=hsh(i,Math.floor(T/3)),q=[cx+(10+i*3+h*4)*k,cy-1-h*3*P.dust];B.set(q[0],q[1],i%2?'#4a4048':'#6a5c64',5)}
+ if(P.dust>0)for(let i=0;i<6;i++){const h=hsh(i,Math.floor(T/3)),q=[cx+MX(10+i*3+h*4)*k,cy-1-h*3*P.dust];B.set(q[0],q[1],i%2?'#4a4048':'#6a5c64',5)}
  return J}
 
 /* ===== 全モーション =====
@@ -1903,6 +1904,23 @@ mv({f:'boarM',ox:BOAR.boarM.ox,id:'bM_look',n:'下をかいで、おびえる',b
  cap:'ひまなとき。鼻を床につけて何かをかぐ。床の割れ目から、ほんの少しくらやみがにじむ。びくっと頭を上げ、たてがみを逆立てて、後ずさって震える。光らない＝攻撃ではない。',
  why:'イノシシが上へ逃げてきた理由を、一度だけ見せる。主人公はこれから、このイノシシがおびえて逃げてきた方へ降りていく。'});
 
+/* モブのひまなとき：尾にとまった羽虫を追って、くるくる回る（若い獣の遊び心）。
+   向きの切りかえは3Fで鏡写しにする（fs）。回るたびに間が詰まる。頭は下げきらず、止まらない（突進の構えと分ける）。地はかかない（溜め突進の印）。 */
+const B_SPIN=[26,50,68,82,92],B_BACK=116;/* 回る時刻（向きを変え始める）と、主人公に気づいて向き直る時刻 */
+function boarFs(t){let s=1,v=1;for(const f of B_SPIN.concat([B_BACK])){if(t>=f+3)s=-s;else if(t>=f){const u=(t-f)/3;v=s*(1-2*u);return Math.abs(v)<.35?(v<0?-.35:.35):v}}return s}
+function boarMoth(t){/* 羽虫の位置（尾の付け根からの相対）。光らない、くすんだ色 */const fl=Math.sin(t*1.3)*1.2;if(t<10)return[14+(10-t)*2,-26+fl+(10-t)];if(t<104)return[17,-15+fl];const d=t-104;return[17+d*.6,-15-d*1.1+fl]}
+mv({f:'boar',ox:BOAR.boar.ox,id:'b_bored',n:'ひまなとき：尾を追って回る',bg:'def',len:176,keys:[K(0,{})],
+ pp:(P,t)=>{boarIdle(P,t);P.fs=boarFs(t);
+  if(t>=12&&t<26){/* 尾に何かとまった。尾をふり、耳がぴくっと動く */P.brs=.5+.3*Math.sin(t*.9);P.look=.25}
+  if(t>=26&&t<104){/* 追いかけて回る：その場で小走り。回るほど速く */const sp=t<68?.6:.9;P.run=(t-26)/(t<68?6:4.5);P.runA=sp;P.hd=.15;P.brs=.7;P.x=Math.sin((t-26)*.12)*3;P.snort=(t%19<3)?.5:0}
+  if(t>=104&&t<B_BACK){/* 主人公に背を向けたまま、ぴたりと止まる（羽虫が飛んでいく） */P.run=0;P.runA=0;P.hd=-.1;P.look=.6;P.x=3}
+  if(t>=B_BACK&&t<146){/* はっと気づいて向き直り、小さく跳ねて白目をむく。震える */const d=t-B_BACK;P.x=3-Math.min(3,d*.5);P.y=d<8?-Math.sin(d/8*Math.PI)*3:0;P.brs=1.4;P.look=d<4?.8:.3;P.trem=d<24?1:0;P.blink=0}
+  if(t>=146){/* 鼻を一度鳴らして、何もなかったように立ち姿へ戻る */const u=Math.min(1,(t-146)/16);P.brs=1.4-1.1*u;P.snort=(t>=150&&t<158)?.9:0}},
+ fx:(B,J,t)=>{if(t>=136)return;const m=boarMoth(t),s=boarFs(t)<0?-1:1,o=[J.tail[0]+(m[0]-16)*s*J.k,J.tail[1]+(m[1]+12)*J.k],w=(t>>1)&1;
+  B.set(o[0],o[1],'#4a4238',5);B.set(o[0]-1,o[1]-w,'#2e2a26',5);B.set(o[0]+1,o[1]-w,'#2e2a26',5)},
+ cap:'尾にとまった羽虫が気になって、自分の尾を追いかけてくるくる回る。回るたびに速くなる。羽虫が飛んでいくと、主人公に背を向けたまま止まり、はっと気づいて向き直り、小さく跳ねて白目をむく。鼻を一度鳴らして、何もなかったように立ち姿へ戻る。光らない＝攻撃ではない。',
+ why:'まだ若い獣で、おびえていても気がそれる。大イノシシの「下をかいで、おびえる」（逃げてきた理由）と、若さと年寄りで対にした。頭は下げきらず、止まるのは背を向けたときだけなので、突進の構え（主人公を向いて頭を下げ、ぴたりと止まる）とは取り違えない。地もかかない（溜め突進の印）。'});
+
 /* たおれる（撃破）：泥に覆われて、爆散する。ザコは何度も倒すので短く、気持ちよく（「遅さは罪」「閃光、爆発、残煙」）
    【泥が覆う時間】○、【閃光】○、【かけらの数】○、【残煙】○ は、ゲームでは調整できる値にする */
 const BDOWN={boar:{cover:[6,30],flash:36,n:18,len:96},boarM:{cover:[6,36],flash:42,n:28,len:110}};
@@ -2046,7 +2064,7 @@ const MOVES_OF={gate:['g_idle','g_bored','g_enter','g_two','g_kneel'],dgate:['dg
  fallen:['f_rise','f_idle','f_bored','f_kneel','f_cutten','f_back','f_arm','f_sa','f_reach','f_maw','f_dark','f_double','f_seefeint','f_counter','f_zanpunish','f_shift','f_twin','f_iai','f_silent','f_cage','f_q_open','f_q_tame','f_q_tsume','f_q_feint','f_q_tfeint','f_q_heavy','f_q_lock','f_q_last','f_q_crush','f_swallow'],
  fallen2:['f2_idle','f2_bored','f2_look','f2_ring','f2_four','f2_core','f2_reflect','f2_mirror','f2_dfeint','f2_seefeint','f2_counter','f2_zanpunish','f2_silentiai','f2_fingers','f2_tsubame','f2_close','f2_pulse','f2_silent','f2_juji','f2_q_open','f2_q_tame','f2_q_tsume','f2_q_feint','f2_q_tfeint','f2_q_heavy','f2_q_lock','f2_q_last','f2_q_crush','f2_end'],
  dragon:['d_enter','d_idle','d_bored','d_slam','d_stab','d_tail','d_bitetail','d_feel','d_dive','d_rage','d_breath','d_down'],
- boar:['b_idle','b_near','b_far'],
+ boar:['b_idle','b_bored','b_near','b_far'],
  boarM:['bM_idle','bM_look','bM_near','bM_far','bM_paw'],
  hydra:['h_enter','h_idle','h_toy','h_order','h_fake','h_one','h_grab','h_swap','h_crawl','h_rift','h_spit','h_pool','h_down']};
 const EXMV={b_near:'突進',b_far:'突進',bM_near:'突進',bM_far:'突進',l_r_tfeint:'打ち合い：フェイント',l2_r_tfeint:'打ち合い：フェイント',r_q_tfeint:'打ち合い：フェイント',f_q_tfeint:'打ち合い：フェイント',f2_q_tfeint:'打ち合い：フェイント',r2_q_tfeint:'打ち合い：フェイント',l_r_last:'打ち合い：最後',l2_r_last:'打ち合い：最後',l_r_crush:'くずし斬り',l2_r_crush:'くずし斬り',r_q_open:'打ち合い',r_q_tame:'打ち合い：溜め',r_q_tsume:'打ち合い：詰め',r_q_feint:'打ち合い：フェイント',r_q_heavy:'打ち合い：重い合',r_q_lock:'打ち合い：押し合い',r_q_last:'打ち合い：最後',r_q_crush:'くずし斬り',r2_q_open:'打ち合い',r2_q_tame:'打ち合い：溜め',r2_q_tsume:'打ち合い：詰め',r2_q_feint:'打ち合い：フェイント',r2_q_heavy:'打ち合い：重い合',r2_q_lock:'打ち合い：押し合い',r2_q_last:'打ち合い：最後',r2_q_crush:'くずし斬り',f_q_open:'打ち合い',f_q_tame:'打ち合い：溜め',f_q_tsume:'打ち合い：詰め',f_q_feint:'打ち合い：フェイント',f_q_heavy:'打ち合い：重い合',f_q_lock:'打ち合い：押し合い',f_q_last:'打ち合い：最後',f_q_crush:'くずし斬り',f2_q_open:'打ち合い',f2_q_tame:'打ち合い：溜め',f2_q_tsume:'打ち合い：詰め',f2_q_feint:'打ち合い：フェイント',f2_q_heavy:'打ち合い：重い合',f2_q_lock:'打ち合い：押し合い',f2_q_last:'打ち合い：最後',f2_q_crush:'くずし斬り',g_two:'二連撃',dg_eyes:'かぶとの触手',dg_sweep:'マントの触手',dg_feint:'手元の触手',dg_two:'二連撃',dl_one:'一回',im_two:'二つ投げ',imM_three:'三つ投げ',dl_fast:'拍が速くなる',dlM_two:'2回続ける',l_two:'二連撃',l_rev:'逆の二連撃',l_thrust:'突き',l_feint:'突きのフェイント',l_rally:'打ち合い',l_r_open:'打ち合い',l_r_tame:'打ち合い：溜め',l_r_tsume:'打ち合い：詰め',l_r_feint:'打ち合い：フェイント',l_r_lock:'打ち合い：押し合い',l_r_last:'打ち合い：最後',l_r_crush:'くずし斬り',l2_r_open:'打ち合い',l2_r_tame:'打ち合い：溜め',l2_r_tsume:'打ち合い：詰め',l2_r_feint:'打ち合い：フェイント',l2_r_lock:'打ち合い：押し合い',l2_r_last:'打ち合い：最後',l2_r_crush:'くずし斬り',l2_r_arm:'打ち合い：触手',l2_r_heavy:'打ち合い：重い合',l2_back:'背中の触手',l2_arm:'腕の触手',l2_tri:'剣と触手の三連',l2_ext:'伸びる刃',l2_extf:'伸びる刃',l2_dark:'ささやき',l2_maw:'胸の口',l2_rally:'打ち合い',r_two:'二連撃',r_swap:'逆の二連撃',r_three:'三段突き',r_delay:'遅らせ突き',r_thrust:'突き',r_feint:'フェイント',r_combo4:'四連撃',r_push:'打ち合い',r2_double:'二重のフェイント',r2_rally:'打ち合い',f_cutten:'剣と触手',f_back:'背中の触手',f_arm:'腕の触手',f_sa:'剣と触手の三連',f_reach:'伸びる刃',f_maw:'胸の口',f_dark:'ささやき',f_double:'二重のフェイント',f_rally:'打ち合い',f2_ring:'背中の触手',f2_four:'四連撃',f2_core:'胸の口',f2_rally:'打ち合い',d_slam:'のしかかり',d_stab:'噛みつき',d_tail:'尾',d_breath:'赤い炎',h_order:'光った首の順',h_one:'三本同時',h_spit:'吐き出し',h_pool:'くらやみの溜まり',f2_rallyx:'打ち合い',r2_rallyx:'打ち合い',r_rallyx:'打ち合い'};

@@ -1,12 +1,14 @@
 """修正前と修正後を並べた比較ページを作る。
-使い方: python3 compare.py <修正前のgitの版> <技ID> [技ID ...]
+使い方: python3 compare.py <修正前のgitの版> <技ID> [技ID ...] [--from=<F>]
+  --from を付けると、修正前も後も、その時刻から撮る（ふりや予告など、一撃目より前を見せたいとき）。
   修正前 = リポジトリ（/home/claude/now）の指定の版の design/v2/*.js、修正後 = この作業フォルダの *.js。
   出力: /home/claude/cmp/（index.html と技ごとのGIF）。中身は毎回入れかえる。"""
 import asyncio,base64,io,os,shutil,subprocess,sys,html
 from playwright.async_api import async_playwright
 from PIL import Image,ImageDraw,ImageFont,ImageChops
 import warnings;warnings.filterwarnings('ignore')
-REV,IDS=sys.argv[1],sys.argv[2:]
+A=[x for x in sys.argv[1:] if not x.startswith('--from=')];T0=next((x[7:] for x in sys.argv[1:] if x.startswith('--from=')),'null')
+REV,IDS=A[0],A[1:]
 HERE=os.path.dirname(os.path.abspath(__file__));REPO='/home/claude/now';OUT='/home/claude/cmp';TMP='/tmp/cmpsrc'
 shutil.rmtree(TMP,ignore_errors=True)
 for v in('old','new'):
@@ -17,10 +19,10 @@ for f in os.listdir(f'{TMP}/old'):
   if f.endswith('.js'):
     r=subprocess.run(['git','-C',REPO,'show',f'{REV}:design/v2/{f}'],capture_output=True)
     if r.returncode==0:open(f'{TMP}/old/{f}','wb').write(r.stdout)
-JS="""(ids)=>{const o={};for(const id of ids){const M=MV.find(m=>m.id===id);if(!M){o[id]=null;continue}const HS=M.gifHits||M.hits,h0=HS&&HS.length?HS[0]:20,h1=HS&&HS.length?HS[HS.length-1]:M.len-40;const t0=M.gifStart!=null?M.gifStart:Math.max(0,h0-34),t1=Math.min(M.len-1,M.gifEnd||h1+36);const fr=[];for(let t=t0;t<=t1;t++){const c=document.createElement('canvas');c.width=CW;c.height=CH;const x=c.getContext('2d');bgFill(x,M.bg);const B=frame(M,t);const im=x.getImageData(0,0,CW,CH);for(let i=0;i<B.c.length;i++){if(!B.c[i])continue;const[r,g,b]=rgb(B.c[i]);im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b}x.putImageData(im,0,0);fr.push(c.toDataURL())}o[id]={t0,hits:HS||[],n:M.n,cap:M.cap||'',fr}}return o}"""
+JS="""(ids)=>{const o={};for(const id of ids){const M=MV.find(m=>m.id===id);if(!M){o[id]=null;continue}const HS=M.gifHits||M.hits,h0=HS&&HS.length?HS[0]:20,h1=HS&&HS.length?HS[HS.length-1]:M.len-40;const t0=window.__T0!=null?window.__T0:M.gifStart!=null?M.gifStart:Math.max(0,h0-34),t1=Math.min(M.len-1,M.gifEnd||h1+36);const fr=[];for(let t=t0;t<=t1;t++){const c=document.createElement('canvas');c.width=CW;c.height=CH;const x=c.getContext('2d');bgFill(x,M.bg);const B=frame(M,t);const im=x.getImageData(0,0,CW,CH);for(let i=0;i<B.c.length;i++){if(!B.c[i])continue;const[r,g,b]=rgb(B.c[i]);im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b}x.putImageData(im,0,0);fr.push(c.toDataURL())}o[id]={t0,hits:HS||[],n:M.n,cap:M.cap||'',fr}}return o}"""
 async def get(v):
   async with async_playwright() as p:
-    b=await p.chromium.launch();pg=await b.new_page();await pg.goto(f'file://{TMP}/{v}/t3.html');await pg.wait_for_timeout(300);r=await pg.evaluate(JS,IDS);await b.close();return r
+    b=await p.chromium.launch();pg=await b.new_page();await pg.goto(f'file://{TMP}/{v}/t3.html');await pg.wait_for_timeout(300);await pg.evaluate(f'window.__T0={T0}');r=await pg.evaluate(JS,IDS);await b.close();return r
 old,new=asyncio.run(get('old')),asyncio.run(get('new'))
 shutil.rmtree(OUT,ignore_errors=True);os.makedirs(OUT)
 F=ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',22);S=3;secs=[]

@@ -3,7 +3,7 @@ function cmd(n){
  if(G.state!=='cmd')return;ac();G.buf=0;const h=G.hero;
  if(n===2&&(!has('gauge')||h.mk<100)){msg(has('gauge')?'見切りが足りない':'まだ使えない');return}
  if(n===3&&h.pot<=0){msg('薬がない');return}
- if(G.en)G.en.lastAtk=n===1;const C=8+P.atkHoldF;G.act={n,t:0,lv:Math.floor(h.mk/100),chase:null,C,I:C+P.cueF};G.state='hero';
+ if(G.en)G.en.lastAtk=n===1;const C=8+P.atkHoldF;G.act={n,t:0,lv:Math.floor(h.mk/100),chase:null,C,I:C+P.heroCueF};G.state='hero';
 }
 const CMDN=['','たたかう','まほう','かいふく'];
 function cmdName(n){if(n===2&&!has('gauge'))return'？？？';const lv=Math.floor(G.hero.mk/100);return n===2&&lv?`まほう：${SPELL[lv]}`:CMDN[n]}

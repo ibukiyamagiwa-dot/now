@@ -55,6 +55,8 @@ const DEF=[
  {k:'tutSlow',n:'【チュートリアルのスロー倍率】',v:1,min:1,max:3,step:.1,u:'×',g:'adv'},
  {k:'mkCarry',n:'【勝利後の見切り持ち越し率】',v:80,min:0,max:100,step:10,u:'%',g:'gauge'},
  {k:'atkHoldF',n:'【たたかうの振りかぶりフレーム】',v:8,min:0,max:60,step:1,u:'F',g:'gauge'},
+ {k:'heroCueF',n:'【こうげきの光から当たりまでのフレーム】',v:20,min:8,max:40,step:1,u:'F',g:'gauge'},
+ {k:'heroSwingF',n:'【こうげきの斬り下ろしフレーム】',v:6,min:2,max:12,step:1,u:'F',g:'gauge'},
  {k:'magBonus',n:'【段ごとの威力ボーナス】',v:.3,min:0,max:1.5,step:.1,u:'×',g:'gauge'},
  {k:'mkMiss',n:'【追撃失敗の見切り減少量】',v:25,min:0,max:100,step:5,u:'',g:'gauge'},
  {k:'missMul',n:'【早押し時の一撃目の倍率】',v:.5,min:0,max:1,step:.1,u:'×',g:'gauge'},
@@ -149,7 +151,7 @@ function buildPanel(){
 function syncOut(){
  DEF.forEach(d=>{if(d.t==='col')return;$('o_'+d.k).textContent=fmt(P[d.k])+d.u;$('p_'+d.k).value=P[d.k]});
  $('der').textContent=`→ ジャスト回避の受付：${justF()}F（パリィ×倍率）`;
- $('der2').textContent=`→ まほうの威力：ほのお ${Math.round(magDmg(1))}／かみなり ${Math.round(magDmg(2))}／ひかり ${Math.round(magDmg(3))}　追撃は敵と同じく、剣が光ってから${P.cueF}F後に着弾　着弾の${P.chaseF}F前から押すと追撃、${P.critF}F前から（剣が触れる瞬間）なら重い一撃`;
+ $('der2').textContent=`→ まほうの威力：ほのお ${Math.round(magDmg(1))}／かみなり ${Math.round(magDmg(2))}／ひかり ${Math.round(magDmg(3))}　追撃：剣が光ってから${P.heroCueF}F後に着弾（最後の${P.heroSwingF}Fで斬り下ろす）　着弾の${P.chaseF}F前から押すと追撃、${P.critF}F前から（剣が触れる瞬間）なら重い一撃`;
  $('json').value=JSON.stringify(toJ(),null,1);
 }
 const dbg={bar:false,slow:false,stop:false,god:false,fix:false,all:false,/* 見え方（開発者ページ） */bgOff:false,heroSee:false,foeSee:false,fxOff:false,uiOff:false};

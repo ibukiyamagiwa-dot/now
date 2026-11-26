@@ -201,25 +201,29 @@ function drawHero(){
  const ps=G.hpose,k=ps?ps.k:'idle';let x=HX;const y=FLOOR,bob=(G.anim>>4)%2;
  x+=Math.round(lungeK(G.act)*lungeD());
  if(G.stop>0&&G.stopMax)x+=Math.round((G.vib==='h'?3:1)*G.stop/G.stopMax)*(G.anim%2?-1:1);
+ if((G.state==='dying'||G.state==='lose')&&HERO.on()){shadowPx(x,10);HERO.draw(x,y,'down',false);return}
  if(G.state==='dying'||G.state==='lose'){shadowPx(x,12);l.drawImage(CACHE.heroDown||(CACHE.heroDown=rot90(spr('hero','h',HERO_HIT))),x-12,y-15);return}
  if(k==='dodge'){l.globalAlpha=.35;knight(x,y,'idle',0,false);l.globalAlpha=1;x-=11}
  if(k==='hit')x-=3;if(k==='parry')x+=2;
+ if(k==='parryH'&&HERO.on()){const u=hvU();x+=hvX();if(u>=0&&u<20){const fx=x+4;for(let i=0;i<4;i++){const L=Math.min(9,2+u)-i*2;if(L>0)pxLine(fx+i,y-1+(i%2),fx+i+L,y-1+(i%2),i%2?'#6a5a4a':'#8a7a66')}}shadowPx(x,10);HERO.draw(x,y,'parryH',false);return}
  if(k==='parryH'){const u=hvU();x+=hvX();if(u<20){const fx=x+4;for(let i=0;i<4;i++){const L=Math.min(9,2+u)-i*2;if(L>0)pxLine(fx+i,y-1+(i%2),fx+i+L,y-1+(i%2),i%2?'#6a5a4a':'#8a7a66')}shadowPx(x,10);heroBrace(x,y,u);return}}
  shadowPx(x,8);knight(x,y,k==='parryH'?'idle':k,bob,k==='hit');
 }
 function knight(x,y,k,bob,hit){
+ /* ?new：資料集の骨組みで描く主人公（js/24h-hero.js） */
+ if(HERO.on()){HERO.draw(x,y,k,hit);return}
  const ox=Math.round(x-7),oy=y-24+bob;
  l.drawImage(spr('hero',hit?'h':'n',hit?HERO_HIT:HERO_PAL),ox,oy);
  const hu=-1,g=k==='guard';l.drawImage(spr('shield','n',SHIELD_PAL),ox+(g?11:7),oy+(g?7:10));
  let ang=-1.15;
  if(k==='ready')ang=-.45;if(k==='parry')ang=.05;if(k==='early')ang=-1.5;
  if(hu>=0){const L2=(a,b,q)=>a+(b-a)*Math.max(0,Math.min(1,q));ang=hu<10?.5+((G.anim>>1)%2?.05:0):hu<16?L2(.5,-2.05,(hu-10)/6):L2(-2.05,-1.15,(hu-16)/12)}
- const A=G.act&&G.act.n===1?G.act:null,I=A?A.I:0;
+ const A=G.act&&G.act.n===1?G.act:null,I=A?A.I:0,SWF=P.heroSwingF;
  const CA=A?contactPt().ac:0,L=(a0,a1,k)=>a0+(a1-a0)*Math.max(0,Math.min(1,k));
  if(A){const t=A.t;
   if(t>=8&&t<A.C)ang=-1.55+((G.anim>>2)%2?.06:0);
-  else if(t>=A.C&&t<I-6)ang=chased(A)?-2.15:L(-1.55,-2.1,(t-A.C)/(I-6-A.C));
-  else if(t>=I-6&&t<=I)ang=L(chased(A)?-2.15:-2.1,CA,(t-(I-6))/6);
+  else if(t>=A.C&&t<I-SWF)ang=chased(A)?-2.15:L(-1.55,-2.1,(t-A.C)/(I-SWF-A.C));
+  else if(t>=I-SWF&&t<=I)ang=L(chased(A)?-2.15:-2.1,CA,(t-(I-SWF))/SWF);
   else if(A.chase==='ok'){if(t<=I+5)ang=L(CA,-1.3,(t-I)/5);else if(t<=I+8)ang=L(-1.3,CA+.15,(t-(I+5))/3);else ang=.95}
   else if(A.chase==='miss'&&t>=I+2)ang=1.25;
   else ang=L(CA,.6,(t-I)/(A.chase==='crit'?10:4))}
@@ -561,7 +565,7 @@ function drawResult(){
  if(G.t>30){c.fillStyle='#e8c46a';c.fillText('▶ A で次の周へ',480,ny+40)}c.textAlign='left';
 }
 const BX=180,BW=600,BY=476;
-const bspan=()=>Math.max(P.guardF,justF())+16,cspan=()=>P.cueF+4;
+const bspan=()=>Math.max(P.guardF,justF())+16,cspan=()=>P.heroCueF+4;
 const bfx=(r,sp)=>Math.round((BX+BW*(1-r/sp))/4)*4;
 function zoneLabel(t,x0,x1){c.textAlign='center';c.font=`${Math.round(16*Math.min(UIS,1.4))}px ${FONT}`;c.lineWidth=5;c.strokeStyle='#120509';c.strokeText(t,(x0+x1)/2,BY+40);c.fillStyle='#efe6e8';c.fillText(t,(x0+x1)/2,BY+40);c.textAlign='left'}
 function marker(x){c.fillStyle='#120509';c.fillRect(x-6,BY-14,12,44);c.fillStyle='#ffffff';c.fillRect(x-3,BY-11,6,38)}

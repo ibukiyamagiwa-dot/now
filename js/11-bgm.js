@@ -199,7 +199,7 @@ function lordFrame(e){const F=e.skin==='R'?'lR_':e.skin==='F'?'lF_':e.skin==='G'
   const s=G.strikes.find(s=>!s.done);
   if(s&&s.rally&&G.rally&&G.rally.on&&G.et<s.start)return ok('clash');
   if(s&&G.et>=s.start){const m=LMV[s.mv]||LMV.cut,d=G.et-s.impact;
-   if(s.fake){const k=G.et-s.cue;return ok(s.mv==='cut'||s.mv==='yank'||SUB?(k>=6?'cutS':k>=3?'cutM':'cutR'):(k>=2&&k<10?'thrS':'thrR'))}
+   if(s.fake){const k=G.et-(s.fk!=null?s.fk:s.cue);return ok(s.mv==='cut'||s.mv==='yank'||SUB?(k>=6?'cutS':k>=3?'cutM':'cutR'):(k>=2&&k<10?'thrS':'thrR'))}
    return ok(d>=-3?m[1]:m[0])}
   if(r)return ok(r.res==='parry'?'clash':(LMV[r.mv]||LMV.cut)[2]);
   if((G.pings||[]).some(pg=>!pg.done)||(s&&(s.mv==='bk'||s.mv==='vlash')))return ok(SUB?'idle':'mawR');

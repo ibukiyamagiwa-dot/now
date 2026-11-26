@@ -270,7 +270,7 @@ function enemyPose(){
    /* 静と動：構えは予兆までに終え、予兆が出ている間は止まる */
    lean=s.iv||s.cue<=s.start?1:Math.min(1,(G.et-s.start)/Math.max(1,Math.min(10,s.cue-s.start)));
    if(G.et<s.cue){if(s.feint&&(s.cue-G.et)%38<5&&s.cue-G.et>12)twitch=1}
-   else{cue=s.dark||s.lob||s.nolight?-1:G.et-s.cue;red=s.red;gold=!!s.rallyOpen;proj=s.proj;if(s.beats&&!s.lob){const k=G.et-s.cue;pulse=s.beats.some(b=>k>=b&&k<b+4);hold=Math.min(1,k/20)}if(s.fake){lean=0;lunge=cue<4?cue/4*.3:Math.max(0,.3*(1-(cue-4)/10));fake=true}else if(s.beat&&!s.dark){const B=s.bf||P.golemBeatF,N=s.bn||4;hold=s.mv==='smash'?Math.min(1,(Math.min(N,Math.floor(cue/B))+Math.min(1,(cue%B)/4)*(cue<B*N?1:0))/N):Math.min(1,cue/(B*2));pulse=cue>=B&&cue%B<B/2&&cue<=B*N+B/2}
+   else{cue=s.dark||s.lob||s.nolight?-1:G.et-s.cue;red=s.red;gold=!!s.rallyOpen;proj=s.proj;if(s.beats&&!s.lob){const k=G.et-s.cue;pulse=s.beats.some(b=>k>=b&&k<b+4);hold=Math.min(1,k/20)}if(s.fake){const c=s.fk!=null?G.et-s.fk:cue;/* ふりの時刻（fk）までは構えたまま止まる */if(c>=0){lean=0;lunge=c<4?c/4*.3:Math.max(0,.3*(1-(c-4)/10))}fake=true}else if(s.beat&&!s.dark){const B=s.bf||P.golemBeatF,N=s.bn||4;hold=s.mv==='smash'?Math.min(1,(Math.min(N,Math.floor(cue/B))+Math.min(1,(cue%B)/4)*(cue<B*N?1:0))/N):Math.min(1,cue/(B*2));pulse=cue>=B&&cue%B<B/2&&cue<=B*N+B/2}
    if(s.mv==='hslam')rise=Math.min(1,cue/(s.cl-4));if(s.mv==='slam'){const B=s.bf||10,kk=cue-(s.bo||0),h=Math.min(3,Math.max(0,Math.floor(kk/B))),lv=[.12,.45,.75,1],pv=h?lv[h-1]:0;rise=pv+(lv[h]-pv)*Math.min(1,Math.max(0,kk-h*B)/4)}mv=s.mv}
   }
  }

@@ -65,7 +65,7 @@ const SMR=Object.assign({},SMK,{cr:5.3,lean:.28,ff:-12,fb:9,koi:1});/* 返しの
 const SMN={ua:2.15,fa:1.3,sw:null,sheath:1,grip:1,sa:-1.05,ua2:.25,fa2:-.35,ff:-13,fb:10,cr:6,lean:.36,hd:.2};/* 二の太刀の構え：さらに低く、左手で鞘を背中へ引き上げる */
 const SMS={ua:3.08,fa:3.12,sw:3.16,ua2:.6,fa2:.1,sheath:0,grip:0,sa:-.5,x:-40,lean:.26,cr:4.6,ff:-14,fb:10,hd:.05};/* 一閃（抜いた瞬間＝当たり） */
 const SMF=Object.assign({},SMS,{ua:2.5,fa:2.05,sw:2.45,lean:.22,cr:4});/* 血振り */
-const SMU={ua:-2.2,fa:-1.95,sw:-1.55,ua2:-2.0,fa2:-1.7,sheath:0,x:-40,lean:-.06,cr:3,ff:-13,fb:10,hd:-.05};/* 頭上へ返す */
+const SMU={ua:-2.2+2*Math.PI,fa:-1.95+2*Math.PI,sw:-1.55+2*Math.PI,ua2:-2.0+2*Math.PI,fa2:-1.7+2*Math.PI,sheath:0,x:-40,lean:-.06,cr:3,ff:-13,fb:10,hd:-.05};/* 頭上へ返す。角度は一閃（前、約π）と打ち下ろし（前下、約2.7）のあいだに置く（+2π）。-2.2 のままだと、一閃→頭上→打ち下ろしで刀が背中側（0）を回っていた（2026-11-26） */
 const SMD={ua:2.7,fa:2.45,sw:2.3,ua2:2.6,fa2:2.35,sheath:0,x:-42,lean:.34,cr:4.8,ff:-14,fb:10};/* 唐竹（打ち下ろし） */
 const SMDF=Object.assign({},SMD,{ua:2.95,fa:2.9,sw:3.05,lean:.38,cr:5});/* 振り切り */
 const SMUP={ua:-2.45,fa:-2.75,sw:-2.0,ua2:.4,fa2:.8,sheath:0,x:-26,lean:.0,cr:2.4,ff:-15,fb:11,grip:0};/* 返し斬り：抜きざまの斬り上げ */
@@ -79,7 +79,7 @@ function smCards(f,pre,isM){const ox=isM?4:8,bg='def',nm=isM?'居合のおかし
   why:'刀を見せない＝読めるのは目の光だけ、という居合の約束を立ち絵から見せる。黒い腕は、本人が力だと思っている浸食。'});
  /* ひまなとき */
  if(!isM)mv({f,ox,id:pre+'_bored',n:'ひまなとき：黒い手を見る',bg,len:170,
-  keys:[K(0,SMI),K(24,SMI),K(36,Object.assign({},SMI,{ua:2.9,fa:-2.5,hd:.25,lean:.0}),'io'),K(60,Object.assign({},SMI,{ua:2.9,fa:-2.2,hd:.25})),K(70,Object.assign({},SMI,{ua:2.9,fa:-2.6,hd:.25})),K(80,Object.assign({},SMI,{ua:2.9,fa:-2.2,hd:.25})),K(120,Object.assign({},SMI,{ua:2.9,fa:-2.5,hd:.25})),K(134,SMI,'io'),K(170,SMI)],
+  keys:[K(0,SMI),K(24,SMI),K(36,Object.assign({},SMI,{ua:2.9,fa:-2.5+2*Math.PI,hd:.25,lean:.0}),'io'),K(60,Object.assign({},SMI,{ua:2.9,fa:-2.2+2*Math.PI,hd:.25})),K(70,Object.assign({},SMI,{ua:2.9,fa:-2.6+2*Math.PI,hd:.25})),K(80,Object.assign({},SMI,{ua:2.9,fa:-2.2+2*Math.PI,hd:.25})),K(120,Object.assign({},SMI,{ua:2.9,fa:-2.5+2*Math.PI,hd:.25})),K(134,SMI,'io'),K(170,SMI)],
   pp:(P,t)=>{smIdlePP(P,t);if(t>=84&&t<120)P.cr+=((t>>2)&1)*.5},
   cap:'黒く染まった右手を顔の前へ上げ、握っては開いて、しげしげと見る。肩が小さく揺れる（笑っている）。それから手を下ろす。光らない。',
   why:'くらやみから力をもらったつもりでいる。実際は浸食されているだけ。プレイヤーには「それは力じゃない」と分かる。'});
@@ -90,7 +90,7 @@ function smCards(f,pre,isM){const ox=isM?4:8,bg='def',nm=isM?'居合のおかし
   why:'次の刻みは、目の前の主人公。斬った数を誇るのは、それが力になると信じているから。'});
  /* 出現 */
  mv({f,ox,id:pre+'_enter',n:'出現：歩いてきて笠を上げる',bg,len:130,
-  keys:[K(0,Object.assign({},SMI,{x:44})),K(48,Object.assign({},SMI,{x:0}),'lin'),K(60,SMI),K(70,Object.assign({},SMI,{ua:-2.6,fa:-1.0,hat:.45}),'out'),K(96,Object.assign({},SMI,{ua:-2.6,fa:-1.0,hat:.45})),K(106,SMI,'io'),K(130,SMI)],
+  keys:[K(0,Object.assign({},SMI,{x:44})),K(48,Object.assign({},SMI,{x:0}),'lin'),K(60,SMI),K(70,Object.assign({},SMI,{ua:-2.6+2*Math.PI,fa:-1.0+2*Math.PI,hat:.45}),'out'),K(96,Object.assign({},SMI,{ua:-2.6+2*Math.PI,fa:-1.0+2*Math.PI,hat:.45})),K(106,SMI,'io'),K(130,SMI)],
   pp:(P,t)=>{if(t<48){const s=Math.sin(t*TAU_/16);P.ff=-5+s*4;P.fb=5-s*4;P.cr=(P.cr||0)+Math.abs(s)*.6}},
   cap:'ゆっくり歩いてきて止まる。笠のふちを指で上げ、主人公を値踏みするように見る（暗い顔と黒い筋が一瞬のぞく）。笠を下ろして、自然体で待つ。',
   why:'構えずに歩いてくる＝相手をなめている。斬ることしか考えていない者の余裕。'});
@@ -106,10 +106,10 @@ function smCards(f,pre,isM){const ox=isM?4:8,bg='def',nm=isM?'居合のおかし
   cap:'居合の構えより深く沈み、鯉口を切る。鞘の口から刃が少しだけ見える（居合の構えとの違いは、この銀色）。このあいだに斬りかかると、返される。まほうなら崩せる。',
   why:'「構えに斬ると返される」のルールを、ここで先に教える（赤い騎士たちで試される）。見分ける場所を一つ（鞘の口の銀色）に絞る。'});
  mv({f,ox,id:pre+'_counter',n:'返し斬り（赤）',bg,len:150,heroP:t=>t>=14&&t<30?HA:null,
-  keys:[K(0,SMR),K(22,SMR),K(26,Object.assign({},SMR,{lean:.12,cr:4.6,x:2})),K(32,Object.assign({},SMR,{cr:6,lean:.34,ff:-14,fb:10}),'out'),K(55,Object.assign({},SMR,{cr:6.1,lean:.36,ff:-14,fb:10})),K(56,SMUP,'snap'),K(60,Object.assign({},SMUP,{ua:-2.15,fa:-2.25,sw:-1.65}),'out'),K(90,Object.assign({},SMUP,{ua:-2.15,fa:-2.25,sw:-1.65})),K(104,Object.assign({},SMF,{x:-26}),'io'),K(112,Object.assign({},SMK,{x:-26,grip:1}),'snap'),K(140,SMI,'io'),K(150,SMI)],
-  cues:[{t:28,col:'r',at:eyeAt}],hits:[56],hitCol:'r',trails:[[53,58,'r',0,'arc']],
+  keys:[K(0,SMR),K(20,SMR),K(23,Object.assign({},SMR,{lean:.12,cr:4.6,x:2})),K(28,Object.assign({},SMR,{cr:6,lean:.34,ff:-14,fb:10}),'out'),K(55,Object.assign({},SMR,{cr:6.1,lean:.36,ff:-14,fb:10})),K(56,SMUP,'snap'),K(60,Object.assign({},SMUP,{ua:-2.15,fa:-2.25,sw:-1.65}),'out'),K(90,Object.assign({},SMUP,{ua:-2.15,fa:-2.25,sw:-1.65})),K(104,Object.assign({},SMF,{ua:SMF.ua-2*Math.PI,fa:SMF.fa-2*Math.PI,sw:SMF.sw-2*Math.PI,x:-26}),'io'),K(112,Object.assign({},SMK,{x:-26,grip:1}),'snap'),K(140,SMI,'io'),K(150,SMI)],
+  cues:[{t:28,col:'r',at:eyeAt}],hits:[56],hitCol:'r',trails:[[53,58,'r',0,'line']],
   fx:(B,J,t)=>{if(t>=22&&t<30)spark(B,Math.round(J.hip[0]-6),Math.round(J.hip[1]+1),t-22,'w');chinRing(B,J,t,112)},
-  cap:'返しの構えに斬りかかると、鞘ごと受け流される。すぐに目が赤く光り、さらに深く沈んで、いつもの間で抜きざまに下から斬り上げる（赤、重い）。弾けば居合返し（構えが崩れる）。',
+  cap:'返しの構えに斬りかかると、鞘ごと受け流される。受けながら深く沈み、沈みきったところで目が赤く光る。そこから、いつもの間で抜きざまに下から斬り上げる（赤、重い）。弾けば居合返し（構えが崩れる）。',
   why:'受けるのは刀ではなく鞘。もう鯉口を切っているので、受けた手のまま抜ける。重い返しなので赤。'});
  if(isM){/* 二の太刀（中ボスだけ）：構えで見分ける。居合の構えより低く、鞘を背中へ大きく引き上げる */
   mv({f,ox,id:pre+'_ni',n:'二の太刀（中ボスだけ）',bg,len:170,
@@ -161,7 +161,7 @@ FORMS.push({key:'samuraiM',ttl:'居合のおかしら',en:'THE DRAWN-BLADE KILLE
  variants:[['n','藍の着物。右腕が黒い'],['r','赤い着物。黒が肩と首へ'],['k','黒い着物。黒が胸へ、笠がほつれる'],['v','紫の着物。目が増える']],
  lore:'人を斬るために、迷宮へ降りてきた者たち。斬った者をくらやみに差し出し、そのかわりに力をもらっているつもりでいる。だが、くらやみの側にはそんなつもりもなく、気にも留めていない。彼らが「力」だと思っているものは、ただの浸食。おかしらの鞘には、斬った数だけ刻みがある。',
  parts:[['深い笠','顔を見せない。笠の下の暗い目だけが見える。合図はこの目に出る'],['鞘の中の刀','抜くのは斬る一瞬だけ。途中は見えない。読めるのは目の光と、斬ったあと'],['黒い右腕','本人は力だと思っている浸食。斬るほど広がる（おかしらは肩まで、首にも筋）'],['鞘の刻み（おかしら）','斬った数。ひまなときに数えている。次の刻みは主人公'],['鯉口の銀色','返しの構えの印。居合の構えとの違いはここだけ'],['鞘引き（おかしら）','左手で鞘を背中へ引き上げた低い構え＝二の太刀が来る']],
- pal:[['#3a4468','藍の着物','光らない'],['#141018','黒い右腕','浸食。光らない'],['#7a6a48','笠','顔をかくす'],['#6a2a2a','笠の下の目','ふだんは光らない。合図のときだけ白く光る']],
+ pal:[['#3a4468','藍の着物','光らない'],['#141018','黒い右腕','浸食。光らない'],['#7a6a48','笠','顔をかくす'],['#6a2a2a','笠の下の目','ふだんは光らない。合図のときだけ白く（返し斬りは赤く）光る']],
  pair:{key:'samurai',ttl:'居合の剣士（モブ）',diff:[['同じ骨格','人型の剣士。おかしらは1.25倍で、黒が肩まで、鞘に刻み'],['技','モブは「居合」「返しの構え→返し斬り」。おかしらは＋「二の太刀」。「構えに斬ると返される」は、おかしらで先に教わる'],['構え','居合＝腰を落として柄に手。二の太刀＝さらに低く鞘を背へ引く。返しの構え＝鯉口の銀色']]}});
 FORMS.push({key:'samurai',ttl:'居合の剣士',en:'MOB · 居合のおかしらと同じ骨格',stage:[],sox:62,vt:'SMV',vnote:'覚悟の段は居合のおかしらと同じ（黒が広がる、笠がほつれる、目が増える）。',
  variants:[['n','藍の着物。右腕が黒い'],['r','赤い着物。黒が肩と首へ'],['k','黒い着物。黒が胸へ'],['v','紫の着物。目が増える']],

@@ -23,7 +23,7 @@ function heroParryFx(B,t,H,stop,keys,big){const d=t-H,c=['#ffffff','#bfe8ff'],bl
 
 /* 弾かれた瞬間を足したカードを作る：もとの攻撃のカード（src）の時間に、弾いた止まり（stop）を差しこむ。
    rx[i]＝i撃目の弾かれ方 {kind:'s'|'b', T:(当たった姿勢)=>形}。brk＝最後に崩れる（ブレイク）なら {P:(t)=>崩れの姿勢, at:崩れ始め} */
-function parriedCard(o){const src=typeof o.src==='string'?MV.find(m=>m.id===o.src):o.src,S=SPEC[src.f],base=Object.assign({},PDEF,S.pose),hs=src.hits,stop=o.stop||12;
+function parriedCard(o){const src0=typeof o.src==='string'?MV.find(m=>m.id===o.src):o.src,src=src0.preYK||src0,/* 予告の連撃は、予告のない形から作る */S=SPEC[src.f],base=Object.assign({},PDEF,S.pose),hs=src.hits,stop=o.stop||12;
  const Hc=hs.map((h,i)=>h+i*stop);/* 弾いた瞬間（カードの時間） */
  const srcT=t=>{let s=t;for(let i=0;i<hs.length;i++){if(t>=Hc[i]+stop)s-=stop;else if(t>Hc[i])return hs[i];else break}return s};
  const sh=x=>x+hs.filter(h=>h<x).length*stop;

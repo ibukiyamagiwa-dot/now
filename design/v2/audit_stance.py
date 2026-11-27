@@ -17,13 +17,14 @@ EXC=[
  ('居合の待つ長さ：構えてから光るまでを揺らす', lambda m:m['id'] in ('sm_iai','smM_iai')),
  ('からくり人形の拍の速さ：同じ技・同じ構えのまま拍が速くなる', lambda m:m['id']=='dl_fast'),
  ('打ち合い（金）：打ち合いの中の合で、軌跡の形と金の合図で読む', lambda m:m['n'].startswith('打ち合い')),
+ ('予告の連撃：予兆は一撃目だけで、続きは予告で見せた順とリズムで来る', lambda m:m.get('yk')),
 ]
 JS=r"""()=>{const out={};const ids=new Set(Object.values(MOVES_OF).flat());
 for(const M of MV){if(!ids.has(M.id)||!M.hits||!M.hits.length)continue;const c0=(M.cues&&M.cues.length)?Math.min(...M.cues.map(c=>c.t)):Math.max(0,M.hits[0]-28);
  const save={cues:M.cues,hits:M.hits,trails:M.trails,noHero:M.noHero};M.cues=[];M.hits=[];M.trails=[];M.noHero=true;
  const imgs=[];for(const dt of[-6,0]){const t=Math.max(0,c0+dt);const B=frame(M,t);const a=[];for(let i=0;i<B.c.length;i++)a.push(B.t[i]&&B.t[i]!==6?B.c[i]:0);imgs.push(a)}
  Object.assign(M,save);
- const hs=M.hits.slice().sort((a,b)=>a-b);out[M.id]={f:M.f,n:M.n,c0,hits:hs,gaps:hs.slice(1).map((h,i)=>h-hs[i]),cols:(M.cues||[]).map(c=>c.col).join(''),imgs}}
+ const hs=M.hits.slice().sort((a,b)=>a-b);out[M.id]={f:M.f,n:M.n,c0,hits:hs,gaps:hs.slice(1).map((h,i)=>h-hs[i]),cols:(M.cues||[]).map(c=>c.col).join(''),yk:!!M.yokoku,imgs}}
 return out}"""
 def why(m):
   for r,f in EXC:

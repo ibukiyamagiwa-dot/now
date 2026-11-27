@@ -317,20 +317,49 @@ const RIG=(()=>{
   return{ks,end:last,chin}}
  function smKeyAt(ks,T){let a=ks[0],b=null;for(const k of ks){if(k.t<=T)a=k;if(k.t>=T){b=k;break}}const A=Object.assign({},SMBASE,a.p);if(!b||b===a)return Object.assign(A,{x:0});
   const Bp=Object.assign({},SMBASE,b.p),u=EZ[b.e||'io'](cl01((T-a.t)/(b.t-a.t))),o={};for(const k in Bp)o[k]=typeof A[k]==='number'&&typeof Bp[k]==='number'?A[k]+(Bp[k]-A[k])*u:(u<.5?A[k]:Bp[k]);o.x=0;return o}
+ /* ---- 居合のパリィされ・ブレイク・やられ（iai.js の sm_pry・sm_brk・sm_rec・sm_hurt、smM_…。T011） ----
+    パリィされ（knightKit）：小＝刀ごと腕がはね上がる（二の太刀の一太刀目。そのまま頭上へ返して二太刀目へ）／大＝刀ごと腕がはね上げられてのけぞり、笠がはね上がって顔がのぞく。
+    ブレイク：居合返しで崩れる。抜き身の刀が床近くまで垂れ、鞘は腰からずれ、笠が傾いたまま肩で息をする。立て直しは一瞬で納刀（チン）して居合の構え。
+    やられ：のけぞって笠がはね上がる。傷から出るのは血ではなく黒いもの（腕と同じ浸食） */
+ function smPry(kind,hp){if(kind==='s')return{ua:hp.ua+.55,fa:hp.fa+1.2,sw:(hp.sw==null?3.16:hp.sw)+1.9,x:3,lean:(hp.lean||0)-.2,hd:-.15};
+  return{ua:4.9,fa:5.4,sw:5.8,ua2:.6,fa2:.3,x:11,lean:-.4,hd:-.35,cr:1.5}}
+ /* 刀の先が床に刺さらないように、剣の角度を上へ寄せる（parried.js の noStab） */
+ function smNoStab(Q){for(let n=0;n<40;n++){const J=joints(OX,H,SAMU,Q),tp=add(J.hdF,dir(Q.sw,W_KATA.len*SAMU.k));if(tp[1]<=H-1)break;Q.sw+=Math.cos(Q.sw)<0?.06:-.06}return Q}
+ const SMBRK=t=>smNoStab(Object.assign({},SMBASE,{x:2,ua:1.55,fa:1.75,sw:2.3+Math.sin(t*.05)*.05,sheath:0,grip:0,ua2:1.4,fa2:1.3,sa:-.6,lean:.26+Math.sin(t*TAU/40)*.03,hd:.45,cr:3.2+Math.sin(t*TAU/40)*.4,hat:.35}));
+ const SMREC=Object.assign({},SMBASE,SMK,{grip:1,x:0});/* 立て直し：納刀して居合の構え */
+ /* 傷からにじむ黒（hurt.js の ooze。血ではない） */
+ function smOoze(B,c,d,n,cols){if(d<0||d>26)return;for(let i=0;i<n;i++){const h=hs(i,7),a=-2.6+h*2.2,v=.9+hs(i,3)*1.2,x=c[0]+Math.cos(a)*v*d*.9+3,y=c[1]+Math.sin(a)*v*d*.9+.05*d*d;if(y<H)B.set(x,y,cols[i%cols.length],4)}}
  /* 居合の姿勢を1フレームに1回進める。技のあとの残心・血振り・納刀は、敵の番が終わっても続けて見せる（返しの構えに入るときは、納刀までで切る） */
  function smState(e){const R=st(e),t=G.anim;if(R.memo===t&&R.posture)return R.posture;R.memo=t;
   let key,T;
   const has=G.strikes&&G.strikes.some(isMain);if(has&&R.skFor!==G.strikes){R.skFor=G.strikes;R.sm=smKeys()}
   /* 技の時刻：敵の番のあいだは G.et、番が終わったあとは G.et＋（番が終わってからのフレーム。G.eEnd は 21-enemy-turn.js が覚える） */
   const T0=!has?null:G.state==='enemy'?G.et:(G.state==='cmd'||G.state==='hero')&&G.eEnd!=null?G.et+(t-G.eEnd):null;R.curT=T0;
-  if(T0!=null&&G.state==='enemy'){key='atk';T=smKeyAt(R.sm.ks,T0)}
-  else if(T0!=null&&!G.ko&&!e.broken&&T0<=(e.stance&&R.sm.chin!=null?R.sm.chin:R.sm.end)){key='atk';T=smKeyAt(R.sm.ks,T0)}
-  else if(!G.ko&&!e.broken&&e.stance){key='stance';T=Object.assign({},SMBASE,SMR,{koi:cl01((t-(R.key==='stance'?R.at:t))/10),x:0})}
+  if(G.ko){key='ko';T=R.prev||SM_IDLE(t)}
+  else if(e.broken){key='brk';T=SMBRK(t)}
+  else if(T0!=null&&G.state==='enemy'){key='atk';T=smKeyAt(R.sm.ks,T0)}
+  else if(R.recAt!=null&&t-R.recAt<30){key='rec';T=SMREC}
+  else if(T0!=null&&T0<=(e.stance&&R.sm.chin!=null?R.sm.chin:R.sm.end)){key='atk';T=smKeyAt(R.sm.ks,T0)}
+  else if(e.stance){key='stance';T=Object.assign({},SMBASE,SMR,{x:0})}
   else{key='idle';T=SM_IDLE(t)}
-  if(key!==R.key){R.key=key;R.from=R.prev;R.at=t;R.dur=key==='stance'?10:key==='idle'?20:6}
-  let posture=T;if(R.from&&t-R.at<R.dur&&key!=='atk')posture=mixP(R.from,T,ease.io(cl01((t-R.at)/R.dur)));
+  if(key!==R.key){const old=R.key;R.key=key;R.from=R.prev;R.at=t;
+   if(key==='brk'){R.dur=16;R.ez='s'}else if(old==='brk'){R.dur=5;R.ez='back';if(key!=='ko'){R.recAt=t;key='rec';R.key='rec';T=SMREC}}else if(key==='stance'){R.dur=10;R.ez='io'}else if(key==='idle'){R.dur=20;R.ez='io'}else{R.dur=6;R.ez='io'}}
+  let posture=T;if(R.from&&t-R.at<R.dur&&key!=='atk'&&key!=='ko'){posture=mixP(R.from,T,ease[R.ez](cl01((t-R.at)/R.dur)))}
   if(key==='stance')posture=Object.assign({},posture,{koi:cl01((t-R.at)/10)});
-  R.chinD=key==='atk'&&R.sm&&R.sm.chin!=null?T0-R.sm.chin:null;
+  if(key==='rec'&&t-R.recAt>=2)posture=Object.assign({},posture,{sheath:1,sw:null,grip:1,hat:0});
+  /* パリィされた撃を拾う（最後の撃なら大） */
+  if(G.state==='enemy'&&has){const ss=G.strikes.filter(isMain),last=ss[ss.length-1];for(const s of ss){if(s.done&&s.res==='parry'&&!R.seen.has(s)){R.seen.add(s);const kind=s===last?'b':'s';R.rx.push({at:t-Math.max(0,G.et-s.impact),kind,T:smPry(kind,smKeyAt(R.sm.ks,s.impact))})}}}
+  R.rx=R.rx.filter(r=>t-r.at<STOP+60);
+  if(key!=='ko'){for(const r of R.rx){const w=pryW(r,t-r.at);if(w>0)posture=mixP(posture,r.T,w)}
+   /* 大のパリィされ：笠がはね上がって顔がのぞき、しばらくして下ろす */
+   for(const r of R.rx){if(r.kind!=='b')continue;const d=t-r.at,hat=d<0?0:d<STOP?Math.min(1,(d+1)/4):Math.max(0,1-(d-STOP-14)/14);if(hat>0)posture=Object.assign({},posture,{hat:Math.max(posture.hat||0,hat)})}}
+  /* 斬られた瞬間を拾う（30F以内の二太刀目は大きく） */
+  if(e.hurt>0&&!R.lastHurt){const two=R.hurt.length&&t-R.hurt[R.hurt.length-1].at<30;R.hurt.push({at:t,two})}R.lastHurt=e.hurt;
+  R.hurt=R.hurt.filter(h=>t-h.at<60);
+  if(R.hurt.length&&key!=='ko'){let A=0,Bk=0;for(const h of R.hurt){if(h.two)Bk=Math.max(Bk,kb(t-h.at,9));else A=Math.max(A,kb(t-h.at,6))}const m=Math.max(A,Bk);posture=Object.assign({},posture);
+   if(key==='brk'){posture.lean-=.2*A+.25*Bk;posture.x=(posture.x||0)+2*A+3*Bk}
+   else{posture.lean=(posture.lean||0)-.25*A-.3*Bk;posture.x=(posture.x||0)+2*A+3*Bk;posture.hd=(posture.hd||0)-.2*m;posture.hat=Math.max(posture.hat||0,.5*m)}}
+  R.chinD=key==='atk'&&R.sm&&R.sm.chin!=null?T0-R.sm.chin:key==='rec'?t-R.recAt-2:null;
   R.prev=posture;R.posture=posture;return posture}
  /* 納刀の「チン」：柄の口から左右へ広がる小さな弧（iai.js の chinRing。光らない灰） */
  function chinFx(B,J,d){if(d<0||d>12||!J.hip)return;const c=add(J.hip,[-1*J.k,1*J.k]);for(let q=0;q<2;q++){const r=2+d*1.1+q*3;for(let a=-.8;a<=.8;a+=.16){B.set(c[0]-Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#d8dce8',4);B.set(c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r,q?'#6a6278':'#d8dce8',4)}}}
@@ -423,6 +452,7 @@ const RIG=(()=>{
   B.outline();
   if(!SH&&!SM&&R.key==='bored'&&G.bored&&J.tip)tapFx(B,Math.round(J.tip[0]),t-G.bored.at);
   if(SM&&R.chinD!=null)chinFx(B,J,R.chinD);
+  if(SM&&J.sc)for(const h of R.hurt){const c=[J.sc[0]-4,J.sc[1]+3];smOoze(B,h.two?[c[0]+1,c[1]-3]:c,t-h.at,h.two?7:6,h.two?[INK2[0],INK2[1],'#3a2a4a']:[INK2[0],INK2[1]])}
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d'),im=cx.createImageData(W,H),memo={};
   for(let i=0;i<B.c.length;i++){const c0=B.c[i];if(!c0)continue;const c=memo[c0]||(memo[c0]=B.t[i]===4?c0:nCol(c0,v,SH||SM?null:e.tint)),n=parseInt(c.slice(1),16);im.data[i*4]=n>>16&255;im.data[i*4+1]=n>>8&255;im.data[i*4+2]=n&255;im.data[i*4+3]=255}
   cx.putImageData(im,0,0);R.img={k,c:cv};return cv}
@@ -443,4 +473,4 @@ const RIG=(()=>{
  const RCH={};function reach(e){const k=e.key==='shadeM'?'M':'n';if(RCH[k]==null){const B=new Buf(W,H),J=shadeDraw(B,OX,H,k==='M'?SHADE_M:SHADE,Object.assign({},SHBASE,SHS),0,null);RCH[k]=J.tip[0]-OX}return RCH[k]}
  const bored=e=>!on(e)?null:e.key==='samuraiB'?{len:BORED_LEN,taps:BORED_TAPS}:e.kind==='shade'?{len:e.key==='shadeM'?180:160,taps:[]}:null;
  const enter=e=>on(e)&&e.kind==='shade'?SH_ENTER_LEN:0,dx=e=>on(e)&&e.kind==='shade'?Math.round(st(e).sdx||0):0;
- return{on,reach,bored,enter,dx,down:downOf,koFx,own:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),act:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'||e.kind==='samurai'),img:render,tip,brkStars,tail}})();
+ return{on,reach,bored,enter,dx,down:downOf,koFx,own:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'||e.kind==='samurai'),act:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'||e.kind==='samurai'),img:render,tip,brkStars,tail}})();

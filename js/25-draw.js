@@ -285,7 +285,7 @@ function drawEnemy(){
  const v=white||hitWhite(e)?'w':e.broken?'b':'n',pal=enemyPal(e,v),img=eSpr(e,v),w=img.width,h=img.height;
  const idle=(G.state!=='enemy'?(G.anim>>4)%2:0)+(e.fly?e.fly+Math.round(Math.sin(G.anim*.12)*2):0);
  const vb=enemyVib(e)+hurtDx(e);
- const AN=G.ko?null:anticip(e);const x=RIG.dx(e)+(G.state==='enter'&&G.enter?G.enter.dx:0)+(AN?AN.dx:0)+(G.ko?G.ko.ex:e.kind==='boar'?boarX():Math.round(ENX(e)+p.lean*5-p.lunge*lungeDist(e)-p.twitch*6+Math.round(G.knock)))+vb,y=FLOOR;
+ const AN=G.ko?null:anticip(e);const x=RIG.dx(e)+(G.state==='enter'&&G.enter?G.enter.dx:0)+(AN?AN.dx:0)+(G.ko?G.ko.ex:e.kind==='boar'?boarX():Math.round(ENX(e)+p.lean*5-p.lunge*lungeDist(e)-p.twitch*6+(RIG.own(e)?0:Math.round(G.knock))))+vb,y=FLOOR;
  const SC=e.sc||1,PX=e.kind==='ghost'&&!G.ko?(ghostAlpha().x??x):x;if(e.kind!=='ghost'||(ghostAlpha().a||0)>.2)shadowPx(PX,e.shw||((w*SC)>>1));if(SC>1){l.save();l.translate(PX,y);l.scale(SC,SC);l.translate(-PX,-y)}
  if(G.ko&&G.ko.sliced&&!RIG.down(e)){
   const x0=x-(w>>1),y0=y-h,g=sliceGeo(w,h,x0,y0),o=sliceOff();

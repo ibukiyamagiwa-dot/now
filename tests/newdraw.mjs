@@ -72,7 +72,11 @@ async function run(q) {
     for (const key of ['samurai', 'samuraiM']) { closeMenu && closeMenu(); startPractice(key); G.card = null; G.cards = []; if (G.enter) G.enter.t = 999; G.en.hp = G.en.hpMax = 9999; let turns = 0, ctr = 0;
       for (let k = 0; k < 24; k++) { G.state = 'cmd'; G.t = 20; for (let i = 0; i < 90; i++) { tick(); draw() } if (G.en.stance && k % 2) { cmd(1); for (let i = 0; i < 80 && G.state !== 'enemy'; i++) { tick(); draw() } if (G.strikes.some(s => s.counter)) ctr++ } else startEnemy();
         turns++; for (let i = 0; i < 300 && G.state === 'enemy'; i++) { const s = G.strikes.find(s => !s.done && G.et === s.impact - (k % 3 ? 2 : 12)); if (s) press(); tick(); draw() } }
-      o[key] = { turns, ctr, used: RIG.on(G.en) } }
+      const u = RIG.on(G.en);
+      /* 出現・ひまなとき・撃破（T012）：?new では出現130F、ひまなときは剣士170F・おかしら190F、撃破は砕けずに勝ちへ */
+      closeMenu && closeMenu(); startPractice(key); G.card = null; G.cards = []; const enter = G.state === 'enter' ? G.enter.rig : 0; let n = 0; while (G.state === 'enter' && n < 400) { tick(); n++ }
+      const b = RIG.bored(G.en); G.en.hp = 0; ko(false); let m = 0, sh = false; while (G.state === 'ko' && m < 600) { tick(); draw(); m++; if (G.ko && G.ko.shattered) sh = true }
+      o[key] = { turns, ctr, used: u, enter, enterTicks: n, bored: b ? b.len : 0, down: G.ko ? G.ko.down0 : null, shattered: sh, afterKo: G.state } }
     return o });
   // 自動で戦わせて、例外が出ないかを見る（パリィとガードをまぜる）
   const auto = await page.evaluate(() => { const T = window.__T; T.fresh(); let turns = 0;
@@ -106,7 +110,7 @@ const B = newR.bored, boredOk = B.has && B.at === B.F && B.starts === 1 && !B.st
 // 影の組は T094 から ?new なしでも新しい絵なので、?new のありなしで同じに動く
 const SN = newR.shade, SO = oldR.shade, shOk = S => ['shade', 'shadeM'].every(k => S[k].enter === 110 && S[k].enterTicks === 110 && S[k].afterEnter === 'cmd' && S[k].bored === (k === 'shadeM' ? 180 : 160)
   && S[k].down === 1 && !S[k].shattered && S[k].afterKo === 'win'), shadeOk = shOk(SN) && shOk(SO);
-const resetOk = newR.reset.same && oldR.reset.same, iaiOk = ['samurai', 'samuraiM'].every(k => newR.iai[k].used && newR.iai[k].ctr > 0 && !oldR.iai[k].used);
+const resetOk = newR.reset.same && oldR.reset.same, iaiOk = ['samurai', 'samuraiM'].every(k => { const N = newR.iai[k], O = oldR.iai[k]; return N.used && N.ctr > 0 && !O.used && N.enter === 130 && N.enterTicks === 130 && N.bored === (k === 'samuraiM' ? 190 : 170) && N.down === 1 && !N.shattered && N.afterKo === 'win' && O.enter === 0 && O.shattered });
 const ok = iaiOk && resetOk && shadeOk && !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
 console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B, iai: iaiOk ? 'OK' : newR.iai, reset: resetOk ? 'OK' : newR.reset, shade: shadeOk ? 'OK' : SN }, oldShade: shadeOk ? 'OK' : SO, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
 process.exit(ok ? 0 : 1);

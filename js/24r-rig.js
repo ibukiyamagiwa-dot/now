@@ -190,8 +190,10 @@ const RIG=(()=>{
   if(d>=4&&d<44)for(let i=0;i<(mid?7:5);i++){const u=(d-4)/40,x=c[0]+(hs(i,5)-.5)*16*k+Math.sin(d*.15+i)*2,y=c[1]-u*18*k-hs(i,6)*4,r=(1.5+u*3)*k;for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++){if(xx*xx+yy*yy>r*r)continue;if(hs(Math.round(x+xx),Math.round(y+yy)+d)<.5-u*.45)px(Math.round(x+xx),Math.round(y+yy),(xx+yy)&1?m.smoke[0]:m.smoke[1])}}}
  /* 撃破の閃光は倒れはじめの10F後（ko2.js の影の F＝[10,16]）、高さは床から16画素（中ボスは1.25倍） */
  const SH_FLASH=10,SH_FLASH_Y=16;
- const downOf=e=>on(e)&&e.kind==='shade'?{len:downLen(e),flash:SH_FLASH}:null;
- function koFx(e){if(!G.ko||G.ko.down0==null||!downOf(e))return;const d=G.t-G.ko.down0,k=e.mid?1.25:1;koBurst([G.ko.ex,FLOOR-SH_FLASH_Y*k],d-SH_FLASH,e.mid?P.koFragMid:P.koFragMob,k,!!e.mid,KOSH)}
+ /* 居合の撃破の芯：最後の一撃の14F後に閃光、かけらは浸食の黒い粒（ko2.js の sm、F＝[14,16]） */
+ const KOSM={frag:['#07050a','#16121c','#3a2e4a','#0e0a12'],smoke:['#120e16','#241c2c']},SM_FLASH=14,SM_FLASH_Y=16;
+ const downOf=e=>!on(e)?null:e.kind==='shade'?{len:downLen(e),flash:SH_FLASH,y:SH_FLASH_Y,mat:KOSH}:e.kind==='samurai'?{len:downLen(e),flash:SM_FLASH,y:SM_FLASH_Y,mat:KOSM}:null;
+ function koFx(e){const D=downOf(e);if(!G.ko||G.ko.down0==null||!D)return;const d=G.t-G.ko.down0,k=e.mid?1.25:1;koBurst([G.ko.ex,FLOOR-D.y*k],d-D.flash,e.mid?P.koFragMid:P.koFragMob,k,!!e.mid,D.mat)}
  /* 影の姿勢を1フレームに1回進める（門番の pose と同じ組み立て。撃破は T009 まで、倒れる前の姿勢のまま） */
  function shState(e){const R=st(e),t=G.anim;if(R.memo===t&&R.posture)return R.posture;R.memo=t;
   let key,T;
@@ -315,8 +317,8 @@ const RIG=(()=>{
    /* 居合：腰を落として柄に手をかけて止まり、目が光ってから一閃。斬ったまま残心→血振り→チンと納める（sm_iai） */
    put(s.start,SMI);sink(s,SMK);put(h-1,Object.assign({},SMK,{cr:4.3}));put(h,SMS,'snap');put(h+24,SMS);put(h+30,SMF,'out');put(h+40,SMF);put(h+48,Object.assign({},SMK,{grip:1}),'snap');chin=h+48;put(h+56,SMK);put(h+82,SMI,'io')}
   return{ks,end:last,chin}}
- function smKeyAt(ks,T){let a=ks[0],b=null;for(const k of ks){if(k.t<=T)a=k;if(k.t>=T){b=k;break}}const A=Object.assign({},SMBASE,a.p);if(!b||b===a)return Object.assign(A,{x:0});
-  const Bp=Object.assign({},SMBASE,b.p),u=EZ[b.e||'io'](cl01((T-a.t)/(b.t-a.t))),o={};for(const k in Bp)o[k]=typeof A[k]==='number'&&typeof Bp[k]==='number'?A[k]+(Bp[k]-A[k])*u:(u<.5?A[k]:Bp[k]);o.x=0;return o}
+ function smKeyAt(ks,T,keepX){let a=ks[0],b=null;for(const k of ks){if(k.t<=T)a=k;if(k.t>=T){b=k;break}}const A=Object.assign({},SMBASE,a.p);if(!b||b===a)return keepX?A:Object.assign(A,{x:0});
+  const Bp=Object.assign({},SMBASE,b.p),u=EZ[b.e||'io'](cl01((T-a.t)/(b.t-a.t))),o={};for(const k in Bp)o[k]=typeof A[k]==='number'&&typeof Bp[k]==='number'?A[k]+(Bp[k]-A[k])*u:(u<.5?A[k]:Bp[k]);if(!keepX)o.x=0;return o}
  /* ---- 居合のパリィされ・ブレイク・やられ（iai.js の sm_pry・sm_brk・sm_rec・sm_hurt、smM_…。T011） ----
     パリィされ（knightKit）：小＝刀ごと腕がはね上がる（二の太刀の一太刀目。そのまま頭上へ返して二太刀目へ）／大＝刀ごと腕がはね上げられてのけぞり、笠がはね上がって顔がのぞく。
     ブレイク：居合返しで崩れる。抜き身の刀が床近くまで垂れ、鞘は腰からずれ、笠が傾いたまま肩で息をする。立て直しは一瞬で納刀（チン）して居合の構え。
@@ -329,22 +331,49 @@ const RIG=(()=>{
  const SMREC=Object.assign({},SMBASE,SMK,{grip:1,x:0});/* 立て直し：納刀して居合の構え */
  /* 傷からにじむ黒（hurt.js の ooze。血ではない） */
  function smOoze(B,c,d,n,cols){if(d<0||d>26)return;for(let i=0;i<n;i++){const h=hs(i,7),a=-2.6+h*2.2,v=.9+hs(i,3)*1.2,x=c[0]+Math.cos(a)*v*d*.9+3,y=c[1]+Math.sin(a)*v*d*.9+.05*d*d;if(y<H)B.set(x,y,cols[i%cols.length],4)}}
+ /* ---- 居合の出現・ひまなとき・撃破（iai.js の sm_enter・smM_enter・sm_bored・smM_bored・sm_down・smM_down。T012） ----
+    補間は資料集と同じ。腕を上げる動き（笠を上げる手・黒い手）は +2π の角度で、体の前を通す。横へ歩く分（x）は画面で動かす */
+ const SMKS=a=>a.map(([t,p,e])=>({t,p:Object.assign({},SMI,p),e}));
+ /* 出現：構えずに歩いてきて止まり、笠のふちを指で上げて値踏みし、下ろして待つ（130F） */
+ const SM_ENTER=SMKS([[0,{x:44}],[48,{x:0},'lin'],[60,{}],[70,{ua:-2.6+TAU,fa:-1.0+TAU,hat:.45},'out'],[96,{ua:-2.6+TAU,fa:-1.0+TAU,hat:.45}],[106,{},'io'],[130,{}]]),SM_ENTER_LEN=130;
+ function smEnter(T){const o=smKeyAt(SM_ENTER,T,true);if(T<48){const s=Math.sin(T*TAU/16);o.ff=-5+s*4;o.fb=5-s*4;o.cr=(o.cr||0)+Math.abs(s)*.6}return o}
+ /* ひまなとき：居合の剣士は黒い右手を顔の前で握っては開いて眺め、肩を揺らして笑う（170F）。おかしらは鞘を傾けて刻みを一つずつなぞり、数え終えると主人公を見る（190F）。光らない */
+ const SMB_H=v=>({ua:2.9,fa:v+TAU,hd:.25});
+ const SM_BORED=SMKS([[0,{}],[24,{}],[36,Object.assign(SMB_H(-2.5),{lean:0}),'io'],[60,SMB_H(-2.2)],[70,SMB_H(-2.6)],[80,SMB_H(-2.2)],[120,SMB_H(-2.5)],[134,{},'io'],[170,{}]]);
+ const SMM_CNT={sa:.15,ua2:1.9,fa2:1.2,hd:.45,lean:.12},SMM_LOOK={sa:.15,ua2:1.9,fa2:1.2,hd:-.05,lean:.06};
+ const SMM_BORED=SMKS([[0,{}],[24,{}],[38,SMM_CNT,'io'],[120,SMM_CNT],[132,SMM_LOOK,'io'],[160,Object.assign({},SMM_LOOK,{lean:SMI.lean})],[176,{},'io'],[190,{}]]);
+ function smBored(e,T){const M=e.key==='samuraiM',o=smKeyAt(M?SMM_BORED:SM_BORED,T,true);o.cr=(o.cr||0)+Math.sin(T*TAU/96)*.35;
+  if(M)o.notchHi=T>=40&&T<120?Math.floor((T-40)/9):null;else if(T>=84&&T<120)o.cr+=((T>>2)&1)*.5;return o}
+ /* 撃破：のけぞってひざをつき、笠が落ちる。右腕の黒が一気に全身へ広がり、下から崩れて消える。床には笠だけ。資料集の150Fを【撃破の長さ】へ縮める（ko2.js の koCore） */
+ const SMKN={kn:1,lean:.35,hd:.35,ua:1.6,fa:1.5,ua2:1.4,fa2:1.6,x:4};
+ const SM_DOWN=SMKS([[0,{}],[6,{lean:-.3,hd:-.3,x:4},'out'],[26,SMKN,'in'],[150,Object.assign({},SMKN,{lean:.38,hd:.42})]]),SM_DOWN_SRC=150;
+ function smDown(e,d){const T=Math.round(Math.max(0,d)*SM_DOWN_SRC/downLen(e)),o=smKeyAt(SM_DOWN,T,true);o.drop=T<20?0:Math.min(1,(T-20)/14);return o}
+ /* 黒が手から全身へ広がり（縮めた時刻の40F〜）、84F から下から崩れる。床に落ちた笠は残す（ko2.js が縮めずに渡す post と同じ時刻） */
+ function smDownPost(B,J,d){const c=J.hdF;if(d<40||!c)return;const u=Math.min(1,(d-40)/30),Rr=u*40,v=d<84?0:Math.min(1,(d-84)/40),W2=B.w;
+  for(let i=0;i<B.c.length;i++){const ty=B.t[i];if(ty!==1&&ty!==2)continue;const col=B.c[i];if((col===STRAW[0]||col===STRAW[1]||col===STRAW[2])&&i/W2>H-4)continue;const x=i%W2,y=i/W2|0,dd=Math.hypot(x-c[0],y-c[1]);
+   if(dd<Rr+hs(x,y)*6){if(v>0&&hs(x*3,y*5)<v*1.7*(1.2-(H-y)/50)){B.c[i]=0;B.t[i]=0;continue}B.c[i]=(x+y)%3?INK2[0]:INK2[1]}}
+  if(v>0)for(let i=0;i<14;i++){const h=hs(i,9),x=c[0]-14+h*30,y=H-2-((d-84)*.35+hs(9,i)*10)%18;if(hs(i,d>>3)<1-v*.6)B.set(x,y,INK2[1],5)}}
  /* 居合の姿勢を1フレームに1回進める。技のあとの残心・血振り・納刀は、敵の番が終わっても続けて見せる（返しの構えに入るときは、納刀までで切る） */
  function smState(e){const R=st(e),t=G.anim;if(R.memo===t&&R.posture)return R.posture;R.memo=t;
   let key,T;
   const has=G.strikes&&G.strikes.some(isMain);if(has&&R.skFor!==G.strikes){R.skFor=G.strikes;R.sm=smKeys()}
   /* 技の時刻：敵の番のあいだは G.et、番が終わったあとは G.et＋（番が終わってからのフレーム。G.eEnd は 21-enemy-turn.js が覚える） */
   const T0=!has?null:G.state==='enemy'?G.et:(G.state==='cmd'||G.state==='hero')&&G.eEnd!=null?G.et+(t-G.eEnd):null;R.curT=T0;
-  if(G.ko){key='ko';T=R.prev||SM_IDLE(t)}
+  if(G.ko){key='ko';T=G.ko.down0!=null?smDown(e,G.t-G.ko.down0):(R.prev||SM_IDLE(t))}
+  else if(G.state==='enter'&&G.enter&&G.enter.rig){key='enter';T=smEnter(G.enter.t)}
   else if(e.broken){key='brk';T=SMBRK(t)}
   else if(T0!=null&&G.state==='enemy'){key='atk';T=smKeyAt(R.sm.ks,T0)}
   else if(R.recAt!=null&&t-R.recAt<30){key='rec';T=SMREC}
   else if(T0!=null&&T0<=(e.stance&&R.sm.chin!=null?R.sm.chin:R.sm.end)){key='atk';T=smKeyAt(R.sm.ks,T0)}
   else if(e.stance){key='stance';T=Object.assign({},SMBASE,SMR,{x:0})}
+  else if(G.bored&&G.state==='cmd'&&e===G.en){key='bored';T=smBored(e,t-G.bored.at)}
   else{key='idle';T=SM_IDLE(t)}
   if(key!==R.key){const old=R.key;R.key=key;R.from=R.prev;R.at=t;
    if(key==='brk'){R.dur=16;R.ez='s'}else if(old==='brk'){R.dur=5;R.ez='back';if(key!=='ko'){R.recAt=t;key='rec';R.key='rec';T=SMREC}}else if(key==='stance'){R.dur=10;R.ez='io'}else if(key==='idle'){R.dur=20;R.ez='io'}else{R.dur=6;R.ez='io'}}
-  let posture=T;if(R.from&&t-R.at<R.dur&&key!=='atk'&&key!=='ko'){posture=mixP(R.from,T,ease[R.ez](cl01((t-R.at)/R.dur)))}
+  /* 出現と撃破は資料集のキーのまま（弾かれ・斬られを重ねない）。横へ歩く・ずれる分は画面で動かす */
+  if(key==='enter'||(key==='ko'&&G.ko.down0!=null)){R.sdx=(T.x||0)*SAMU.k*(e.sc||1);const o=Object.assign({},T,{x:0});R.chinD=null;R.downD=key==='ko'?G.t-G.ko.down0:null;R.prev=o;R.posture=o;return o}
+  R.sdx=0;R.downD=null;
+  let posture=T;if(R.from&&t-R.at<R.dur&&key!=='atk'&&key!=='ko'&&key!=='bored'){posture=mixP(R.from,T,ease[R.ez](cl01((t-R.at)/R.dur)))}
   if(key==='stance')posture=Object.assign({},posture,{koi:cl01((t-R.at)/10)});
   if(key==='rec'&&t-R.recAt>=2)posture=Object.assign({},posture,{sheath:1,sw:null,grip:1,hat:0});
   /* パリィされた撃を拾う（最後の撃なら大） */
@@ -452,6 +481,7 @@ const RIG=(()=>{
   B.outline();
   if(!SH&&!SM&&R.key==='bored'&&G.bored&&J.tip)tapFx(B,Math.round(J.tip[0]),t-G.bored.at);
   if(SM&&R.chinD!=null)chinFx(B,J,R.chinD);
+  if(SM&&R.downD!=null)smDownPost(B,J,R.downD);
   if(SM&&J.sc)for(const h of R.hurt){const c=[J.sc[0]-4,J.sc[1]+3];smOoze(B,h.two?[c[0]+1,c[1]-3]:c,t-h.at,h.two?7:6,h.two?[INK2[0],INK2[1],'#3a2a4a']:[INK2[0],INK2[1]])}
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d'),im=cx.createImageData(W,H),memo={};
   for(let i=0;i<B.c.length;i++){const c0=B.c[i];if(!c0)continue;const c=memo[c0]||(memo[c0]=B.t[i]===4?c0:nCol(c0,v,SH||SM?null:e.tint)),n=parseInt(c.slice(1),16);im.data[i*4]=n>>16&255;im.data[i*4+1]=n>>8&255;im.data[i*4+2]=n&255;im.data[i*4+3]=255}
@@ -471,6 +501,6 @@ const RIG=(()=>{
  /* own：パリィされ・やられまで骨組みで出す敵（ゲームの押し下がりを重ねない）。act：技の動きを骨組みで出す敵（ゲームの予備動作の伸び縮みを重ねない） */
  /* 影ののびる斬りの当たり（SHS）で、剣先が足元のまん中からどれだけ前に出るか（画素、前が負）。ゲームの寄せ（lungeDist）を、剣先が主人公に届く長さにするのに使う */
  const RCH={};function reach(e){const k=e.key==='shadeM'?'M':'n';if(RCH[k]==null){const B=new Buf(W,H),J=shadeDraw(B,OX,H,k==='M'?SHADE_M:SHADE,Object.assign({},SHBASE,SHS),0,null);RCH[k]=J.tip[0]-OX}return RCH[k]}
- const bored=e=>!on(e)?null:e.key==='samuraiB'?{len:BORED_LEN,taps:BORED_TAPS}:e.kind==='shade'?{len:e.key==='shadeM'?180:160,taps:[]}:null;
- const enter=e=>on(e)&&e.kind==='shade'?SH_ENTER_LEN:0,dx=e=>on(e)&&e.kind==='shade'?Math.round(st(e).sdx||0):0;
+ const bored=e=>!on(e)?null:e.key==='samuraiB'?{len:BORED_LEN,taps:BORED_TAPS}:e.kind==='shade'?{len:e.key==='shadeM'?180:160,taps:[]}:e.kind==='samurai'?{len:e.key==='samuraiM'?190:170,taps:[]}:null;
+ const enter=e=>!on(e)?0:e.kind==='shade'?SH_ENTER_LEN:e.kind==='samurai'?SM_ENTER_LEN:0,dx=e=>on(e)&&(e.kind==='shade'||e.kind==='samurai')?Math.round(st(e).sdx||0):0;
  return{on,reach,bored,enter,dx,down:downOf,koFx,own:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'||e.kind==='samurai'),act:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'||e.kind==='samurai'),img:render,tip,brkStars,tail}})();

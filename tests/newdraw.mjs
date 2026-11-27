@@ -67,6 +67,13 @@ async function run(q) {
       G.en.hp = 0; ko(false); n = 0; let shattered = false; while (G.state === 'ko' && n < 600) { tick(); n++; if (G.ko && G.ko.shattered) shattered = true }
       o.down = G.ko ? G.ko.down0 : null; o.koTicks = n; o.afterKo = G.state; o.shattered = shattered; o.len = G.en.mid ? P.koLenMid : P.koLenMob }
     return r });
+  // 居合の組（T010〜）：?new で、居合・二の太刀・返しの構えと返し斬りをまぜて戦わせ、例外が出ず骨組みの絵で描かれる
+  const iai = await page.evaluate(() => { const o = {};
+    for (const key of ['samurai', 'samuraiM']) { closeMenu && closeMenu(); startPractice(key); G.card = null; G.cards = []; if (G.enter) G.enter.t = 999; G.en.hp = G.en.hpMax = 9999; let turns = 0, ctr = 0;
+      for (let k = 0; k < 24; k++) { G.state = 'cmd'; G.t = 20; for (let i = 0; i < 90; i++) { tick(); draw() } if (G.en.stance && k % 2) { cmd(1); for (let i = 0; i < 80 && G.state !== 'enemy'; i++) { tick(); draw() } if (G.strikes.some(s => s.counter)) ctr++ } else startEnemy();
+        turns++; for (let i = 0; i < 300 && G.state === 'enemy'; i++) { const s = G.strikes.find(s => !s.done && G.et === s.impact - (k % 3 ? 2 : 12)); if (s) press(); tick(); draw() } }
+      o[key] = { turns, ctr, used: RIG.on(G.en) } }
+    return o });
   // 自動で戦わせて、例外が出ないかを見る（パリィとガードをまぜる）
   const auto = await page.evaluate(() => { const T = window.__T; T.fresh(); let turns = 0;
     for (let k = 0; k < 40; k++) { startEnemy(); turns++; for (let i = 0; i < 300 && G.state === 'enemy'; i++) { const s = G.strikes.find(s => !s.done && G.et === s.impact - (k % 3 ? 2 : 12)); if (s) press(); tick() } G.state = 'cmd'; G.en.broken = k % 5 === 4 ? 1 : 0; T.step(20) }
@@ -91,7 +98,7 @@ async function run(q) {
       for (let i = 0; i < 12; i++) { G.card = null; G.cards = []; tick(); out.push(window.__snap()) } } return out });
   const reset = { first, same: after.length === fresh.length && after.every((s, i) => s === fresh[i]), bad: after.findIndex((s, i) => s !== fresh[i]), a: after.find((s, i) => s !== fresh[i]), f: fresh.find((s, i) => s !== after[i]) };
   await page.close();
-  return { errors, info, auto, shots, bored, shade, reset };
+  return { errors, info, auto, shots, bored, shade, reset, iai };
 }
 const oldR = await run(''), newR = await run('?new');
 await browser.close(); srv.close();
@@ -99,7 +106,7 @@ const B = newR.bored, boredOk = B.has && B.at === B.F && B.starts === 1 && !B.st
 // 影の組は T094 から ?new なしでも新しい絵なので、?new のありなしで同じに動く
 const SN = newR.shade, SO = oldR.shade, shOk = S => ['shade', 'shadeM'].every(k => S[k].enter === 110 && S[k].enterTicks === 110 && S[k].afterEnter === 'cmd' && S[k].bored === (k === 'shadeM' ? 180 : 160)
   && S[k].down === 1 && !S[k].shattered && S[k].afterKo === 'win'), shadeOk = shOk(SN) && shOk(SO);
-const resetOk = newR.reset.same && oldR.reset.same;
-const ok = resetOk && shadeOk && !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
-console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B, reset: resetOk ? 'OK' : newR.reset, shade: shadeOk ? 'OK' : SN }, oldShade: shadeOk ? 'OK' : SO, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
+const resetOk = newR.reset.same && oldR.reset.same, iaiOk = ['samurai', 'samuraiM'].every(k => newR.iai[k].used && newR.iai[k].ctr > 0 && !oldR.iai[k].used);
+const ok = iaiOk && resetOk && shadeOk && !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
+console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B, iai: iaiOk ? 'OK' : newR.iai, reset: resetOk ? 'OK' : newR.reset, shade: shadeOk ? 'OK' : SN }, oldShade: shadeOk ? 'OK' : SO, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
 process.exit(ok ? 0 : 1);

@@ -61,7 +61,7 @@ function enemyStep(){
  for(const pg of G.pings||[]){if(!pg.done&&G.et>=pg.t){pg.done=true;pg.at=G.et;G.en.kind==='hydra'?(pg.heads||[pg.note]).forEach(h=>SFX.headPing(h)):eyeFoe()?SFX.eye(pg.note):SFX.ping(pg.note);if(G.en.kind==='echo'){ring(EX-2,FLOOR-30-(G.en.fly||0),2,30,18,'#7fe3e3');ring(EX-2,FLOOR-30-(G.en.fly||0),2,18,12,'#ffffff')}}}
  if(G.state!=='enemy')return;
  if(G.strikes.every(s=>s.done)&&G.et>=G.endT){if(G.hero.psn>0&&G.mode!=='tut'){SFX.poison();hurt(G.hero.psn,'#b06ad8');text(HX+10,FLOOR-30,'毒','#b06ad8');G.hero.psn+=3;if(G.hero.hp<=0){G.state='dying';G.t=0;return}}if(G.mode==='tut'){const st=TUT[G.tut.i];if(G.tut.done)return tutClear();if(st.loop===true||(st.loop==='gauge'&&G.hero.mk<100)){G.state='cmd';G.t=-20;startEnemy();return}}
- G.state='cmd';G.t=0;if(G.rally)G.rally.on=false;if(!usable(G.sel))G.sel=firstUsable();msg(G.mode==='tut'?tutLbl():'A で決定（↑↓ でコマンドを選ぶ）');turnEnd()}
+ G.state='cmd';G.t=0;G.eEnd=G.anim;if(G.rally)G.rally.on=false;if(!usable(G.sel))G.sel=firstUsable();msg(G.mode==='tut'?tutLbl():'A で決定（↑↓ でコマンドを選ぶ）');turnEnd()}
 }
 function press(){
  ac();

@@ -9,7 +9,7 @@ node tests/requests.mjs . > /tmp/requests.txt && echo "依頼の一覧 OK" || { 
 node tests/tickets.mjs . > /tmp/tickets.txt && echo "チケット OK" || { echo "チケット NG"; cat /tmp/tickets.txt; exit 1; }
 node tests/nippo.mjs . > /tmp/nippo.txt && echo "日報の形 OK" || { echo "日報の形 NG"; cat /tmp/nippo.txt; exit 1; }
 node tests/smoke.mjs . > /tmp/smoke.json && echo "起動テスト OK" || { echo "起動テスト NG"; cat /tmp/smoke.json | head -c 2000; exit 1; }
-node tests/newdraw.mjs . > /tmp/newdraw.json && echo "骨組みの絵（?new の門番・居合の組、影の組）のテスト OK" || { echo "?new のテスト NG"; cat /tmp/newdraw.json; exit 1; }
+node tests/newdraw.mjs . > /tmp/newdraw.json && echo "骨組みの絵（?new の門番、影の組・居合の組）のテスト OK" || { echo "?new のテスト NG"; cat /tmp/newdraw.json; exit 1; }
 # 自動で戦わせるテストは、手元では敵ごとに 800F（速さ優先）、GitHub（CI）では 2400F。夜通しは node tests/soak.mjs . 200000 <種>
 SOAK_FR=${SOAK_FR:-$([ -n "$CI" ] && echo 2400 || echo 800)}
 node tests/soak.mjs . "$SOAK_FR" > /tmp/soak.txt 2>&1 && echo "自動で戦わせるテスト OK（敵ごとに ${SOAK_FR}F）" || { echo "自動で戦わせるテスト NG"; grep -v agent-proxy /tmp/soak.txt; exit 1; }

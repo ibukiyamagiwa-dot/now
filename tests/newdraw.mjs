@@ -110,7 +110,7 @@ const B = newR.bored, boredOk = B.has && B.at === B.F && B.starts === 1 && !B.st
 // 影の組は T094 から ?new なしでも新しい絵なので、?new のありなしで同じに動く
 const SN = newR.shade, SO = oldR.shade, shOk = S => ['shade', 'shadeM'].every(k => S[k].enter === 110 && S[k].enterTicks === 110 && S[k].afterEnter === 'cmd' && S[k].bored === (k === 'shadeM' ? 180 : 160)
   && S[k].down === 1 && !S[k].shattered && S[k].afterKo === 'win'), shadeOk = shOk(SN) && shOk(SO);
-const resetOk = newR.reset.same && oldR.reset.same, iaiOk = ['samurai', 'samuraiM'].every(k => { const N = newR.iai[k], O = oldR.iai[k]; return N.used && N.ctr > 0 && !O.used && N.enter === 130 && N.enterTicks === 130 && N.bored === (k === 'samuraiM' ? 190 : 170) && N.down === 1 && !N.shattered && N.afterKo === 'win' && O.enter === 0 && O.shattered });
+const resetOk = newR.reset.same && oldR.reset.same, iaiOk = ['samurai', 'samuraiM'].every(k => { const N = newR.iai[k], O = oldR.iai[k]; /* 居合の組は T097 から ?new なしでも新しい絵なので、ありなしで同じに動く */return [N, O].every(S => S.used && S.ctr > 0 && S.enter === 130 && S.enterTicks === 130 && S.bored === (k === 'samuraiM' ? 190 : 170) && S.down === 1 && !S.shattered && S.afterKo === 'win') });
 const ok = iaiOk && resetOk && shadeOk && !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
 console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B, iai: iaiOk ? 'OK' : newR.iai, reset: resetOk ? 'OK' : newR.reset, shade: shadeOk ? 'OK' : SN }, oldShade: shadeOk ? 'OK' : SO, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
 process.exit(ok ? 0 : 1);

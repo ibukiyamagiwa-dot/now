@@ -111,6 +111,11 @@ const DEF=[
  {k:'ivBat',n:'【連撃の間】夜のコウモリ：二連撃',v:42,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivBeast',n:'【連撃の間】牙の盗賊：短剣の投げ',v:40,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivShade',n:'【連撃の間】影の剣士：本物が2回続く',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
+ /* 【居合の待つ長さ】：構えてから目が光るまで。揺らすのは居合だけ（DECISIONS.md の例外「居合の待つ長さ」）。二の太刀は揺らさない（chars/iai.md の「数値」） */
+ {k:'preIai1',n:'【居合の待つ長さ（短い）】',v:12,min:0,max:60,step:1,u:'F',g:'adv'},
+ {k:'preIai2',n:'【居合の待つ長さ（長い）】',v:30,min:0,max:60,step:1,u:'F',g:'adv'},
+ {k:'preIaiNi',n:'【二の太刀の待つ長さ】',v:18,min:0,max:60,step:1,u:'F',g:'adv'},
+ {k:'ivIaiNi',n:'【連撃の間】居合のおかしら：二の太刀',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
  {k:'ivShadeM',n:'【連撃の間】うそつきの影：本物が2回続く',v:44,min:6,max:60,step:1,u:'F',g:'adv'},
  /* 【ふりのあとの間】：ふり（紫の輪から【予兆から着弾までのフレーム】後）から、次の合図まで。影の剣士は振りかぶりへ戻って止まってから、うそつきの影は戻らずに続ける（design/chars/shade.md の「数値」） */
  {k:'reachShade',n:'【影の剣先が届く位置】（?new：のびる斬りの剣先が、主人公の前の何画素に届くか）',v:8,min:0,max:30,step:1,u:'px',g:'adv'},

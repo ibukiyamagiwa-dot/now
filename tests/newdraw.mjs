@@ -81,8 +81,9 @@ async function run(q) {
 const oldR = await run(''), newR = await run('?new');
 await browser.close(); srv.close();
 const B = newR.bored, boredOk = B.has && B.at === B.F && B.starts === 1 && !B.strikes && B.state === 'cmd' && !B.after && !oldR.bored.has && oldR.bored.starts === 0;
-const SN = newR.shade, SO = oldR.shade, shadeOk = ['shade', 'shadeM'].every(k => SN[k].enter === 110 && SN[k].enterTicks === 110 && SN[k].afterEnter === 'cmd' && SN[k].bored === (k === 'shadeM' ? 180 : 160)
-  && SN[k].down === 1 && !SN[k].shattered && SN[k].afterKo === 'win' && SO[k].enter === 0 && SO[k].bored === 0 && SO[k].down == null && SO[k].shattered);
+// 影の組は T094 から ?new なしでも新しい絵なので、?new のありなしで同じに動く
+const SN = newR.shade, SO = oldR.shade, shOk = S => ['shade', 'shadeM'].every(k => S[k].enter === 110 && S[k].enterTicks === 110 && S[k].afterEnter === 'cmd' && S[k].bored === (k === 'shadeM' ? 180 : 160)
+  && S[k].down === 1 && !S[k].shattered && S[k].afterKo === 'win'), shadeOk = shOk(SN) && shOk(SO);
 const ok = shadeOk && !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
 console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B, shade: shadeOk ? 'OK' : SN }, oldShade: shadeOk ? 'OK' : SO, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
 process.exit(ok ? 0 : 1);

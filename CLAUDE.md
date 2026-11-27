@@ -32,7 +32,7 @@
 | `tools/` `tests/` | 作るためのスクリプトと、テスト |
 
 - js の主な中身：`01-params` 手触りの数値 `DEF`→`P`（開発パネルで変更でき、`localStorage` に保存）／`02-sfx` 効果音／`03-enemies` 敵データ `EN`／`04`〜`07` ボスごとの行動／`08-dojo`・`09-rally` 打ち合いと道場／`11-bgm` BGM／`14-state` 状態 `G`／`15-tutorial`／`16-tips-records` 覚悟 `KAKU`・記録 `REC`／`20-hero` 自分の行動／`21-enemy-turn` 敵の行動／`22-ko` とどめ／`23-loop` 1フレームの処理／`24-draw-data` 絵のデータ `SPR` `NSPR` `LANC`／`25-draw` 描画（240×135 に描いて4倍に拡大）／`26-menu`／`27-input`／`29-boot` 起動とループ
-- `js/24r-rig.js`：資料集（`design/v2`）の骨組みの描き方をゲームに移したもの。URL に `?new` をつけたときだけ使う（`NEWDRAW`）。いまは門番（`samuraiB`）だけで、`eSpr` で絵を差しかえる。体の動きはゲームの合図と当たりの時刻から決めるので、手触りは変わらない。名前はすべて `RIG` の中。`node tests/newdraw.mjs . <フォルダ>` で、?new なしとありの同じ場面を撮れる。
+- `js/24r-rig.js`：資料集（`design/v2`）の骨組みの描き方をゲームに移したもの。影の組（影の剣士・うそつきの影）はいつもこれで描き（T094）、門番（`samuraiB`）はまだ URL に `?new` をつけたときだけ（`NEWDRAW`）。どの敵かは `RIG.on` の一か所で決め、`eSpr` で絵を差しかえる。体の動きはゲームの合図と当たりの時刻から決めるので、手触りは変わらない。名前はすべて `RIG` の中。`node tests/newdraw.mjs . <フォルダ>` で、?new なしとありの同じ場面を撮れる。
 - どのページかは `window.PAGE` で分かる（本編は未定義、道場は `'rally'`）。ページごとの違いは、本編のコードを書きかえず、この印と `pages/` で出す。
 - 保存キー（`localStorage`）：`parryRPG.P` `parryRPG.cfg` `parryRPG.meta` `parryRPG.tips` `parryRPG.tutDone` `parryRPG.rec`。**キー名を変えると友達の記録が消えるので変えない。**
 - 開発者ページのパスワードはソースに平文で書かれていて、公開リポジトリでは誰でも読める。隠しにはなっていない。

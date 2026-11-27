@@ -5,7 +5,7 @@
 // 　　　　　④床と間合い（design/GAME_REQUESTS.md「床と間合い」）：敵の絵だけを描いて、床（FLOOR）より下に見える画素が0、
 //         床で切る前の絵の沈み（剣先も含む）が【床に沈んでよい深さ】以内、だれも振っていないときに主人公と重ならない。床の影・床をすべるたまり・合図の光は数えない。
 // 使い方: node tests/soak.mjs [フォルダ=.] [敵ごとのフレーム数=2400] [種=1]
-//   check.sh では短く走らせる。夜通し回すなら: node tests/soak.mjs . 200000 7
+//   check.sh では短く走らせる（手元 800F、GitHub の CI 2400F。SOAK_FR で変えられる）。夜通し回すなら: node tests/soak.mjs . 200000 7
 // 落ちたときは、敵・種・フレームを出すので、同じ種で走らせれば同じところで落ちる。敵ごとの押した回数と状態は SOAK_STATS=1 で出る。
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';

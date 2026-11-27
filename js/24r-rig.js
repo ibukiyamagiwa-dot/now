@@ -1,4 +1,4 @@
-/* ===== 資料集の骨組みで描く（URL に ?new をつけたときだけ。いまは門番と、影の剣士・うそつきの影〈立ち絵と覚悟の段だけ。技の動きは T093〉） =====
+/* ===== 資料集の骨組みで描く。影の剣士・うそつきの影はいつも（T094）、門番はまだ URL に ?new をつけたときだけ =====
    見本は design/v2（engine.js の Buf、rig.js の knight、specs.js の SPEC.gate、moves.js の g_two・g_kneel、parried.js の g_pry・g_brk・g_rec、hurt.js の g_hurt）。
    門番に要る部品だけを移し、名前はすべて RIG の中に閉じこめる（ゲームの OUT・knight・ring などとぶつけない）。
    手触りは変えない：体の動きは、ゲームの合図と当たりの時刻（G.strikes の cue・impact）から決め、踏みこみの距離はゲームの lungeDist のまま。 */
@@ -328,7 +328,8 @@ const RIG=(()=>{
  /* 影の尾の続き：キャンバスの右の端から画面の外まで（かかとから床の線にも）。影は持ち主から離れられない */
  function tail(e,x,y){const R=st(e);if(!R.J)render(e,'n');const V=SHV[e.tint]||SHV.n,sc=e.sc||1,x0=Math.round(x+(W>>1)*sc),hx=Math.round(x+(R.J.footB[0]-OX)*sc),T=G.anim;
   for(let q=hx;q<LW+4;q++){if(q<hx+18||(q+T)%5)px(q,y,V.tail);if(q>=x0){px(q,y-1,V.tail);if(V.tailW>1&&(q*3+T)%7)px(q,y-2,V.tail)}}}
- const on=e=>typeof NEWDRAW!=='undefined'&&NEWDRAW&&!!e&&(e.key==='samuraiB'||e.kind==='shade');
+ /* どの敵を骨組みで描くか：作り直せた敵から順に ?new なしでも新しい絵にする（GAME_REQUESTS の「入れ方」）。影の組は T094 から常に、門番はまだ ?new のときだけ */
+ const on=e=>!!e&&(e.kind==='shade'||(typeof NEWDRAW!=='undefined'&&NEWDRAW&&e.key==='samuraiB'));
  /* own：パリィされ・やられまで骨組みで出す敵（ゲームの押し下がりを重ねない）。act：技の動きを骨組みで出す敵（ゲームの予備動作の伸び縮みを重ねない） */
  /* 影ののびる斬りの当たり（SHS）で、剣先が足元のまん中からどれだけ前に出るか（画素、前が負）。ゲームの寄せ（lungeDist）を、剣先が主人公に届く長さにするのに使う */
  const RCH={};function reach(e){const k=e.key==='shadeM'?'M':'n';if(RCH[k]==null){const B=new Buf(W,H),J=shadeDraw(B,OX,H,k==='M'?SHADE_M:SHADE,Object.assign({},SHBASE,SHS),0,null);RCH[k]=J.tip[0]-OX}return RCH[k]}

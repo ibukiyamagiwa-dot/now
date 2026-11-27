@@ -317,7 +317,7 @@ function drawEnemy(){
   for(let t=0;t<=1;t+=.1){const ax=sx+(fx-sx)*t,ay=sy+(fy-sy)*t;l.fillStyle=nCol('#64626e',v,e.tint);l.fillRect(Math.round(ax)-2,Math.round(ay)-2,5,5)}
   {const F=nspr('fist',v,e.tint);l.drawImage(F,fx-(F.width>>1),fy-(F.height>>1));tip={x:fx-5,y:fy-6}}
  }else if(e.kind==='beast'){tip=p.proj?{x:an('beast',x,y,0).x,y:an('beast',x,y,0).y-8-idle}:{x:an('beastT',x,y).x,y:an('beastT',x,y).y-idle};const fly=G.state==='enemy'?G.strikes.filter(s=>s.proj&&!s.done&&G.et>=s.impact-12).length:0;for(let i=0;i<Math.max(0,(e.daggers||0)-fly);i++){const D=an('beast',x,y,i),bx=D.x,by=D.y-idle;outLine(bx+1,by,bx+3,by-7,OUT);outLine(bx,by,bx+2,by-7,'#d9e2f2');px(bx,by+1,'#7a4a2a')}}
- else if(e.kind==='shade'){if(RIG.on(e)){tip=RIG.tip(e,x,y-idle);RIG.tail(e,x,y)}else tip=an('shadeT',x,y)}
+ else if(e.kind==='shade'){tip=RIG.tip(e,x,y-idle);RIG.tail(e,x,y)}
  else if(e.kind==='armor'){tip=an('armorT',x,y)}
  else if(e.kind==='bat'){const T=an('batT',x,y);tip={x:T.x,y:T.y-idle}}
  else if(e.kind==='shroom'){const T=an('shroomT',x,y);tip={x:T.x,y:T.y-idle}}

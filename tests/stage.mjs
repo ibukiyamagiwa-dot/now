@@ -2,6 +2,8 @@
 // 覚悟の段ごとに、その段の本番に出る敵を背景の前に立たせて測る。不合格があれば終了コード1。
 //   輪郭の差：敵のふちの画素と、すぐ外の背景の L* の差（待機4コマの平均）が 14 以上
 //   合図の余白：合図が出る所（x 70〜215、y 12〜105）の背景のいちばん明るい L* が、合図の一番暗い色より 14 以上暗い
+// 影の組（影の剣士・うそつきの影）の床の尾（床の線から上2行）は、床にある影で輪郭ではないので数えない（soak.mjs の床の点検と同じ）。
+//   資料集の点検はキャンバスの中だけなので尾が短いが、ゲームでは尾が画面の端まで続き、床に溶けて差を下げるため（T094）。
 // 幽霊は「見えにくい敵」として半透明に作ってある（待機の不透明度 0.32）ので、輪郭の差は測るが合否には入れない。
 // 使い方: node tests/stage.mjs [フォルダ=.]
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
@@ -33,13 +35,13 @@ const res = await page.evaluate(({ edge, cue, skip }) => {
     for (const key0 of keys) {
       RM2 = freshMods(); G = baseG(); G.K = K; G.Kmin = K; G.order = [key0]; G.runLen = 1; startBattle(0, false);
       G.state = 'cmd'; G.enter = null; G.card = null; G.cards = [];
-      let e = 0, n = 0;
+      let e = 0, n = 0; const yMax = G.en.kind === 'shade' ? FLOOR - 2 : H - 1;
       for (const a of [0, 24, 48, 72]) {
         G.anim = a; l.clearRect(0, 0, W, H); drawEnemy();
         const d = l.getImageData(0, 0, W, H).data, isF = i => d[i * 4 + 3] >= 128,
           fc = i => { const al = d[i * 4 + 3] / 255; return [0, 1, 2].map(c => d[i * 4 + c] * al + bg[i][c] * (1 - al)) };
         let se = 0, ne = 0;
-        for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { const i = y * W + x; if (!isF(i)) continue;
+        for (let y = 1; y < yMax; y++) for (let x = 1; x < W - 1; x++) { const i = y * W + x; if (!isF(i)) continue;
           for (const j of [i - 1, i + 1, i - W, i + W]) if (!isF(j)) { se += Math.abs(Ls(fc(i)) - Ls(bg[j])); ne++ } }
         e += ne ? se / ne : 0; n++;
       }

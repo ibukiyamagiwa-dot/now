@@ -75,8 +75,23 @@ async function run(q) {
     let ms = null; if (used) { const t0 = performance.now(); for (let i = 0; i < 300; i++) { G.anim++; RIG.img(G.en, 'n') } ms = (performance.now() - t0) / 300 }
     return { turns, used, ms };
   });
+  // 戦いが変わっても姿勢の覚えが残らない（T107）：別の戦いのあとで始めた戦いと、開き直していきなり始めた同じ戦いとで、同じフレームの主人公と影の姿勢が同じ
+  const snap = () => { draw(); const h = typeof HERO === 'object' ? HERO.pose('idle') : null, r = G.en && G.en._rig && G.en._rig.posture;
+    const f = o => o && Object.fromEntries(Object.entries(o).filter(([, v]) => typeof v === 'number').map(([k, v]) => [k, +v.toFixed(4)])); return JSON.stringify({ h: f(h), e: f(r) }) };
+  const second = () => page.evaluate(() => { const T = window.__T, out = [];
+    for (const [k, tut] of [['shade', 0], [null, 1]]) { if (tut) startTut(tut); else { closeMenu && closeMenu(); startPractice(k) } G.card = null; G.cards = []; if (G.enter) G.enter.t = 999;
+      for (let i = 0; i < 12; i++) { G.card = null; G.cards = []; tick(); out.push(window.__snap()) } }
+    return out });
+  await page.evaluate(`window.__snap=${snap.toString()}`);
+  const first = await page.evaluate(() => { startTut(0); G.card = null; G.cards = []; for (let i = 0; i < 260; i++) { G.card = null; G.cards = []; if (G.state === 'cmd' && G.t >= 10) cmd(1); tick(); draw() }
+    closeMenu && closeMenu(); startPractice('samuraiB'); G.card = null; G.cards = []; for (let i = 0; i < 200; i++) { if (G.state === 'cmd' && G.t >= 10) cmd(1); tick(); draw() } return G.anim });
+  const after = await second();
+  await page.reload(); await page.waitForTimeout(800); await page.evaluate(`window.VSPD=0;window.__T={};window.__snap=${snap.toString()}`);
+  const fresh = await page.evaluate(() => { const out = []; for (const [k, tut] of [['shade', 0], [null, 1]]) { if (tut) startTut(tut); else { closeMenu && closeMenu(); startPractice(k) } G.card = null; G.cards = []; if (G.enter) G.enter.t = 999;
+      for (let i = 0; i < 12; i++) { G.card = null; G.cards = []; tick(); out.push(window.__snap()) } } return out });
+  const reset = { first, same: after.length === fresh.length && after.every((s, i) => s === fresh[i]), bad: after.findIndex((s, i) => s !== fresh[i]), a: after.find((s, i) => s !== fresh[i]), f: fresh.find((s, i) => s !== after[i]) };
   await page.close();
-  return { errors, info, auto, shots, bored, shade };
+  return { errors, info, auto, shots, bored, shade, reset };
 }
 const oldR = await run(''), newR = await run('?new');
 await browser.close(); srv.close();
@@ -84,6 +99,7 @@ const B = newR.bored, boredOk = B.has && B.at === B.F && B.starts === 1 && !B.st
 // 影の組は T094 から ?new なしでも新しい絵なので、?new のありなしで同じに動く
 const SN = newR.shade, SO = oldR.shade, shOk = S => ['shade', 'shadeM'].every(k => S[k].enter === 110 && S[k].enterTicks === 110 && S[k].afterEnter === 'cmd' && S[k].bored === (k === 'shadeM' ? 180 : 160)
   && S[k].down === 1 && !S[k].shattered && S[k].afterKo === 'win'), shadeOk = shOk(SN) && shOk(SO);
-const ok = shadeOk && !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
-console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B, shade: shadeOk ? 'OK' : SN }, oldShade: shadeOk ? 'OK' : SO, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
+const resetOk = newR.reset.same && oldR.reset.same;
+const ok = resetOk && shadeOk && !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
+console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B, reset: resetOk ? 'OK' : newR.reset, shade: shadeOk ? 'OK' : SN }, oldShade: shadeOk ? 'OK' : SO, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
 process.exit(ok ? 0 : 1);

@@ -283,7 +283,9 @@ const RIG=(()=>{
  /* やられ（g_hurt）：体ごと押されるが、交差はほどかない。二太刀目で腰が落ちる */
  const kb=(a,dur)=>a<0?0:a<4?Math.sin(a/4*Math.PI/2):Math.exp(-(a-4)/dur);
 
- function st(e){return e._rig||(e._rig={key:'',from:null,at:0,dur:1,ez:'io',prev:null,rx:[],seen:new WeakSet(),hurt:[],lastHurt:0,memo:-1,posture:null,J:null,img:{}})}
+ /* 敵ごとの姿勢の覚え。G.anim は戦いごとに0に戻るので、時計が戻ったら覚えを捨てる（T107。前の戦いの姿勢で固まらないように） */
+ const R0=()=>({key:'',from:null,at:0,dur:1,ez:'io',prev:null,rx:[],seen:new WeakSet(),hurt:[],lastHurt:0,memo:-1,posture:null,J:null,img:{},last:-1});
+ function st(e){const R=e._rig||(e._rig=R0()),t=G.anim;if(t<R.last)Object.assign(R,R0());R.last=t;return R}
  /* 1フレームに1回だけ姿勢を進める（同じフレームで何度呼ばれても同じ結果） */
  function pose(e){const R=st(e),t=G.anim;if(R.memo===t&&R.posture)return R.posture;R.memo=t;
   let key,T;

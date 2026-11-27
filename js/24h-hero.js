@@ -100,7 +100,9 @@ const HERO=(()=>{
  const ANG=['ua','fa','sw','ua2','fa2'];
  function nearTo(from,to){const o=Object.assign({},to);for(const k of ANG)if(typeof o[k]==='number'&&typeof from[k]==='number'){while(o[k]-from[k]>Math.PI)o[k]-=TAU;while(o[k]-from[k]<-Math.PI)o[k]+=TAU}return o}
  function mixP(A,B2,u){const T=nearTo(A,B2),o=Object.assign({},A);for(const k in T)if(typeof T[k]==='number'&&typeof A[k]==='number')o[k]=A[k]+(T[k]-A[k])*u;return o}
- const R={key:'',from:null,at:0,prev:null,memo:-1,memoK:'',P:null,J:null,img:{}};
+ const R0=()=>({key:'',from:null,at:0,prev:null,memo:-1,memoK:'',P:null,J:null,img:{},last:-1}),R=R0();
+ /* G.anim は戦いごとに0に戻る。時計が戻ったら、前の戦いの姿勢・つなぎ・絵の覚えを捨てる（T107：t-R.at がマイナスになり、姿勢が引き伸ばされていた） */
+ function clock(t){if(t<R.last)Object.assign(R,R0());R.last=t}
  function target(k){const A=G.act&&G.act.n===1?G.act:null,t=G.anim;
   if(A)return['atk',keyAt(atkKeys(A),A.t)];
   if(G.act&&G.act.n===2)return['magic',Object.assign({},BASE,HP_.magic)];
@@ -115,9 +117,9 @@ const HERO=(()=>{
   /* 待機：肘を曲げた構えで、ゆっくり息（hh_idle） */
   const P0=Object.assign({},BASE);P0.cr+=Math.max(0,Math.sin(t*.105))*.8;return['idle',P0]}
  /* 1フレームに1回だけ姿勢を進める。姿勢の種類が変わったら、前の姿勢から 6F でつなぐ */
- function pose(k){const t=G.anim,mk=t+'|'+k;if(R.memoK===mk&&R.P)return R.P;R.memoK=mk;
+ function pose(k){const t=G.anim;clock(t);const mk=t+'|'+k;if(R.memoK===mk&&R.P)return R.P;R.memoK=mk;
   const[key,T]=target(k);if(key!==R.key){R.key=key;R.from=R.prev;R.at=t}
-  let P0=T;if(R.from&&key!=='atk'&&t-R.at<6)P0=mixP(R.from,T,ez.io((t-R.at)/6));
+  let P0=T;if(R.from&&key!=='atk'&&t-R.at<6)P0=mixP(R.from,T,ez.io(Math.min(1,Math.max(0,(t-R.at)/6))));
   R.prev=P0;R.P=P0;return P0}
  /* 姿勢から絵へ。やられ中は赤くする（仮。T082 で資料集の白と赤の光に） */
  const HURTC='#ff7b86';
@@ -147,4 +149,4 @@ const HERO=(()=>{
  function fig(w,h,ox,oy,Q,T,k,sword){const k0=S.k,w0=S.w;S.k=k;S.w=W_MIM;const B=new Buf(w,h),q=Object.assign({},PDEF,Q);let J;
   try{J=joints(ox,oy,q);drawCape(B,J,T);drawArm(B,J.shB,J.elB,J.hdB,false);drawLeg(B,J.hpB,J.kneeB,J.footB,false);drawTorso(B,J);drawLeg(B,J.hpF,J.kneeF,J.footF,true);drawHead(B,J,q,T);drawShield(B,J,q.shieldFront);
    if(sword&&q.sw!=null)J.tip=drawBlade(B,J.hdF,q.sw);drawArm(B,J.shF,J.elF,J.hdF,true)}finally{S.k=k0;S.w=w0}return{B,J}}
- return{on:()=>typeof NEWDRAW!=='undefined'&&NEWDRAW,draw,fig}})();
+ return{on:()=>typeof NEWDRAW!=='undefined'&&NEWDRAW,draw,fig,pose}})();/* pose はテスト（tests/newdraw.mjs）が姿勢を見るため */

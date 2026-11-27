@@ -142,4 +142,9 @@ const HERO=(()=>{
   if(A.chase&&A.chase!=='miss'&&t<I&&(G.anim>>1)%2)pxStar(tp.x,tp.y,A.chase==='crit'?4:3,A.chase==='crit'?HSL[0]:HSL[1]);
   if(t>=I-SW&&t<I+3)trail(A,x,y,Math.max(I-SW,t-3),Math.min(t,I+1));
   if(A.chase==='ok'&&t>=I+5&&t<I+12)trail(A,x,y,Math.max(I+5,t-3),Math.min(t,I+9))}
- return{on:()=>typeof NEWDRAW!=='undefined'&&NEWDRAW,draw}})();
+ /* うそつきの影が主人公をまねる（shade.js の shadeMimic＝主人公の形、大きさ k、長い剣21）ときに、主人公の形だけを描いて返す。sword=false で剣なし */
+ const W_MIM={len:21,w:1.1,col:'#d8dce8',hi:'#ffffff',lo:'#7a8098',guard:'#2a1a22',guardHi:'#6a4a50',grip:'#2a1a22',gw:2};
+ function fig(w,h,ox,oy,Q,T,k,sword){const k0=S.k,w0=S.w;S.k=k;S.w=W_MIM;const B=new Buf(w,h),q=Object.assign({},PDEF,Q);let J;
+  try{J=joints(ox,oy,q);drawCape(B,J,T);drawArm(B,J.shB,J.elB,J.hdB,false);drawLeg(B,J.hpB,J.kneeB,J.footB,false);drawTorso(B,J);drawLeg(B,J.hpF,J.kneeF,J.footF,true);drawHead(B,J,q,T);drawShield(B,J,q.shieldFront);
+   if(sword&&q.sw!=null)J.tip=drawBlade(B,J.hdF,q.sw);drawArm(B,J.shF,J.elF,J.hdF,true)}finally{S.k=k0;S.w=w0}return{B,J}}
+ return{on:()=>typeof NEWDRAW!=='undefined'&&NEWDRAW,draw,fig}})();

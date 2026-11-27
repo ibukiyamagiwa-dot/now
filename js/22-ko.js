@@ -54,6 +54,8 @@ function koStep(){
  if(K.parry&&G.t===1)slice();
  if(G.en.kind==='lord'&&G.en.cine)return lordKoStep(K);
  if(K.boss){if((!K.parry&&G.t===1)||G.t===10||G.t===20||G.t===30)boom();if(G.t===42)shatter();if(G.t>=120)win()}
+ else if(RIG.down(G.en)){/* ?new の影：砕かずに、資料集の撃破（倒れて、尾をたどって画面の外へ）。閃光とかけらと残煙は RIG.koFx */const D=RIG.down(G.en),s0=K.parry?12:1;if(G.t===s0)K.down0=s0;const d=G.t-s0;
+  if(d===D.flash){SFX.shatter();shake(P.koShake);text(K.ex,FLOOR-(K.parry?20:46),'撃破！','#e8c46a',true)}if(d>=D.len)win()}
  else{if(G.t===(K.parry?12:1))shatter();if(G.t>=(K.parry?50:50))win()}
 }
 function streakUp(x,y){G.streak++;const n=G.streak;if(G.mode==='run'){G.maxStreak=Math.max(G.maxStreak||0,n);if(n>REC.bestChain){REC.bestChain=n;G.newChain=true;saveRec()}}if(n<2)return;

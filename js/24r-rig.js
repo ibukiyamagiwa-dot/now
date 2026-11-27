@@ -101,7 +101,9 @@ const RIG=(()=>{
     stretch＝後ろのかかとより前を、前へ引きのばす（のびる）／flat＝床へ倒れて平たくなる（0〜1）／rip＝輪郭のゆらぎ／cut＝斬られた筋（すき間）。
     先に影色の絵を作ってから、出力の画素ごとに元の画素を引く（のばしても、すき間ができない）。背中側（上と右）の内側1画素を明るくして、暗い背景に溶けないようにする */
  function shadeDraw(B,ox,oy,S,posture,T,tint){const V=SHV[tint]||SHV.n;
-  const W1=new Buf(B.w,B.h),J=knight(W1,ox,oy,S,posture,T),W2=new Buf(B.w,B.h);knight(W2,ox,oy,S,Object.assign({},posture,{sw:null,sw2:null}),T);
+  /* mimic＝主人公の形（丸い兜・羽根飾り・マント・盾）に入れかわる（shM_bored）。形だけ主人公の骨組み（js/24h-hero.js）から借りる */
+  let W1,J,W2;if((posture.mimic||0)>.5&&typeof HERO!=='undefined'){const a=HERO.fig(B.w,B.h,ox,oy,posture,T,S.k,true);W1=a.B;J=a.J;W2=HERO.fig(B.w,B.h,ox,oy,posture,T,S.k,false).B}
+  else{W1=new Buf(B.w,B.h);J=knight(W1,ox,oy,S,posture,T);W2=new Buf(B.w,B.h);knight(W2,ox,oy,S,Object.assign({},posture,{sw:null,sw2:null}),T)}
   const flat=posture.flat||0,st=posture.stretch||0,rip=Math.max(posture.rip||0,V.rip),ax=J.footB?J.footB[0]:ox,cut=posture.cut||0;
   const X=(x,y)=>{let nx=x<ax?ax-(ax-x)*(1+st):x;if(rip)nx+=Math.round(Math.sin(y*.9+T*.6)*rip);return nx},Y=y=>oy-(oy-y)*(1-flat);
   const tx=Math.round(X(ax,oy-1));for(let x=tx-2;x<B.w;x++){B.set(x,oy-1,V.tail,3);if(V.tailW>1&&(x<tx+30||(x*3+T)%7))B.set(x,oy-2,V.tail,3)}
@@ -149,16 +151,60 @@ const RIG=(()=>{
   return{ua:4.9,fa:5.4,sw:5.8,ua2:.6,fa2:.3,x:(hp.x||0)+4,lean:-.4,hd:-.35,cr:1.5,stretch:-.1,flat:.45,rip:3}}
  /* ブレイク（sh_brk）：床へ倒れて平たい影になり、剣士の形のまま床に伸びる。ときどき輪郭がゆらぐ */
  const SHBRK=t=>Object.assign({},SHBASE,{flat:.86+Math.sin(t*.07)*.02,rip:.6,ua:1.6,fa:1.9,sw:2.5,lean:.15,hd:.4,cr:3});
+ /* ---- 影の出現・ひまなとき・撃破（design/v2/shade.js の sh_enter・shM_enter・sh_bored・shM_bored・sh_down・shM_down。T009） ----
+    キーは基本の姿勢との差。補間は資料集と同じ（行き先のキーの ease、角度もそのまま）。x（横へすべる）は、骨組みの中ではなく画面で動かす（キャンバスからはみ出すので） */
+ const KS=a=>a.map(([t,p,e])=>({t,p,e}));
+ function keyAt(ks,T){let a=ks[0],b=null;for(const k of ks){if(k.t<=T)a=k;if(k.t>=T){b=k;break}}const A=Object.assign({},SHBASE,a.p);if(!b||b===a)return A;
+  const Bp=Object.assign({},SHBASE,b.p),u=EZ[b.e||'io'](cl01((T-a.t)/(b.t-a.t))),o={};for(const k in Bp)o[k]=typeof A[k]==='number'&&typeof Bp[k]==='number'?A[k]+(Bp[k]-A[k])*u:(u<.5?A[k]:Bp[k]);return o}
+ /* 出現：床の影のまますべってきて、一気に立ち上がる（少し背が伸びすぎて収まる）。110F */
+ const SH_ENTER=KS([[0,{x:-30,flat:1}],[40,{x:0,flat:1},'out'],[52,{x:0,flat:-.08},'out'],[58,{flat:.04}],[62,{flat:0}],[110,{}]]),SH_ENTER_LEN=110;
+ const shEnter=T=>{const o=keyAt(SH_ENTER,T);if(T>=40&&T<58)o.rip=1.2;return o};
+ /* ひまなとき：影の剣士は首だけ後ろへ向けて尾の先（持ち主のほう）を見る（160F）。うそつきの影は主人公の形に入れかわって同じ構えで息をする（180F）。光らない */
+ const SH_BORED=KS([[0,{}],[30,{}],[44,{hd:-.35,lean:-.15,sw:3.2},'io'],[96,{hd:-.35,lean:-.15,sw:3.2}],[110,{},'io'],[160,{}]]);
+ const SHM_MIM={ua:2.2,fa:2.0,sw:-2.3,lean:.05,cr:1},SHM_BORED=KS([[0,{}],[40,{}],[48,SHM_MIM,'io'],[130,SHM_MIM],[140,{},'io'],[180,{}]]);
+ function shBored(e,T){if(e.key!=='shadeM'){const o=keyAt(SH_BORED,T);o.rip=(T%90<10)?.6:0;return o}
+  const o=keyAt(SHM_BORED,T);o.mimic=T>=46&&T<132?1:0;if(T>=44&&T<50||T>=128&&T<134)o.rip=2;return o}
+ /* 撃破：輪郭が大きくゆらいで床に倒れ、平たい影になって、尾をたどって画面の外へ引きずられる。資料集の130Fを【撃破の長さ】へ縮める（ko2.js の koCore） */
+ const SH_DOWN=KS([[0,{}],[6,{lean:-.3,hd:-.3,rip:3},'out'],[20,{flat:1,rip:1},'in'],[36,{flat:1}],[110,{flat:1,x:70},'in'],[130,{flat:1,x:70}]]),SH_DOWN_SRC=130;
+ const downLen=e=>e.mid?P.koLenMid:P.koLenMob;
+ function shDown(e,d){const T=Math.round(Math.max(0,d)*SH_DOWN_SRC/downLen(e)),o=keyAt(SH_DOWN,T);if(T<20)o.rip=2.5*(1-T/20);return o}
+ /* 撃破の芯（全員共通、mobs.js の flashCore・ko2.js の koBurst）：閃光（白に黒のふち→黒紫の暗い衝撃の輪）、影のしぶきのかけら、残煙。画面に直接描く */
+ const FLSPK=[[-.35,1.0],[.45,.62],[1.25,.85],[1.95,.5],[2.55,1.1],[3.35,.7],[4.3,.9],[5.1,.55]];
+ const hs=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
+ function vn2(x){const i=Math.floor(x),f=x-i,h=n=>{const s=Math.sin(n*127.1)*43758.5;return s-Math.floor(s)};return h(i)+(h(i+1)-h(i))*f*f*(3-2*f)}
+ const KOSH={frag:['#0e0a14','#1c1626','#3a3048','#120e18'],smoke:['#1c1626','#2e2638']};/* 影のしぶき */
+ function flashCore(c,d,k){if(d<-1||d>=7)return;const put=(x,y,col)=>{if(col)px(Math.round(c[0]+x),Math.round(c[1]+y),col)},Wc='#ffffff',D='#000000';
+  if(d===-1){for(let y=-7;y<=7;y++)for(let x=-7;x<=7;x++){const q=Math.hypot(x,y*1.2);if(q<=4*k)put(x,y,Wc);else if(q<=6*k&&(x+y)&1)put(x,y,D)}return}
+  if(d<=1){const R=(d?13:10)*k;for(let y=-R;y<=R;y++)for(let x=-R;x<=R;x++){const q=Math.hypot(x,y*1.25);if(q<=R-1.5)put(x,y,Wc);else if(q<=R+.5)put(x,y,(x+y)&1?D:Wc)}
+   for(const[a,l]of FLSPK){const L=(18+l*20)*k*(d?1.25:1),w0=(d?2:3)*k;for(let r=R-2;r<L;r+=.5){const w=Math.max(.5,w0*(1-(r-R)/(L-R)));const x=Math.cos(a)*r,y=Math.sin(a)*r*.8,nx=-Math.sin(a),ny=Math.cos(a);for(let o=-w-1;o<=w+1;o+=.5){const col=Math.abs(o)>w?D:Wc;if(col===D&&r>L-3)continue;put(Math.round(x+nx*o),Math.round(y+ny*o*.8),col)}}}
+   for(let x=-46*k;x<=34*k;x++){if(Math.abs(x)<R)continue;put(x,0,Math.abs(x)>(x<0?40:28)*k?((x&1)?Wc:null):Wc);if(Math.abs(x)<(x<0?30:20)*k)put(x,1,D)}return}
+  const u=d-2,R=(15+u*4)*k;
+  for(const[a,l]of FLSPK){const L=(18+l*20)*k*1.3;for(let r=R*.6;r<L*(1+u*.15);r+=3+u){if(hs(Math.round(r),Math.round(a*10)+d)<.35+u*.12)continue;put(Math.round(Math.cos(a)*r),Math.round(Math.sin(a)*r*.8),u<2?'#d8d0e0':'#43365a')}}
+  for(let t=0;t<Math.PI*2;t+=.6/R){if(vn2(t*3+d*.7)>.62)continue;for(let w=0;w<(u<2?3:2);w++){const r=R-w;put(Math.round(Math.cos(t)*r),Math.round(Math.sin(t)*r*.75),w===0?((Math.round(t*20))&1?D:'#3e2e54'):u<1?'#d8d0e0':'#2c2238')}}}
+ function koBurst(c,d,n,k,mid,m){const FL=FLOOR;flashCore(c,d,k);
+  for(let i=0;i<n;i++){const a=-Math.PI*(.08+.84*hs(i,1)),v=(1.4+hs(i,2)*2.6)*k,s=hs(i,3)>.45?3:2,tl=d-1;if(tl<0)continue;let x=c[0]+Math.cos(a)*v*tl,y=c[1]+Math.sin(a)*v*tl+.11*tl*tl;const land=y>=FL;if(land){y=FL;x=c[0]+Math.cos(a)*v*Math.min(tl,(Math.sqrt(Math.max(0,(Math.sin(a)*v)**2+.44*(FL-c[1])))-Math.sin(a)*v)/.22)}
+   const life=34+hs(i,4)*14;if(d<1||tl>life)continue;const fade=land?Math.max(0,1-(tl-life*.55)/(life*.45)):1;if(fade<=0||(land&&hs(i,tl)>fade))continue;
+   for(let yy=0;yy<s;yy++)for(let xx=0;xx<s+(land?1:0);xx++)px(Math.round(x+xx),Math.round(y-yy),(yy===s-1||xx===0)&&!land?m.frag[2]:land?m.frag[3]:(i+xx)%2?m.frag[0]:m.frag[1])}
+  if(d>=4&&d<44)for(let i=0;i<(mid?7:5);i++){const u=(d-4)/40,x=c[0]+(hs(i,5)-.5)*16*k+Math.sin(d*.15+i)*2,y=c[1]-u*18*k-hs(i,6)*4,r=(1.5+u*3)*k;for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++){if(xx*xx+yy*yy>r*r)continue;if(hs(Math.round(x+xx),Math.round(y+yy)+d)<.5-u*.45)px(Math.round(x+xx),Math.round(y+yy),(xx+yy)&1?m.smoke[0]:m.smoke[1])}}}
+ /* 撃破の閃光は倒れはじめの10F後（ko2.js の影の F＝[10,16]）、高さは床から16画素（中ボスは1.25倍） */
+ const SH_FLASH=10,SH_FLASH_Y=16;
+ const downOf=e=>on(e)&&e.kind==='shade'?{len:downLen(e),flash:SH_FLASH}:null;
+ function koFx(e){if(!G.ko||G.ko.down0==null||!downOf(e))return;const d=G.t-G.ko.down0,k=e.mid?1.25:1;koBurst([G.ko.ex,FLOOR-SH_FLASH_Y*k],d-SH_FLASH,e.mid?P.koFragMid:P.koFragMob,k,!!e.mid,KOSH)}
  /* 影の姿勢を1フレームに1回進める（門番の pose と同じ組み立て。撃破は T009 まで、倒れる前の姿勢のまま） */
  function shState(e){const R=st(e),t=G.anim;if(R.memo===t&&R.posture)return R.posture;R.memo=t;
   let key,T;
-  if(G.ko){key='ko';T=R.prev||SH_IDLE(t)}
+  if(G.ko){key='ko';T=G.ko.down0!=null?shDown(e,G.t-G.ko.down0):(R.prev||SH_IDLE(t))}
+  else if(G.state==='enter'&&G.enter&&G.enter.rig){key='enter';T=shEnter(G.enter.t)}
   else if(e.broken){key='brk';T=SHBRK(t)}
   else if(G.state==='enemy'&&G.strikes&&G.strikes.length){key='atk';T=shAtkAt(e,G.et)}
+  else if(G.bored&&G.state==='cmd'&&e===G.en){key='bored';T=shBored(e,t-G.bored.at)}
   else{key='idle';T=SH_IDLE(t)}
   if(key!==R.key){const old=R.key;R.key=key;R.from=R.prev;R.at=t;
    if(key==='brk'){R.dur=16;R.ez='s'}else if(old==='brk'){R.dur=5;R.ez='back'}else if(key==='idle'){R.dur=20;R.ez='io'}else{R.dur=6;R.ez='io'}}
-  let posture=T;if(R.from&&t-R.at<R.dur&&key!=='ko'){const u=ease[R.ez](cl01((t-R.at)/R.dur));posture=mixP(R.from,T,u)}
+  let posture=T;if(R.from&&t-R.at<R.dur&&key!=='ko'&&key!=='enter'){const u=ease[R.ez](cl01((t-R.at)/R.dur));posture=mixP(R.from,T,u)}
+  /* 出現と撃破は資料集のキーのまま（弾かれ・斬られを重ねない）。横へすべる分は画面で動かす */
+  if(key==='enter'||(key==='ko'&&G.ko.down0!=null)){R.sdx=(posture.x||0)*SHADE.k*(e.sc||1);posture=Object.assign({},posture,{x:0});R.prev=posture;R.posture=posture;return posture}
+  R.sdx=0;
   if(G.state==='enemy'&&G.strikes){const ss=G.strikes.filter(isMain),last=ss[ss.length-1];for(const s of ss){if(s.done&&s.res==='parry'&&!R.seen.has(s)){R.seen.add(s);const kind=s===last?'b':'s';R.rx.push({at:t-Math.max(0,G.et-s.impact),kind,T:shPry(kind,shAtkAt(e,s.impact))})}}}
   R.rx=R.rx.filter(r=>t-r.at<STOP+60);
   for(const r of R.rx){const w=pryW(r,t-r.at);if(w>0)posture=mixP(posture,r.T,w)}
@@ -286,5 +332,6 @@ const RIG=(()=>{
  /* own：パリィされ・やられまで骨組みで出す敵（ゲームの押し下がりを重ねない）。act：技の動きを骨組みで出す敵（ゲームの予備動作の伸び縮みを重ねない） */
  /* 影ののびる斬りの当たり（SHS）で、剣先が足元のまん中からどれだけ前に出るか（画素、前が負）。ゲームの寄せ（lungeDist）を、剣先が主人公に届く長さにするのに使う */
  const RCH={};function reach(e){const k=e.key==='shadeM'?'M':'n';if(RCH[k]==null){const B=new Buf(W,H),J=shadeDraw(B,OX,H,k==='M'?SHADE_M:SHADE,Object.assign({},SHBASE,SHS),0,null);RCH[k]=J.tip[0]-OX}return RCH[k]}
- const bored=e=>on(e)&&e.key==='samuraiB'?{len:BORED_LEN,taps:BORED_TAPS}:null;
- return{on,reach,bored,own:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),act:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),img:render,tip,brkStars,tail}})();
+ const bored=e=>!on(e)?null:e.key==='samuraiB'?{len:BORED_LEN,taps:BORED_TAPS}:e.kind==='shade'?{len:e.key==='shadeM'?180:160,taps:[]}:null;
+ const enter=e=>on(e)&&e.kind==='shade'?SH_ENTER_LEN:0,dx=e=>on(e)&&e.kind==='shade'?Math.round(st(e).sdx||0):0;
+ return{on,reach,bored,enter,dx,down:downOf,koFx,own:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),act:e=>on(e)&&(e.key==='samuraiB'||e.kind==='shade'),img:render,tip,brkStars,tail}})();

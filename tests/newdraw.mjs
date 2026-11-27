@@ -59,6 +59,14 @@ async function run(q) {
   const bored = await page.evaluate(() => { const T = window.__T; T.fresh(); const F = Math.round(P.boredS * 60); let at = -1, len = 0, starts = 0, strikes = 0, was = false;
     for (let i = 0; i < F + 900; i++) { tick(); if (G.bored && !was) { starts++; if (at < 0) { at = G.t; len = G.bored.len } } was = !!G.bored; strikes += (G.strikes || []).length + G.rings.length; if (G.state !== 'cmd') break }
     return { has: !!RIG.bored(G.en), at, F, len, starts, strikes, state: G.state, after: !!G.bored } });
+  // 影の出現・ひまなとき・撃破（T009）：?new では、出現は資料集の長さで終わってあなたの番に、ひまなときは影ごとの長さ、撃破は砕かずに【撃破の長さ】で勝ちへ
+  const shade = await page.evaluate(() => { const r = {};
+    for (const key of ['shade', 'shadeM']) { closeMenu && closeMenu(); startPractice(key); G.card = null; G.cards = []; const o = r[key] = { enter: G.state === 'enter' ? G.enter.rig : 0 };
+      let n = 0; while (G.state === 'enter' && n < 400) { tick(); n++ } o.enterTicks = n; o.afterEnter = G.state;
+      const b = RIG.bored(G.en); o.bored = b ? b.len : 0;
+      G.en.hp = 0; ko(false); n = 0; let shattered = false; while (G.state === 'ko' && n < 600) { tick(); n++; if (G.ko && G.ko.shattered) shattered = true }
+      o.down = G.ko ? G.ko.down0 : null; o.koTicks = n; o.afterKo = G.state; o.shattered = shattered; o.len = G.en.mid ? P.koLenMid : P.koLenMob }
+    return r });
   // 自動で戦わせて、例外が出ないかを見る（パリィとガードをまぜる）
   const auto = await page.evaluate(() => { const T = window.__T; T.fresh(); let turns = 0;
     for (let k = 0; k < 40; k++) { startEnemy(); turns++; for (let i = 0; i < 300 && G.state === 'enemy'; i++) { const s = G.strikes.find(s => !s.done && G.et === s.impact - (k % 3 ? 2 : 12)); if (s) press(); tick() } G.state = 'cmd'; G.en.broken = k % 5 === 4 ? 1 : 0; T.step(20) }
@@ -68,11 +76,13 @@ async function run(q) {
     return { turns, used, ms };
   });
   await page.close();
-  return { errors, info, auto, shots, bored };
+  return { errors, info, auto, shots, bored, shade };
 }
 const oldR = await run(''), newR = await run('?new');
 await browser.close(); srv.close();
 const B = newR.bored, boredOk = B.has && B.at === B.F && B.starts === 1 && !B.strikes && B.state === 'cmd' && !B.after && !oldR.bored.has && oldR.bored.starts === 0;
-const ok = !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
-console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B }, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
+const SN = newR.shade, SO = oldR.shade, shadeOk = ['shade', 'shadeM'].every(k => SN[k].enter === 110 && SN[k].enterTicks === 110 && SN[k].afterEnter === 'cmd' && SN[k].bored === (k === 'shadeM' ? 180 : 160)
+  && SN[k].down === 1 && !SN[k].shattered && SN[k].afterKo === 'win' && SO[k].enter === 0 && SO[k].bored === 0 && SO[k].down == null && SO[k].shattered);
+const ok = shadeOk && !oldR.errors.length && !newR.errors.length && newR.auto.used && !oldR.auto.used && newR.auto.ms < 4 && boredOk;
+console.log(JSON.stringify({ ok, old: { errors: oldR.errors, used: oldR.auto.used }, new: { errors: newR.errors, used: newR.auto.used, msPerFrame: newR.auto.ms && +newR.auto.ms.toFixed(3), bored: B, shade: shadeOk ? 'OK' : SN }, oldShade: shadeOk ? 'OK' : SO, timing: newR.info.hit2 && newR.info.hit2.strikes }, null, 1));
 process.exit(ok ? 0 : 1);

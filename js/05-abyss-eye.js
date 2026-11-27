@@ -74,7 +74,10 @@ function bintroStep(){const t=++G.t;if(t===1)G.banner=null;
  if(t===66){G.banner={s:G.binName||G.en.name,t:0};SFX.rage();shake(P.shake*.5)}
  if(t>=120){G.state='cmd';G.t=0;if(G.binCs&&G.binCs.length){showCards(G.binCs);G.binCs=null}}}
 /* 登場：暗闇から足音、門の前で×に構え、名乗る */
-function enterStep(){const E=G.enter,t=++E.t;const w=Math.min(1,Math.max(0,(t-16)/64)),ea=1-(1-w)*(1-w);E.dx=E.rise?0:Math.round(120*(1-ea));
+function enterStep(){const E=G.enter,t=++E.t;
+ /* ?new の影の出現（RIG.enter の長さ）：骨組みが床からすべってきて立ち上がる。暗転・足音・名乗りはない */
+ if(E.rig){if(t>=E.rig){G.state='cmd';G.t=0;G.enter=null;if(E.cs&&E.cs.length)showCards(E.cs)}return}
+const w=Math.min(1,Math.max(0,(t-16)/64)),ea=1-(1-w)*(1-w);E.dx=E.rise?0:Math.round(120*(1-ea));
  if(E.rise&&t<96&&t%3===0)G.pts.push({x:EX+(Math.random()-.5)*20,y:FLOOR-2-Math.random()*30,vx:(Math.random()-.5)*.4,vy:-.5-Math.random()*.7,t:0,life:36,col:Math.random()<.3?'#c89aff':'#4a2260',sz:Math.random()<.3?2:1,drag:.98,g:-.01});
  if(t<84)E.f=(t>>4)%2?'idle2':'idle';
  if(!E.rise&&(t===24||t===40||t===56||t===72)){SFX.thud(0);shake(P.shake*.5);for(let i=0;i<5;i++)G.pts.push({x:EX+E.dx-6+Math.random()*12,y:FLOOR,vx:(Math.random()-.5)*.8,vy:-.3-Math.random()*.4,t:0,life:18,col:'#4a4058',sz:1,drag:.95,g:0})}

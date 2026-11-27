@@ -76,7 +76,7 @@ function press(){
  if(G.state==='ko'){if(G.t>30&&G.stop<=0)skipKo();else nudge();return}
  if(G.state==='roar'){if(G.rh>0){if(G.rh<ROAR_HOLD-24)G.rh=0;else nudge();return}if(G.en&&G.en.kind==='lord'&&G.t>8)skipRoar();else nudge();return}
  if(G.state==='bintro'){if(G.t>8&&G.t<66)G.t=65;else if(G.t>=70)G.t=119;else nudge();return}
- if(G.state==='enter'){if(G.enter&&G.enter.t>30&&G.enter.t<140){G.enter.t=140;G.enter.dx=0;G.enter.f='guard';if(!G.banner)G.banner={s:G.en.name,t:0}}else nudge();return}
+ if(G.state==='enter'){if(G.enter&&G.enter.rig){if(G.enter.t>30)G.enter.t=G.enter.rig;else nudge();return}if(G.enter&&G.enter.t>30&&G.enter.t<140){G.enter.t=140;G.enter.dx=0;G.enter.f='guard';if(!G.banner)G.banner={s:G.en.name,t:0}}else nudge();return}
  if(G.state==='cmd'){if(G.t>=10)cmd(G.sel);else{G.buf=G.sel;nudge()}return}
  if(G.state==='hero'){const a=G.act;if(a&&a.n===1&&a.d&&a.t<a.d){nudge();return}if(a&&a.n===1&&!a.chase&&has('chase')){const r=a.I-a.t;
   if(r>P.chaseF||(r<-P.lateF&&r>=-14)){const early=r>0;tutOn('miss');a.chase='miss';a.early=early;G.stats.miss++;syncStats();lose(P.mkMiss);SFX.miss();text(heroX(),FLOOR-34,early?'はやい！':'おそい！','#ff9a9a');if(!early)pose('early',12)}

@@ -285,9 +285,9 @@ function drawEnemy(){
  const v=white||hitWhite(e)?'w':e.broken?'b':'n',pal=enemyPal(e,v),img=eSpr(e,v),w=img.width,h=img.height;
  const idle=(G.state!=='enemy'?(G.anim>>4)%2:0)+(e.fly?e.fly+Math.round(Math.sin(G.anim*.12)*2):0);
  const vb=enemyVib(e)+hurtDx(e);
- const AN=G.ko?null:anticip(e);const x=(G.state==='enter'&&G.enter?G.enter.dx:0)+(AN?AN.dx:0)+(G.ko?G.ko.ex:e.kind==='boar'?boarX():Math.round(ENX(e)+p.lean*5-p.lunge*lungeDist(e)-p.twitch*6+Math.round(G.knock)))+vb,y=FLOOR;
+ const AN=G.ko?null:anticip(e);const x=RIG.dx(e)+(G.state==='enter'&&G.enter?G.enter.dx:0)+(AN?AN.dx:0)+(G.ko?G.ko.ex:e.kind==='boar'?boarX():Math.round(ENX(e)+p.lean*5-p.lunge*lungeDist(e)-p.twitch*6+Math.round(G.knock)))+vb,y=FLOOR;
  const SC=e.sc||1,PX=e.kind==='ghost'&&!G.ko?(ghostAlpha().x??x):x;if(e.kind!=='ghost'||(ghostAlpha().a||0)>.2)shadowPx(PX,e.shw||((w*SC)>>1));if(SC>1){l.save();l.translate(PX,y);l.scale(SC,SC);l.translate(-PX,-y)}
- if(G.ko&&G.ko.sliced){
+ if(G.ko&&G.ko.sliced&&!RIG.down(e)){
   const x0=x-(w>>1),y0=y-h,g=sliceGeo(w,h,x0,y0),o=sliceOff();
   l.save();l.beginPath();l.moveTo(g.ax,g.ay);l.lineTo(g.bx,g.by);l.lineTo(g.bx,y0-60);l.lineTo(g.ax,y0-60);l.closePath();l.clip();l.drawImage(img,x0+o.ux,y0+o.uy);l.restore();
   l.save();l.beginPath();l.moveTo(g.ax,g.ay);l.lineTo(g.bx,g.by);l.lineTo(g.bx,y+20);l.lineTo(g.ax,y+20);l.closePath();l.clip();l.drawImage(img,x0+o.lx,y0+o.ly);l.restore();
@@ -623,8 +623,8 @@ function draw(){
  if(G.state==='ko'&&G.stop>0){l.fillStyle='rgba(8,2,6,.6)';l.fillRect(0,0,LW,LH)}
  const IA=(G.iai||G.xs)&&G.stop>0&&G.state!=='ko'&&!G.uk;if(IA){l.fillStyle='rgba(4,2,12,.7)';l.fillRect(0,0,LW,LH)}
  if(G.uk){const t=G.uk.t;l.fillStyle=`rgba(3,1,8,${t<UK.CUT?.86:t<UK.HIT?.72:t<UK.END-6?.5:.25})`;l.fillRect(0,0,LW,LH)}
- drawHole();seeThru(dbg.foeSee,()=>floorClip(()=>{drawEnemy();drawLordKo()}));drawSlamShadow();seeThru(dbg.heroSee,drawHero);if(!dbg.fxOff){drawFX();drawIai();drawUK();drawXSlash();drawWhis();drawRally();drawUKV()}
- if(G.state==='enter'&&G.enter&&G.enter.t<70){l.fillStyle=`rgba(0,0,0,${Math.max(0,.92-G.enter.t/70*.92).toFixed(3)})`;l.fillRect(0,0,LW,LH)}
+ drawHole();seeThru(dbg.foeSee,()=>floorClip(()=>{drawEnemy();drawLordKo()}));drawSlamShadow();seeThru(dbg.heroSee,drawHero);if(!dbg.fxOff){if(G.ko)RIG.koFx(G.en);/* 撃破の芯は敵の拡大（うそつきの影の1.25倍）の外で、光と粒として描く */drawFX();drawIai();drawUK();drawXSlash();drawWhis();drawRally();drawUKV()}
+ if(G.state==='enter'&&G.enter&&!G.enter.rig&&G.enter.t<70){l.fillStyle=`rgba(0,0,0,${Math.max(0,.92-G.enter.t/70*.92).toFixed(3)})`;l.fillRect(0,0,LW,LH)}
  const KC=G.state==='ko'&&G.t<=koZoomEnd()?G.ko.cam:IA?{z:S*1.4,fx:(HX+EX)/2,fy:FLOOR-30}:null,z=KC?KC.z:S,w=960/z,h=540/z;
  const x0=KC?Math.max(0,Math.min(LW-w,Math.round(KC.fx-w/2))):0,y0=KC?Math.max(0,Math.min(LH-h,Math.round(KC.fy-h/2))):0;
  const cz=z===S?{x0:0,y0:0,z}:{x0,y0,z};G.cam=cz;
